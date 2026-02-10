@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pendataan Barang</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+<body class="flex flex-col min-h-screen">
+
+    <div class="bg-white">
+        <!-- Mobile menu -->
+
+        <header class="relative h-10 bg-indigo-600">
+            <div
+                class="flex h-10 items-center justify-center bg-indigo-600 px-4 text-sm font-medium text-white sm:px-6 lg:px-8">
+                <p class="text-white">SELAMAT DATANG DI WEBSITE PENDATAAN BARANG</p>
+            </div>
+
+            <nav aria-label="Top" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="border-b border-gray-200">
+                    <div class="flex h-16 items-center">
+
+                        <!-- Logo -->
+                        <div class="ml-4 flex lg:ml-0">
+                            <a href="#">
+                                <span class="sr-only">Your Company</span>
+                                <img src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
+                                    alt="" class="h-8 w-auto" />
+                            </a>
+                        </div>
+
+                        <!-- Flyout menus -->
+                        <el-popover-group class="group/popover-group hidden lg:ml-8 lg:block lg:self-stretch">
+                            <div class="flex h-full space-x-8">
+                                <div class="group/popover flex">
+                                    <div class="relative flex">
+                                        <button popovertarget="desktop-menu-women"
+                                            class="relative flex items-center justify-center text-sm font-medium transition-colors duration-200 ease-out group-not-has-open/popover:text-gray-700 group-has-open/popover:text-indigo-600 group-not-has-open/popover:hover:text-gray-800">
+                                            HOME
+                                            <span aria-hidden="true"
+                                                class="absolute inset-x-0 -bottom-px z-30 h-0.5 bg-transparent duration-200 ease-in group-has-open/popover:bg-indigo-600 group-has-open/popover-group:duration-150 group-has-open/popover-group:ease-out"></span>
+                                        </button>
+                                    </div>
+
+                                </div>
+                                <div class="group/popover flex">
+                                    <div class="relative flex">
+                                        <button popovertarget="desktop-menu-men"
+                                            class="relative flex items-center justify-center text-sm font-medium transition-colors duration-200 ease-out group-not-has-open/popover:text-gray-700 group-has-open/popover:text-indigo-600 group-not-has-open/popover:hover:text-gray-800">
+                                            CONTACT US
+                                            <span aria-hidden="true"
+                                                class="absolute inset-x-0 -bottom-px z-30 h-0.5 bg-transparent duration-200 ease-in group-has-open/popover:bg-indigo-600 group-has-open/popover-group:duration-150 group-has-open/popover-group:ease-out"></span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </el-popover-group>
+
+                        <div class="ml-auto flex items-center">
+                            <div class="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
+                                <a href="views/login.ejs "
+                                    class="text-sm font-medium text-gray-700 hover:text-gray-800">Sign
+                                    in</a>
+                                <span aria-hidden="true" class="h-6 w-px bg-gray-200"></span>
+                                <a href="#" class="text-sm font-medium text-gray-700 hover:text-gray-800">Create
+                                    account</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+    </div>
+
+
+</body>
+
+</html>

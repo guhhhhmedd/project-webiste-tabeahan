@@ -1,0 +1,75 @@
+.m-bg {
+  background: linear-gradient(
+    #055af7 30%,
+    #0e4cbe 20%,
+    #163e88 20%,
+    #055af7 20%,
+    #00a86b 30%
+  );
+}
+
+.pixel-box {
+  border: 4px solid #000;
+  box-shadow:
+    4px 0 #000,
+    0 4px #000,
+    4px 4px #000;
+}
+
+.pixel-input {
+  background: #1f2937;
+  border: 4px solid #000;
+  color: white;
+  padding: 10px;
+  width: 100%;
+}
+
+.pixel-btn {
+  background: #e52521;
+  border: 4px solid #000;
+  box-shadow: inset -4px -4px #b91c1c;
+  transition: transform 0.1s;
+}
+
+.pixel-btn:hover {
+  transform: translateY(2px);
+  box-shadow: inset -2px -2px #b91c1c;
+}
+
+.shooting-star {
+  position: absolute;
+  width: 120px;
+  height: 2px;
+  background: linear-gradient(90deg, white, transparent);
+  opacity: 0;
+  transform: rotate(-45deg);
+  animation: shoot 3s linear infinite;
+}
+
+.delay-1 {
+  animation-delay: 1s;
+}
+
+.delay-2 {
+  animation-delay: 2s;
+}
+
+.delay-3 {
+  animation-delay: 3s;
+}
+
+@keyframes shoot {
+  0% {
+    transform: translateX(0) translateY(0) rotate(-45deg);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(-600px) translateY(600px) rotate(-45deg);
+    opacity: 0;
+  }
+}

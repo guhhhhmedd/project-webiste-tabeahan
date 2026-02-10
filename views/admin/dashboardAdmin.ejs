@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Tabeahan Cendekia</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+<body class="bg-slate-100 font-sans">
+    <nav class="bg-[#0f172a] p-4 text-white flex justify-between shadow-lg sticky top-0 z-50">
+        <div class="flex items-center gap-2">
+            <span class="bg-yellow-600 text-[10px] px-2 py-0.5 rounded font-bold uppercase">Administrator</span>
+            <span class="font-bold tracking-wider text-sm md:text-base">TABEAHAN CENDEKIA</span>
+        </div>
+        <a href="/logout" class="bg-red-600 hover:bg-red-700 px-4 py-1 rounded text-xs font-bold transition">Logout</a>
+    </nav>
+
+    <div class="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <div class="lg:col-span-4 space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex items-center gap-2 mb-4 border-b pb-2">
+                    <span class="text-xl">📝</span>
+                    <h3 class="text-lg font-bold text-slate-800">Tambah Soal CAT</h3>
+                </div>
+                <form action="/admin/tambah-soal" method="POST" class="space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 uppercase">Kategori Materi</label>
+                        <select name="materi"
+                            class="w-full border border-slate-300 p-2.5 rounded-lg bg-slate-50 mt-1 focus:ring-2 focus:ring-blue-500 outline-none"
+                            required>
+                            <option value="TWK">Tes Wawasan Kebangsaan (TWK)</option>
+                            <option value="TIU">Tes Intelejensia Umum (TIU)</option>
+                            <option value="TKP">Tes Karakteristik Pribadi (TKP)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 uppercase">Pertanyaan</label>
+                        <textarea name="soal" placeholder="Tulis soal di sini..."
+                            class="w-full border border-slate-300 p-2.5 rounded-lg h-28 mt-1 focus:ring-2 focus:ring-blue-500 outline-none"
+                            required></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-3">
+                        <input type="text" name="a" placeholder="Opsi A"
+                            class="border border-slate-300 p-2 rounded-lg text-sm" required>
+                        <input type="text" name="b" placeholder="Opsi B"
+                            class="border border-slate-300 p-2 rounded-lg text-sm" required>
+                        <input type="text" name="c" placeholder="Opsi C"
+                            class="border border-slate-300 p-2 rounded-lg text-sm" required>
+                        <input type="text" name="d" placeholder="Opsi D"
+                            class="border border-slate-300 p-2 rounded-lg text-sm" required>
+                        <input type="text" name="e" placeholder="Opsi E"
+                            class="border border-slate-300 p-2 rounded-lg text-sm" required>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 uppercase">Kunci Jawaban</label>
+                        <select name="kunci"
+                            class="w-full border-2 border-yellow-400 p-2.5 rounded-lg bg-yellow-50 font-bold mt-1"
+                            required>
+                            <option value="" disabled selected>-- Pilih Kunci --</option>
+                            <option value="a">Opsi A</option>
+                            <option value="b">Opsi B</option>
+                            <option value="c">Opsi C</option>
+                            <option value="d">Opsi D</option>
+                            <option value="e">Opsi E</option>
+                        </select>
+                    </div>
+
+                    <button
+                        class="w-full bg-[#0f172a] text-white py-3 rounded-xl font-bold hover:bg-black transition shadow-lg active:scale-95">
+                        SIMPAN DATA SOAL
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="lg:col-span-8">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <span class="text-xl">👥</span> Verifikasi Peserta Ujian
+                    </h3>
+                    <span class="text-xs text-slate-400 font-mono">Total: <%= users.length %> Peserta</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-600 uppercase text-[11px] tracking-widest">
+                                <th class="px-6 py-4">Nama Peserta</th>
+                                <th class="px-6 py-4">Bukti Bayar</th>
+                                <th class="px-6 py-4">Status</th>
+                                <th class="px-6 py-4">Token</th>
+                                <th class="px-4 py-4 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <% users.forEach(u=> { %>
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="px-6 py-4">
+                                        <p class="font-bold text-slate-800">
+                                            <%= u.username %>
+                                        </p>
+                                        <p class="text-[10px] text-slate-400">
+                                            <%= u.email %>
+                                        </p>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <% if(u.bukti_transfer) { %>
+                                            <a href="/uploads/bukti/<%= u.bukti_transfer %>" target="_blank"
+                                                class="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold underline decoration-dotted">
+                                                <span>👁️ Lihat Bukti</span>
+                                            </a>
+                                            <% } else { %>
+                                                <span
+                                                    class="text-slate-300 italic text-xs underline decoration-dotted">Belum
+                                                    Upload</span>
+                                                <% } %>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase
+                                        <%= u.status === 'LUNAS' ? 'bg-green-100 text-green-700' : 
+                                           u.status === 'PENDING' ? 'bg-orange-100 text-orange-600 animate-pulse' : 
+                                           'bg-slate-100 text-slate-500' %>">
+                                            <%= u.status %>
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <code class="bg-slate-100 px-2 py-1 rounded text-blue-700 font-bold">
+                                        <%= u.token_ujian || '------' %>
+                                    </code>
+                                    </td>
+                                    <td class="px-4 py-4 text-center">
+                                        <% if(u.status==='PENDING' ) { %>
+                                            <div class="flex flex-col gap-2">
+                                                <a href="/admin/verify/<%= u.id %>"
+                                                    onclick="return confirm('Terima pembayaran ini?')"
+                                                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-sm transition">
+                                                    VERIFIKASI
+                                                </a>
+
+                                                <a href="/admin/reject/<%= u.id %>"
+                                                    onclick="return confirm('Tolak pembayaran ini? Peserta harus upload ulang bukti transfer.')"
+                                                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-sm transition">
+                                                    TOLAK
+                                                </a>
+                                            </div>
+                                            <% } else if(u.status==='LUNAS' ) { %>
+                                                <span
+                                                    class="text-green-500 font-bold text-xs flex items-center justify-center gap-1">
+                                                     Sukses
+                                                </span>
+                                                <% } else if(u.status==='DITOLAK' ) { %>
+                                                    <span
+                                                        class="text-red-500 font-bold text-[10px] flex items-center justify-center gap-1 uppercase">
+                                                         Ditolak
+                                                    </span>
+                                                    <% } else { %>
+                                                        <span class="text-slate-300 text-xs italic">Menunggu...</span>
+                                                        <% } %>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <% if (users.length===0) { %>
+                    <div class="p-10 text-center text-slate-400 italic">
+                        Belum ada peserta yang mendaftar.
+                    </div>
+                    <% } %>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
