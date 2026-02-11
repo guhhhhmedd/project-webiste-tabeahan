@@ -1,159 +1,174 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <title>Ujian CAT</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .hidden { display: none; }
-        .nav-item.answered { background-color: #b8924a; color: white; border-color: #b8924a; }
-        .nav-item.active { border: 2px solid #4a3721; font-weight: bold; color: #4a3721; }
+        .hidden {
+            display: none;
+        }
+
+        .nav-item.answered {
+            background-color: #b8924a;
+            color: white;
+            border-color: #b8924a;
+        }
+
+        .nav-item.active {
+            border: 2px solid #4a3721;
+            font-weight: bold;
+            color: #4a3721;
+        }
     </style>
 </head>
+
 <body class="bg-slate-100 p-4 md:p-8">
-    <div id="exam-data" 
-         data-total="<%= soal.length %>" 
-         data-start="<%= waktuMulai %>"
-         class="hidden"></div>
+    <div id="exam-data" data-total="<%= soal.length %>" data-start="<%= waktuMulai %>" class="hidden"></div>
 
     <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div class="lg:col-span-3 bg-white p-6 rounded-xl shadow">
             <div class="flex justify-between border-b pb-4 mb-6">
                 <h2 id="timer" class="text-2xl font-mono font-bold text-red-600">00:00:00</h2>
-                <span class="font-bold text-slate-700 uppercase"><%= user.username %></span>
+                <span class="font-bold text-slate-700 uppercase">
+                    <%= user.username %>
+                </span>
             </div>
 
             <div id="soal-container">
-                <% soal.forEach((s, index) => { %>
-                <div id="box-<%= index %>" class="soal-box hidden">
-                    <p class="text-sm text-slate-400 mb-2 uppercase">Soal Ke-<%= index + 1 %> | <%= s.materi %></p>
-                    <p class="text-lg font-medium mb-6"><%= s.soal %></p>
-                    <div class="space-y-3">
-                        <% ['a','b','c','d','e'].forEach(opt => { %>
-                        <label class="block p-4 border rounded-lg hover:bg-slate-50 cursor-pointer transition">
-                            <input type="radio" 
-                                   name="q_<%= s.id %>" 
-                                   value="<%= opt %>" 
-                                   class="jawaban-radio"
-                                   data-qid="<%= s.id %>" 
-                                   data-idx="<%= index %>">
-                            <span class="ml-2 uppercase font-bold text-slate-700"><%= opt %>. <%= s['opsi_'+opt] %></span>
-                        </label>
-                        <% }) %>
+                <% soal.forEach((s, index)=> { %>
+                    <div id="box-<%= index %>" class="soal-box hidden">
+                        <p class="text-sm text-slate-400 mb-2 uppercase">Soal Ke-<%= index + 1 %> | <%= s.materi %>
+                        </p>
+                        <p class="text-lg font-medium mb-6">
+                            <%= s.soal %>
+                        </p>
+                        <div class="space-y-3">
+                            <% ['a','b','c','d','e'].forEach(opt=> { %>
+                                <label class="block p-4 border rounded-lg hover:bg-slate-50 cursor-pointer transition">
+                                    <input type="radio" name="q_<%= s.id %>" value="<%= opt %>" class="jawaban-radio"
+                                        data-qid="<%= s.id %>" data-idx="<%= index %>">
+                                    <span class="ml-2 uppercase font-bold text-slate-700">
+                                        <%= opt %>. <%= s['opsi_'+opt] %>
+                                    </span>
+                                </label>
+                                <% }) %>
+                        </div>
                     </div>
-                </div>
-                <% }) %>
+                    <% }) %>
             </div>
 
             <div class="flex justify-between mt-8 border-t pt-4">
-                <button onclick="navSoal(-1)" class="bg-slate-200 px-6 py-2 rounded font-bold hover:bg-slate-300">KEMBALI</button>
-                <button onclick="navSoal(1)" class="bg-[#4a3721] text-white px-6 py-2 rounded font-bold hover:bg-black transition">LANJUT</button>
+                <button onclick="navSoal(-1)"
+                    class="bg-slate-200 px-6 py-2 rounded font-bold hover:bg-slate-300">KEMBALI</button>
+                <button onclick="navSoal(1)"
+                    class="bg-[#4a3721] text-white px-6 py-2 rounded font-bold hover:bg-black transition">LANJUT</button>
             </div>
         </div>
 
         <div class="bg-white p-4 rounded-xl shadow h-fit">
             <div class="grid grid-cols-5 gap-2">
-                <% soal.forEach((s, index) => { %>
-                <button id="nav-<%= index %>" onclick="lompat(<%= index %>)" class="nav-item w-10 h-10 border rounded text-xs text-slate-400">
-                    <%= index + 1 %>
-                </button>
-                <% }) %>
+                <% soal.forEach((s, index)=> { %>
+                    <button id="nav-('<%= index %>')" onclick="lompat('<%= index %>')"
+                        class="nav-item w-10 h-10 border rounded text-xs text-slate-400">
+                        <%= index + 1 %>
+                    </button>
+                    <% }) %>
             </div>
-            <button onclick="selesaiUjian()" class="w-full mt-6 bg-red-600 text-white py-3 rounded font-bold hover:bg-red-700 transition">AKHIRI UJIAN</button>
+            <button onclick="selesaiUjian()"
+                class="w-full mt-6 bg-red-600 text-white py-3 rounded font-bold hover:bg-red-700 transition">AKHIRI
+                UJIAN</button>
         </div>
     </div>
 
     <script>
-        // Ambil data dari elemen HTML tadi
         const examMeta = document.getElementById('exam-data').dataset;
         const totalSoal = parseInt(examMeta.total);
-        const startTime = new Date(examMeta.start).getTime();
-        const endTime = startTime + (60 * 60 * 1000); 
+
+        // Fix format tanggal biar gak Invalid Date
+        const startTime = new Date(examMeta.start.replace(' ', 'T')).getTime();
+        const endTime = startTime + (60 * 60 * 1000); // 60 Menit
+
         let currentIdx = 0;
 
-        // Inisialisasi Tampilan
         function updateView() {
             document.querySelectorAll('.soal-box').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            
+
             const currentBox = document.getElementById(`box-${currentIdx}`);
             const currentNav = document.getElementById(`nav-${currentIdx}`);
-            
-            if(currentBox) currentBox.classList.remove('hidden');
-            if(currentNav) currentNav.classList.add('active');
+
+            if (currentBox) currentBox.classList.remove('hidden');
+            if (currentNav) currentNav.classList.add('active');
         }
-        
-        // Panggil saat pertama kali load
+
         updateView();
 
         function navSoal(step) {
             let n = currentIdx + step;
-            if(n >= 0 && n < totalSoal) { 
-                currentIdx = n; 
-                updateView(); 
+            if (n >= 0 && n < totalSoal) {
+                currentIdx = n;
+                updateView();
             }
         }
 
-        function lompat(idx) { 
-            currentIdx = idx; 
-            updateView(); 
+        function lompat(idx) {
+            currentIdx = idx;
+            updateView();
         }
 
-        // Event Listener untuk Radio Button (Pengganti onclick)
         document.querySelectorAll('.jawaban-radio').forEach(radio => {
-            radio.addEventListener('change', function() {
+            radio.addEventListener('change', function () {
                 const qId = this.dataset.qid;
                 const jaw = this.value;
                 const idx = this.dataset.idx;
-                
+
+                // Tandai langsung biar user tenang
+                document.getElementById(`nav-${idx}`).classList.add('answered');
+
                 fetch('/ujian/simpan-jawaban', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ questionId: qId, jawaban: jaw })
                 })
-                .then(res => res.json())
-                .then(data => {
-                    document.getElementById(`nav-${idx}`).classList.add('answered');
-                })
-                .catch(err => console.error("Error simpan:", err));
+                    .catch(err => {
+                        alert("Gagal simpan jawaban! Cek internetmu Le.");
+                        document.getElementById(`nav-${idx}`).classList.remove('answered');
+                    });
             });
         });
 
-        // Timer Logic
         const timerLabel = document.getElementById('timer');
         const timerInterval = setInterval(() => {
             const now = new Date().getTime();
             const diff = endTime - now;
 
-            if(diff <= 0) { 
+            if (diff <= 0) {
                 clearInterval(timerInterval);
-                alert("Waktu Habis!"); 
-                processSelesai(); 
-                return; 
+                processSelesai();
+                return;
             }
 
-            const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
             const m = Math.floor((diff / (1000 * 60)) % 60);
             const s = Math.floor((diff / 1000) % 60);
+            timerLabel.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 
-            timerLabel.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            if (diff < 300000) timerLabel.classList.add('animate-pulse'); // Kedip pas sisa 5 menit
         }, 1000);
 
         function selesaiUjian() {
-            if(confirm("Apakah Anda yakin ingin mengakhiri ujian?")) {
+            if (confirm("Yakin mau selesai sekarang, Le?")) {
                 processSelesai();
             }
         }
 
         function processSelesai() {
             fetch('/ujian/selesai', { method: 'POST' })
-            .then(res => res.json())
-            .then(data => {
-                alert("Ujian Selesai! Skor Anda: " + data.skor);
-                window.location.href = "/dashboard";
-            })
-            .catch(err => console.error("Error selesai:", err));
+                .then(() => { window.location.href = "/dashboard"; })
+                .catch(() => { window.location.href = "/dashboard"; });
         }
     </script>
 </body>
+
 </html>

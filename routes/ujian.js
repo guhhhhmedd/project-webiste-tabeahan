@@ -3,30 +3,43 @@ const router = express.Router();
 const db = require("../config/db");
 
 router.post("/mulai", async (req, res) => {
-  console.log("ISI REQ.BODY:", req.body);
-
   try {
     const { token_input } = req.body;
     const userId = req.session.user ? req.session.user.id : null;
 
-    try {
-      const [rows] = await db.query(
-        "SELECT token_ujian FROM users WHERE id = ?",
-        [userId],
+    if (!userId) return res.redirect("/login");
+
+    // 1. Ambil data user
+    const [users] = await db.query(
+      "SELECT token_ujian, status, status_ujian FROM users WHERE id = ?",
+      [userId],
+    );
+    const user = users[0];
+
+    // 2. Validasi: Apakah sudah bayar? Apakah token benar?
+    if (user.status !== "LUNAS") {
+      return res.send(
+        "<script>alert('Bayar dulu Le!'); window.location.href='/dashboard';</script>",
       );
-      const tokenAsli = rows[0].token_ujian;
-      if (token_input.toUpperCase() !== tokenAsli.toUpperCase()) {
-        return res.send(
-          "<script>alert('Token Salah! Silakan cek kembali.'); window.location.href='/dashboard';</script>",
-        );
-      }
-      res.redirect("/ujian/soal");
-    } catch (err) {
-      res.status(500).send("Gagal memvalidasi token.");
     }
+
+    if (token_input.trim().toUpperCase() !== user.token_ujian.toUpperCase()) {
+      return res.send(
+        "<script>alert('Token Salah!'); window.location.href='/dashboard';</script>",
+      );
+    }
+
+    // 3. SET STATUS: Penting biar bisa masuk ke halaman soal
+    // Kita set waktu_mulai sekarang dan status_ujian
+    await db.query(
+      "UPDATE users SET status_ujian = 'SEDANG_UJIAN', waktu_mulai = NOW() WHERE id = ?",
+      [userId],
+    );
+
+    res.redirect("/ujian/soal");
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error Server");
+    res.status(500).send("Gagal memulai ujian.");
   }
 });
 
@@ -35,21 +48,25 @@ router.get("/soal", async (req, res) => {
     const userId = req.session.user ? req.session.user.id : null;
     if (!userId) return res.redirect("/login");
 
+    // Ambil data user terbaru
     const [users] = await db.query("SELECT * FROM users WHERE id = ?", [
       userId,
     ]);
     const user = users[0];
 
-    if (!user || user.status_ujian !== "SEDANG_UJIAN") {
+    // Proteksi: Kalau statusnya bukan SEDANG_UJIAN, tendang balik
+    if (user.status_ujian !== "SEDANG_UJIAN") {
       return res.redirect("/dashboard");
     }
 
+    // Ambil 50 Soal Acak
+    // Pastikan nama kolom sesuai: id, materi, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e
     const [daftarSoal] = await db.query(`
-            SELECT id, materi, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, bobot_nilai 
-            FROM questions 
-            ORDER BY RAND() 
-            LIMIT 50
-        `);
+        SELECT id, materi, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e 
+        FROM questions 
+        ORDER BY RAND() 
+        LIMIT 50
+    `);
 
     res.render("ujian-soal", {
       user: user,
@@ -101,29 +118,39 @@ router.post("/selesai", async (req, res) => {
             FROM jawaban_peserta j
             JOIN questions q ON j.question_id = q.id
             WHERE j.user_id = ?
-        `,
+            `,
       [userId],
     );
 
     let skorTotal = 0;
     let benar = 0;
     let salah = 0;
+    let kosong = 0;
 
     hasil.forEach((row) => {
-      if (row.jawaban_user === row.kunci) {
+      // Jika jawaban kosong atau null
+      if (!row.jawaban_user || row.jawaban_user === "") {
+        kosong++;
+        // Tidak ditambah, tidak dikurangi
+      }
+      // Jika jawaban Benar
+      else if (row.jawaban_user === row.kunci) {
         benar++;
         skorTotal += 5;
-      } else {
+      }
+      // Jika jawaban Salah (Ada isinya tapi tidak sama dengan kunci)
+      else {
         salah++;
         skorTotal -= 1;
       }
     });
 
-    // Skor minimum 0
-    const skorFinal = skorTotal < 0 ? 0 : skorTotal;
+    // Skor minimum 0 biar gak minus
+    const skorFinal = Math.max(0, skorTotal);
 
     console.log(`=== HASIL AKHIR USER ${userId} ===`);
-    console.log(`Benar: ${benar}, Salah: ${salah}, Total Skor: ${skorFinal}`);
+    console.log(`B: ${benar}, S: ${salah}, K: ${kosong}, Total: ${skorFinal}`);
+
     await db.query(
       "UPDATE users SET status_ujian = 'SELESAI', skor = ? WHERE id = ?",
       [skorFinal, userId],
