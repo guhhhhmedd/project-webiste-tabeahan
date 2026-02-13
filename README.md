@@ -1,9 +1,4 @@
-## Cara Menjalankan Project
-1. git clone ...
-2. npm install     <!-- npm install untuk menginstal semua defendensi yang diperlukan untuk bisa menjalankan websitenya di local -->
-3. Buat file .env
-4. Buat database MySQL
-5. npm start# 📘 Project Ujian CAT Web
+# 📘 Project Ujian CAT Web
 
 Aplikasi ujian berbasis web menggunakan:
 
@@ -53,7 +48,7 @@ mysql -u root -p
 Buat database:
 
 ```sql
-CREATE DATABASE db_pencatatan;
+CREATE DATABASE namadb;
 EXIT;
 ```
 
@@ -66,7 +61,7 @@ Pastikan file `database.sql` ada di folder project.
 Jalankan:
 
 ```bash
-mysql -u root -p db_pencatatan < database.sql
+mysql -u root -p namadb < database.sql
 ```
 
 Jika berhasil, semua tabel akan otomatis dibuat.
@@ -86,10 +81,10 @@ Isi dengan konfigurasi berikut:
 ```env
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD= password mysql kalian
-DB_NAME=db_pencatatan
-DB_PORT=3000
-SESSION_SECRET=tabeahan-cendekia-secret
+DB_PASSWORD=
+DB_NAME=namadb
+DB_PORT=3306
+SESSION_SECRET=secret123
 ```
 
 Sesuaikan jika menggunakan user/password berbeda.
@@ -138,5 +133,20 @@ Pastikan username & password MySQL benar.
 
 ---
 
-# 📂 Struktur Pentin
+# 📂 Struktur Penting
 
+* `app.js` → file utama aplikasi
+* `config/` → konfigurasi database
+* `routes/` → routing aplikasi
+* `views/` → template EJS
+* `public/` → file static (css, image, upload)
+
+---
+
+# 👨‍💻 Developer
+
+Project ini dibuat untuk pembelajaran dan pengembangan aplikasi ujian berbasis web.
+
+---
+
+🔥 Jika ada kendala saat setup, pastikan semua langkah sudah diikuti dengan benar.
