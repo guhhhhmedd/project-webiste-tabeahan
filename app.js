@@ -76,6 +76,16 @@ app.get("/dashboard", isLogin, async (req, res) => {
     const userId = req.session.user.id;
     const [rows] = await db.query("SELECT * FROM users WHERE id = ?", [userId]);
     const user = rows[0];
+
+    if (user.status_ujian === 'SEDANG_UJIAN') {
+      return res.send(`
+        <script>
+          alert('Ujian sedang berlangsung! Selesaikan dulu atau tunggu waktu habis.');
+          window.location.href='/ujian/soal';
+        </script>
+      `);
+    }
+
     const [rankingRows] = await db.query(`
       SELECT username, skor 
       FROM users 
@@ -83,15 +93,17 @@ app.get("/dashboard", isLogin, async (req, res) => {
       ORDER BY skor DESC, id ASC
     `);
 
+    
     const myRank =
-      rankingRows.findIndex((r) => r.username === user.username) + 1;
-
+    rankingRows.findIndex((r) => r.username === user.username) + 1;
+    
     res.render("users/dashboard", {
       user: user,
       rankings: rankingRows.slice(0, 10),
       myRank: myRank > 0 ? myRank : "-",
     });
-  } catch (err) {
+   
+} catch (err) {
     console.error(err);
     res.status(500).send("Database Error");
   }
