@@ -11,9 +11,8 @@
         }
 
         .nav-item.answered {
-            background-color: #b8924a;
+            background-color: #d72323;
             color: white;
-            border-color: #b8924a;
         }
 
         .nav-item.active {
@@ -70,7 +69,7 @@
         <div class="bg-white p-4 rounded-xl shadow h-fit">
             <div class="grid grid-cols-5 gap-2">
                 <% soal.forEach((s, index)=> { %>
-                    <button id="nav-('<%= index %>')" onclick="lompat('<%= index %>')"
+                    <button id="nav-<%= index %>" onclick="lompat(<%= index %>)"
                         class="nav-item w-10 h-10 border rounded text-xs text-slate-400">
                         <%= index + 1 %>
                     </button>
@@ -86,24 +85,27 @@
         const examMeta = document.getElementById('exam-data').dataset;
         const totalSoal = parseInt(examMeta.total);
 
-        // Fix format tanggal biar gak Invalid Date
-        const startTime = new Date(examMeta.start.replace(' ', 'T')).getTime();
-        const endTime = startTime + (60 * 60 * 1000); // 60 Menit
+        // --- LOGIKA WAKTU (Anti-NaN) ---
+        const startTime = Number(examMeta.start);
+        const durasiMenit = 60;
+        const endTime = startTime + (durasiMenit * 60 * 1000);
+        // console.log("Waktu Start (Timestamp):", startTime);
 
         let currentIdx = 0;
 
         function updateView() {
             document.querySelectorAll('.soal-box').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active', 'border-2', 'border-black', 'ring-2', 'ring-yellow-400'));
 
             const currentBox = document.getElementById(`box-${currentIdx}`);
             const currentNav = document.getElementById(`nav-${currentIdx}`);
 
             if (currentBox) currentBox.classList.remove('hidden');
-            if (currentNav) currentNav.classList.add('active');
+            if (currentNav) {
+                currentNav.classList.add('active', 'ring-2', 'ring-yellow-400');
+                currentNav.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
         }
-
-        updateView();
 
         function navSoal(step) {
             let n = currentIdx + step;
@@ -114,31 +116,11 @@
         }
 
         function lompat(idx) {
-            currentIdx = idx;
+            currentIdx = parseInt(idx);
             updateView();
         }
 
-        document.querySelectorAll('.jawaban-radio').forEach(radio => {
-            radio.addEventListener('change', function () {
-                const qId = this.dataset.qid;
-                const jaw = this.value;
-                const idx = this.dataset.idx;
-
-                // Tandai langsung biar user tenang
-                document.getElementById(`nav-${idx}`).classList.add('answered');
-
-                fetch('/ujian/simpan-jawaban', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ questionId: qId, jawaban: jaw })
-                })
-                    .catch(err => {
-                        alert("Gagal simpan jawaban! Cek internetmu Le.");
-                        document.getElementById(`nav-${idx}`).classList.remove('answered');
-                    });
-            });
-        });
-
+        // --- LOGIKA TIMER HITUNG MUNDUR ---
         const timerLabel = document.getElementById('timer');
         const timerInterval = setInterval(() => {
             const now = new Date().getTime();
@@ -146,28 +128,87 @@
 
             if (diff <= 0) {
                 clearInterval(timerInterval);
+                timerLabel.innerText = "00:00";
+                alert("Waktu Habis! Jawaban Anda akan dikirim otomatis.");
                 processSelesai();
                 return;
             }
 
             const m = Math.floor((diff / (1000 * 60)) % 60);
             const s = Math.floor((diff / 1000) % 60);
+
+            // Tampilkan Menit:Detik (Contoh: 59:05)
             timerLabel.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 
-            if (diff < 300000) timerLabel.classList.add('animate-pulse'); // Kedip pas sisa 5 menit
+            // Efek merah kedip kalau sisa 5 menit
+            if (diff < 300000) {
+                timerLabel.classList.add('animate-pulse', 'text-red-500');
+            }
         }, 1000);
 
-        function selesaiUjian() {
-            if (confirm("Yakin mau selesai sekarang, Le?")) {
-                processSelesai();
-            }
-        }
+        // --- SIMPAN JAWABAN REAL-TIME ---
+        document.querySelectorAll('.jawaban-radio').forEach(radio => {
+            radio.addEventListener('change', function () {
+                const qId = this.dataset.qid;
+                const jaw = this.value;
+                const idx = this.dataset.idx;
+
+                // Beri warna di nomor navigasi kalau sudah dijawab
+                const navBtn = document.getElementById(`nav-${idx}`);
+                if (navBtn) {
+                    navBtn.classList.add('answered', 'bg-[#b8924a]', 'text-white');
+                }
+
+                fetch('/ujian/simpan-jawaban', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ questionId: qId, jawaban: jaw })
+                }).catch(err => {
+                    console.error("Gagal simpan:", err);
+                });
+            });
+        });
 
         function processSelesai() {
             fetch('/ujian/selesai', { method: 'POST' })
                 .then(() => { window.location.href = "/dashboard"; })
                 .catch(() => { window.location.href = "/dashboard"; });
         }
+
+        updateView();
+
+
+        // 1. Matikan Klik Kanan
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function (e) {
+            if (e.keyCode == 123) return false;
+            // Ctrl+Shift+I (Inspect)
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            // Ctrl+Shift+J (Console)
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+            // Ctrl+U (View Source)
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+            // Ctrl+S (Save Page)
+            if (e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false;
+            // Ctrl+C (Copy) - Biar soal gak bisa dicontek ke luar
+            if (e.ctrlKey && e.keyCode == 'C'.charCodeAt(0)) return false;
+        };
+
+        let violationCount = 0;
+
+        document.addEventListener("visibilitychange", function () {
+            if (document.visibilityState === 'hidden') {
+                violationCount++;
+
+                if (violationCount >= 2) {
+                    alert("PELANGGARAN KERAS! Kamu sudah 2 kali pindah tab. Ujian otomatis DIHENTIKAN!");
+                    processSelesai();
+                } else {
+                    alert("PERINGATAN! Jangan pindah tab atau membuka aplikasi lain. Satu kali lagi, ujianmu hangus!");
+                }
+            }
+        });
+
     </script>
 </body>
 

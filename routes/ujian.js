@@ -30,13 +30,12 @@ router.post("/mulai", async (req, res) => {
       );
     }
 
-    // 3. SET STATUS: Penting biar bisa masuk ke halaman soal
-    // Kita set waktu_mulai sekarang dan status_ujian
+    // 3. SET STATUS: biar bisa masuk ke halaman soal dan gak bisa keluar masuk sembarangan
     await db.query(
       "UPDATE users SET status_ujian = 'SEDANG_UJIAN', waktu_mulai = NOW() WHERE id = ?",
       [userId],
     );
-
+    req.session.isUjianActive = true;
     res.redirect("/ujian/soal");
   } catch (err) {
     console.error(err);
@@ -61,7 +60,7 @@ router.get("/soal", async (req, res) => {
     }
 
     // Ambil 50 Soal Acak
-    // Pastikan nama kolom sesuai: id, materi, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e
+    // nama kolom harus sesuai: id, materi, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e
     const [daftarSoal] = await db.query(`
         SELECT id, materi, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e 
         FROM questions 
@@ -72,7 +71,7 @@ router.get("/soal", async (req, res) => {
     res.render("ujian-soal", {
       user: user,
       soal: daftarSoal,
-      waktuMulai: user.waktu_mulai,
+      waktuMulai: new Date (user.waktu_mulai).getTime()
     });
   } catch (err) {
     console.error(err);
@@ -103,6 +102,15 @@ router.post("/simpan-jawaban", async (req, res) => {
     console.error(" GAGAL SIMPAN JAWABAN:", err);
     res.status(500).json({ status: "error" });
   }
+});
+
+// route selesai paksa kalau users coba untuk keluar dari sesi ujian
+router.post("/selesai-paksa", async (req, res) => {
+    const userId = req.session.user.id;
+    await db.query("UPDATE users SET status_ujian = 'SELESAI' WHERE id = ?", [userId]);
+    
+    req.session.isUjianActive = false;
+    res.json({ message: "Ujian dihentikan paksa" });
 });
 
 // Route Selesai (Logika Scoring -1, +5, 0)
