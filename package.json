@@ -5,7 +5,7 @@
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "multer": "^2.0.2",
-    "mysql2": "^3.16.2"
+    "mysql2": "^3.17.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
@@ -13,5 +13,20 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js -e js, ejs"
-  }
+  },
+  "name": "project-webiste-tabeahan",
+  "version": "1.0.0",
+  "description": "Aplikasi ujian berbasis web menggunakan:",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/guhhhhmedd/project-webiste-tabeahan.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/guhhhhmedd/project-webiste-tabeahan/issues"
+  },
+  "homepage": "https://github.com/guhhhhmedd/project-webiste-tabeahan#readme"
 }

@@ -8,6 +8,8 @@ const multer = require("multer");
 const path = require("path");
 const ujianRouter = require("./routes/ujian");
 
+
+
 // MIDDLEWARE
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -61,6 +63,11 @@ function isAdmin(req, res, next) {
   if (req.session.user && req.session.user.role === "admin") return next();
   res.status(403).send("Akses Ditolak: Halaman ini khusus Admin.");
 }
+
+app.get("/", (req, res) => {
+  res.render("landing");
+});
+
 app.get("/register", (req, res) => {
   if (req.session.users) return res.redirect("/register");
   res.render("register", { err: null });
