@@ -8,8 +8,6 @@ const multer = require("multer");
 const path = require("path");
 const ujianRouter = require("./routes/ujian");
 
-
-
 // MIDDLEWARE
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -84,7 +82,7 @@ app.get("/dashboard", isLogin, async (req, res) => {
     const [rows] = await db.query("SELECT * FROM users WHERE id = ?", [userId]);
     const user = rows[0];
 
-    if (user.status_ujian === 'SEDANG_UJIAN') {
+    if (user.status_ujian === "SEDANG_UJIAN") {
       return res.send(`
         <script>
           alert('Ujian sedang berlangsung! Selesaikan dulu atau tunggu waktu habis.');
@@ -100,17 +98,15 @@ app.get("/dashboard", isLogin, async (req, res) => {
       ORDER BY skor DESC, id ASC
     `);
 
-    
     const myRank =
-    rankingRows.findIndex((r) => r.username === user.username) + 1;
-    
+      rankingRows.findIndex((r) => r.username === user.username) + 1;
+
     res.render("users/dashboard", {
       user: user,
       rankings: rankingRows.slice(0, 10),
       myRank: myRank > 0 ? myRank : "-",
     });
-   
-} catch (err) {
+  } catch (err) {
     console.error(err);
     res.status(500).send("Database Error");
   }
@@ -203,14 +199,11 @@ app.get("/admin/verify/:id", isLogin, isAdmin, async (req, res) => {
   try {
     const tokenBaru = Math.random().toString(36).substring(2, 10).toUpperCase();
 
-    // 1. Update status di tabel USERS dulu
     await db.query(
       "UPDATE users SET status = 'LUNAS', token_ujian = ? WHERE id = ?",
       [tokenBaru, targetId],
     );
 
-    // 2. Update status di tabel PAYMENTS
-    // Pastikan targetId ini sama dengan kolom user_id di tabel payments
     const [result] = await db.query(
       "UPDATE payments SET status = 'LUNAS' WHERE user_id = ?",
       [targetId],
@@ -220,11 +213,9 @@ app.get("/admin/verify/:id", isLogin, isAdmin, async (req, res) => {
       `Update payment untuk User ${targetId} berhasil. Baris terpengaruh: ${result.affectedRows}`,
     );
 
-    // 3. Kalau semua sukses, baru redirect
     res.redirect("/dashboardAdmin");
   } catch (err) {
     console.error("ERROR VERIFIKASI:", err);
-    // Biar nggak BLANK PAGE, kasih respon yang jelas
     res.status(500).send(`
             <h3>Gagal Verifikasi Le!</h3>
             <p>Pesan Error: ${err.message}</p>
@@ -233,26 +224,39 @@ app.get("/admin/verify/:id", isLogin, isAdmin, async (req, res) => {
   }
 });
 
-// delete account
+// delete account dari dashboard user
 
 app.post("/deleteAccount", isLogin, async (req, res) => {
-  const { id } = req.body;
-
+  const userId = req.session.user.id;
   try {
-    await db.query("DELETE FROM users WHERE ID = ? ", [id]);
+    await db.query("DELETE FROM jawaban_peserta WHERE user_id = ? ", [userId]);
+    await db.query("DELETE FROM users WHERE ID = ? ", [userId]);
     req.session.destroy((err) => {
       if (err) {
         console.error("Gagal hapus session:", err);
         return res.redirect("/dashboard");
       }
       res.clearCookie("connect.sid");
-      res.render("register", {
-        message: "Akun anda berhasil dihapus selamanya.",
+      res.redirect("/register?message=Akun berhasil dihapus");
       });
-    });
   } catch (error) {
     console.error("hapus akun");
     res.render("dashboard", { error: "akun anda gagal dihapus" });
+  }
+});
+
+// delete account dari halaman admin
+// pelajaran penting kalo mau hapus data baiknya mulai hapus dari bawah keatas jangan dari atas kebawah 
+app.post("/deleteAccountFromAdmin", isAdmin, async (req, res) => {
+  const { id } = req.body;
+
+  try {
+    await db.query("DELETE FROM jawaban_peserta WHERE user_id = ?", [id]);
+    await db.query("DELETE FROM users WHERE ID = ? ", [id]);
+    res.redirect("/dashboardAdmin?message=akun berhasil dihapus");
+  } catch (error) {
+    console.error("gagal hapus akun", error);
+    res.status(500).send(" database error!");
   }
 });
 

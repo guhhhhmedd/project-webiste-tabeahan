@@ -97,6 +97,7 @@
                                 <th class="px-6 py-4">Status</th>
                                 <th class="px-6 py-4">Token</th>
                                 <th class="px-4 py-4 text-center">Aksi</th>
+                                <th class="px-4 py-4 text-center">delete account</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -153,19 +154,29 @@
                                             <% } else if(u.status==='LUNAS' ) { %>
                                                 <span
                                                     class="text-green-500 font-bold text-xs flex items-center justify-center gap-1">
-                                                     Sukses
+                                                    Sukses
                                                 </span>
                                                 <% } else if(u.status==='DITOLAK' ) { %>
                                                     <span
                                                         class="text-red-500 font-bold text-[10px] flex items-center justify-center gap-1 uppercase">
-                                                         Ditolak
+                                                        Ditolak
                                                     </span>
                                                     <% } else { %>
                                                         <span class="text-slate-300 text-xs italic">Menunggu...</span>
                                                         <% } %>
 
 
-                                                        
+
+                                    </td>
+                                    <td>
+                                        <form action="/deleteAccountFromAdmin" method="POST"
+                                            onsubmit="return confirm('Akun akan dihapus permanen! Anda yakin?')">
+                                            <input type="hidden" name="id" value="<%= u.id %>">
+
+                                            <button type="submit"
+                                                class="text-center cursor-pointer bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-sm transition">delete
+                                                account</button>
+                                        </form>
                                     </td>
                                 </tr>
                                 <% }) %>
