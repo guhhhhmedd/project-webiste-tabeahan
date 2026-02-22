@@ -1,4 +1,6 @@
 require("dotenv").config();
+const helmet = require("helmet");
+const compression = require("compression");
 const session = require("express-session");
 const express = require("express");
 const app = express();
@@ -9,7 +11,26 @@ const path = require("path");
 const ujianRouter = require("./routes/ujian");
 const XLSX = require("xlsx");
 const fs = require("fs"); // Bawaan Node.js untuk urusan file
+const rateLimit = require("express-rate-limit");
 
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
+        styleSrc: ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "blob:"],
+        fontSrc: [
+          "'self'",
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+        ],
+      },
+    },
+  }),
+);
+app.use(compression());
 // MIDDLEWARE
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -38,6 +59,30 @@ app.set("view engine", "ejs");
 app.set("views", "views");
 app.use("/ujian", ujianRouter); // ROUTER UJIAN
 
+// batas tes untuk setiap login
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true, 
+  handler: (req, res) => {
+    const retryAfter = Math.ceil(req.rateLimit.resetTime / 1000); // waktu reset dalam detik (unix timestamp)
+    res.status(429).render("login", {
+      error: null,
+      rateLimited: true,
+      resetTime: retryAfter,
+    });
+  },
+});
+
+// batas untuk  maksimal 5 registrasi per IP
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: "Terlalu banyak registrasi, coba lagi 1 jam lagi.",
+});
+
 // KONFIGURASI MULTER
 const storageBukti = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "public/uploads/bukti/"),
@@ -46,7 +91,20 @@ const storageBukti = multer.diskStorage({
     cb(null, `bukti-${userId}-${Date.now()}${path.extname(file.originalname)}`);
   },
 });
-const uploadBukti = multer({ storage: storageBukti });
+
+// upload bukti pembayaran
+const uploadBukti = multer({
+  storage: storageBukti,
+  limits: { fileSize: 2 * 1024 * 1024 }, // maksimal 2MB
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Hanya file JPG/PNG yang diizinkan!"));
+    }
+  },
+});
 
 // Konfigurasi Multer untuk Excel
 const storageExcel = multer.diskStorage({
@@ -108,28 +166,22 @@ app.get("/dashboard", isLogin, async (req, res) => {
     const user = rows[0];
 
     if (user.status_ujian === "SEDANG_UJIAN") {
-      return res.send(`
-        <script>
-          alert('Ujian sedang berlangsung! Selesaikan dulu atau tunggu waktu habis.');
-          window.location.href='/ujian/soal';
-        </script>
-      `);
+      return res.send(`<script>alert('Ujian sedang berlangsung!');window.location.href='/ujian/soal';</script>`);
     }
 
     const [rankingRows] = await db.query(`
-      SELECT username, skor 
-      FROM users 
+      SELECT username, skor FROM users 
       WHERE status_ujian = 'SELESAI' 
       ORDER BY skor DESC, id ASC
     `);
 
-    const myRank =
-      rankingRows.findIndex((r) => r.username === user.username) + 1;
+    const myRank = rankingRows.findIndex((r) => r.username === user.username) + 1;
 
     res.render("users/dashboard", {
-      user: user,
+      user,
       rankings: rankingRows.slice(0, 10),
       myRank: myRank > 0 ? myRank : "-",
+      uploadError: req.query.uploadError || null, // ← tambah ini
     });
   } catch (err) {
     console.error(err);
@@ -139,7 +191,7 @@ app.get("/dashboard", isLogin, async (req, res) => {
 
 // edit soal
 app.get("/admin/kelola-soal/:paket", isAdmin, async (req, res) => {
-  const namaPaket = req.params.paket; 
+  const namaPaket = req.params.paket;
   try {
     const [soalList] = await db.query(
       "SELECT * FROM questions WHERE TRIM(paket) = ? ORDER BY id DESC",
@@ -156,53 +208,76 @@ app.get("/admin/kelola-soal/:paket", isAdmin, async (req, res) => {
   }
 });
 
-// 
+//
 app.get("/admin/editSoal/:id", isAdmin, async (req, res) => {
-    try {
-        const [rows] = await db.query("SELECT * FROM questions WHERE id = ?", [req.params.id]);
-        
-        if (rows.length === 0) return res.redirect("/dashboardAdmin");
+  try {
+    const [rows] = await db.query("SELECT * FROM questions WHERE id = ?", [
+      req.params.id,
+    ]);
 
-        res.render("admin/editSoal", { s: rows[0] }); 
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Error Database: " + err.message);
-    }
+    if (rows.length === 0) return res.redirect("/dashboardAdmin");
+
+    res.render("admin/editSoal", { s: rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error Database: " + err.message);
+  }
 });
 
 //  Update soal
 app.post("/admin/updateSoal", isAdmin, async (req, res) => {
-    const { id, paket, materi, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci } = req.body;
-    
-    try {
-        const sql = `
+  const {
+    id,
+    paket,
+    materi,
+    soal,
+    opsi_a,
+    opsi_b,
+    opsi_c,
+    opsi_d,
+    opsi_e,
+    kunci,
+  } = req.body;
+
+  try {
+    const sql = `
             UPDATE questions 
             SET paket = ?, materi = ?, soal = ?, 
                 opsi_a = ?, opsi_b = ?, opsi_c = ?, opsi_d = ?, opsi_e = ?, 
                 kunci = ? 
             WHERE id = ?
         `;
-        
-        await db.query(sql, [paket, materi, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, id]);
-        
-        res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}`);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Gagal Update: " + err.message);
-    }
+
+    await db.query(sql, [
+      paket,
+      materi,
+      soal,
+      opsi_a,
+      opsi_b,
+      opsi_c,
+      opsi_d,
+      opsi_e,
+      kunci,
+      id,
+    ]);
+
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}`);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Gagal Update: " + err.message);
+  }
 });
 
 // PROSES HAPUS SOAL
 app.post("/admin/delete-soal", isAdmin, async (req, res) => {
-    const { id, paket } = req.body;
-    try {
-        await db.query("DELETE FROM soal WHERE id = ?", [id]);
-        res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}`);
-    } catch (err) {
-        res.status(500).send("Gagal menghapus soal");
-    }
+  const { id, paket } = req.body;
+  try {
+    await db.query("DELETE FROM soal WHERE id = ?", [id]);
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}`);
+  } catch (err) {
+    res.status(500).send("Gagal menghapus soal");
+  }
 });
-
 
 app.get("/dashboardAdmin", isAdmin, async (req, res) => {
   try {
@@ -231,8 +306,8 @@ app.get("/dashboardAdmin", isAdmin, async (req, res) => {
 
     res.render("admin/dashboardAdmin", {
       statsSoal,
-      daftarPaket, 
-      users, 
+      daftarPaket,
+      users,
     });
   } catch (err) {
     console.error("Gagal di dashboardAdmin:", err);
@@ -254,8 +329,8 @@ app.post("/admin/update-durasi", isAdmin, async (req, res) => {
 });
 
 app.get("/admin/daftarPeserta", isAdmin, async (req, res) => {
-    try {
-        const [users] = await db.query(`
+  try {
+    const [users] = await db.query(`
             SELECT 
                 u.*, 
                 p.bukti_transfer 
@@ -270,15 +345,19 @@ app.get("/admin/daftarPeserta", isAdmin, async (req, res) => {
             ORDER BY u.id DESC
         `);
 
-        res.render("admin/daftarPeserta", { users });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Gagal memuat data peserta");
-    }
+    res.render("admin/daftarPeserta", { users });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Gagal memuat data peserta");
+  }
 });
 
 // --- IMPORT EXCEL ---
-app.post("/admin/upload-soal", isAdmin, uploadExcel.single("fileExcel"), async (req, res) => {
+app.post(
+  "/admin/upload-soal",
+  isAdmin,
+  uploadExcel.single("fileExcel"),
+  async (req, res) => {
     if (!req.file) return res.status(400).send("File kaga ada, Bre!");
 
     try {
@@ -341,14 +420,18 @@ app.post("/admin/tambah-soal", isAdmin, async (req, res) => {
   }
 });
 
-app.post("/login", async (req, res) => {
+app.post("/login", loginLimiter, async (req, res) => {
   const { username, password } = req.body;
   try {
     const [rows] = await db.query("SELECT * FROM users WHERE username = ?", [
       username,
     ]);
     if (rows.length === 0 || password !== rows[0].password) {
-      return res.render("login", { error: "Username atau Password salah" });
+      return res.render("login", {
+        error: "Username atau Password salah",
+        rateLimited: false,
+        resetTime: null,
+      });
     }
     const user = rows[0];
     req.session.user = {
@@ -359,14 +442,32 @@ app.post("/login", async (req, res) => {
     res.redirect(user.role === "admin" ? "/dashboardAdmin" : "/dashboard");
   } catch (err) {
     console.error("ERROR LOGIN:", err);
-    res.render("login", { error: "Terjadi kesalahan server: " + err.message });
+    res.render("login", {
+      error: "Terjadi kesalahan server coba lagi ",
+      rateLimited: false,
+      resetTime: null,
+    });
   }
 });
 
-app.post("/register", async (req, res) => {
+app.post("/register", registerLimiter, async (req, res) => {
   const { username, password, email } = req.body;
+
   if (!username || !password || !email) {
-    return res.render("register", { error: "Semua form wajib diisi, Bre!" });
+    return res.render("register", { err: "Semua form wajib diisi!" });
+  }
+
+  if (username.length < 3 || username.length > 20) {
+    return res.render("register", { err: "Username harus 3-20 karakter!" });
+  }
+
+  if (password.length < 6) {
+    return res.render("register", { err: "Password minimal 6 karakter!" });
+  }
+
+  // Validasi format email
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.render("register", { err: "Format email tidak valid!" });
   }
 
   try {
@@ -379,13 +480,32 @@ app.post("/register", async (req, res) => {
     let pesanError = "Gagal registrasi.";
     if (err.code === "ER_DUP_ENTRY")
       pesanError = "Username atau Email sudah terdaftar!";
-
-    res.render("register", { error: pesanError });
+    res.render("register", { err: pesanError });
   }
 });
 
-app.post("/users/upload-bukti", isLogin, uploadBukti.single("bukti"), async (req, res) => {
-    if (!req.file) return res.status(400).send("Mohon pilih file.");
+app.post(
+  "/users/upload-bukti",
+  isLogin,
+  (req, res, next) => {
+    uploadBukti.single("bukti")(req, res, (err) => {
+      if (err instanceof multer.MulterError) {
+        if (err.code === "LIMIT_FILE_SIZE")
+          return res.redirect(
+            "/dashboard?uploadError=File terlalu besar! Maksimal 2MB.",
+          );
+        return res.redirect("/dashboard?uploadError=Error upload file.");
+      } else if (err) {
+        return res.redirect(`/dashboard?uploadError=${err.message}`);
+      }
+      next();
+    });
+  },
+  async (req, res) => {
+    if (!req.file)
+      return res.redirect(
+        "/dashboard?uploadError=Mohon pilih file terlebih dahulu.",
+      );
     try {
       const userId = req.session.user.id;
       await db.query(
@@ -397,7 +517,8 @@ app.post("/users/upload-bukti", isLogin, uploadBukti.single("bukti"), async (req
       ]);
       res.redirect("/dashboard");
     } catch (err) {
-      res.status(500).send("Gagal upload.");
+      console.error(err);
+      res.redirect("/dashboard?uploadError=Gagal upload, silakan coba lagi.");
     }
   },
 );
@@ -512,7 +633,6 @@ app.post("/deleteAccountFromAdmin", isAdmin, async (req, res) => {
     res.status(500).send("Database error!");
   }
 });
-
 
 app.post("/admin/delete-soal", isAdmin, async (req, res) => {
   const { id, paket } = req.body;
