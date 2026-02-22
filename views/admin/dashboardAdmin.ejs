@@ -8,61 +8,66 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
-<body class="bg-slate-100 font-sans">
-    <nav class="bg-[#0f172a] p-4 text-white flex justify-between shadow-lg sticky top-0 z-50">
-        <div class="flex items-center gap-2">
-            <span class="bg-yellow-600 text-[10px] px-2 py-0.5 rounded font-bold uppercase">Administrator</span>
-            <span class="font-bold tracking-wider text-sm md:text-base">TABEAHAN CENDEKIA</span>
+<body class="bg-slate-100 font-sans text-slate-900">
+    <nav class="bg-[#0f172a] p-4 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex flex-col md:flex-row items-center gap-2 md:gap-6">
+                <div class="flex items-center gap-2">
+                    <span class="bg-yellow-600 text-[10px] px-2 py-0.5 rounded font-bold uppercase text-white">Administrator</span>
+                    <span class="font-bold tracking-wider text-sm md:text-base">TABEAHAN CENDEKIA</span>
+                </div>
+                <div class="flex gap-4 text-[10px] md:text-xs font-bold uppercase tracking-widest mt-2 md:mt-0">
+                    <a href="/dashboardAdmin" class="text-yellow-500 border-b border-yellow-500 pb-1">Dashboard</a>
+                    <a href="/admin/daftarPeserta" class="text-slate-400 hover:text-white transition">Peserta Ujian</a>
+                </div>
+            </div>
+            <a href="/logout" class="bg-red-600 hover:bg-red-700 px-6 py-1.5 md:py-1 rounded text-xs font-bold transition w-full md:w-auto text-center">Logout</a>
         </div>
-        <a href="/logout" class="bg-red-600 hover:bg-red-700 px-4 py-1 rounded text-xs font-bold transition">Logout</a>
     </nav>
 
-    <div class="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <div class="max-w-7xl mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
 
         <div class="lg:col-span-4 space-y-6">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200">
                 <div class="flex items-center gap-2 mb-4 border-b pb-2">
                     <span class="text-xl">📝</span>
                     <h3 class="text-lg font-bold text-slate-800">Tambah Soal CAT</h3>
                 </div>
                 <form action="/admin/tambah-soal" method="POST" class="space-y-4">
-                    <div>
-                        <label class="text-xs font-bold text-slate-500 uppercase">Kategori Materi</label>
-                        <select name="materi"
-                            class="w-full border border-slate-300 p-2.5 rounded-lg bg-slate-50 mt-1 focus:ring-2 focus:ring-blue-500 outline-none"
-                            required>
-                            <option value="TWK">Tes Wawasan Kebangsaan (TWK)</option>
-                            <option value="TIU">Tes Intelejensia Umum (TIU)</option>
-                            <option value="TKP">Tes Karakteristik Pribadi (TKP)</option>
-                        </select>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase">Pilih Paket</label>
+                            <select name="paket" class="w-full border border-slate-300 p-3 rounded-lg bg-slate-50 mt-1 focus:ring-2 focus:ring-blue-500 outline-none text-sm" required>
+                                <option value="Paket SKD/TKD">Paket SKD/TKD</option>
+                                <option value="Paket Akademik Polri">Paket Akademik Polri</option>
+                                <option value="Paket PPPK">Paket PPPK</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase">Kategori Materi</label>
+                            <select name="materi" class="w-full border border-slate-300 p-3 rounded-lg bg-slate-50 mt-1 focus:ring-2 focus:ring-blue-500 outline-none text-sm" required>
+                                <option value="TWK">TWK</option>
+                                <option value="TIU">TIU</option>
+                                <option value="TKP">TKP</option>
+                                <option value="Pengetahuan Umum">Pengetahuan Umum</option>
+                                <option value="Teknis">Teknis</option>
+                            </select>
+                        </div>
                     </div>
-
                     <div>
-                        <label class="text-xs font-bold text-slate-500 uppercase">Pertanyaan</label>
-                        <textarea name="soal" placeholder="Tulis soal di sini..."
-                            class="w-full border border-slate-300 p-2.5 rounded-lg h-28 mt-1 focus:ring-2 focus:ring-blue-500 outline-none"
-                            required></textarea>
+                        <label class="text-[10px] font-bold text-slate-500 uppercase">Pertanyaan</label>
+                        <textarea name="soal" placeholder="Tulis soal di sini..." class="w-full border border-slate-300 p-3 rounded-lg h-28 mt-1 focus:ring-2 focus:ring-blue-500 outline-none text-sm" required></textarea>
                     </div>
-
-                    <div class="grid grid-cols-1 gap-3">
-                        <input type="text" name="a" placeholder="Opsi A"
-                            class="border border-slate-300 p-2 rounded-lg text-sm" required>
-                        <input type="text" name="b" placeholder="Opsi B"
-                            class="border border-slate-300 p-2 rounded-lg text-sm" required>
-                        <input type="text" name="c" placeholder="Opsi C"
-                            class="border border-slate-300 p-2 rounded-lg text-sm" required>
-                        <input type="text" name="d" placeholder="Opsi D"
-                            class="border border-slate-300 p-2 rounded-lg text-sm" required>
-                        <input type="text" name="e" placeholder="Opsi E"
-                            class="border border-slate-300 p-2 rounded-lg text-sm" required>
+                    <div class="grid grid-cols-1 gap-2">
+                        <input type="text" name="a" placeholder="Opsi A" class="border p-3 rounded-lg text-sm" required>
+                        <input type="text" name="b" placeholder="Opsi B" class="border p-3 rounded-lg text-sm" required>
+                        <input type="text" name="c" placeholder="Opsi C" class="border p-3 rounded-lg text-sm" required>
+                        <input type="text" name="d" placeholder="Opsi D" class="border p-3 rounded-lg text-sm" required>
+                        <input type="text" name="e" placeholder="Opsi E" class="border p-3 rounded-lg text-sm" required>
                     </div>
-
                     <div>
-                        <label class="text-xs font-bold text-slate-500 uppercase">Kunci Jawaban</label>
-                        <select name="kunci"
-                            class="w-full border-2 border-yellow-400 p-2.5 rounded-lg bg-yellow-50 font-bold mt-1"
-                            required>
-                            <option value="" disabled selected>-- Pilih Kunci --</option>
+                        <label class="text-[10px] font-bold text-slate-500 uppercase">Kunci Jawaban</label>
+                        <select name="kunci" class="w-full border-2 border-yellow-400 p-3 rounded-lg bg-yellow-50 font-bold" required>
                             <option value="a">Opsi A</option>
                             <option value="b">Opsi B</option>
                             <option value="c">Opsi C</option>
@@ -70,117 +75,83 @@
                             <option value="e">Opsi E</option>
                         </select>
                     </div>
-
-                    <button
-                        class="w-full bg-[#0f172a] text-white py-3 rounded-xl font-bold hover:bg-black transition shadow-lg active:scale-95">
+                    <button class="w-full bg-[#0f172a] text-white py-4 rounded-xl font-bold hover:bg-black transition shadow-lg active:scale-95">
                         SIMPAN DATA SOAL
+                    </button>
+                </form>
+            </div>
+
+            <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-green-500">
+                <div class="flex items-center gap-2 mb-4 border-b pb-2">
+                    <span class="text-xl">📊</span>
+                    <h3 class="text-lg font-bold text-slate-800">Bulk Import Excel</h3>
+                </div>
+                <form action="/admin/upload-soal" method="POST" enctype="multipart/form-data" class="space-y-4">
+                    <input type="file" name="fileExcel" accept=".xlsx, .xls" required
+                        class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer" />
+                    <button class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition text-xs">
+                        UPLOAD & PROSES EXCEL
                     </button>
                 </form>
             </div>
         </div>
 
-        <div class="lg:col-span-8">
+        <div class="lg:col-span-8 space-y-6">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <span class="text-xl">👥</span> Verifikasi Peserta Ujian
-                    </h3>
-                    <span class="text-xs text-slate-400 font-mono">Total: <%= users.length %> Peserta</span>
+                <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row justify-between md:items-center gap-2">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">📦 Kelola Soal Per Paket</h3>
+                    <span class="text-[9px] md:text-[10px] text-slate-400 font-bold">Klik tombol untuk edit/hapus soal</span>
                 </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-100 text-slate-600 uppercase text-[11px] tracking-widest">
-                                <th class="px-6 py-4">Nama Peserta</th>
-                                <th class="px-6 py-4">Bukti Bayar</th>
-                                <th class="px-6 py-4">Status</th>
-                                <th class="px-6 py-4">Token</th>
-                                <th class="px-4 py-4 text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            <% users.forEach(u=> { %>
-                                <tr class="hover:bg-slate-50 transition">
-                                    <td class="px-6 py-4">
-                                        <p class="font-bold text-slate-800">
-                                            <%= u.username %>
-                                        </p>
-                                        <p class="text-[10px] text-slate-400">
-                                            <%= u.email %>
-                                        </p>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <% if(u.bukti_transfer) { %>
-                                            <a href="/uploads/bukti/<%= u.bukti_transfer %>" target="_blank"
-                                                class="text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold underline decoration-dotted">
-                                                <span>👁️ Lihat Bukti</span>
-                                            </a>
-                                            <% } else { %>
-                                                <span
-                                                    class="text-slate-300 italic text-xs underline decoration-dotted">Belum
-                                                    Upload</span>
-                                                <% } %>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase
-                                        <%= u.status === 'LUNAS' ? 'bg-green-100 text-green-700' : 
-                                           u.status === 'PENDING' ? 'bg-orange-100 text-orange-600 animate-pulse' : 
-                                           'bg-slate-100 text-slate-500' %>">
-                                            <%= u.status %>
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <code class="bg-slate-100 px-2 py-1 rounded text-blue-700 font-bold">
-                                        <%= u.token_ujian || '------' %>
-                                    </code>
-                                    </td>
-                                    <td class="px-4 py-4 text-center">
-                                        <% if(u.status==='PENDING' ) { %>
-                                            <div class="flex flex-col gap-2">
-                                                <a href="/admin/verify/<%= u.id %>"
-                                                    onclick="return confirm('Terima pembayaran ini?')"
-                                                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-sm transition">
-                                                    VERIFIKASI
-                                                </a>
-
-                                                <a href="/admin/reject/<%= u.id %>"
-                                                    onclick="return confirm('Tolak pembayaran ini? Peserta harus upload ulang bukti transfer.')"
-                                                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-sm transition">
-                                                    TOLAK
-                                                </a>
-                                            </div>
-                                            <% } else if(u.status==='LUNAS' ) { %>
-                                                <span
-                                                    class="text-green-500 font-bold text-xs flex items-center justify-center gap-1">
-                                                     Sukses
-                                                </span>
-                                                <% } else if(u.status==='DITOLAK' ) { %>
-                                                    <span
-                                                        class="text-red-500 font-bold text-[10px] flex items-center justify-center gap-1 uppercase">
-                                                         Ditolak
-                                                    </span>
-                                                    <% } else { %>
-                                                        <span class="text-slate-300 text-xs italic">Menunggu...</span>
-                                                        <% } %>
-
-
-                                                        
-                                    </td>
-                                </tr>
-                                <% }) %>
-                        </tbody>
-                    </table>
-                </div>
-
-                <% if (users.length===0) { %>
-                    <div class="p-10 text-center text-slate-400 italic">
-                        Belum ada peserta yang mendaftar.
-                    </div>
+                <div class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                    <% if (statsSoal.length > 0) { %>
+                        <% statsSoal.forEach(s => { %>
+                            <div class="p-4 bg-white rounded-xl border border-slate-200 hover:border-blue-400 transition-all group shadow-sm flex flex-col justify-between">
+                                <div>
+                                    <p class="text-[9px] text-slate-400 uppercase font-bold tracking-widest mb-1">DATA PAKET</p>
+                                    <h4 class="text-base font-black text-slate-700 leading-tight mb-4 uppercase"><%= s.paket %></h4>
+                                </div>
+                                <div class="flex items-end justify-between">
+                                    <p class="text-2xl font-black text-blue-600 leading-none">
+                                        <%= s.total %> <span class="text-xs font-normal text-slate-400">Soal</span>
+                                    </p>
+                                    <a href="/admin/kelola-soal/<%= encodeURIComponent(s.paket) %>"
+                                        class="bg-slate-100 group-hover:bg-blue-600 group-hover:text-white text-slate-600 px-3 py-2 rounded-lg text-[9px] font-bold transition-colors">
+                                        KELOLA →
+                                    </a>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <p class="text-xs text-slate-400 italic p-4">Belum ada data soal terinput.</p>
                     <% } %>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-4 border-b border-slate-100 bg-slate-50/50">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">⏱️ Pengaturan Durasi Ujian</h3>
+                </div>
+                <div class="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <% daftarPaket.forEach(p => { %>
+                        <form action="/admin/update-durasi" method="POST"
+                            class="p-4 border rounded-xl bg-slate-50 flex flex-col gap-3 transition hover:border-blue-300">
+                            <input type="hidden" name="id" value="<%= p.id %>">
+                            <span class="text-[9px] font-black text-blue-600 uppercase tracking-tighter truncate">
+                                <%= p.nama_paket %>
+                            </span>
+                            <div class="flex items-center gap-2">
+                                <input type="number" name="durasi" value="<%= p.durasi_menit %>"
+                                    class="w-full border border-slate-300 p-2 rounded-lg text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none">
+                                <span class="text-[10px] text-slate-500 font-bold">MIN</span>
+                            </div>
+                            <button type="submit" class="bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold hover:bg-blue-700 transition uppercase shadow-sm">
+                                Update
+                            </button>
+                        </form>
+                    <% }) %>
+                </div>
             </div>
         </div>
     </div>
 </body>
-
 </html>

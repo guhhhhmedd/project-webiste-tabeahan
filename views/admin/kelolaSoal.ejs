@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Soal - <%= paket %></title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-slate-50 p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <a href="/dashboardAdmin" class="text-indigo-600 text-xs font-bold uppercase tracking-wider hover:underline">← Dashboard</a>
+                <h1 class="text-3xl font-black text-slate-800">Daftar Soal: <%= paket %></h1>
+            </div>
+            <div class="bg-white border border-slate-200 px-4 py-2 rounded-2xl shadow-sm">
+                <span class="text-xs text-slate-400 font-bold uppercase block">Total Database</span>
+                <span class="text-xl font-black text-indigo-600"><%= soalList.length %> Soal</span>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50 border-b border-slate-100">
+                        <tr>
+                            <th class="p-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Materi</th>
+                            <th class="p-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Pertanyaan</th>
+                            <th class="p-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Kunci</th>
+                            <th class="p-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        <% soalList.forEach(s => { %>
+                        <tr class="hover:bg-slate-50/50 transition-colors group">
+                            <td class="p-5">
+                                <span class="px-2 py-1 bg-indigo-50 text-indigo-600 text-[10px] rounded-lg font-black uppercase">
+                                    <%= s.materi %>
+                                </span>
+                            </td>
+                            <td class="p-5">
+                                <p class="text-sm text-slate-700 font-medium leading-relaxed">
+                                    <%= s.soal.length > 100 ? s.soal.substring(0, 100) + '...' : s.soal %>
+                                </p>
+                            </td>
+                            <td class="p-5 text-center">
+                                <span class="inline-block w-8 h-8 leading-8 rounded-full bg-emerald-100 text-emerald-700 font-black text-xs border border-emerald-200 uppercase">
+                                    <%= s.kunci %>
+                                </span>
+                            </td>
+                            <td class="p-5">
+                                <div class="flex justify-end items-center gap-2">
+                                    <a href="/admin/editSoal/<%= s.id %>" class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black px-4 py-2 rounded-xl transition shadow-md shadow-blue-100 uppercase">
+                                        Edit
+                                    </a>
+                                    
+                                    <form action="/admin/delete-soal" method="POST" onsubmit="return confirm('Hapus soal ini selamanya?')">
+                                        <input type="hidden" name="id" value="<%= s.id %>">
+                                        <input type="hidden" name="paket" value="<%= s.paket %>">
+                                        <button type="submit" class="p-2 text-slate-300 hover:text-red-600 transition">
+                                            🗑️
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+            <% if(soalList.length === 0) { %>
+                <div class="p-20 text-center">
+                    <p class="text-slate-400 font-medium italic">Oops! Belum ada soal di paket ini.</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>
