@@ -4,262 +4,478 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tabeahan Cendekia - Platform Ujian CAT Modern</title>
+  <title>Tabeahan Cendekia - Platform Ujian CAT</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
+    :root {
+      --cream: #fff8f8;
+      --warm: #f5e8e8;
+      --gold: #c8a020;
+      --gold-light: #e0b830;
+      --dark: #7a1010;
+      --red-deep: #5a0a0a;
+      --muted: #9b6b6b;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
-      font-family: "Inter", sans-serif;
+      font-family: "DM Sans", sans-serif;
+      background: var(--cream);
+      color: var(--dark);
     }
 
-    .glass {
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+    h1, h2, h3 { font-family: "Playfair Display", serif; }
+
+    /* Grain overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
     }
 
-    .hero-pattern {
-      background-color: #f8fafc;
-      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e2e8f0' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    /* Navbar */
+    .navbar {
+      background: rgba(255, 248, 248, 0.90);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(184, 146, 74, 0.15);
+    }
+
+    /* Hero decorative lines */
+    .ruled-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    /* Stats counter */
+    .stat-card {
+      border-left: 2px solid var(--gold);
+      padding-left: 1.5rem;
+    }
+
+    /* Feature cards */
+    .feature-card {
+      background: white;
+      border: 1px solid rgba(184, 146, 74, 0.12);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+    .feature-card:hover::before { transform: scaleX(1); }
+    .feature-card:hover {
+      border-color: rgba(184, 146, 74, 0.3);
+      box-shadow: 0 8px 32px -8px rgba(184, 146, 74, 0.15);
+      transform: translateY(-2px);
+    }
+
+    /* Paket cards */
+    .paket-card {
+      background: white;
+      border: 1px solid #e8e0d4;
+      transition: all 0.25s ease;
+    }
+    .paket-card:hover {
+      border-color: var(--gold);
+      box-shadow: 0 12px 40px -12px rgba(184, 146, 74, 0.2);
+      transform: translateY(-3px);
+    }
+
+    /* CTA Button */
+    .btn-primary {
+      background: var(--dark);
+      color: var(--cream);
+      transition: all 0.2s ease;
+      letter-spacing: 0.05em;
+    }
+    .btn-primary:hover {
+      background: var(--gold);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px -4px rgba(184, 146, 74, 0.4);
+    }
+
+    .btn-outline {
+      border: 1.5px solid var(--dark);
+      color: var(--dark);
+      transition: all 0.2s ease;
+    }
+    .btn-outline:hover {
+      background: var(--dark);
+      color: var(--cream);
+    }
+
+    /* Decorative number */
+    .big-number {
+      font-family: "Playfair Display", serif;
+      font-size: 8rem;
+      line-height: 1;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(184, 146, 74, 0.2);
+    }
+
+    /* Testimonial quote mark */
+    .quote-mark {
+      font-family: "Playfair Display", serif;
+      font-size: 5rem;
+      line-height: 0.5;
+      color: var(--gold);
+      opacity: 0.3;
+    }
+
+    /* Mobile menu */
+    #mobile-menu { transition: all 0.2s ease; }
+
+    /* Fade in animation */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeInUp 0.6s ease forwards; }
+    .fade-in-delay-1 { animation: fadeInUp 0.6s ease 0.1s forwards; opacity: 0; }
+    .fade-in-delay-2 { animation: fadeInUp 0.6s ease 0.2s forwards; opacity: 0; }
+    .fade-in-delay-3 { animation: fadeInUp 0.6s ease 0.3s forwards; opacity: 0; }
+
+    /* Diagonal section divider */
+    .diagonal-top {
+      clip-path: polygon(0 4%, 100% 0%, 100% 100%, 0% 100%);
     }
   </style>
 </head>
 
-<body class="text-slate-800 antialiased">
+<body>
+
   <!-- Navbar -->
-  <nav class="fixed w-full z-50 transition-all duration-300 glass border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-20">
-        <div class="flex-shrink-0">
-          <a href="/" class="flex items-center gap-3">
-            <img src="/logo.png" alt="Logo" class="h-10 w-auto" />
-            <span class="font-bold text-xl tracking-wide text-slate-900">Tabeahan<span
-                class="text-yellow-600">Cendekia</span></span>
-          </a>
+  <nav class="navbar fixed w-full z-50">
+    <div class="max-w-6xl mx-auto px-6 lg:px-8">
+      <div class="flex justify-between items-center h-18 py-4">
+        <a href="/" class="flex items-center gap-3">
+          <img src="/logo.png" alt="Logo" class="h-9 w-auto" />
+          <div>
+            <span class="font-bold text-base text-dark tracking-wide" style="font-family:'Playfair Display',serif">Tabeahan <span style="color:var(--gold)">Cendekia</span></span>
+          </div>
+        </a>
+
+        <div class="hidden md:flex items-center gap-8">
+          <a href="#fitur" class="text-sm font-medium text-muted hover:text-dark transition" style="color:var(--muted)">Fitur</a>
+          <a href="#paket" class="text-sm font-medium text-muted hover:text-dark transition" style="color:var(--muted)">Paket</a>
+          <a href="/login" class="text-sm font-semibold" style="color:var(--dark)">Masuk</a>
+          <a href="/register" class="btn-primary px-5 py-2.5 text-sm font-semibold rounded-lg">Daftar Sekarang</a>
         </div>
 
-        <!-- Desktop Menu -->
-        <div class="hidden md:flex space-x-8 items-center">
-          <!-- <a
-              href="#fitur"
-              class="text-slate-600 hover:text-yellow-600 font-medium transition"
-              >Fitur</a
-            >
-            <a
-              href="#tentang"
-              class="text-slate-600 hover:text-yellow-600 font-medium transition"
-              >Tentang</a
-            >  -->
-          <a href="/login" class="text-slate-900 hover:text-yellow-600 font-bold transition">Masuk</a>
-          <a href="/register"
-            class="bg-slate-900 text-white px-5 py-2.5 rounded-full font-medium hover:bg-yellow-600 transition shadow-lg hover:shadow-yellow-500/30">Daftar
-            Sekarang</a>
-        </div>
-
-        <!-- Mobile Menu Button -->
-        <div class="md:hidden flex items-center">
-          <button id="mobile-menu-button" class="text-slate-600 hover:text-slate-900 focus:outline-none">
-            <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        </div>
+        <button id="mobile-menu-button" class="md:hidden p-2" style="color:var(--dark)">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
       </div>
     </div>
 
-    <!-- Mobile Menu -->
-    <div id="mobile-menu"
-      class="hidden md:hidden bg-white/95 backdrop-blur-md border-t border-slate-100 absolute w-full left-0 shadow-lg">
-      <div class="px-4 pt-2 pb-6 space-y-2">
-        <!-- <a href="#fitur" class="block px-3 py-3 rounded-md text-base font-medium text-slate-700 hover:text-yellow-600 hover:bg-slate-50 transition">Fitur</a>
-            <a href="#tentang" class="block px-3 py-3 rounded-md text-base font-medium text-slate-700 hover:text-yellow-600 hover:bg-slate-50 transition">Tentang</a> -->
-        <a href="/login"
-          class="block px-3 py-3 mt-4 text-center rounded-md text-base font-bold bg-slate-900 text-white hover:bg-yellow-600 transition">Masuk</a>
-        <a href="/register"
-          class="block px-3 py-3 mt-4 text-center rounded-md text-base font-bold bg-slate-900 text-white hover:bg-yellow-600 transition">Daftar
-          Sekarang</a>
-      </div>
+    <div id="mobile-menu" class="hidden md:hidden px-6 pb-6 pt-2 border-t" style="border-color:rgba(122,16,16,0.1); background:var(--cream)">
+      <a href="#fitur" class="block py-3 text-sm font-medium" style="color:var(--muted)">Fitur</a>
+      <a href="#paket" class="block py-3 text-sm font-medium" style="color:var(--muted)">Paket</a>
+      <a href="/login" class="block py-3 text-sm font-semibold" style="color:var(--dark)">Masuk</a>
+      <a href="/register" class="btn-primary block text-center mt-3 px-5 py-3 text-sm font-semibold rounded-lg">Daftar Sekarang</a>
     </div>
   </nav>
 
-  <!-- Hero Section -->
-  <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden hero-pattern">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-      <h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 mb-6 tracking-tight">
-        Simulasi Ujian CAT <br />
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-700">Terbaik &
-          Terpercaya</span>
-      </h1>
-      <p class="mt-4 max-w-2xl mx-auto text-xl text-slate-600 mb-10">
-        Persiapkan diri Anda menembus impian dengan sistem Computer Assisted
-        Test yang real-time, akurat, dan transparan.
-      </p>
-      <div class="flex justify-center gap-4">
-        <a href="/login"
-          class="px-8 py-4 bg-yellow-600 text-white rounded-full font-bold text-lg hover:bg-yellow-700 transition transform hover:-translate-y-1 shadow-xl hover:shadow-yellow-600/40">
-          Mulai Ujian
-        </a>
-        <a href="#fitur"
-          class="px-8 py-4 bg-white text-slate-700 border border-slate-300 rounded-full font-bold text-lg hover:bg-slate-50 transition transform hover:-translate-y-1">
-          Pelajari Lebih Lanjut
-        </a>
+  <!-- Hero -->
+  <section class="relative min-h-screen flex items-center pt-20" style="background:var(--cream)">
+
+    <!-- Background decorative text -->
+    <div class="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none select-none">
+      <span class="big-number">CAT</span>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-6 lg:px-8 py-24 relative z-10">
+      <div class="max-w-3xl">
+
+        <div class="flex items-center gap-3 mb-8 fade-in">
+          <div class="ruled-line w-12"></div>
+          <span class="text-xs font-semibold uppercase tracking-[0.2em]" style="color:var(--gold)">Platform Ujian CAT Digital</span>
+        </div>
+
+        <h1 class="text-5xl md:text-7xl font-black leading-[1.05] mb-8 fade-in-delay-1" style="color:var(--dark)">
+          Persiapan<br/>
+          <span style="color:var(--gold)">Cerdas,</span><br/>
+          Hasil Terbaik.
+        </h1>
+
+        <p class="text-lg md:text-xl leading-relaxed mb-10 max-w-xl fade-in-delay-2" style="color:var(--muted); font-weight:300">
+          Latih kemampuan dengan soal-soal SKD, TKD, dan PPPK yang disusun sistematis. Pantau perkembangan lewat leaderboard real-time.
+        </p>
+
+        <div class="flex flex-wrap gap-4 mb-16 fade-in-delay-3">
+          <a href="/register" class="btn-primary px-8 py-4 text-sm font-semibold rounded-lg">
+            Mulai Latihan Gratis
+          </a>
+          <a href="#fitur" class="btn-outline px-8 py-4 text-sm font-semibold rounded-lg">
+            Lihat Fitur
+          </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-3 gap-8 fade-in-delay-3">
+          <div class="stat-card">
+            <p class="text-3xl font-black" style="font-family:'Playfair Display',serif; color:var(--dark)">500+</p>
+            <p class="text-xs font-medium mt-1 uppercase tracking-widest" style="color:var(--muted)">Bank Soal</p>
+          </div>
+          <div class="stat-card">
+            <p class="text-3xl font-black" style="font-family:'Playfair Display',serif; color:var(--dark)">3</p>
+            <p class="text-xs font-medium mt-1 uppercase tracking-widest" style="color:var(--muted)">Paket Ujian</p>
+          </div>
+          <div class="stat-card">
+            <p class="text-3xl font-black" style="font-family:'Playfair Display',serif; color:var(--dark)">Real</p>
+            <p class="text-xs font-medium mt-1 uppercase tracking-widest" style="color:var(--muted)">Time Score</p>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <!-- Decoration -->
-    <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
-      <div
-        class="absolute -top-40 -right-40 w-96 h-96 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob">
-      </div>
-      <div
-        class="absolute top-40 -left-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000">
-      </div>
-      <div
-        class="absolute -bottom-40 left-1/2 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000">
+    <!-- Ruled lines decoration (notebook feel) -->
+    <div class="absolute right-0 top-0 h-full w-1/3 overflow-hidden pointer-events-none hidden lg:block">
+      <div class="h-full flex flex-col justify-center gap-8 pr-8 opacity-10">
+        <% for(let i = 0; i < 20; i++) { %>
+        <div style="height:1px; background:var(--gold)"></div>
+        <% } %>
       </div>
     </div>
   </section>
 
-  <!-- Features Section -->
-  <section id="fitur" class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- Divider -->
+  <div class="ruled-line"></div>
+
+  <!-- Features -->
+  <section id="fitur" class="py-24" style="background:white; border-top: 3px solid #c8a020">
+    <div class="max-w-6xl mx-auto px-6 lg:px-8">
+
+      <div class="flex items-start gap-16 mb-16">
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="ruled-line w-8"></div>
+            <span class="text-xs font-semibold uppercase tracking-[0.2em]" style="color:var(--gold)">Kenapa Kami</span>
+          </div>
+          <h2 class="text-4xl md:text-5xl font-bold leading-tight" style="color:var(--dark)">
+            Dirancang untuk<br/>Kelulusan Anda.
+          </h2>
+        </div>
+        <div class="flex-1 hidden md:flex items-end">
+          <p class="text-base leading-relaxed" style="color:var(--muted); font-weight:300">
+            Setiap fitur dibangun dengan mempertimbangkan kebutuhan nyata peserta seleksi CPNS, Polri, dan PPPK.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <div class="feature-card p-8 rounded-xl">
+          <div class="w-12 h-12 rounded-lg flex items-center justify-center mb-6" style="background:rgba(184,146,74,0.1)">
+            <svg class="w-6 h-6" style="color:var(--gold)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3" style="color:var(--dark)">Nilai Instan</h3>
+          <p class="text-sm leading-relaxed" style="color:var(--muted)">Skor langsung keluar setelah ujian selesai. Evaluasi kemampuan secara akurat dan transparan tanpa menunggu.</p>
+        </div>
+
+        <div class="feature-card p-8 rounded-xl">
+          <div class="w-12 h-12 rounded-lg flex items-center justify-center mb-6" style="background:rgba(184,146,74,0.1)">
+            <svg class="w-6 h-6" style="color:var(--gold)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3" style="color:var(--dark)">Soal Berkualitas</h3>
+          <p class="text-sm leading-relaxed" style="color:var(--muted)">TWK, TIU, TKP, dan materi akademik yang disusun sesuai kisi-kisi terbaru dan diperbarui secara berkala.</p>
+        </div>
+
+        <div class="feature-card p-8 rounded-xl">
+          <div class="w-12 h-12 rounded-lg flex items-center justify-center mb-6" style="background:rgba(184,146,74,0.1)">
+            <svg class="w-6 h-6" style="color:var(--gold)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3" style="color:var(--dark)">Papan Peringkat</h3>
+          <p class="text-sm leading-relaxed" style="color:var(--muted)">Bandingkan skor dengan peserta lain secara real-time. Motivasi diri untuk terus meningkatkan kemampuan.</p>
+        </div>
+
+        <div class="feature-card p-8 rounded-xl">
+          <div class="w-12 h-12 rounded-lg flex items-center justify-center mb-6" style="background:rgba(184,146,74,0.1)">
+            <svg class="w-6 h-6" style="color:var(--gold)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3" style="color:var(--dark)">Sistem Token</h3>
+          <p class="text-sm leading-relaxed" style="color:var(--muted)">Akses ujian diamankan dengan token unik per peserta. Tidak bisa digunakan dua kali, aman dan terkontrol.</p>
+        </div>
+
+        <div class="feature-card p-8 rounded-xl">
+          <div class="w-12 h-12 rounded-lg flex items-center justify-center mb-6" style="background:rgba(184,146,74,0.1)">
+            <svg class="w-6 h-6" style="color:var(--gold)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3" style="color:var(--dark)">Timer Otomatis</h3>
+          <p class="text-sm leading-relaxed" style="color:var(--muted)">Waktu ujian berjalan otomatis sesuai paket yang dipilih. Simulasi kondisi ujian nyata yang sesungguhnya.</p>
+        </div>
+
+        <div class="feature-card p-8 rounded-xl">
+          <div class="w-12 h-12 rounded-lg flex items-center justify-center mb-6" style="background:rgba(184,146,74,0.1)">
+            <svg class="w-6 h-6" style="color:var(--gold)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3" style="color:var(--dark)">Dukungan Admin</h3>
+          <p class="text-sm leading-relaxed" style="color:var(--muted)">Tim admin siap membantu verifikasi pembayaran dan kendala teknis. Respons cepat via WhatsApp.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Paket Section -->
+  <section id="paket" class="py-24" style="background:var(--cream)">
+    <div class="max-w-6xl mx-auto px-6 lg:px-8">
+
       <div class="text-center mb-16">
-        <h2 class="text-3xl font-bold text-slate-900 sm:text-4xl">
-          Kenapa Memilih Kami?
-        </h2>
-        <p class="mt-4 text-lg text-slate-600">
-          Fitur lengkap untuk menunjang kelulusan Anda.
-        </p>
+        <div class="flex items-center justify-center gap-3 mb-4">
+          <div class="ruled-line w-8"></div>
+          <span class="text-xs font-semibold uppercase tracking-[0.2em]" style="color:var(--gold)">Pilihan Paket</span>
+          <div class="ruled-line w-8"></div>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold" style="color:var(--dark)">Paket Ujian Tersedia</h2>
+        <p class="text-base mt-4 max-w-lg mx-auto" style="color:var(--muted); font-weight:300">Pilih paket sesuai jalur seleksi yang kamu tuju. Semua paket sudah termasuk akses penuh ke bank soal.</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-        <!-- Feature 1 -->
-        <div class="p-8 bg-slate-50 rounded-2xl hover:shadow-xl transition duration-300 border border-slate-100 group">
-          <div
-            class="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center mb-6 group-hover:bg-yellow-600 transition duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg"
-              class="h-8 w-8 text-yellow-600 group-hover:text-white transition duration-300" fill="none"
-              viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <div class="paket-card rounded-xl overflow-hidden">
+          <div class="p-6" style="background:linear-gradient(135deg, #3a0f0f, #6b1a1a)">
+            <div class="text-4xl mb-4">🏛️</div>
+            <h3 class="font-bold text-white text-lg" style="font-family:'Playfair Display',serif">SKD / TKD</h3>
+            <p class="text-xs mt-1" style="color:rgba(255,255,255,0.5)">CPNS · Kedinasan · 90 Menit</p>
           </div>
-          <h3 class="text-xl font-bold text-slate-900 mb-3">
-            Realtime Scoring
-          </h3>
-          <p class="text-slate-600">
-            Nilai langsung keluar setelah selesai ujian. Evaluasi kemampuan
-            Anda secara instan dan akurat.
-          </p>
+          <div class="p-6">
+            <p class="text-sm leading-relaxed mb-6" style="color:var(--muted)">Latihan soal SKD/TKD lengkap untuk seleksi CPNS dan sekolah kedinasan. Mencakup TWK, TIU, dan TKP.</p>
+            <div class="flex items-end justify-between">
+              <div>
+                <p class="text-xs line-through" style="color:#ccc">Rp 100.000</p>
+                <p class="text-2xl font-black" style="font-family:'Playfair Display',serif; color:var(--gold)">Rp 50.000</p>
+              </div>
+              <span class="text-xs font-bold px-2 py-1 rounded" style="background:rgba(184,146,74,0.1); color:var(--gold)">50% OFF</span>
+            </div>
+            <a href="/register" class="btn-primary block text-center mt-4 py-3 text-sm font-semibold rounded-lg">Pilih Paket</a>
+          </div>
         </div>
 
-        <!-- Feature 2 -->
-        <div class="p-8 bg-slate-50 rounded-2xl hover:shadow-xl transition duration-300 border border-slate-100 group">
-          <div
-            class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-6 group-hover:bg-blue-600 transition duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg"
-              class="h-8 w-8 text-blue-600 group-hover:text-white transition duration-300" fill="none"
-              viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-            </svg>
+        <div class="paket-card rounded-xl overflow-hidden" style="border-color:var(--gold); box-shadow: 0 12px 40px -12px rgba(184,146,74,0.25)">
+          <div class="p-6 relative" style="background:linear-gradient(135deg, #0f1a3a, #1a2e6b)">
+            <div class="absolute top-4 right-4 text-[9px] font-bold px-3 py-1" style="background:var(--gold); color:white; font-family:'DM Sans',sans-serif">POPULER</div>
+            <div class="text-4xl mb-4">👮</div>
+            <h3 class="font-bold text-white text-lg" style="font-family:'Playfair Display',serif">Akademik Polri</h3>
+            <p class="text-xs mt-1" style="color:rgba(255,255,255,0.5)">Bintara · Akpol · 90 Menit</p>
           </div>
-          <h3 class="text-xl font-bold text-slate-900 mb-3">
-            Materi Terupdate
-          </h3>
-          <p class="text-slate-600">
-            Soal-soal TWK, TIU, dan TKP yang selalu diperbarui sesuai
-            kisi-kisi terbaru.
-          </p>
+          <div class="p-6">
+            <p class="text-sm leading-relaxed mb-6" style="color:var(--muted)">Persiapan ujian akademik Polri untuk jalur Bintara dan Akpol. Materi lengkap dan terstruktur.</p>
+            <div class="flex items-end justify-between">
+              <div>
+                <p class="text-xs line-through" style="color:#ccc">Rp 100.000</p>
+                <p class="text-2xl font-black" style="font-family:'Playfair Display',serif; color:var(--gold)">Rp 50.000</p>
+              </div>
+              <span class="text-xs font-bold px-2 py-1 rounded" style="background:rgba(184,146,74,0.1); color:var(--gold)">50% OFF</span>
+            </div>
+            <a href="/register" class="btn-primary block text-center mt-4 py-3 text-sm font-semibold rounded-lg">Pilih Paket</a>
+          </div>
         </div>
 
-        <!-- Feature 3 -->
-        <div class="p-8 bg-slate-50 rounded-2xl hover:shadow-xl transition duration-300 border border-slate-100 group">
-          <div
-            class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mb-6 group-hover:bg-green-600 transition duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg"
-              class="h-8 w-8 text-green-600 group-hover:text-white transition duration-300" fill="none"
-              viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
+        <div class="paket-card rounded-xl overflow-hidden">
+          <div class="p-6" style="background:linear-gradient(135deg, #0f3a1a, #1a6b2e)">
+            <div class="text-4xl mb-4">👨‍🏫</div>
+            <h3 class="font-bold text-white text-lg" style="font-family:'Playfair Display',serif">Paket PPPK</h3>
+            <p class="text-xs mt-1" style="color:rgba(255,255,255,0.5)">Guru · Teknis · 120 Menit</p>
           </div>
-          <h3 class="text-xl font-bold text-slate-900 mb-3">
-            Analisis Ranking
-          </h3>
-          <p class="text-slate-600">
-            Lihat posisi Anda dibandingkan peserta lain melalui fitur
-            Leaderboard yang transparan.
-          </p>
+          <div class="p-6">
+            <p class="text-sm leading-relaxed mb-6" style="color:var(--muted)">Latihan soal PPPK untuk tenaga guru, teknis, dan fungsional. Komprehensif dan sesuai standar.</p>
+            <div class="flex items-end justify-between">
+              <div>
+                <p class="text-xs line-through" style="color:#ccc">Rp 100.000</p>
+                <p class="text-2xl font-black" style="font-family:'Playfair Display',serif; color:var(--gold)">Rp 50.000</p>
+              </div>
+              <span class="text-xs font-bold px-2 py-1 rounded" style="background:rgba(184,146,74,0.1); color:var(--gold)">50% OFF</span>
+            </div>
+            <a href="/register" class="btn-primary block text-center mt-4 py-3 text-sm font-semibold rounded-lg">Pilih Paket</a>
+          </div>
         </div>
+
       </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-24" style="background:#5a0a0a">
+    <div class="max-w-6xl mx-auto px-6 lg:px-8 text-center">
+      <div class="ruled-line w-16 mx-auto mb-8" style="background:linear-gradient(90deg, transparent, rgba(184,146,74,0.5), transparent)"></div>
+      <h2 class="text-4xl md:text-6xl font-black mb-6" style="font-family:'Playfair Display',serif; color:var(--cream)">
+        Siap Untuk<br/><span style="color:var(--gold)">Lolos Seleksi?</span>
+      </h2>
+      <p class="text-base mb-10 max-w-md mx-auto" style="color:rgba(255,255,255,0.4); font-weight:300">
+        Daftar sekarang dan mulai latihan hari ini. Persaingan tidak menunggu.
+      </p>
+      <a href="/register" class="inline-block px-10 py-4 text-sm font-semibold rounded-lg transition" style="background:var(--gold); color:white; letter-spacing:0.05em">
+        Daftar Sekarang — Gratis
+      </a>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="bg-slate-900 text-slate-300 py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
-        <div class="mb-8 md:mb-0">
-          <div class="flex items-center gap-2 mb-4">
+  <footer class="py-12 border-t" style="background:#5a0a0a; border-color:rgba(255,255,255,0.05)">
+    <div class="max-w-6xl mx-auto px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+        <div>
+          <div class="flex items-center gap-2 mb-3">
             <img src="/logo.png" alt="Logo" class="h-8 w-auto" />
-            <span class="font-bold text-white text-xl">Tabeahan Cendekia</span>
+            <span class="font-bold text-lg" style="font-family:'Playfair Display',serif; color:var(--cream)">Tabeahan <span style="color:var(--gold)">Cendekia</span></span>
           </div>
-          <p class="text-sm max-w-sm">
-            Platform belajar dan ujian terbaik untuk masa depan Anda.
-          </p>
+          <p class="text-xs max-w-xs leading-relaxed" style="color:rgba(255,255,255,0.3)">Platform belajar dan ujian CAT untuk mempersiapkan seleksi terbaik.</p>
         </div>
-        <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-8 text-sm font-medium">
+        <div class="flex gap-8 text-xs font-medium" style="color:rgba(255,255,255,0.4)">
           <a href="#" class="hover:text-white transition">Privacy Policy</a>
           <a href="#" class="hover:text-white transition">Terms of Service</a>
-          <a href="#" class="hover:text-white transition">Contact</a>
+          <a href="#" class="hover:text-white transition">Hubungi Kami</a>
         </div>
       </div>
-      <div class="border-t border-slate-800 mt-12 pt-8 text-left md:text-center text-sm text-slate-500">
+      <div class="mt-10 pt-6 border-t text-xs text-center" style="border-color:rgba(255,255,255,0.05); color:rgba(255,255,255,0.2)">
         &copy; 2026 Tabeahan Cendekia. All rights reserved.
       </div>
     </div>
   </footer>
 
-  <style>
-    @keyframes blob {
-      0% {
-        transform: translate(0px, 0px) scale(1);
-      }
-
-      33% {
-        transform: translate(30px, -50px) scale(1.1);
-      }
-
-      66% {
-        transform: translate(-20px, 20px) scale(0.9);
-      }
-
-      100% {
-        transform: translate(0px, 0px) scale(1);
-      }
-    }
-
-    .animate-blob {
-      animation: blob 7s infinite;
-    }
-
-    .animation-delay-2000 {
-      animation-delay: 2s;
-    }
-
-    .animation-delay-4000 {
-      animation-delay: 4s;
-    }
-  </style>
   <script>
     const btn = document.getElementById('mobile-menu-button');
     const menu = document.getElementById('mobile-menu');
+    btn.addEventListener('click', () => menu.classList.toggle('hidden'));
 
-    btn.addEventListener('click', () => {
-      menu.classList.toggle('hidden');
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
     });
   </script>
 </body>
-
 </html>
