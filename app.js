@@ -143,22 +143,6 @@ app.get("/login", (req, res) => {
   res.render("login", { error: null });
 });
 
-// tolakPembayaran
-app.get("/admin/reject/:id", isAdmin, async (req, res) => {
-  const targetId = req.params.id;
-  try {
-    await db.query("UPDATE users SET status = 'DITOLAK' WHERE id = ?", [
-      targetId,
-    ]);
-    await db.query("UPDATE payments SET status = 'DITOLAK' WHERE user_id = ?", [
-      targetId,
-    ]);
-    res.redirect("/dashboardAdmin");
-  } catch (err) {
-    res.status(500).send("Gagal menolak verifikasi");
-  }
-});
-
 app.get("/dashboard", isLogin, async (req, res) => {
   try {
     const userId = req.session.user.id;
@@ -175,13 +159,19 @@ app.get("/dashboard", isLogin, async (req, res) => {
       ORDER BY skor DESC, id ASC
     `);
 
+    // Tambah query paket
+    const [paketList] = await db.query(
+      "SELECT * FROM paket_ujian WHERE is_active = 1"
+    );
+
     const myRank = rankingRows.findIndex((r) => r.username === user.username) + 1;
 
     res.render("users/dashboard", {
       user,
-      rankings: rankingRows.slice(0, 10),
+      rankings: rankingRows.slice(0, 5),
       myRank: myRank > 0 ? myRank : "-",
-      uploadError: req.query.uploadError || null, // ← tambah ini
+      uploadError: req.query.uploadError || null,
+      paketList, // ← tambah ini
     });
   } catch (err) {
     console.error(err);
@@ -272,7 +262,7 @@ app.post("/admin/updateSoal", isAdmin, async (req, res) => {
 app.post("/admin/delete-soal", isAdmin, async (req, res) => {
   const { id, paket } = req.body;
   try {
-    await db.query("DELETE FROM soal WHERE id = ?", [id]);
+    await db.query("DELETE FROM questions WHERE id = ?", [id]);
     res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}`);
   } catch (err) {
     res.status(500).send("Gagal menghapus soal");
@@ -523,6 +513,22 @@ app.post(
   },
 );
 
+// tolakPembayaran
+app.get("/admin/reject/:id", isAdmin, async (req, res) => {
+  const targetId = req.params.id;
+  try {
+    await db.query("UPDATE users SET status = 'DITOLAK' WHERE id = ?", [
+      targetId,
+    ]);
+    await db.query("UPDATE payments SET status = 'DITOLAK' WHERE user_id = ?", [
+      targetId,
+    ]);
+    res.redirect("/admin/daftarPeserta/");
+  } catch (err) {
+    res.status(500).send("Gagal menolak verifikasi");
+  }
+});
+
 app.get("/admin/verify/:id", isLogin, isAdmin, async (req, res) => {
   const targetId = req.params.id; // Ini ID orang yang mau diverifikasi
 
@@ -543,7 +549,7 @@ app.get("/admin/verify/:id", isLogin, isAdmin, async (req, res) => {
       `Update payment untuk User ${targetId} berhasil. Baris terpengaruh: ${result.affectedRows}`,
     );
 
-    res.redirect("/dashboardAdmin");
+    res.redirect("/admin/daftarPeserta/");
   } catch (err) {
     console.error("ERROR VERIFIKASI:", err);
     res.status(500).send(`
