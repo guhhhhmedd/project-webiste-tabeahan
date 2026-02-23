@@ -3,12 +3,20 @@ const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
 
+// --- 1. ROUTE MULAI UJIAN ---
 router.post("/mulai", async (req, res) => {
   try {
-    const { token_input } = req.body;
+    const { token_input, paket_pilihan } = req.body; // Ambil paket_pilihan dari dropdown dashboard
     const userId = req.session.user ? req.session.user.id : null;
 
     if (!userId) return res.redirect("/login");
+
+    // Pastikan user memilih paket
+    if (!paket_pilihan) {
+      return res.send(
+        "<script>alert('Pilih paket ujian dulu, Bre!'); window.location.href='/dashboard';</script>",
+      );
+    }
 
     // 1. Ambil data user
     const [users] = await db.query(
@@ -17,7 +25,7 @@ router.post("/mulai", async (req, res) => {
     );
     const user = users[0];
 
-    // 2. Validasi: Apakah sudah bayar? Apakah token benar?
+    // 2. Validasi Pembayaran & Token
     if (user.status !== "LUNAS") {
       return res.send(
         "<script>alert('Bayar dulu Le!'); window.location.href='/dashboard';</script>",
@@ -30,11 +38,12 @@ router.post("/mulai", async (req, res) => {
       );
     }
 
-    // 3. SET STATUS: biar bisa masuk ke halaman soal dan gak bisa keluar masuk sembarangan
+    // 3. SET STATUS & PAKET: Simpan paket yang dipilih user ke tabel users
     await db.query(
-      "UPDATE users SET status_ujian = 'SEDANG_UJIAN', waktu_mulai = NOW() WHERE id = ?",
-      [userId],
+      "UPDATE users SET status_ujian = 'SEDANG_UJIAN', waktu_mulai = NOW(), paket_pilihan = ? WHERE id = ?",
+      [paket_pilihan, userId],
     );
+
     req.session.isUjianActive = true;
     res.redirect("/ujian/soal");
   } catch (err) {
@@ -43,35 +52,43 @@ router.post("/mulai", async (req, res) => {
   }
 });
 
+// --- 2. ROUTE HALAMAN SOAL ---
 router.get("/soal", async (req, res) => {
   try {
     const userId = req.session.user ? req.session.user.id : null;
     if (!userId) return res.redirect("/login");
 
-    // Ambil data user terbaru
-    const [users] = await db.query("SELECT * FROM users WHERE id = ?", [
-      userId,
-    ]);
+    // Ambil data user DAN durasi dari tabel paket_ujian berdasarkan paket_pilihan user
+    const [users] = await db.query(
+      `SELECT u.*, p.durasi_menit 
+       FROM users u 
+       LEFT JOIN paket_ujian p ON u.paket_pilihan = p.nama_paket 
+       WHERE u.id = ?`,
+      [userId],
+    );
+
     const user = users[0];
 
-    // Proteksi: Kalau statusnya bukan SEDANG_UJIAN, tendang balik
-    if (user.status_ujian !== "SEDANG_UJIAN") {
+    // Proteksi status ujian
+    if (!user || user.status_ujian !== "SEDANG_UJIAN") {
       return res.redirect("/dashboard");
     }
 
-    // Ambil 50 Soal Acak
-    // nama kolom harus sesuai: id, materi, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e
-    const [daftarSoal] = await db.query(`
-        SELECT id, materi, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e 
-        FROM questions 
-        ORDER BY RAND() 
-        LIMIT 50
-    `);
+    // AMBIL SOAL SESUAI PAKET USER (Limit 100 soal acak)
+    const [daftarSoal] = await db.query(
+      `SELECT id, materi, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e 
+       FROM questions 
+       WHERE paket = ? 
+       ORDER BY RAND() 
+       LIMIT 100`,
+      [user.paket_pilihan],
+    );
 
     res.render("ujian-soal", {
       user: user,
       soal: daftarSoal,
-      waktuMulai: new Date (user.waktu_mulai).getTime()
+      durasi: user.durasi_menit || 90, // default 90 jika durasi tidak ditemukan
+      waktuMulai: new Date(user.waktu_mulai).getTime(),
     });
   } catch (err) {
     console.error(err);
@@ -79,6 +96,7 @@ router.get("/soal", async (req, res) => {
   }
 });
 
+// --- 3. SIMPAN JAWABAN (AJAX) ---
 router.post("/simpan-jawaban", async (req, res) => {
   try {
     const { questionId, jawaban } = req.body;
@@ -87,47 +105,48 @@ router.post("/simpan-jawaban", async (req, res) => {
     if (!userId) return res.status(401).json({ status: "error" });
 
     const query = `
-            INSERT INTO jawaban_peserta (user_id, question_id, jawaban_user) 
-            VALUES (?, ?, ?) 
-            ON DUPLICATE KEY UPDATE jawaban_user = VALUES(jawaban_user)
-        `;
+        INSERT INTO jawaban_peserta (user_id, question_id, jawaban_user) 
+        VALUES (?, ?, ?) 
+        ON DUPLICATE KEY UPDATE jawaban_user = VALUES(jawaban_user)
+    `;
 
     await db.query(query, [userId, questionId, jawaban]);
-
-    console.log(
-      `Jawaban User ${userId} untuk soal ${questionId} disimpan: ${jawaban}`,
-    );
     res.json({ status: "success" });
   } catch (err) {
-    console.error(" GAGAL SIMPAN JAWABAN:", err);
+    console.error("GAGAL SIMPAN JAWABAN:", err);
     res.status(500).json({ status: "error" });
   }
 });
 
-// route selesai paksa kalau users coba untuk keluar dari sesi ujian
+// --- 4. SELESAI PAKSA (Jika pindah tab/curang) ---
 router.post("/selesai-paksa", async (req, res) => {
-    const userId = req.session.user.id;
+  try {
+    const userId = req.session.user ? req.session.user.id : null;
+    if (!userId) return res.status(401).json({ status: "error" });
+
     await db.query("UPDATE users SET status_ujian = 'SELESAI' WHERE id = ?", [userId]);
-    
+
     req.session.isUjianActive = false;
     res.json({ message: "Ujian dihentikan paksa" });
+  } catch (err) {
+    console.error("GAGAL SELESAI PAKSA:", err);
+    res.status(500).json({ status: "error" });
+  }
 });
 
-// Route Selesai (Logika Scoring -1, +5, 0)
+// --- 5. ROUTE SELESAI NORMAL (Scoring) ---
 router.post("/selesai", async (req, res) => {
   try {
     const userId = req.session.user ? req.session.user.id : null;
     if (!userId) return res.status(401).json({ status: "error" });
 
     const [hasil] = await db.query(
-      `
-            SELECT 
-                UPPER(TRIM(j.jawaban_user)) as jawaban_user, 
-                UPPER(TRIM(q.kunci)) as kunci
-            FROM jawaban_peserta j
-            JOIN questions q ON j.question_id = q.id
-            WHERE j.user_id = ?
-            `,
+      `SELECT 
+        UPPER(TRIM(j.jawaban_user)) as jawaban_user, 
+        UPPER(TRIM(q.kunci)) as kunci
+       FROM jawaban_peserta j
+       JOIN questions q ON j.question_id = q.id
+       WHERE j.user_id = ?`,
       [userId],
     );
 
@@ -137,24 +156,20 @@ router.post("/selesai", async (req, res) => {
     let kosong = 0;
 
     hasil.forEach((row) => {
-      // Jika jawaban kosong atau null
-      if (!row.jawaban_user || row.jawaban_user === "") {
+      const jawUser = row.jawaban_user;
+      const kunci = row.kunci;
+
+      if (!jawUser || jawUser === "") {
         kosong++;
-        // Tidak ditambah, tidak dikurangi
-      }
-      // Jika jawaban Benar
-      else if (row.jawaban_user === row.kunci) {
+      } else if (jawUser === kunci) {
         benar++;
         skorTotal += 5;
-      }
-      // Jika jawaban Salah (Ada isinya tapi tidak sama dengan kunci)
-      else {
+      } else {
         salah++;
         skorTotal -= 1;
       }
     });
 
-    // Skor minimum 0 biar gak minus
     const skorFinal = Math.max(0, skorTotal);
 
     console.log(`=== HASIL AKHIR USER ${userId} ===`);
@@ -165,6 +180,7 @@ router.post("/selesai", async (req, res) => {
       [skorFinal, userId],
     );
 
+    req.session.isUjianActive = false;
     res.json({ status: "success", skor: skorFinal });
   } catch (err) {
     console.error("ERROR HITUNG SKOR:", err);

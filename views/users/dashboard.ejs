@@ -18,12 +18,10 @@
     .card-hover:hover { transform: translateY(-5px); }
     .dropdown:hover .dropdown-menu { display: block; }
 
-    /* Upload area styling */
     .upload-zone { transition: all 0.2s ease; }
     .upload-zone:hover { border-color: #b8924a; background: #fffbf5; }
     .upload-zone.dragover { border-color: #b8924a; background: #fff8ed; transform: scale(1.01); }
 
-    /* Error shake animation */
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
       20% { transform: translateX(-8px); }
@@ -33,7 +31,6 @@
     }
     .shake { animation: shake 0.4s ease; }
 
-    /* Toast notification */
     @keyframes slideIn {
       from { transform: translateX(100%); opacity: 0; }
       to { transform: translateX(0); opacity: 1; }
@@ -49,8 +46,7 @@
 
 <body class="bg-[#fdfaf5] min-h-screen">
 
-  <!-- Toast Error Notification -->
-  <% if (uploadError) { %>
+  <% if (typeof uploadError !== 'undefined' && uploadError) { %>
   <div id="toast" class="toast fixed top-4 right-4 z-[999] max-w-sm">
     <div class="bg-white border-l-4 border-red-500 rounded-xl shadow-2xl p-4 flex items-start gap-3">
       <div class="text-2xl">❌</div>
@@ -60,7 +56,6 @@
       </div>
       <button onclick="dismissToast()" class="text-slate-300 hover:text-slate-500 text-lg leading-none">×</button>
     </div>
-    <!-- Progress bar -->
     <div class="h-1 bg-red-100 rounded-b-xl overflow-hidden">
       <div id="toast-bar" class="h-full bg-red-400 w-full transition-all duration-[4000ms] ease-linear"></div>
     </div>
@@ -108,147 +103,139 @@
   <main class="p-4 md:p-8 max-w-6xl mx-auto">
     <div class="mb-8">
       <h1 class="text-2xl font-bungee text-tabeahan-dark">Selamat Datang, <%= user.username %>!</h1>
-      <p class="text-slate-500 text-sm">Status Ujian:
+      <p class="text-slate-500 text-sm">Status Akun: 
         <span class="font-bold <%= user.status === 'LUNAS' ? 'text-green-600' : 'text-orange-500' %>">
           <%= user.status %>
         </span>
       </p>
     </div>
 
-    <div class="lg:col-span-2 space-y-6">
-      <div class="bg-white p-8 rounded-3xl shadow-sm border-t-8 border-tabeahan min-h-[400px] flex flex-col justify-center relative overflow-hidden">
-        <div class="absolute -right-10 -bottom-10 text-[90px] opacity-5 select-none">📝</div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border-t-8 border-tabeahan min-h-[450px] flex flex-col justify-center relative overflow-hidden">
+          <div class="absolute -right-10 -bottom-10 text-[90px] opacity-5 select-none">📝</div>
 
-        <h3 class="font-bungee text-tabeahan-gold text-xl mb-6 text-center uppercase tracking-wider">Gerbang Utama Ujian</h3>
+          <h3 class="font-bungee text-tabeahan-gold text-xl mb-6 text-center uppercase tracking-wider">Gerbang Utama Ujian</h3>
 
-        <% if (user.status === 'LUNAS') { %>
-          <% if (user.status_ujian === 'SELESAI') { %>
-            <div class="text-center space-y-4">
-              <div class="inline-block p-4 bg-yellow-50 rounded-full mb-2"><span class="text-4xl">🎓</span></div>
-              <h4 class="text-slate-400 text-xs font-bold uppercase tracking-widest">Skor Akhir Anda</h4>
-              <div class="text-8xl font-bungee text-tabeahan-dark drop-shadow-md"><%= user.skor || 0 %></div>
-              <div class="inline-flex items-center gap-2 bg-tabeahan-dark text-yellow-400 px-6 py-2 rounded-full font-bungee text-sm shadow-lg">
-                RANKING #<%= typeof myRank !== 'undefined' ? myRank : '?' %>
+          <% if (user.status === 'LUNAS') { %>
+            <% if (user.status_ujian === 'SELESAI') { %>
+              <div class="text-center space-y-4">
+                <div class="inline-block p-4 bg-yellow-50 rounded-full mb-2"><span class="text-4xl">🎓</span></div>
+                <h4 class="text-slate-400 text-xs font-bold uppercase tracking-widest">Skor Akhir Anda</h4>
+                <div class="text-8xl font-bungee text-tabeahan-dark drop-shadow-md"><%= user.skor || 0 %></div>
+                <div class="inline-flex items-center gap-2 bg-tabeahan-dark text-yellow-400 px-6 py-2 rounded-full font-bungee text-sm shadow-lg">
+                  RANKING #<%= typeof myRank !== 'undefined' ? myRank : '?' %>
+                </div>
+                <p class="text-xs text-slate-400 mt-6 max-w-xs mx-auto italic underline">"Hasil ini sudah final dan tersimpan dalam database."</p>
               </div>
-              <p class="text-xs text-slate-400 mt-6 max-w-xs mx-auto italic underline">"Hasil ini sudah final dan tersimpan dalam database."</p>
+
+            <% } else { %>
+              <div class="text-center max-w-md mx-auto w-full">
+                <div class="p-4 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 mb-6">
+                  <p class="text-[10px] text-slate-500 mb-2 font-bold uppercase">Token Akses Ujian Anda:</p>
+                  <div class="bg-tabeahan-dark text-white p-4 rounded-xl shadow-inner">
+                    <span class="text-3xl font-bungee tracking-[0.1em] text-yellow-400"><%= user.token_ujian %></span>
+                  </div>
+                </div>
+
+                <form action="/ujian/mulai" method="POST" class="space-y-4">
+                  <div class="text-left">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Pilih Paket Ujian</label>
+                    <select name="paket_pilihan" class="w-full px-4 py-3 border-2 border-tabeahan rounded-xl font-bold bg-white outline-none focus:ring-4 focus:ring-yellow-200" required>
+                        <option value="" disabled selected>-- PILIH PAKET ANDA --</option>
+                        <option value="Paket SKD/TKD">PAKET SKD/TKD (90 Menit)</option>
+                        <option value="Paket Akademik Polri">PAKET AKADEMIK POLRI (90 Menit)</option>
+                        <option value="Paket PPPK">PAKET PPPK (120 Menit)</option>
+                    </select>
+                  </div>
+
+                  <div class="text-left">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Konfirmasi Token</label>
+                    <input type="text" name="token_input" placeholder="KETIK TOKEN DI SINI"
+                      class="w-full px-4 py-3 border-2 border-tabeahan rounded-xl text-center font-bungee tracking-widest focus:ring-4 focus:ring-yellow-200 outline-none uppercase" required>
+                  </div>
+
+                  <button type="submit"
+                    class="w-full bg-tabeahan-gold text-white py-4 rounded-2xl font-bungee text-lg hover:bg-yellow-700 transition-all shadow-[0_5px_0_0_#8b6d37] active:shadow-none active:translate-y-1"
+                    onclick="return confirm('Peringatan: Waktu akan mulai berjalan dan sistem akan mengunci layar. Anda siap?')">
+                    VERIFIKASI & MULAI UJIAN
+                  </button>
+                </form>
+                <p class="text-[10px] text-slate-400 mt-4 italic">Pastikan baterai penuh dan koneksi stabil.</p>
+              </div>
+            <% } %>
+
+          <% } else if (user.status === 'PENDING') { %>
+            <div class="text-center py-10">
+              <div class="text-6xl mb-4 animate-bounce">⏳</div>
+              <h4 class="font-bungee text-orange-500 text-lg">Validasi Pembayaran</h4>
+              <p class="text-sm text-slate-600 mt-2 max-w-sm mx-auto">Bukti transfer Anda sedang dicek manual oleh Admin. Halaman ini akan berubah otomatis jika sudah disetujui.</p>
             </div>
 
           <% } else { %>
-            <div class="text-center max-w-md mx-auto">
-              <div class="p-6 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 mb-6">
-                <p class="text-xs text-slate-500 mb-3 font-bold uppercase">Token Akses Ujian Anda:</p>
-                <div class="bg-tabeahan-dark text-white p-5 rounded-xl shadow-inner mb-4">
-                  <span class="text-4xl font-bungee tracking-[0.2em] text-yellow-400"><%= user.token_ujian %></span>
+            <div class="space-y-6">
+              <% if (user.status === 'DITOLAK') { %>
+              <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-lg flex items-start gap-3">
+                <span class="text-xl">❌</span>
+                <div>
+                  <p class="text-red-700 font-bold text-xs uppercase font-bungee">Pembayaran Ditolak</p>
+                  <p class="text-[10px] text-red-600">Bukti tidak valid. Silakan upload ulang bukti transfer yang jelas.</p>
                 </div>
-                <p class="text-[10px] text-red-500 italic mb-2">*Masukkan kembali token di atas untuk memvalidasi akses</p>
               </div>
-              <form action="/ujian/mulai" method="POST" class="space-y-4">
-                <input type="text" name="token_input" placeholder="KETIK TOKEN DI SINI"
-                  class="w-full px-4 py-3 border-2 border-tabeahan rounded-xl text-center font-bungee tracking-widest focus:ring-4 focus:ring-yellow-200 outline-none uppercase" required>
-                <button type="submit"
-                  class="w-full bg-tabeahan-gold text-white py-4 rounded-2xl font-bungee text-lg hover:bg-yellow-700 transition-all shadow-[0_5px_0_0_#8b6d37] active:shadow-none active:translate-y-1"
-                  onclick="return confirm('Waktu akan mulai berjalan. Anda siap?')">
-                  VERIFIKASI & MULAI UJIAN
+              <% } %>
+
+              <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-100 flex items-center justify-between">
+                <div class="text-xs text-slate-700">
+                  <p class="font-bold">Biaya Pendaftaran:</p>
+                  <p class="text-lg font-bungee text-tabeahan-dark">Rp 50.000</p>
+                </div>
+                <div class="text-right text-[10px] text-slate-500 leading-tight">
+                  <p class="font-bold text-tabeahan-dark">BCA: 1234-567-890</p>
+                  <p>a.n Tabeahan Cendekia</p>
+                </div>
+              </div>
+
+              <form action="/users/upload-bukti" method="POST" enctype="multipart/form-data" class="space-y-4" id="uploadForm">
+                <div id="dropZone" class="upload-zone border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center cursor-pointer relative min-h-[120px] flex items-center justify-center">
+                  <input type="file" name="bukti" id="buktiInput" accept="image/jpeg,image/png,image/jpg"
+                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    onchange="handleFileSelect(this)" required>
+
+                  <div id="dropContent" class="pointer-events-none">
+                    <div class="text-4xl mb-2">📁</div>
+                    <p class="font-bungee text-slate-500 text-xs uppercase tracking-wide">Klik atau drag bukti transfer</p>
+                    <p class="text-[10px] text-slate-400 mt-1">Format: JPG / PNG (Maks 2MB)</p>
+                  </div>
+
+                  <div id="filePreview" class="hidden pointer-events-none">
+                    <img id="previewImg" src="" alt="Preview" class="max-h-40 mx-auto rounded-xl shadow-md mb-2 object-contain">
+                    <p id="fileName" class="text-xs font-bold text-tabeahan-dark"></p>
+                    <p id="fileSize" class="text-[10px] text-slate-400"></p>
+                  </div>
+                </div>
+
+                <div id="fileError" class="hidden p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2">
+                  <span class="text-lg">⚠️</span>
+                  <p id="fileErrorText" class="text-xs text-red-600 font-bold"></p>
+                </div>
+
+                <button type="submit" id="submitBtn"
+                  class="w-full bg-tabeahan-dark text-yellow-400 py-3 rounded-xl font-bungee text-sm hover:bg-black transition-all shadow-lg">
+                  KIRIM BUKTI PEMBAYARAN
                 </button>
               </form>
-              <p class="text-[10px] text-slate-400 mt-4 italic">Pastikan koneksi internet stabil sebelum memulai.</p>
             </div>
           <% } %>
-
-        <% } else if (user.status === 'PENDING') { %>
-          <div class="text-center py-10">
-            <div class="text-6xl mb-4 animate-bounce">⏳</div>
-            <h4 class="font-bungee text-orange-500 text-lg">Validasi Pembayaran</h4>
-            <p class="text-sm text-slate-600 mt-2 max-w-sm mx-auto">Bukti transfer Anda sudah kami terima. Admin sedang mengecek manual. Mohon tunggu beberapa saat.</p>
-          </div>
-
-        <% } else { %>
-          <div class="space-y-6">
-
-            <% if (user.status === 'DITOLAK') { %>
-            <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-lg flex items-start gap-3">
-              <span class="text-xl">❌</span>
-              <div>
-                <p class="text-red-700 font-bold text-xs uppercase font-bungee">Pembayaran Ditolak</p>
-                <p class="text-[10px] text-red-600">Bukti tidak valid atau tidak terbaca. Mohon upload ulang.</p>
-              </div>
-            </div>
-            <% } %>
-
-            <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-100 flex items-center justify-between">
-              <div class="text-xs text-slate-700">
-                <p class="font-bold">Biaya Pendaftaran:</p>
-                <p class="text-lg font-bungee text-tabeahan-dark">Rp 50.000</p>
-              </div>
-              <div class="text-right text-[10px] text-slate-500 leading-tight">
-                <p>BCA: 1234-567-890</p>
-                <p>a.n Tabeahan Cendekia</p>
-              </div>
-            </div>
-
-            <!-- Upload Form -->
-            <form action="/users/upload-bukti" method="POST" enctype="multipart/form-data" class="space-y-4" id="uploadForm">
-
-              <!-- Drop Zone -->
-              <div id="dropZone"
-                class="upload-zone border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center cursor-pointer relative min-h-[120px] flex items-center justify-center"
-                ondragover="handleDragOver(event)"
-                ondragleave="handleDragLeave(event)"
-                ondrop="handleDrop(event)">
-
-                <!-- Input transparan menutupi seluruh area -->
-                <input type="file" name="bukti" id="buktiInput" accept="image/jpeg,image/png,image/jpg"
-                  class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                  onchange="handleFileSelect(this)" required>
-
-                <div id="dropContent" class="pointer-events-none">
-                  <div class="text-4xl mb-2">📁</div>
-                  <p class="font-bungee text-slate-500 text-xs uppercase tracking-wide">Klik atau drag file ke sini</p>
-                  <p class="text-[10px] text-slate-400 mt-1">JPG / PNG • Maksimal 2MB</p>
-                </div>
-
-                <!-- Preview setelah file dipilih -->
-                <div id="filePreview" class="hidden pointer-events-none">
-                  <img id="previewImg" src="" alt="Preview" class="max-h-40 mx-auto rounded-xl shadow-md mb-2 object-contain">
-                  <p id="fileName" class="text-xs font-bold text-tabeahan-dark"></p>
-                  <p id="fileSize" class="text-[10px] text-slate-400"></p>
-                  <p class="text-[10px] text-slate-400 mt-1 italic">Klik untuk ganti file</p>
-                </div>
-              </div>
-
-              <!-- Inline error untuk validasi client-side -->
-              <div id="fileError" class="hidden p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2">
-                <span class="text-lg">⚠️</span>
-                <p id="fileErrorText" class="text-xs text-red-600 font-bold"></p>
-              </div>
-
-              <!-- Info format yang diterima -->
-              <div class="flex gap-2 text-[10px] text-slate-400">
-                <span class="bg-slate-100 px-2 py-1 rounded-lg">✅ JPG</span>
-                <span class="bg-slate-100 px-2 py-1 rounded-lg">✅ PNG</span>
-                <span class="bg-red-50 text-red-400 px-2 py-1 rounded-lg">❌ PDF</span>
-                <span class="bg-red-50 text-red-400 px-2 py-1 rounded-lg">❌ DOCX</span>
-                <span class="bg-red-50 text-red-400 px-2 py-1 rounded-lg">❌ > 2MB</span>
-              </div>
-
-              <button type="submit" id="submitBtn"
-                class="w-full bg-tabeahan-dark text-yellow-400 py-3 rounded-xl font-bungee text-sm hover:bg-black transition-all shadow-lg disabled:opacity-40 disabled:cursor-not-allowed">
-                KIRIM KONFIRMASI PEMBAYARAN
-              </button>
-            </form>
-          </div>
-        <% } %>
+        </div>
       </div>
-    </div><br>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 space-y-6">
       <div class="lg:col-span-1 space-y-6">
-        <div class="bg-tabeahan-dark text-white p-6 rounded-2xl shadow-xl border-b-4 border-tabeahan card-hover">
-          <h3 class="font-bungee text-yellow-400 text-md mb-4 flex items-center gap-2">🏆 10 Besar Skor</h3>
+        <div class="bg-tabeahan-dark text-white p-6 rounded-3xl shadow-xl border-b-4 border-tabeahan card-hover">
+          <h3 class="font-bungee text-yellow-400 text-sm mb-4 flex items-center gap-2">🏆 Top 10 Leaderboard</h3>
           <div class="space-y-3">
-            <% if (rankings && rankings.length > 0) { %>
+            <% if (typeof rankings !== 'undefined' && rankings && rankings.length > 0) { %>
               <% rankings.forEach((r, index) => { %>
-                <div class="flex justify-between items-center text-xs p-2 rounded-lg <%= r.username === user.username ? 'bg-yellow-400/20 border border-yellow-400/50' : 'bg-white/5' %>">
+                <div class="flex justify-between items-center text-xs p-3 rounded-xl <%= r.username === user.username ? 'bg-yellow-400/20 border border-yellow-400/50' : 'bg-white/5' %>">
                   <span class="<%= r.username === user.username ? 'text-yellow-400 font-bold' : 'text-slate-300' %>">
                     <%= index + 1 %>. <%= r.username %>
                   </span>
@@ -256,9 +243,17 @@
                 </div>
               <% }) %>
             <% } else { %>
-              <p class="text-[10px] text-slate-400 italic text-center py-4">Belum ada data peringkat.</p>
+              <p class="text-[10px] text-slate-400 italic text-center py-4">Menunggu data peserta selesai...</p>
             <% } %>
           </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 card-hover">
+          <h4 class="font-bungee text-slate-400 text-[10px] mb-3 uppercase">Pusat Bantuan</h4>
+          <p class="text-xs text-slate-600 mb-4 leading-relaxed">Kendala login atau verifikasi? Hubungi admin via WhatsApp.</p>
+          <a href="https://wa.me/62812345678" target="_blank" class="block text-center bg-green-500 text-white py-3 rounded-xl font-bold text-xs hover:bg-green-600 transition">
+            HUBUNGI ADMIN (WA)
+          </a>
         </div>
       </div>
     </div>
@@ -268,13 +263,10 @@
     // === TOAST AUTO DISMISS ===
     const toast = document.getElementById('toast');
     if (toast) {
-      // Mulai progress bar
       setTimeout(() => {
         const bar = document.getElementById('toast-bar');
         if (bar) bar.style.width = '0%';
       }, 100);
-
-      // Auto dismiss setelah 4 detik
       setTimeout(() => dismissToast(), 4000);
     }
 
@@ -286,13 +278,12 @@
     }
 
     // === FILE UPLOAD VALIDATION ===
-    const MAX_SIZE = 2 * 1024 * 1024; // 2MB
+    const MAX_SIZE = 2 * 1024 * 1024;
     const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/jpg'];
 
     function handleFileSelect(input) {
       const file = input.files[0];
-      if (!file) return;
-      validateAndPreview(file);
+      if (file) validateAndPreview(file);
     }
 
     function handleDragOver(e) {
@@ -310,41 +301,29 @@
       const file = e.dataTransfer.files[0];
       if (!file) return;
 
-      // Assign ke input
       const input = document.getElementById('buktiInput');
       const dt = new DataTransfer();
       dt.items.add(file);
       input.files = dt.files;
-
       validateAndPreview(file);
     }
 
     function validateAndPreview(file) {
       const errorDiv = document.getElementById('fileError');
-      const errorText = document.getElementById('fileErrorText');
       const dropZone = document.getElementById('dropZone');
 
-      // Reset error
       errorDiv.classList.add('hidden');
 
-      // Validasi tipe file
       if (!ALLOWED_TYPES.includes(file.type)) {
-        showFileError(`Format "${file.name.split('.').pop().toUpperCase()}" tidak didukung! Gunakan JPG atau PNG.`);
-        dropZone.classList.add('shake');
-        setTimeout(() => dropZone.classList.remove('shake'), 400);
+        showFileError(`Format file tidak didukung!`);
         return;
       }
 
-      // Validasi ukuran
       if (file.size > MAX_SIZE) {
-        const sizeMB = (file.size / 1024 / 1024).toFixed(1);
-        showFileError(`File terlalu besar! Ukuran file: ${sizeMB}MB, maksimal 2MB.`);
-        dropZone.classList.add('shake');
-        setTimeout(() => dropZone.classList.remove('shake'), 400);
+        showFileError(`File terlalu besar (Maks 2MB)!`);
         return;
       }
 
-      // Tampilkan preview
       const reader = new FileReader();
       reader.onload = (e) => {
         document.getElementById('previewImg').src = e.target.result;
@@ -360,7 +339,6 @@
       const errorDiv = document.getElementById('fileError');
       document.getElementById('fileErrorText').textContent = msg;
       errorDiv.classList.remove('hidden');
-      // Reset file input
       document.getElementById('buktiInput').value = '';
       document.getElementById('dropContent').classList.remove('hidden');
       document.getElementById('filePreview').classList.add('hidden');
