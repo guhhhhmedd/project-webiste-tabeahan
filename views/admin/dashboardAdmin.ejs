@@ -1,210 +1,304 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Tabeahan Cendekia</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Tabeahan Cendekia</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
-<body class="bg-slate-100 font-sans text-slate-900">
-    <nav class="bg-[#0f172a] p-4 text-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex flex-col md:flex-row items-center gap-2 md:gap-6">
-                <div class="flex items-center gap-2">
-                    <span
-                        class="bg-yellow-600 text-[10px] px-2 py-0.5 rounded font-bold uppercase text-white">Administrator</span>
-                    <span class="font-bold tracking-wider text-sm md:text-base">TABEAHAN CENDEKIA</span>
-                </div>
-                <div class="flex gap-4 text-[10px] md:text-xs font-bold uppercase tracking-widest mt-2 md:mt-0">
-                    <a href="/dashboardAdmin" class="text-yellow-500 border-b border-yellow-500 pb-1">Dashboard</a>
-                    <a href="/admin/daftarPeserta" class="text-slate-400 hover:text-white transition">Peserta Ujian</a>
-                </div>
-            </div>
-            <a href="/logout"
-                class="bg-red-600 hover:bg-red-700 px-6 py-1.5 md:py-1 rounded text-xs font-bold transition w-full md:w-auto text-center">Logout</a>
+<body class="bg-neutral-300 font-sans text-slate-900 min-h-screen">
+
+  <!-- NAVBAR -->
+  <nav class="bg-[#0f172a] text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 py-3 flex justify-between items-center">
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2.5">
+          <img src="/logo.png" alt="Logo" class="h-8 w-auto opacity-90">
+          <div>
+            <span class="font-bold text-sm tracking-wide block leading-tight">TABEAHAN CENDEKIA</span>
+            <span
+              class="bg-yellow-500 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase text-slate-900">Administrator</span>
+          </div>
         </div>
-    </nav>
-
-    <div class="max-w-7xl mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
-
-        <div class="lg:col-span-4 space-y-6">
-            <div class="bg-white p-5 md:p-6 rounded-3xl shadow-sm border ">
-                <div class="flex items-center gap-2 mb-4 border-b pb-2">
-                    <span class="text-xl">📝</span>
-                    <h3 class="text-lg font-bold text-slate-800">Tambah Soal CAT</h3>
-                </div>
-                <form action="/admin/tambah-soal" method="POST" class="space-y-4">
-                    <div class="grid grid-cols-1 gap-4">
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase">Pilih Paket</label>
-                            <select name="paket"
-                                class="w-full border border-slate-300 p-3 rounded-lg bg-slate-50 mt-1 focus:ring-2 focus:ring-blue-500 outline-none text-sm"
-                                required>
-                                <option value="Paket SKD/TKD">Paket SKD/TKD</option>
-                                <option value="Paket Akademik Polri">Paket Akademik Polri</option>
-                                <option value="Paket PPPK">Paket PPPK</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase">Kategori Materi</label>
-                            <select name="materi"
-                                class="w-full border border-slate-300 p-3 rounded-lg bg-slate-50 mt-1 focus:ring-2 focus:ring-blue-500 outline-none text-sm"
-                                required>
-                                <option value="TWK">TWK</option>
-                                <option value="TIU">TIU</option>
-                                <option value="TKP">TKP</option>
-                                <option value="Pengetahuan Umum">Pengetahuan Umum</option>
-                                <option value="Wawsaan Kebangsaan">Wawsaan Kebangsaan</option>
-                                <option value="Penalaran Numerik">Penalaran Numerik</option>
-                                <option value="Bahasa Indonesia">Bahasa Indonesia</option>
-                                <option value="Bahasa Inggris">Bahasa Inggris</option>
-                                <option value="Kompetensi Teknis">Kompetensi Teknis</option>
-                                <option value="Kompetensi Manajerial">Kompetensi Manajerial</option>
-                                <option value="Kompetensi Sosial-Kultural">Kompetensi Sosial-Kultural</option>
-                                <option value="Kompetensi Wawancara">Kompetensi Wawancara</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-500 uppercase">Pertanyaan</label>
-                        <textarea name="soal" placeholder="Tulis soal di sini..."
-                            class="w-full border border-slate-300 p-3 rounded-lg h-28 mt-1 focus:ring-2 focus:ring-blue-500 outline-none text-sm"
-                            required></textarea>
-                    </div>
-                    <div class="grid grid-cols-1 gap-2">
-                        <input type="text" name="a" placeholder="Opsi A" class="border p-3 rounded-lg text-sm" required>
-                        <input type="text" name="b" placeholder="Opsi B" class="border p-3 rounded-lg text-sm" required>
-                        <input type="text" name="c" placeholder="Opsi C" class="border p-3 rounded-lg text-sm" required>
-                        <input type="text" name="d" placeholder="Opsi D" class="border p-3 rounded-lg text-sm" required>
-                        <input type="text" name="e" placeholder="Opsi E" class="border p-3 rounded-lg text-sm" required>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-500 uppercase">Kunci Jawaban</label>
-                        <select name="kunci"
-                            class="w-full border-2 border-yellow-400 p-3 rounded-lg bg-yellow-50 font-bold" required>
-                            <option value="a">Opsi A</option>
-                            <option value="b">Opsi B</option>
-                            <option value="c">Opsi C</option>
-                            <option value="d">Opsi D</option>
-                            <option value="e">Opsi E</option>
-                        </select>
-                    </div>
-                    <button
-                        class="w-full bg-[#0f172a] cursor-pointer text-white py-4 rounded-xl font-bold hover:bg-black transition shadow-lg active:scale-95">
-                        SIMPAN DATA SOAL
-                    </button>
-                </form>
-            </div>
-
-            <div
-                class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-green-500">
-                <div class="flex items-center gap-2 mb-4 border-b pb-2">
-                    <span class="text-xl">📊</span>
-                    <h3 class="text-lg font-bold text-slate-800">Bulk Import Excel</h3>
-                </div>
-                <form action="/admin/upload-soal" method="POST" enctype="multipart/form-data" class="space-y-4">
-                    <input type="file" name="fileExcel" accept=".xlsx, .xls" required
-                        class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer" />
-                    <button
-                        class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition text-xs">
-                        UPLOAD & PROSES EXCEL
-                    </button>
-                </form>
-            </div>
+        <div class="hidden md:flex gap-5 text-[11px] font-bold uppercase tracking-widest">
+          <a href="/dashboardAdmin" class="text-yellow-400 border-b border-yellow-400 pb-0.5">Dashboard</a>
+          <a href="/admin/daftarPeserta" class="text-slate-400 hover:text-white transition">Peserta Ujian</a>
         </div>
-
-        <div class="lg:col-span-8 space-y-6">
-            <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                <div
-                    class="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row justify-between md:items-center gap-2">
-                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">📦 Kelola Soal Per Paket</h3>
-                    <span class="text-[9px] md:text-[10px] text-slate-400 font-bold">Klik tombol untuk edit/hapus
-                        soal</span>
-                </div>
-                <div class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                    <% if (statsSoal.length> 0) { %>
-                        <% statsSoal.forEach(s=> { %>
-                            <div
-                                class="p-4 bg-white rounded-xl border border-slate-200 hover:border-blue-400 transition-all group shadow-sm flex flex-col justify-between">
-                                <div>
-                                    <p class="text-[9px] text-slate-400 uppercase font-bold tracking-widest mb-1">DATA
-                                        PAKET</p>
-                                    <h4 class="text-base font-black text-slate-700 leading-tight mb-4 uppercase">
-                                        <%= s.paket %>
-                                    </h4>
-                                </div>
-                                <div class="flex items-end justify-between">
-                                    <p class="text-2xl font-black text-blue-600 leading-none">
-                                        <%= s.total %> <span class="text-xs font-normal text-slate-400">Soal</span>
-                                    </p>
-                                    <a href="/admin/kelola-soal/<%= encodeURIComponent(s.paket) %>"
-                                        class="bg-slate-100 group-hover:bg-blue-600 group-hover:text-white text-slate-600 px-3 py-2 rounded-lg text-[9px] font-bold transition-colors">
-                                        KELOLA →
-                                    </a>
-                                </div>
-                            </div>
-                            <% }) %>
-                                <% } else { %>
-                                    <p class="text-xs text-slate-400 italic p-4">Belum ada data soal terinput.</p>
-                                    <% } %>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                <div class="p-4 border-b border-slate-100 bg-slate-50/50">
-                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">⏱️ Pengaturan Durasi Ujian</h3>
-                </div>
-                <div class="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <% daftarPaket.forEach(p=> { %>
-                        <form action="/admin/update-durasi" method="POST"
-                            class="p-4 border rounded-xl bg-slate-50 flex flex-col gap-3 transition hover:border-blue-300">
-                            <input type="hidden" name="id" value="<%= p.id %>">
-                            <span class="text-[9px] font-black text-blue-600 uppercase tracking-tighter truncate">
-                                <%= p.nama_paket %>
-                            </span>
-                            <div class="flex items-center gap-2">
-                                <input type="number" name="durasi" value="<%= p.durasi_menit %>"
-                                    class="w-full border border-slate-300 p-2 rounded-lg text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none">
-                                <span class="text-[10px] text-slate-500 font-bold">MIN</span>
-                            </div>
-                            <button type="submit"
-                                class="bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold hover:bg-blue-700 transition uppercase shadow-sm">
-                                Update
-                            </button>
-                        </form>
-                        <% }) %>
-                </div>
-            </div>
-        </div>
+      </div>
+      <a href="/logout" class="bg-red-600 hover:bg-red-700 px-5 py-1.5 rounded text-xs font-bold transition">Logout</a>
     </div>
-    <script>
-        const materiPerPaket = {
-            "Paket SKD/TKD": ["TWK", "TIU", "TKP"],
-            "Paket Akademik Polri": ["Pengetahuan Umum", "Wawasan Kebangsaan", "Penalaran Numerik", "Bahasa Indonesia", "Bahasa Inggris"],
-            "Paket PPPK": ["Kompetensi Teknis", "Kompetensi Manajerial", "Kompetensi Sosial-Kultural", "Kompetensi Wawancara"]
-        };
+  </nav>
 
-        const paketSelect = document.querySelector('select[name="paket"]');
-        const materiSelect = document.querySelector('select[name="materi"]');
+  <div class="max-w-7xl mx-auto px-4 md:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        function updateMateri() {
-            const paket = paketSelect.value;
-            const materiList = materiPerPaket[paket] || [];
+    <div class="lg:col-span-5 space-y-5">
 
-            materiSelect.innerHTML = '';
-            materiList.forEach(m => {
-                const opt = document.createElement('option');
-                opt.value = m;
-                opt.textContent = m;
-                materiSelect.appendChild(opt);
-            });
-        }
+      <!-- Form Tambah Soal Manual -->
+      <div class="bg-white shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-sky-500 border-b border-slate-200 px-5 py-3 flex items-center gap-2">
+          <span class="text-base">📝</span>
+          <h3 class="font-bold text-slate-800 text-sm">Tambah Soal CAT</h3>
+        </div>
+        <div class="p-5">
+          <form action="/admin/tambah-soal" method="POST" class="space-y-3">
 
-        paketSelect.addEventListener('change', updateMateri);
-        updateMateri(); // jalankan saat halaman pertama load
-    </script>
+            <!-- Paket & Materi sejajar -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Pilih Paket</label>
+                <select name="paket"
+                  class="w-full border border-slate-300 p-2.5 rounded-lg bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  required>
+                  <option value="Paket SKD/TKD">Paket SKD/TKD</option>
+                  <option value="Paket Akademik Polri">Paket Akademik Polri</option>
+                  <option value="Paket PPPK">Paket PPPK</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Kategori Materi</label>
+                <select name="materi"
+                  class="w-full border border-slate-300 p-2.5 rounded-lg bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  required></select>
+              </div>
+            </div>
+
+            <!-- Pertanyaan -->
+            <div>
+              <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Pertanyaan</label>
+              <textarea name="soal" placeholder="Tulis soal di sini..."
+                class="w-full border border-slate-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none h-24"
+                required></textarea>
+            </div>
+
+            <!-- Opsi A-E dalam 2 kolom -->
+            <div>
+              <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Pilihan Jawaban</label>
+              <div class="grid grid-cols-2 gap-2">
+                <input type="text" name="a" placeholder="A. ..."
+                  class="border border-slate-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  required>
+                <input type="text" name="b" placeholder="B. ..."
+                  class="border border-slate-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  required>
+                <input type="text" name="c" placeholder="C. ..."
+                  class="border border-slate-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  required>
+                <input type="text" name="d" placeholder="D. ..."
+                  class="border border-slate-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  required>
+                <input type="text" name="e" placeholder="E. ..."
+                  class="col-span-2 border border-slate-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  required>
+              </div>
+            </div>
+
+            <!-- Kunci + Submit sejajar -->
+            <div class="flex items-end gap-3">
+              <div class="flex-1">
+                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Kunci Jawaban</label>
+                <select name="kunci"
+                  class="w-full border-2 border-yellow-400 p-2.5 rounded-lg bg-yellow-50 font-bold text-sm outline-none"
+                  required>
+                  <option value="a">Opsi A</option>
+                  <option value="b">Opsi B</option>
+                  <option value="c">Opsi C</option>
+                  <option value="d">Opsi D</option>
+                  <option value="e">Opsi E</option>
+                </select>
+              </div>
+              <button type="submit"
+                class="bg-[#0f172a] hover:bg-slate-800 active:scale-95 text-white px-5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer shadow">
+                SIMPAN SOAL
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+      <!-- Form Import Excel -->
+      <div class="bg-white overflow-hidden">
+        <div class="bg-sky-500 border-b border-slate-200 px-5 py-3 flex items-center gap-2">
+          <span class="text-base"></span>
+          <h3 class="font-bold text-slate-800 text-sm">Bulk Import Excel</h3>
+          <span class="ml-auto text-[10px] text-black-400 font-semibold">Upload banyak soal sekaligus</span>
+        </div>
+        <div class="p-5 space-y-4">
+          <form action="/admin/upload-soal" method="POST" enctype="multipart/form-data" class="space-y-3">
+
+            <!-- Drop zone -->
+            <div
+              class="border-2 border-dashed border-slate-300 hover:border-green-400 rounded-xl p-5 text-center transition bg-slate-50 hover:bg-green-50">
+              <div class="text-3xl mb-2">📊</div>
+              <p class="text-xs font-semibold text-slate-600 mb-1">Pilih file Excel</p>
+              <p class="text-[10px] text-slate-400 mb-3">Format .xlsx atau .xls</p>
+              <input type="file" name="fileExcel" accept=".xlsx,.xls" required
+                class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-green-100 file:text-green-700 hover:file:bg-green-200 cursor-pointer">
+            </div>
+
+            <!-- Info format -->
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+              <p class="text-[10px] font-bold text-slate-500 uppercase mb-1">Format Kolom Excel:</p>
+              <p class="text-[11px] text-slate-600 font-mono">paket | materi | soal | a | b | c | d | e | kunci</p>
+            </div>
+
+            <!-- Peringatan ENUM -->
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+              <p class="text-[10px] font-bold text-yellow-700 uppercase mb-1">⚠️ Nama paket harus tepat:</p>
+              <ul class="text-[10px] text-yellow-700 space-y-0.5 pl-3 list-disc">
+                <li>Paket SKD/TKD</li>
+                <li>Paket Akademik Polri</li>
+                <li>Paket PPPK</li>
+              </ul>
+            </div>
+
+            <button type="submit"
+              class="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-lg text-xs font-bold transition cursor-pointer">
+              UPLOAD & PROSES EXCEL
+            </button>
+
+            <a href="/template_import_soal.xlsx" download
+              class="w-full flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-300 py-2.5 rounded-lg text-xs font-bold transition">
+               Download Template Excel
+            </a>
+          </form>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== KOLOM KANAN ===== -->
+    <div class="lg:col-span-7 space-y-5">
+
+      <!-- Soal Per Paket -->
+      <div class="bg-white  shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-sky-500 border-b border-slate-200 px-5 py-3 flex items-center gap-2">
+          <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">Kelola Soal Per Paket</h3>
+          <span class="text-[10px] text-black-400 font-semibold">Klik tombol untuk edit/hapus soal</span>
+        </div>
+        <div class="p-5">
+          <% if (statsSoal.length> 0) { %>
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+              <% statsSoal.forEach((s, i)=> { %>
+                <% const colors=['border-l-slate-800', 'border-l-blue-600' , 'border-l-green-600' ]; const
+                  textColors=['text-slate-800', 'text-blue-600' , 'text-green-600' ]; const
+                  bgColors=['bg-slate-800', 'bg-blue-600' , 'bg-green-600' ]; const cl=colors[i] || colors[0]; const
+                  tc=textColors[i] || textColors[0]; const bc=bgColors[i] || bgColors[0]; %>
+                  <div
+                    class="border border-slate-200 border-l-4 <%= cl %> rounded-xl p-4 hover:shadow-md transition-all group flex flex-col justify-between gap-3">
+                    <div>
+                      <p class="text-[9px] text-slate-400 uppercase font-bold tracking-widest mb-1">Paket Ujian</p>
+                      <h4 class="text-sm font-black text-slate-700 leading-tight">
+                        <%= s.paket %>
+                      </h4>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                      <p class="text-2xl font-black <%= tc %> leading-none">
+                        <%= s.total %><span class="text-xs font-normal text-slate-400 ml-1">soal</span>
+                      </p>
+                      <a href="/admin/kelola-soal/<%= encodeURIComponent(s.paket) %>"
+                        class="<%= bc %> text-white px-3 py-1.5 rounded-lg text-[10px] font-bold transition opacity-80 group-hover:opacity-100">
+                        KELOLA →
+                      </a>
+                    </div>
+                  </div>
+                  <% }) %>
+            </div>
+            <% } else { %>
+              <div class="text-center py-10 text-slate-400">
+                <div class="text-4xl mb-2 opacity-30">📭</div>
+                <p class="text-xs font-semibold">Belum ada soal yang diinput.</p>
+              </div>
+              <% } %>
+        </div>
+      </div>
+
+      <!-- Durasi Ujian -->
+      <div class="bg-white shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-sky-500 border-b border-slate-200 px-5 py-3 flex items-center gap-2">
+          <h3 class="font-bold text-black-800 text-sm flex items-center gap-2"> Pengaturan Durasi Ujian</h3>
+          <span class="text-[10px] text-black-400 font-semibold">Satuan: menit</span>
+        </div>
+        <div class="p-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <% daftarPaket.forEach((p, i)=> { %>
+            <% const borders=['hover:border-slate-400', 'hover:border-blue-400' , 'hover:border-green-400' ]; const
+              bts=['bg-slate-800 hover:bg-slate-900', 'bg-blue-600 hover:bg-blue-700'
+              , 'bg-green-600 hover:bg-green-700' ]; const bd=borders[i] || borders[0]; const bt=bts[i] || bts[0]; %>
+              <form action="/admin/update-durasi" method="POST"
+                class="border border-slate-200 <%= bd %> rounded-xl p-4 bg-slate-50 flex flex-col gap-3 transition">
+                <input type="hidden" name="id" value="<%= p.id %>">
+                <p class="text-[10px] font-black text-slate-600 uppercase tracking-tight truncate">
+                  <%= p.nama_paket %>
+                </p>
+                <div class="flex items-center gap-2">
+                  <input type="number" name="durasi" value="<%= p.durasi_menit %>"
+                    class="w-full border border-slate-300 p-2 rounded-lg text-sm font-bold text-center focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                  <span class="text-[10px] text-slate-400 font-bold flex-shrink-0">MIN</span>
+                </div>
+                <button type="submit"
+                  class="<%= bt %> text-white py-2 rounded-lg text-[10px] font-bold transition uppercase cursor-pointer">
+                  Update
+                </button>
+              </form>
+              <% }) %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-xl border-l-4 border-yellow-400 shadow-xl
+           translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+  </div>
+
+  <script>
+    // Materi per paket
+    const materiPerPaket = {
+      "Paket SKD/TKD": ["TWK", "TIU", "TKP"],
+      "Paket Akademik Polri": ["Pengetahuan Umum", "Wawasan Kebangsaan", "Penalaran Numerik", "Bahasa Indonesia", "Bahasa Inggris"],
+      "Paket PPPK": ["Kompetensi Teknis", "Kompetensi Manajerial", "Kompetensi Sosial-Kultural", "Kompetensi Wawancara"]
+    };
+
+    const paketSelect = document.querySelector('select[name="paket"]');
+    const materiSelect = document.querySelector('select[name="materi"]');
+
+    function updateMateri() {
+      const list = materiPerPaket[paketSelect.value] || [];
+      materiSelect.innerHTML = '';
+      list.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m; opt.textContent = m;
+        materiSelect.appendChild(opt);
+      });
+    }
+    paketSelect.addEventListener('change', updateMateri);
+    updateMateri();
+
+    // Toast
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.remove('translate-y-20', 'opacity-0');
+      t.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        t.classList.add('translate-y-20', 'opacity-0');
+        t.classList.remove('translate-y-0', 'opacity-100');
+      }, 3000);
+    }
+
+    document.querySelectorAll('form').forEach(form => {
+      form.addEventListener('submit', () => {
+        const a = form.action;
+        if (a.includes('tambah-soal')) showToast('✅ Soal berhasil disimpan!');
+        if (a.includes('upload-soal')) showToast('📂 Mengupload file Excel...');
+        if (a.includes('update-durasi')) showToast('⏱️ Durasi berhasil diupdate!');
+      });
+    });
+  </script>
+
 </body>
 
 </html>
