@@ -53,7 +53,7 @@ body::after {
   position: relative;
 }
 .nav-link::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -3px;
   left: 0;
@@ -222,4 +222,180 @@ body::after {
 /* Diagonal section divider */
 .diagonal-top {
   clip-path: polygon(0 4%, 100% 0%, 100% 100%, 0% 100%);
+}
+
+/* ══════════════════════════════════════
+   MOBILE RESPONSIVENESS — max-width 768px
+   ══════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* ── Navbar ── */
+  .navbar {
+    position: fixed;
+    width: 100%;
+  }
+  .navbar > div {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .navbar-logo {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  /* ── Hero Section ── */
+  .hero-section {
+    min-height: unset !important;
+    padding: 5rem 1.25rem 2.5rem !important;
+  }
+  .hero-section img {
+    max-width: 100% !important;
+    max-height: 260px !important;
+  }
+  .hero-section h1 {
+    font-size: 1.75rem !important;
+    line-height: 1.3 !important;
+  }
+
+  /* ── Section padding ganti py-24 jadi lebih kecil ── */
+  section.py-24,
+  section[class*="py-24"] {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+  }
+
+  /* ── Section header margin ── */
+  .text-center.mb-16 {
+    margin-bottom: 2rem;
+  }
+  .text-center.mb-14 {
+    margin-bottom: 1.75rem;
+  }
+
+  /* ── Section headings ── */
+  section h2 {
+    font-size: 1.75rem !important;
+    line-height: 1.3 !important;
+  }
+
+  /* ── Feature cards ── */
+  .feature-card {
+    padding: 1.25rem !important;
+  }
+
+  /* ── Paket cards ── */
+  .paket-card {
+    width: 100%;
+  }
+
+  /* ── YouTube CTA button ── */
+  #video .text-center a {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* ── Kelas Fleksibel cards ── */
+  #kelas .feature-card {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem !important;
+  }
+
+  /* ── CTA Section ── */
+  .cta-section {
+    padding-top: 2.5rem !important;
+    padding-bottom: 2.5rem !important;
+  }
+  .cta-section h2 {
+    font-size: 2rem !important;
+  }
+
+  /* ── Footer ── */
+  footer {
+    padding-top: 2.5rem;
+    padding-bottom: 1.5rem;
+  }
+  footer .grid {
+    gap: 2rem;
+  }
+
+  /* ── FAQ ── */
+  .faq-btn {
+    padding: 1rem 1.25rem;
+    font-size: 0.875rem;
+  }
+  .faq-btn span {
+    font-size: 0.875rem !important;
+  }
+
+  /* ── Hero trust badges ── */
+  .hero-trust {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  /* ── CTA buttons hero ── */
+  .hero-cta {
+    flex-direction: column;
+    width: 100%;
+  }
+  .hero-cta a {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  /* ── Section inner padding ── */
+  section > div.max-w-6xl,
+  section > div.max-w-3xl {
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+  }
+
+  /* ── Video cards ── */
+  #video .grid {
+    gap: 1rem;
+  }
+
+  /* ── Paket section ── */
+  #paket .grid {
+    gap: 1rem;
+  }
+
+  /* ── Features grid ── */
+  #fitur .grid {
+    gap: 1rem;
+  }
+
+  /* ── Kelas grid ── */
+  #kelas .grid {
+    gap: 1rem;
+  }
+}
+
+/* ══════════════════════════════════════
+   EXTRA SMALL — max-width 480px
+   ══════════════════════════════════════ */
+@media (max-width: 480px) {
+  section h2 {
+    font-size: 1.5rem !important;
+  }
+
+  .hero-section h1 {
+    font-size: 1.5rem !important;
+  }
+
+  .hero-section img {
+    max-height: 200px !important;
+  }
+
+  /* FAQ font size */
+  .faq-btn span {
+    font-size: 0.8125rem !important;
+  }
+
+  /* CTA big heading */
+  section[style*="#5a0a0a"] h2 {
+    font-size: 1.75rem !important;
+  }
 }
