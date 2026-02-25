@@ -69,7 +69,7 @@
         <div class="bg-white p-4 rounded-xl shadow h-fit">
             <div class="grid grid-cols-5 gap-2">
                 <% soal.forEach((s, index)=> { %>
-                    <button id="nav-<%= index %>" onclick="lompat(<%= index %>)"
+                    <button id="nav-<%= index %>" data-index="<%= index %>"
                         class="nav-item w-10 h-10 border rounded text-xs text-slate-400">
                         <%= index + 1 %>
                     </button>
@@ -176,6 +176,13 @@
         }
 
         updateView();
+
+        // Event listener untuk tombol navigasi soal (menggantikan onclick inline)
+        document.querySelectorAll('.nav-item[data-index]').forEach(btn => {
+            btn.addEventListener('click', function () {
+                lompat(parseInt(this.dataset.index));
+            });
+        });
 
 
         // 1. Matikan Klik Kanan

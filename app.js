@@ -20,7 +20,7 @@ app.use(
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
         styleSrc: ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "blob:"],
+        imgSrc: ["'self'", "data:", "blob:", "https://img.youtube.com"],
         fontSrc: [
           "'self'",
           "https://fonts.googleapis.com",
@@ -131,6 +131,14 @@ function isAdmin(req, res, next) {
 
 app.get("/", (req, res) => {
   res.render("landing");
+});
+
+app.get("/terms", (req, res) => {
+  res.render("terms");
+});
+
+app.get("/privacy", (req, res) => {
+  res.render("privacy");
 });
 
 app.get("/register", (req, res) => {

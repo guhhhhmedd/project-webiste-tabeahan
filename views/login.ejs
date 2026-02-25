@@ -59,7 +59,7 @@
   <!-- Left panel -->
   <div class="left-panel hidden lg:flex flex-col justify-between p-12 w-[420px] flex-shrink-0">
     <a href="/" class="flex items-center gap-3">
-      <img src="/logo.png" alt="Logo" class="h-9 w-auto">
+      <img src="./asset/logo.png" alt="Logo" class="h-9 w-auto">
       <span style="font-family:'Playfair Display',serif; color:var(--cream); font-size:1rem; font-weight:700">
         Tabeahan <span style="color:var(--gold)">Cendekia</span>
       </span>
@@ -97,7 +97,9 @@
     <div class="w-full max-w-sm fade-in">
 
       <div class="lg:hidden text-center mb-8">
-        <img src="/logo.png" alt="Logo" class="h-14 mx-auto mb-3">
+
+        <img src="./asset/logo.png" alt="Logo" class="h-14 mx-auto mb-3">
+
         <span style="font-family:'Playfair Display',serif; color:var(--dark); font-size:1.1rem; font-weight:700">
           Tabeahan <span style="color:var(--gold)">Cendekia</span>
         </span>
@@ -119,7 +121,7 @@
           <p>Coba lagi dalam <span id="countdown" class="font-mono font-bold"></span></p>
         </div>
         <script>
-          const resetTime = <%= resetTime %> * 1000;
+          const resetTime = Number("<%= resetTime %>") * 1000;
           function updateCountdown() {
             const diff = resetTime - Date.now();
             if (diff <= 0) { location.reload(); return; }
