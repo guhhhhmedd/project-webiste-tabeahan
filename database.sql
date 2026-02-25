@@ -38,7 +38,7 @@ CREATE TABLE `jawaban_peserta` (
 
 LOCK TABLES `jawaban_peserta` WRITE;
 /*!40000 ALTER TABLE `jawaban_peserta` DISABLE KEYS */;
-INSERT INTO `jawaban_peserta` VALUES (1,17,13,'a'),(2,17,6,'a'),(3,17,5,'c'),(4,17,8,'b'),(5,17,2,'b'),(6,17,7,'a'),(7,17,1,'b'),(8,17,9,'e'),(9,17,3,'c'),(10,17,11,'a'),(11,17,4,'e'),(12,17,12,'c'),(13,17,10,'e'),(73,28,13,'c');
+INSERT INTO `jawaban_peserta` VALUES (73,28,13,'c');
 /*!40000 ALTER TABLE `jawaban_peserta` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -96,7 +96,7 @@ CREATE TABLE `payments` (
 
 LOCK TABLES `payments` WRITE;
 /*!40000 ALTER TABLE `payments` DISABLE KEYS */;
-INSERT INTO `payments` VALUES (1,123,'cash','pending','2026-02-04 07:57:12'),(2,14,'bukti-14-1770262648924-626653815.jpeg','pending','2026-02-05 03:37:28'),(6,17,'bukti-17-1770297514876-380158116.jpeg','pending','2026-02-05 13:18:34'),(7,18,'bukti-18-1770711982616-991169500.png','pending','2026-02-10 08:26:22'),(8,13,'bukti-13-1770773881443-136416692.jpeg','pending','2026-02-11 01:38:01'),(9,6,'bukti-6-1770797000331-332470884.png','pending','2026-02-11 08:03:20'),(11,19,'bukti-19-1770815324204-780622657.jpeg','pending','2026-02-11 13:08:44'),(13,21,'bukti-21-1771042626730-239695429.png','LUNAS','2026-02-14 04:17:06'),(14,22,'bukti-22-1771044039087-723859638.png','LUNAS','2026-02-14 04:40:39'),(15,23,'bukti-23-1771133933991-457940483.png','LUNAS','2026-02-15 05:38:54'),(16,25,'bukti-25-1771749374368.png','LUNAS','2026-02-22 08:36:14'),(17,25,'bukti-25-1771749431788.png','LUNAS','2026-02-22 08:37:11'),(18,25,'bukti-25-1771749503213.png','LUNAS','2026-02-22 08:38:23'),(25,24,'bukti-24-1771805961966.png','LUNAS','2026-02-23 00:19:21'),(27,28,'bukti-28-1771826818920.png','LUNAS','2026-02-23 06:06:58');
+INSERT INTO `payments` VALUES (1,123,'cash','pending','2026-02-04 07:57:12'),(2,14,'bukti-14-1770262648924-626653815.jpeg','pending','2026-02-05 03:37:28'),(7,18,'bukti-18-1770711982616-991169500.png','pending','2026-02-10 08:26:22'),(8,13,'bukti-13-1770773881443-136416692.jpeg','pending','2026-02-11 01:38:01'),(9,6,'bukti-6-1770797000331-332470884.png','pending','2026-02-11 08:03:20'),(11,19,'bukti-19-1770815324204-780622657.jpeg','pending','2026-02-11 13:08:44'),(13,21,'bukti-21-1771042626730-239695429.png','LUNAS','2026-02-14 04:17:06'),(14,22,'bukti-22-1771044039087-723859638.png','LUNAS','2026-02-14 04:40:39'),(27,28,'bukti-28-1771826818920.png','LUNAS','2026-02-23 06:06:58');
 /*!40000 ALTER TABLE `payments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -109,7 +109,7 @@ DROP TABLE IF EXISTS `questions`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `questions` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `paket` varchar(50) DEFAULT NULL,
+  `paket` enum('Paket SKD/TKD','Paket Akademik Polri','Paket PPPK') NOT NULL,
   `materi` varchar(100) NOT NULL,
   `soal` text NOT NULL,
   `opsi_a` text NOT NULL,
@@ -120,7 +120,7 @@ CREATE TABLE `questions` (
   `kunci` char(1) NOT NULL,
   `bobot_nilai` int DEFAULT '5',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -129,7 +129,7 @@ CREATE TABLE `questions` (
 
 LOCK TABLES `questions` WRITE;
 /*!40000 ALTER TABLE `questions` DISABLE KEYS */;
-INSERT INTO `questions` VALUES (1,'Paket SKD/TKD','TWK','Apa lambang sila ke-3?','Bintang','Rantai','Pohon Beringin','Banteng','Padi Kapas','c',5),(9,'Paket SKD/TKD','TWK','Apa ibukota Indonesia?','Jakarta','Bandung','Medan','Surabaya','Palembang','a',5),(12,'Paket SKD/TKD','TIU','Ibu kota Jawa Barat?','Bekasi','Depok','Bandung','Cirebon','Garut','c',5),(13,'Paket SKD/TKD','TWK','Lambang sila ke-1 yang benar apa?','Pohon','Rantai','Bintang','Padi','Banteng','c',5),(23,'Paket Akademik Polri','Pengetahuan Umum','apa itu polisis','anjing','kucing','kelinci','buaya','polisi','a',5),(24,'Paket Akademik Polri','Wawasan Kebangsaan','apa itu polisis','anjing','kucing','kelinci','buaya','polisi','b',5),(25,'Paket Akademik Polri','Penalaran Numerik','apa itu polisis','anjing','kucing','kelinci','buaya','polisi','a',5),(26,'Paket Akademik Polri','Bahasa Indonesia','apa itu polisis','anjing','kucing','kelinci','buaya','polisi','a',5),(27,'Paket Akademik Polri','Bahasa Inggris','apa itu polisis','anjing','kucing','kelinci','buaya','polisi','a',5),(28,'Paket PPPK','Kompetensi Teknis','Pertanyaan soal...','...','...','...','...','...','b',5),(29,'Paket PPPK','Kompetensi Manajerial','Pertanyaan soal...','...','...','...','...','...','b',5),(30,'Paket PPPK','Kompetensi Sosial-Kultural','Pertanyaan soal...','...','...','...','...','...','b',5),(31,'Paket PPPK','Kompetensi-Wawancara','Pertanyaan soal...','...','...','...','...','...','b',5),(32,'Paket SKD/TKD','Kompetensi Wawancara','apa itu wawancara jhghj','a','s','d','f','g','b',5),(33,'Paket SKD/TWK','TKP','Siapa penemu lampu pijar?','Tesla','Edison','Einstein','Newton','Galilieo','b',5),(34,'Paket SKD/TWK','TIU','1 + 1 berapa, Bre?','1','2','3','4','5','b',5),(35,'Paket SKD/TWK','TWK','Apa itu Murasaki?','Merah','Biru','Kuning','Ungu','Hijau','d',5);
+INSERT INTO `questions` VALUES (1,'Paket SKD/TKD','TWK','Apa lambang sila ke-3?','Bintang','Rantai','Pohon Beringin','Banteng','Padi Kapas','c',5),(9,'Paket SKD/TKD','TWK','Apa ibukota Indonesia?','Jakarta','Bandung','Medan','Surabaya','Palembang','a',5),(12,'Paket SKD/TKD','TIU','Ibu kota Jawa Barat?','Bekasi','Depok','Bandung','Cirebon','Garut','c',5),(13,'Paket SKD/TKD','TWK','Lambang sila ke-1 yang benar apa?','Pohon','Rantai','Bintang','Padi','Banteng','c',5),(23,'Paket Akademik Polri','Pengetahuan Umum','apa itu polisis','anjing','kucing','kelinci','buaya','polisi','a',5),(24,'Paket Akademik Polri','Wawasan Kebangsaan','apa itu polisis','anjing','kucing','kelinci','buaya','polisi','b',5),(25,'Paket Akademik Polri','Penalaran Numerik','apa itu polisis','anjing','kucing','kelinci','buaya','polisi','a',5),(26,'Paket Akademik Polri','Bahasa Indonesia','apa itu polisis','anjing','kucing','kelinci','buaya','polisi','a',5),(27,'Paket Akademik Polri','Bahasa Inggris','apa itu polisis','anjing','kucing','kelinci','buaya','polisi','a',5),(28,'Paket PPPK','Kompetensi Teknis','Pertanyaan soal...','...','...','...','...','...','b',5),(29,'Paket PPPK','Kompetensi Manajerial','Pertanyaan soal...','...','...','...','...','...','b',5),(30,'Paket PPPK','Kompetensi Sosial-Kultural','Pertanyaan soal...','...','...','...','...','...','b',5),(31,'Paket PPPK','Kompetensi-Wawancara','Pertanyaan soal...','...','...','...','...','...','b',5),(33,'Paket SKD/TKD','TKP','Siapa penemu lampu pijar?','Tesla','Edison','Einstein','Newton','Galilieo','b',5),(34,'Paket SKD/TKD','TIU','1 + 1 berapa, Bre?','1','2','3','4','5','b',5),(35,'Paket SKD/TKD','TWK','Apa itu Murasaki?','Merah','Biru','Kuning','Ungu','Hijau','d',5),(36,'Paket SKD/TKD','TKP','Siapa penemu lampu pijar?','Tesla','Edison','Einstein','Newton','Galilieo','b',5),(37,'Paket SKD/TKD','TKP','Siapa penemu lampu pijar?','Tesla','Edison','Einstein','Newton','Galilieo','b',5),(38,'Paket SKD/TKD','TWK','Pancasila sebagai dasar negara Indonesia disahkan pada tanggal?','17 Agustus 1945','18 Agustus 1945','1 Juni 1945','5 Juli 1959','1 Oktober 1965','b',5),(39,'Paket SKD/TKD','TWK','Lambang negara Indonesia adalah?','Burung Elang','Burung Garuda','Burung Merak','Burung Rajawali','Burung Phoenix','b',5),(40,'Paket SKD/TKD','TIU','Jika 2x + 4 = 10, maka nilai x adalah?','2','3','4','5','6','b',5),(41,'Paket SKD/TKD','TIU','Antonim dari kata KUAT adalah?','Tegap','Sehat','Lemah','Kokoh','Gagah','c',5),(42,'Paket SKD/TKD','TKP','Ketika rekan kerja Anda melakukan kesalahan, sikap Anda adalah?','Diam saja','Melaporkan ke atasan langsung','Menegur dengan sopan dan membantu memperbaiki','Menyalahkan di depan umum','Membiarkan saja','c',5),(43,'Paket Akademik Polri','Pengetahuan Umum','Ibu kota negara Indonesia saat ini adalah?','Jakarta','Surabaya','Bandung','Nusantara','Yogyakarta','a',5),(44,'Paket Akademik Polri','Wawasan Kebangsaan','Semboyan negara Indonesia adalah?','Bhineka Tunggal Ika','Pancasila','Persatuan Indonesia','Tut Wuri Handayani','Garuda Pancasila','a',5),(45,'Paket Akademik Polri','Bahasa Indonesia','Penulisan yang benar adalah?','di rumah','dirumah','Di rumah','diRumah','Di Rumah','a',5),(46,'Paket PPPK','Kompetensi Teknis','Aparatur Sipil Negara diatur dalam Undang-Undang nomor?','UU No. 5 Tahun 2014','UU No. 8 Tahun 1974','UU No. 43 Tahun 1999','UU No. 11 Tahun 2017','UU No. 20 Tahun 2023','a',5),(47,'Paket PPPK','Kompetensi Manajerial','Dalam mengelola tim, hal pertama yang harus dilakukan pemimpin adalah?','Membagi tugas secara merata','Memahami kemampuan tiap anggota','Menetapkan target tinggi','Memberikan sanksi tegas','Mengevaluasi kinerja','b',5);
 /*!40000 ALTER TABLE `questions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -157,7 +157,7 @@ CREATE TABLE `users` (
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `username_2` (`username`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -166,7 +166,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (2,'admin123','admin123','admin@gmail.com','admin','BELUM_BAYAR',NULL,'2026-01-27 14:23:38',0,'IDLE',NULL,NULL),(17,'dadada','dadada123','dada@gmail.com','users','LUNAS','KO7TDZOW','2026-02-04 04:35:56',11,'SELESAI','2026-02-05 22:58:01',NULL),(23,'nive','nive123','nive@gmail.com','users','LUNAS','S9D5TERY','2026-02-15 05:38:05',0,'IDLE',NULL,NULL),(24,'cisco','cisco123','cisco@gmail.com','users','LUNAS','WKHSD0D8','2026-02-19 07:26:15',0,'IDLE',NULL,NULL),(25,'guhu','123456','teguharif5505@gmail.com','users','LUNAS','W3D9AVRO','2026-02-22 08:23:20',0,'IDLE',NULL,NULL),(28,'ucup','ucup123','ucup@gmail.com','users','LUNAS','UT2TW15A','2026-02-23 00:56:50',0,'SEDANG_UJIAN','2026-02-23 13:08:52','Paket SKD/TKD');
+INSERT INTO `users` VALUES (2,'admin123','admin123','admin@gmail.com','admin','BELUM_BAYAR',NULL,'2026-01-27 14:23:38',0,'IDLE',NULL,NULL),(28,'ucup','ucup123','ucup@gmail.com','users','LUNAS','UT2TW15A','2026-02-23 00:56:50',5,'SELESAI','2026-02-23 13:08:52','Paket SKD/TKD'),(32,'guhu','123456','teguharif5505@gmail.com','users','BELUM_BAYAR',NULL,'2026-02-24 16:54:37',0,'IDLE',NULL,NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -179,4 +179,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-02-23 15:37:30
+-- Dump completed on 2026-02-25  0:17:18

@@ -1,18 +1,16 @@
 require("dotenv").config();
+const express = require("express");
+const session = require("express-session");
 const helmet = require("helmet");
 const compression = require("compression");
-const session = require("express-session");
-const express = require("express");
-const app = express();
-const port = 3000;
-const db = require("./config/db"); // db pakai versi PROMISE
-const multer = require("multer");
 const path = require("path");
-const ujianRouter = require("./routes/ujian");
-const XLSX = require("xlsx");
-const fs = require("fs"); // Bawaan Node.js untuk urusan file
-const rateLimit = require("express-rate-limit");
 
+const app = express();
+const port = process.env.PORT || 3000;
+
+// ========================
+// SECURITY MIDDLEWARE
+// ========================
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -28,107 +26,59 @@ app.use(
         ],
       },
     },
-  }),
+  })
 );
 app.use(compression());
-// MIDDLEWARE
+
+// ========================
+// GENERAL MIDDLEWARE
+// ========================
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
+// ========================
+// SESSION
+// ========================
 app.use(
   session({
-    secret: "tabeahan-cendekia-secret",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 },
-  }),
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === "production",
+    },
+  })
 );
 
-// Middleware biar kalo reload gak bisa keluar selain logout
+// No cache — biar reload tidak bisa balik ke halaman sebelumnya
 app.use((req, res, next) => {
-  res.set(
-    "Cache-Control",
-    "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
-  );
+  res.set("Cache-Control", "no-cache, private, no-store, must-revalidate");
   next();
 });
 
+// ========================
+// VIEW ENGINE
+// ========================
 app.set("view engine", "ejs");
 app.set("views", "views");
-app.use("/ujian", ujianRouter); // ROUTER UJIAN
 
-// batas tes untuk setiap login
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  standardHeaders: true,
-  legacyHeaders: false,
-  skipSuccessfulRequests: true, 
-  handler: (req, res) => {
-    const retryAfter = Math.ceil(req.rateLimit.resetTime / 1000); // waktu reset dalam detik (unix timestamp)
-    res.status(429).render("login", {
-      error: null,
-      rateLimited: true,
-      resetTime: retryAfter,
-    });
-  },
-});
+// ========================
+// ROUTES
+// ========================
+const authRouter = require("./routes/auth");
+const usersRouter = require("./routes/users");
+const adminRouter = require("./routes/admin");
+const ujianRouter = require("./routes/ujian");
 
-// batas untuk  maksimal 5 registrasi per IP
-const registerLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 5,
-  message: "Terlalu banyak registrasi, coba lagi 1 jam lagi.",
-});
+app.use("/", authRouter);
+app.use("/", usersRouter);
+app.use("/", adminRouter);
+app.use("/ujian", ujianRouter);
 
-// KONFIGURASI MULTER
-const storageBukti = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "public/uploads/bukti/"),
-  filename: (req, file, cb) => {
-    const userId = req.session.user ? req.session.user.id : "anon";
-    cb(null, `bukti-${userId}-${Date.now()}${path.extname(file.originalname)}`);
-  },
-});
-
-// upload bukti pembayaran
-const uploadBukti = multer({
-  storage: storageBukti,
-  limits: { fileSize: 2 * 1024 * 1024 }, // maksimal 2MB
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error("Hanya file JPG/PNG yang diizinkan!"));
-    }
-  },
-});
-
-// Konfigurasi Multer untuk Excel
-const storageExcel = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = "public/uploads/excel_temp/";
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, `import-${Date.now()}${path.extname(file.originalname)}`);
-  },
-});
-const uploadExcel = multer({ storage: storageExcel });
-
-// MIDDLEWARE PROTEKSI
-function isLogin(req, res, next) {
-  if (req.session.user) return next();
-  res.redirect("/login");
-}
-function isAdmin(req, res, next) {
-  if (req.session.user && req.session.user.role === "admin") return next();
-  res.render("login", { error: "Hanya admin yang bisa masuk!" });
-}
-
+// Landing page
 app.get("/", (req, res) => {
   res.render("landing");
 });

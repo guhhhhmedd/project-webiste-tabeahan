@@ -1,143 +1,304 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verifikasi Peserta | Admin</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
+
 <body class="bg-slate-100 font-sans">
-    <nav class="bg-[#0f172a] p-4 text-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex flex-col md:flex-row items-center gap-2 md:gap-6">
-                <div class="flex items-center gap-2">
-                    <span class="bg-yellow-600 text-[10px] px-2 py-0.5 rounded font-bold uppercase">Administrator</span>
-                    <span class="font-bold tracking-wider text-sm md:text-base">TABEAHAN CENDEKIA</span>
+
+    <nav class="bg-[#0f172a] text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 md:px-8 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2.5">
+                    <img src="/logo.png" alt="Logo" class="h-8 w-auto opacity-90">
+                    <div>
+                        <span class="font-bold text-sm tracking-wide block leading-tight">TABEAHAN CENDEKIA</span>
+                        <span
+                            class="bg-yellow-500 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase text-slate-900">Administrator</span>
+                    </div>
                 </div>
-                <div class="flex gap-4 text-[10px] md:text-xs font-bold uppercase tracking-widest mt-2 md:mt-0">
-                    <a href="/dashboardAdmin" class="text-slate-400 hover:text-white transition">Dashboard</a>
-                    <a href="/admin/daftarPeserta" class="text-yellow-500 border-b border-yellow-500 pb-1">Peserta Ujian</a>
+                <div class="hidden md:flex gap-5 text-[11px] font-bold uppercase tracking-widest">
+                    <a href="/dashboardAdmin" class="text-slate-400 hover:text-white transition ">Dashboard</a>
+                    <a href="/admin/daftarPeserta" class=" text-yellow-400 border-b border-yellow-400 pb-0.5">Peserta Ujian</a>
                 </div>
             </div>
-            <a href="/logout" class="bg-red-600 hover:bg-red-700 px-6 py-1.5 md:py-1 rounded text-xs font-bold transition w-full md:w-auto text-center">Logout</a>
+            <a href="/logout"
+                class="bg-red-600 hover:bg-red-700 px-5 py-1.5 rounded text-xs font-bold transition">Logout</a>
         </div>
     </nav>
 
     <div class="p-4 md:p-8">
         <div class="max-w-7xl mx-auto">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-50/50">
-                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <span class="text-xl">👥</span> Verifikasi Peserta Ujian
+
+                <!-- Header -->
+                <div
+                    class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3 bg-slate-50">
+                    <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        👥 Verifikasi Peserta Ujian
                     </h3>
-                    <span class="bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-xs font-black uppercase">
-                        Total: <%= users.length %> Peserta
-                    </span>
+                    <div class="flex items-center gap-3">
+                        <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-black uppercase">
+                            Total: <%= users.length %> Peserta
+                        </span>
+                        <!-- Toggle semua password -->
+                        <button id="toggleAllBtn"
+                            class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold transition cursor-pointer">
+                            <span id="toggleAllIcon">👁️</span>
+                            <span id="toggleAllText">Tampilkan Semua Password</span>
+                        </button>
+                    </div>
                 </div>
 
+                <!-- Tabel Desktop -->
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left border-collapse hidden md:table">
                         <thead>
-                            <tr class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-widest border-b">
-                                <th class="px-6 py-4">Nama Peserta</th>
-                                <th class="px-6 py-4 text-center">Bukti</th>
-                                <th class="px-6 py-4 text-center">Status</th>
-                                <th class="px-6 py-4">Token</th>
-                                <th class="px-4 py-4 text-center">Aksi Verifikasi</th>
-                                <th class="px-4 py-4 text-center">Hapus</th>
+                            <tr
+                                class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-widest border-b border-slate-200">
+                                <th class="px-5 py-3">Peserta</th>
+                                <th class="px-5 py-3 text-center">Password</th>
+                                <th class="px-5 py-3 text-center">Bukti</th>
+                                <th class="px-5 py-3 text-center">Status</th>
+                                <th class="px-5 py-3">Token</th>
+                                <th class="px-5 py-3 text-center">Verifikasi</th>
+                                <th class="px-5 py-3 text-center">Hapus</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
-                            <% users.forEach(u => { %>
+                            <% users.forEach((u, idx)=> { %>
                                 <tr class="hover:bg-slate-50/80 transition">
-                                    <td class="px-6 py-4">
-                                        <p class="font-bold text-slate-800"><%= u.username %></p>
-                                        <p class="text-[10px] text-slate-400 font-mono tracking-tighter"><%= u.email %></p>
+
+                                    <!-- Nama & Email -->
+                                    <td class="px-5 py-3.5">
+                                        <p class="font-bold text-slate-800 text-sm">
+                                            <%= u.username %>
+                                        </p>
+                                        <p class="text-[10px] text-slate-400 font-mono">
+                                            <%= u.email %>
+                                        </p>
                                     </td>
-                                    <td class="px-6 py-4 text-center">
+
+                                    <!-- Password dengan toggle -->
+                                    <td class="px-5 py-3.5 text-center">
+                                        <div class="flex items-center justify-center gap-1.5">
+                                            <code id="pw-<%= idx %>"
+                                                class="bg-slate-100 px-2 py-1 rounded text-[11px] font-mono text-slate-800 tracking-wider select-none pw-hidden">
+                        <%= u.password %>
+                      </code>
+                                            <button data-idx="<%= idx %>" id="pwbtn-<%= idx %>" title="Lihat password"
+                                                class="pw-toggle text-slate-400 hover:text-slate-700 transition text-sm cursor-pointer p-1 rounded hover:bg-slate-100">
+                                                👁️
+                                            </button>
+                                        </div>
+                                    </td>
+
+                                    <!-- Bukti Transfer -->
+                                    <td class="px-5 py-3.5 text-center">
                                         <% if(u.bukti_transfer) { %>
-                                            <a href="/uploads/bukti/<%= u.bukti_transfer %>" target="_blank" class="bg-blue-50 text-blue-600 px-2 py-1 rounded border border-blue-200 text-[10px] font-bold hover:bg-blue-100">LIHAT</a>
-                                        <% } else { %>
-                                            <span class="text-slate-300 text-[10px]">KOSONG</span>
-                                        <% } %>
+                                            <a href="/uploads/bukti/<%= u.bukti_transfer %>" target="_blank"
+                                                class="bg-blue-50 text-blue-600 px-2 py-1 rounded border border-blue-200 text-[10px] font-bold hover:bg-blue-100 transition">
+                                                LIHAT
+                                            </a>
+                                            <% } else { %>
+                                                <span class="text-slate-300 text-[10px] font-semibold">KOSONG</span>
+                                                <% } %>
                                     </td>
-                                    <td class="px-6 py-4 text-center">
-                                        <span class="px-2 py-1 rounded text-[10px] font-black uppercase <%= u.status === 'LUNAS' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-600' %>">
+
+                                    <!-- Status -->
+                                    <td class="px-5 py-3.5 text-center">
+                                        <span class="px-2 py-1 rounded text-[10px] font-black uppercase
+                      <%= u.status === 'LUNAS' ? 'bg-green-100 text-green-700' :
+                          u.status === 'DITOLAK' ? 'bg-red-100 text-red-600' :
+                          u.status === 'PENDING' ? 'bg-orange-100 text-orange-600' :
+                          'bg-slate-100 text-slate-500' %>">
                                             <%= u.status %>
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <code class="bg-slate-100 px-2 py-1 rounded text-blue-700 font-bold text-xs"><%= u.token_ujian || '------' %></code>
+
+                                    <!-- Token -->
+                                    <td class="px-5 py-3.5">
+                                        <code class="bg-slate-100 px-2 py-1 rounded text-blue-700 font-bold text-xs">
+                      <%= u.token_ujian || '------' %>
+                    </code>
                                     </td>
-                                    <td class="px-4 py-4 text-center">
-                                        <% if(u.status === 'PENDING') { %>
-                                            <div class="flex justify-center gap-2">
-                                                <a href="/admin/verify/<%= u.id %>" class="bg-green-600 text-white px-3 py-1 rounded text-[10px] font-bold hover:bg-green-700 transition" onclick="return confirm('Verifikasi pembayaran?')">TERIMA</a>
-                                                <a href="/admin/reject/<%= u.id %>" class="bg-red-100 text-red-600 px-3 py-1 rounded text-[10px] font-bold hover:bg-red-200 transition">TOLAK</a>
+
+                                    <!-- Verifikasi -->
+                                    <td class="px-5 py-3.5 text-center">
+                                        <% if(u.status==='PENDING' ) { %>
+                                            <div class="flex justify-center gap-1.5">
+                                                <a href="/admin/verify/<%= u.id %>" class="confirm-verify"
+                                                    class="bg-green-600 text-white px-3 py-1.5 rounded text-[10px] font-bold hover:bg-green-700 transition">
+                                                    TERIMA
+                                                </a>
+                                                <a href="/admin/reject/<%= u.id %>" class="confirm-reject"
+                                                    class="bg-red-100 text-red-600 px-3 py-1.5 rounded text-[10px] font-bold hover:bg-red-200 transition">
+                                                    TOLAK
+                                                </a>
                                             </div>
-                                        <% } else { %>
-                                            <span class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Selesai</span>
-                                        <% } %>
+                                            <% } else { %>
+                                                <span class="text-slate-300 text-[10px] font-bold uppercase">—</span>
+                                                <% } %>
                                     </td>
-                                    <td class="px-4 py-4 text-center">
-                                        <form action="/deleteAccountFromAdmin" method="POST" onsubmit="return confirm('Hapus permanen?')">
+
+                                    <!-- Hapus -->
+                                    <td class="px-5 py-3.5 text-center">
+                                        <form action="/deleteAccountFromAdmin" method="POST"
+                                            class="confirm-delete-form">
                                             <input type="hidden" name="id" value="<%= u.id %>">
-                                            <button type="submit" class="p-2 text-red-300 hover:text-red-600 hover:bg-red-50 rounded-full transition">🗑️</button>
+                                            <button type="submit"
+                                                class="p-1.5 text-red-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer">
+                                                🗑️
+                                            </button>
                                         </form>
                                     </td>
+
                                 </tr>
-                            <% }) %>
+                                <% }) %>
                         </tbody>
                     </table>
 
+                    <!-- Card Mobile -->
                     <div class="md:hidden divide-y divide-slate-100">
-                        <% users.forEach(u => { %>
+                        <% users.forEach((u, idx)=> { %>
                             <div class="p-4 space-y-3">
                                 <div class="flex justify-between items-start">
                                     <div>
-                                        <p class="font-black text-slate-800 uppercase text-sm"><%= u.username %></p>
-                                        <p class="text-[10px] text-slate-400 font-mono"><%= u.email %></p>
+                                        <p class="font-black text-slate-800 text-sm">
+                                            <%= u.username %>
+                                        </p>
+                                        <p class="text-[10px] text-slate-400 font-mono">
+                                            <%= u.email %>
+                                        </p>
                                     </div>
-                                    <span class="px-2 py-1 rounded text-[9px] font-black uppercase <%= u.status === 'LUNAS' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-600' %>">
+                                    <span class="px-2 py-1 rounded text-[9px] font-black uppercase
+                    <%= u.status === 'LUNAS' ? 'bg-green-100 text-green-700' :
+                        u.status === 'DITOLAK' ? 'bg-red-100 text-red-600' :
+                        'bg-orange-100 text-orange-600' %>">
                                         <%= u.status %>
                                     </span>
                                 </div>
-                                
+
                                 <div class="grid grid-cols-2 gap-2 text-[10px] font-bold">
+                                    <!-- Password mobile -->
+                                    <div class="col-span-2 bg-slate-50 p-2.5 rounded border border-slate-100">
+                                        <p class="text-slate-400 uppercase text-[8px] mb-1.5">Password</p>
+                                        <div class="flex items-center justify-between gap-2">
+                                            <code id="pw-m-<%= idx %>"
+                                                class="text-slate-700 font-mono text-xs pw-hidden">
+                        <%= u.password %>
+                      </code>
+                                            <button data-idx="m-<%= idx %>"
+                                                class="pw-toggle text-slate-400 hover:text-slate-700 transition cursor-pointer text-sm">
+                                                👁️
+                                            </button>
+                                        </div>
+                                    </div>
+
                                     <div class="bg-slate-50 p-2 rounded border border-slate-100">
                                         <p class="text-slate-400 uppercase text-[8px] mb-1">Bukti Transfer</p>
                                         <% if(u.bukti_transfer) { %>
-                                            <a href="/uploads/bukti/<%= u.bukti_transfer %>" target="_blank" class="text-blue-600 flex items-center gap-1">🖼️ BUKA FOTO</a>
-                                        <% } else { %>
-                                            <span class="text-slate-300 italic">BELUM ADA</span>
-                                        <% } %>
+                                            <a href="/uploads/bukti/<%= u.bukti_transfer %>" target="_blank"
+                                                class="text-blue-600">🖼️ BUKA FOTO</a>
+                                            <% } else { %>
+                                                <span class="text-slate-300 italic">BELUM ADA</span>
+                                                <% } %>
                                     </div>
                                     <div class="bg-slate-50 p-2 rounded border border-slate-100">
                                         <p class="text-slate-400 uppercase text-[8px] mb-1">Token Ujian</p>
-                                        <span class="text-blue-700 font-mono"><%= u.token_ujian || 'BELUM SET' %></span>
+                                        <span class="text-blue-700 font-mono">
+                                            <%= u.token_ujian || 'BELUM SET' %>
+                                        </span>
                                     </div>
                                 </div>
 
                                 <div class="flex gap-2">
-                                    <% if(u.status === 'PENDING') { %>
-                                        <a href="/admin/verify/<%= u.id %>" class="flex-1 bg-green-600 text-white text-center py-2 rounded-lg text-xs font-bold shadow-sm">VERIFIKASI</a>
-                                        <a href="/admin/reject/<%= u.id %>" class="flex-1 bg-red-50 text-red-600 text-center py-2 rounded-lg text-xs font-bold border border-red-100">TOLAK</a>
-                                    <% } %>
-                                    <form action="/deleteAccountFromAdmin" method="POST" class="w-12" onsubmit="return confirm('Hapus permanen?')">
-                                        <input type="hidden" name="id" value="<%= u.id %>">
-                                        <button type="submit" class="w-full h-full bg-slate-100 text-slate-400 py-2 rounded-lg border border-slate-200">🗑️</button>
-                                    </form>
+                                    <% if(u.status==='PENDING' ) { %>
+                                        <a href="/admin/verify/<%= u.id %>" onclick="return confirm('Verifikasi?')"
+                                            class="flex-1 bg-green-600 text-white text-center py-2 rounded-lg text-xs font-bold">VERIFIKASI</a>
+                                        <a href="/admin/reject/<%= u.id %>" class="confirm-reject-mobile"
+                                            class="flex-1 bg-red-50 text-red-600 text-center py-2 rounded-lg text-xs font-bold border border-red-100">TOLAK</a>
+                                        <% } %>
+                                            <form action="/deleteAccountFromAdmin" method="POST"
+                                                class="<%= u.status === 'PENDING' ? 'w-12' : 'flex-1' %>"
+                                                class="confirm-delete-mobile">
+                                                <input type="hidden" name="id" value="<%= u.id %>">
+                                                <button type="submit"
+                                                    class="w-full bg-slate-100 text-slate-400 py-2 rounded-lg border border-slate-200 cursor-pointer">
+                                                    🗑️ <%= u.status !=='PENDING' ? 'Hapus Akun' : '' %>
+                                                </button>
+                                            </form>
                                 </div>
                             </div>
-                        <% }) %>
+                            <% }) %>
                     </div>
                 </div>
 
-                <% if (users.length === 0) { %>
+                <% if (users.length===0) { %>
                     <div class="p-10 text-center text-slate-400 italic text-sm">Belum ada peserta terdaftar.</div>
-                <% } %>
+                    <% } %>
+
             </div>
         </div>
     </div>
+
+    <style>
+        .pw-hidden {
+            filter: blur(4px);
+            user-select: none;
+            transition: filter 0.2s ease;
+        }
+    </style>
+
+    <script>
+        // Toggle password per baris
+        const pwVisible = {};
+
+        document.querySelectorAll('.pw-toggle').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const idx = this.dataset.idx;
+                const el = document.getElementById('pw-' + idx);
+                if (!el) return;
+                pwVisible[idx] = !pwVisible[idx];
+                el.classList.toggle('pw-hidden', !pwVisible[idx]);
+            });
+        });
+
+        // Toggle semua password
+        let allVisible = false;
+        document.getElementById('toggleAllBtn').addEventListener('click', function () {
+            allVisible = !allVisible;
+            document.querySelectorAll('[id^="pw-"]').forEach(el => {
+                el.classList.toggle('pw-hidden', !allVisible);
+            });
+            document.getElementById('toggleAllIcon').textContent = allVisible ? '🙈' : '👁️';
+            document.getElementById('toggleAllText').textContent = allVisible ? 'Sembunyikan Semua' : 'Tampilkan Semua Password';
+        });
+
+        // Confirm dialogs — ganti onclick dengan addEventListener
+        document.querySelectorAll('.confirm-verify, .confirm-verify-mobile').forEach(el => {
+            el.addEventListener('click', function (e) {
+                if (!confirm('Verifikasi pembayaran user ini?')) e.preventDefault();
+            });
+        });
+
+        document.querySelectorAll('.confirm-reject, .confirm-reject-mobile').forEach(el => {
+            el.addEventListener('click', function (e) {
+                if (!confirm('Tolak pembayaran user ini?')) e.preventDefault();
+            });
+        });
+
+        document.querySelectorAll('.confirm-delete-form, .confirm-delete-mobile').forEach(form => {
+            form.addEventListener('submit', function (e) {
+                if (!confirm('Hapus akun ini secara permanen?')) e.preventDefault();
+            });
+        });
+    </script>
+
 </body>
+
 </html>
