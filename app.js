@@ -18,8 +18,12 @@ app.use(
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
         styleSrc: ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "blob:"],
-        fontSrc: ["'self'", "https://fonts.googleapis.com", "https://fonts.gstatic.com"],
+        imgSrc: ["'self'", "data:", "blob:", "https://img.youtube.com"],
+        fontSrc: [
+          "'self'",
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+        ],
       },
     },
   })
@@ -74,14 +78,19 @@ app.use("/", usersRouter);
 app.use("/", adminRouter);
 app.use("/ujian", ujianRouter);
 
-// Landing page
+// Landing page & static pages
 app.get("/", (req, res) => {
   res.render("landing");
 });
 
-// ========================
-// START SERVER
-// ========================
+app.get("/terms", (req, res) => {
+  res.render("terms");
+});
+
+app.get("/privacy", (req, res) => {
+  res.render("privacy");
+});
+
 app.listen(port, () => {
   console.log(`Server aktif di http://localhost:${port}`);
 });
