@@ -1,304 +1,246 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifikasi Peserta | Admin</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daftar Peserta | Tabeahan Cendekia</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
+<body class="bg-slate-100 font-sans text-slate-900 min-h-screen">
 
-<body class="bg-slate-100 font-sans">
-
-    <nav class="bg-[#0f172a] text-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 md:px-8 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-6">
-                <div class="flex items-center gap-2.5">
-                    <img src="/logo.png" alt="Logo" class="h-8 w-auto opacity-90">
-                    <div>
-                        <span class="font-bold text-sm tracking-wide block leading-tight">TABEAHAN CENDEKIA</span>
-                        <span
-                            class="bg-yellow-500 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase text-slate-900">Administrator</span>
-                    </div>
-                </div>
-                <div class="hidden md:flex gap-5 text-[11px] font-bold uppercase tracking-widest">
-                    <a href="/dashboardAdmin" class="text-slate-400 hover:text-white transition ">Dashboard</a>
-                    <a href="/admin/daftarPeserta" class=" text-yellow-400 border-b border-yellow-400 pb-0.5">Peserta Ujian</a>
-                </div>
-            </div>
-            <a href="/logout"
-                class="bg-red-600 hover:bg-red-700 px-5 py-1.5 rounded text-xs font-bold transition">Logout</a>
+  <!-- NAVBAR -->
+  <nav class="bg-[#0f172a] text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 py-3 flex justify-between items-center">
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2.5">
+          <img src="/logo.png" alt="Logo" class="h-8 w-auto opacity-90">
+          <div>
+            <span class="font-bold text-sm tracking-wide block leading-tight">TABEAHAN CENDEKIA</span>
+            <span class="bg-yellow-500 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase text-slate-900">Administrator</span>
+          </div>
         </div>
-    </nav>
-
-    <div class="p-4 md:p-8">
-        <div class="max-w-7xl mx-auto">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-
-                <!-- Header -->
-                <div
-                    class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3 bg-slate-50">
-                    <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                        👥 Verifikasi Peserta Ujian
-                    </h3>
-                    <div class="flex items-center gap-3">
-                        <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-black uppercase">
-                            Total: <%= users.length %> Peserta
-                        </span>
-                        <!-- Toggle semua password -->
-                        <button id="toggleAllBtn"
-                            class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold transition cursor-pointer">
-                            <span id="toggleAllIcon">👁️</span>
-                            <span id="toggleAllText">Tampilkan Semua Password</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Tabel Desktop -->
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left border-collapse hidden md:table">
-                        <thead>
-                            <tr
-                                class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-widest border-b border-slate-200">
-                                <th class="px-5 py-3">Peserta</th>
-                                <th class="px-5 py-3 text-center">Password</th>
-                                <th class="px-5 py-3 text-center">Bukti</th>
-                                <th class="px-5 py-3 text-center">Status</th>
-                                <th class="px-5 py-3">Token</th>
-                                <th class="px-5 py-3 text-center">Verifikasi</th>
-                                <th class="px-5 py-3 text-center">Hapus</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            <% users.forEach((u, idx)=> { %>
-                                <tr class="hover:bg-slate-50/80 transition">
-
-                                    <!-- Nama & Email -->
-                                    <td class="px-5 py-3.5">
-                                        <p class="font-bold text-slate-800 text-sm">
-                                            <%= u.username %>
-                                        </p>
-                                        <p class="text-[10px] text-slate-400 font-mono">
-                                            <%= u.email %>
-                                        </p>
-                                    </td>
-
-                                    <!-- Password dengan toggle -->
-                                    <td class="px-5 py-3.5 text-center">
-                                        <div class="flex items-center justify-center gap-1.5">
-                                            <code id="pw-<%= idx %>"
-                                                class="bg-slate-100 px-2 py-1 rounded text-[11px] font-mono text-slate-800 tracking-wider select-none pw-hidden">
-                        <%= u.password %>
-                      </code>
-                                            <button data-idx="<%= idx %>" id="pwbtn-<%= idx %>" title="Lihat password"
-                                                class="pw-toggle text-slate-400 hover:text-slate-700 transition text-sm cursor-pointer p-1 rounded hover:bg-slate-100">
-                                                👁️
-                                            </button>
-                                        </div>
-                                    </td>
-
-                                    <!-- Bukti Transfer -->
-                                    <td class="px-5 py-3.5 text-center">
-                                        <% if(u.bukti_transfer) { %>
-                                            <a href="/uploads/bukti/<%= u.bukti_transfer %>" target="_blank"
-                                                class="bg-blue-50 text-blue-600 px-2 py-1 rounded border border-blue-200 text-[10px] font-bold hover:bg-blue-100 transition">
-                                                LIHAT
-                                            </a>
-                                            <% } else { %>
-                                                <span class="text-slate-300 text-[10px] font-semibold">KOSONG</span>
-                                                <% } %>
-                                    </td>
-
-                                    <!-- Status -->
-                                    <td class="px-5 py-3.5 text-center">
-                                        <span class="px-2 py-1 rounded text-[10px] font-black uppercase
-                      <%= u.status === 'LUNAS' ? 'bg-green-100 text-green-700' :
-                          u.status === 'DITOLAK' ? 'bg-red-100 text-red-600' :
-                          u.status === 'PENDING' ? 'bg-orange-100 text-orange-600' :
-                          'bg-slate-100 text-slate-500' %>">
-                                            <%= u.status %>
-                                        </span>
-                                    </td>
-
-                                    <!-- Token -->
-                                    <td class="px-5 py-3.5">
-                                        <code class="bg-slate-100 px-2 py-1 rounded text-blue-700 font-bold text-xs">
-                      <%= u.token_ujian || '------' %>
-                    </code>
-                                    </td>
-
-                                    <!-- Verifikasi -->
-                                    <td class="px-5 py-3.5 text-center">
-                                        <% if(u.status==='PENDING' ) { %>
-                                            <div class="flex justify-center gap-1.5">
-                                                <a href="/admin/verify/<%= u.id %>" class="confirm-verify"
-                                                    class="bg-green-600 text-white px-3 py-1.5 rounded text-[10px] font-bold hover:bg-green-700 transition">
-                                                    TERIMA
-                                                </a>
-                                                <a href="/admin/reject/<%= u.id %>" class="confirm-reject"
-                                                    class="bg-red-100 text-red-600 px-3 py-1.5 rounded text-[10px] font-bold hover:bg-red-200 transition">
-                                                    TOLAK
-                                                </a>
-                                            </div>
-                                            <% } else { %>
-                                                <span class="text-slate-300 text-[10px] font-bold uppercase">—</span>
-                                                <% } %>
-                                    </td>
-
-                                    <!-- Hapus -->
-                                    <td class="px-5 py-3.5 text-center">
-                                        <form action="/deleteAccountFromAdmin" method="POST"
-                                            class="confirm-delete-form">
-                                            <input type="hidden" name="id" value="<%= u.id %>">
-                                            <button type="submit"
-                                                class="p-1.5 text-red-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer">
-                                                🗑️
-                                            </button>
-                                        </form>
-                                    </td>
-
-                                </tr>
-                                <% }) %>
-                        </tbody>
-                    </table>
-
-                    <!-- Card Mobile -->
-                    <div class="md:hidden divide-y divide-slate-100">
-                        <% users.forEach((u, idx)=> { %>
-                            <div class="p-4 space-y-3">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <p class="font-black text-slate-800 text-sm">
-                                            <%= u.username %>
-                                        </p>
-                                        <p class="text-[10px] text-slate-400 font-mono">
-                                            <%= u.email %>
-                                        </p>
-                                    </div>
-                                    <span class="px-2 py-1 rounded text-[9px] font-black uppercase
-                    <%= u.status === 'LUNAS' ? 'bg-green-100 text-green-700' :
-                        u.status === 'DITOLAK' ? 'bg-red-100 text-red-600' :
-                        'bg-orange-100 text-orange-600' %>">
-                                        <%= u.status %>
-                                    </span>
-                                </div>
-
-                                <div class="grid grid-cols-2 gap-2 text-[10px] font-bold">
-                                    <!-- Password mobile -->
-                                    <div class="col-span-2 bg-slate-50 p-2.5 rounded border border-slate-100">
-                                        <p class="text-slate-400 uppercase text-[8px] mb-1.5">Password</p>
-                                        <div class="flex items-center justify-between gap-2">
-                                            <code id="pw-m-<%= idx %>"
-                                                class="text-slate-700 font-mono text-xs pw-hidden">
-                        <%= u.password %>
-                      </code>
-                                            <button data-idx="m-<%= idx %>"
-                                                class="pw-toggle text-slate-400 hover:text-slate-700 transition cursor-pointer text-sm">
-                                                👁️
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div class="bg-slate-50 p-2 rounded border border-slate-100">
-                                        <p class="text-slate-400 uppercase text-[8px] mb-1">Bukti Transfer</p>
-                                        <% if(u.bukti_transfer) { %>
-                                            <a href="/uploads/bukti/<%= u.bukti_transfer %>" target="_blank"
-                                                class="text-blue-600">🖼️ BUKA FOTO</a>
-                                            <% } else { %>
-                                                <span class="text-slate-300 italic">BELUM ADA</span>
-                                                <% } %>
-                                    </div>
-                                    <div class="bg-slate-50 p-2 rounded border border-slate-100">
-                                        <p class="text-slate-400 uppercase text-[8px] mb-1">Token Ujian</p>
-                                        <span class="text-blue-700 font-mono">
-                                            <%= u.token_ujian || 'BELUM SET' %>
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="flex gap-2">
-                                    <% if(u.status==='PENDING' ) { %>
-                                        <a href="/admin/verify/<%= u.id %>" onclick="return confirm('Verifikasi?')"
-                                            class="flex-1 bg-green-600 text-white text-center py-2 rounded-lg text-xs font-bold">VERIFIKASI</a>
-                                        <a href="/admin/reject/<%= u.id %>" class="confirm-reject-mobile"
-                                            class="flex-1 bg-red-50 text-red-600 text-center py-2 rounded-lg text-xs font-bold border border-red-100">TOLAK</a>
-                                        <% } %>
-                                            <form action="/deleteAccountFromAdmin" method="POST"
-                                                class="<%= u.status === 'PENDING' ? 'w-12' : 'flex-1' %>"
-                                                class="confirm-delete-mobile">
-                                                <input type="hidden" name="id" value="<%= u.id %>">
-                                                <button type="submit"
-                                                    class="w-full bg-slate-100 text-slate-400 py-2 rounded-lg border border-slate-200 cursor-pointer">
-                                                    🗑️ <%= u.status !=='PENDING' ? 'Hapus Akun' : '' %>
-                                                </button>
-                                            </form>
-                                </div>
-                            </div>
-                            <% }) %>
-                    </div>
-                </div>
-
-                <% if (users.length===0) { %>
-                    <div class="p-10 text-center text-slate-400 italic text-sm">Belum ada peserta terdaftar.</div>
-                    <% } %>
-
-            </div>
+        <div class="hidden md:flex gap-5 text-[11px] font-bold uppercase tracking-widest">
+          <a href="/dashboardAdmin" class="text-slate-400 hover:text-white transition">Dashboard</a>
+          <a href="/admin/daftarPeserta" class="text-white border-b border-yellow-500 pb-0.5">Peserta Ujian</a>
         </div>
+      </div>
+      <a href="/logout" class="bg-red-600 hover:bg-red-700 px-5 py-1.5 rounded text-xs font-bold transition">Logout</a>
+    </div>
+  </nav>
+
+  <div class="max-w-7xl mx-auto px-4 py-8">
+
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+      <div>
+        <a href="/dashboardAdmin" class="inline-flex items-center gap-1.5 text-slate-400 hover:text-slate-700 text-xs font-bold uppercase tracking-widest transition mb-2">← Dashboard</a>
+        <h1 class="text-2xl font-black text-slate-800">Daftar Peserta</h1>
+        <p class="text-sm text-slate-500 mt-0.5">Verifikasi pembayaran per paket ujian</p>
+      </div>
+      <div class="bg-white px-4 py-2.5 rounded-lg border border-slate-200 shadow-sm">
+        <span class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest">Total Peserta</span>
+        <span class="text-xl font-black text-[#0f172a]"><%= users.length %></span>
+      </div>
     </div>
 
-    <style>
-        .pw-hidden {
-            filter: blur(4px);
-            user-select: none;
-            transition: filter 0.2s ease;
+    <!-- Toast notifikasi -->
+    <% if (typeof message !== 'undefined' && message) { %>
+    <div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm font-semibold flex items-center gap-2">
+      ✅ <%= message %>
+    </div>
+    <% } %>
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm font-semibold flex items-center gap-2">
+      ❌ <%= error %>
+    </div>
+    <% } %>
+
+    <!-- Tabel Peserta -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="bg-slate-50 border-b border-slate-200 px-5 py-3">
+        <h3 class="text-xs font-bold text-slate-600 uppercase tracking-widest">👥 Data Peserta & Status Pembayaran Per Paket</h3>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              <th class="px-5 py-3">#</th>
+              <th class="px-5 py-3">Peserta</th>
+              <th class="px-5 py-3">Password</th>
+              <th class="px-5 py-3">Status Ujian</th>
+              <th class="px-5 py-3">Pembayaran Per Paket</th>
+              <th class="px-5 py-3 text-right">Aksi Akun</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <% users.forEach((u, i) => {
+              const userPayments = paymentsMap[u.id] || [];
+            %>
+            <tr class="hover:bg-slate-50 transition align-top">
+
+              <!-- Nomor -->
+              <td class="px-5 py-4">
+                <span class="text-xs font-bold text-slate-300"><%= i + 1 %></span>
+              </td>
+
+              <!-- Info User -->
+              <td class="px-5 py-4">
+                <p class="text-sm font-bold text-slate-800"><%= u.username %></p>
+                <p class="text-[11px] text-slate-400 truncate max-w-[160px]"><%= u.email %></p>
+                <p class="text-[10px] text-slate-300 mt-0.5">ID #<%= u.id %></p>
+              </td>
+
+              <!-- Password (blur) -->
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-2">
+                  <span id="pw-<%= i %>" class="text-xs font-mono text-slate-600 pw-hidden"><%= u.password %></span>
+                  <button class="pw-toggle text-slate-300 hover:text-slate-600 transition text-sm cursor-pointer" data-idx="<%= i %>">👁️</button>
+                </div>
+              </td>
+
+              <!-- Status Ujian -->
+              <td class="px-5 py-4">
+                <% if (u.status_ujian === 'SELESAI') { %>
+                  <span class="inline-block px-2 py-1 rounded text-[10px] font-black uppercase bg-purple-50 text-purple-700 border border-purple-200">Selesai</span>
+                  <p class="text-xs font-black text-slate-700 mt-1">Skor: <%= u.skor || 0 %></p>
+                <% } else if (u.status_ujian === 'SEDANG_UJIAN') { %>
+                  <span class="inline-block px-2 py-1 rounded text-[10px] font-black uppercase bg-blue-50 text-blue-700 border border-blue-200 animate-pulse">Sedang Ujian</span>
+                <% } else { %>
+                  <span class="inline-block px-2 py-1 rounded text-[10px] font-black uppercase bg-slate-100 text-slate-500">Belum Ujian</span>
+                <% } %>
+              </td>
+
+              <!-- Pembayaran per paket -->
+              <td class="px-5 py-4">
+                <% if (userPayments.length === 0) { %>
+                  <p class="text-[11px] italic text-slate-400">Belum ada pembayaran</p>
+                <% } else { %>
+                  <div class="space-y-2">
+                    <% userPayments.forEach(pay => { %>
+                    <div class="border border-slate-200 rounded-lg p-2.5 text-[11px]">
+                      <div class="flex items-center justify-between gap-2 flex-wrap">
+                        <!-- Paket & status -->
+                        <div>
+                          <p class="font-bold text-slate-700 text-xs"><%= pay.paket %></p>
+                          <div class="flex items-center gap-2 mt-0.5">
+                            <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase
+                              <%= pay.status === 'LUNAS' ? 'bg-green-100 text-green-700' :
+                                  pay.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
+                                  pay.status === 'DITOLAK' ? 'bg-red-100 text-red-700' :
+                                  pay.status === 'USED' ? 'bg-purple-100 text-purple-700' :
+                                  'bg-slate-100 text-slate-500' %>">
+                              <%= pay.status %>
+                            </span>
+                            <% if (pay.token_ujian) { %>
+                              <span class="font-mono font-bold text-[10px] text-blue-600">Token: <%= pay.token_ujian %></span>
+                            <% } %>
+                          </div>
+                        </div>
+
+                        <!-- Bukti & tombol aksi -->
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                          <% if (pay.bukti_transfer) { %>
+                            <a href="/uploads/bukti/<%= pay.bukti_transfer %>" target="_blank"
+                              class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-[10px] font-bold transition">
+                              📄 Bukti
+                            </a>
+                          <% } %>
+
+                          <% if (pay.status === 'PENDING') { %>
+                            <form action="/admin/verify/<%= pay.id %>" method="POST" class="confirm-verify inline">
+                              <button type="submit" class="px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-[10px] font-bold transition cursor-pointer">
+                                ✅ Verifikasi
+                              </button>
+                            </form>
+                            <form action="/admin/reject/<%= pay.id %>" method="POST" class="confirm-reject inline">
+                              <button type="submit" class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-[10px] font-bold transition cursor-pointer">
+                                ❌ Tolak
+                              </button>
+                            </form>
+                          <% } %>
+                        </div>
+                      </div>
+                    </div>
+                    <% }) %>
+                  </div>
+                <% } %>
+              </td>
+
+              <!-- Aksi Akun -->
+              <td class="px-5 py-4">
+                <div class="flex justify-end">
+                  <form action="/deleteAccountFromAdmin" method="POST" class="confirm-delete-admin">
+                    <input type="hidden" name="id" value="<%= u.id %>">
+                    <button type="submit" class="p-1.5 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded transition cursor-pointer">
+                      🗑️
+                    </button>
+                  </form>
+                </div>
+              </td>
+
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <% if (users.length === 0) { %>
+        <div class="p-16 text-center">
+          <div class="text-4xl opacity-20 mb-3">👤</div>
+          <p class="text-slate-400 text-sm font-semibold">Belum ada peserta terdaftar.</p>
+        </div>
+      <% } %>
+    </div>
+
+    <p class="mt-6 text-center text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+      Tabeahan Cendekia Admin Panel
+    </p>
+  </div>
+
+  <style>
+    .pw-hidden { filter: blur(4px); user-select: none; }
+  </style>
+
+  <script>
+    // Password toggle per baris
+    const pwVisible = {};
+    document.querySelectorAll('.pw-toggle').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const idx = this.dataset.idx;
+        pwVisible[idx] = !pwVisible[idx];
+        const el = document.getElementById('pw-' + idx);
+        if (pwVisible[idx]) {
+          el.classList.remove('pw-hidden');
+          this.textContent = '🙈';
+        } else {
+          el.classList.add('pw-hidden');
+          this.textContent = '👁️';
         }
-    </style>
+      });
+    });
 
-    <script>
-        // Toggle password per baris
-        const pwVisible = {};
+    // Confirm verify
+    document.querySelectorAll('.confirm-verify').forEach(form => {
+      form.addEventListener('submit', e => {
+        if (!confirm('Verifikasi pembayaran ini dan generate token?')) e.preventDefault();
+      });
+    });
 
-        document.querySelectorAll('.pw-toggle').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const idx = this.dataset.idx;
-                const el = document.getElementById('pw-' + idx);
-                if (!el) return;
-                pwVisible[idx] = !pwVisible[idx];
-                el.classList.toggle('pw-hidden', !pwVisible[idx]);
-            });
-        });
+    // Confirm reject
+    document.querySelectorAll('.confirm-reject').forEach(form => {
+      form.addEventListener('submit', e => {
+        if (!confirm('Tolak pembayaran ini?')) e.preventDefault();
+      });
+    });
 
-        // Toggle semua password
-        let allVisible = false;
-        document.getElementById('toggleAllBtn').addEventListener('click', function () {
-            allVisible = !allVisible;
-            document.querySelectorAll('[id^="pw-"]').forEach(el => {
-                el.classList.toggle('pw-hidden', !allVisible);
-            });
-            document.getElementById('toggleAllIcon').textContent = allVisible ? '🙈' : '👁️';
-            document.getElementById('toggleAllText').textContent = allVisible ? 'Sembunyikan Semua' : 'Tampilkan Semua Password';
-        });
-
-        // Confirm dialogs — ganti onclick dengan addEventListener
-        document.querySelectorAll('.confirm-verify, .confirm-verify-mobile').forEach(el => {
-            el.addEventListener('click', function (e) {
-                if (!confirm('Verifikasi pembayaran user ini?')) e.preventDefault();
-            });
-        });
-
-        document.querySelectorAll('.confirm-reject, .confirm-reject-mobile').forEach(el => {
-            el.addEventListener('click', function (e) {
-                if (!confirm('Tolak pembayaran user ini?')) e.preventDefault();
-            });
-        });
-
-        document.querySelectorAll('.confirm-delete-form, .confirm-delete-mobile').forEach(form => {
-            form.addEventListener('submit', function (e) {
-                if (!confirm('Hapus akun ini secara permanen?')) e.preventDefault();
-            });
-        });
-    </script>
+    // Confirm hapus akun
+    document.querySelectorAll('.confirm-delete-admin').forEach(form => {
+      form.addEventListener('submit', e => {
+        if (!confirm('Hapus akun ini secara permanen?')) e.preventDefault();
+      });
+    });
+  </script>
 
 </body>
-
 </html>
