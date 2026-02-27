@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard | Tabeahan Cendekia</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body class="bg-neutral-300 font-sans text-slate-900 min-h-screen">
@@ -15,7 +16,7 @@
     <div class="max-w-7xl mx-auto px-4 md:px-8 py-3 flex justify-between items-center">
       <div class="flex items-center gap-6">
         <div class="flex items-center gap-2.5">
-          <img src="/logo.png" alt="Logo" class="h-8 w-auto opacity-90">
+          <img src="./asset/logo.png" alt="Logo" class="h-8 w-auto opacity-90">
           <div>
             <span class="font-bold text-sm tracking-wide block leading-tight">TABEAHAN CENDEKIA</span>
             <span
@@ -161,7 +162,7 @@
 
             <a href="/template_import_soal.xlsx" download
               class="w-full flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-300 py-2.5 rounded-lg text-xs font-bold transition">
-               Download Template Excel
+              Download Template Excel
             </a>
           </form>
         </div>
@@ -215,34 +216,41 @@
         </div>
       </div>
 
-      <!-- Durasi Ujian -->
-      <div class="bg-white shadow-sm border border-slate-200 overflow-hidden">
-        <div class="bg-sky-500 border-b border-slate-200 px-5 py-3 flex items-center gap-2">
-          <h3 class="font-bold text-black-800 text-sm flex items-center gap-2"> Pengaturan Durasi Ujian</h3>
-          <span class="text-[10px] text-black-400 font-semibold">Satuan: menit</span>
+      <!-- stats -->
+      <div class="bg-white shadow-md border border-slate-200 rounded-xl overflow-hidden mb-6">
+        <div class="bg-[#0f172a] px-5 py-3 flex items-center justify-between">
+          <h3 class="text-white font-bold text-sm">📈 Tren Pertumbuhan Peserta</h3>
+          <span class="text-[10px] text-slate-400 font-mono uppercase">6 Bulan Terakhir</span>
         </div>
-        <div class="p-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <% daftarPaket.forEach((p, i)=> { %>
-            <% const borders=['hover:border-slate-400', 'hover:border-blue-400' , 'hover:border-green-400' ]; const
-              bts=['bg-slate-800 hover:bg-slate-900', 'bg-blue-600 hover:bg-blue-700'
-              , 'bg-green-600 hover:bg-green-700' ]; const bd=borders[i] || borders[0]; const bt=bts[i] || bts[0]; %>
-              <form action="/admin/update-durasi" method="POST"
-                class="border border-slate-200 <%= bd %> rounded-xl p-4 bg-slate-50 flex flex-col gap-3 transition">
-                <input type="hidden" name="id" value="<%= p.id %>">
-                <p class="text-[10px] font-black text-slate-600 uppercase tracking-tight truncate">
-                  <%= p.nama_paket %>
+
+        <div class="p-6">
+          <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+            <div class="space-y-3">
+              <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl">
+                <p class="text-[10px] font-bold text-blue-600 uppercase tracking-tighter">Total Pendaftar</p>
+                <p class="text-3xl font-black text-slate-800">
+                  <%= userStats.total_users || 0 %>
                 </p>
-                <div class="flex items-center gap-2">
-                  <input type="number" name="durasi" value="<%= p.durasi_menit %>"
-                    class="w-full border border-slate-300 p-2 rounded-lg text-sm font-bold text-center focus:ring-2 focus:ring-blue-500 outline-none bg-white">
-                  <span class="text-[10px] text-slate-400 font-bold flex-shrink-0">MIN</span>
-                </div>
-                <button type="submit"
-                  class="<%= bt %> text-white py-2 rounded-lg text-[10px] font-bold transition uppercase cursor-pointer">
-                  Update
-                </button>
-              </form>
-              <% }) %>
+              </div>
+              <div class="bg-green-50 border border-green-100 p-4 rounded-xl">
+                <p class="text-[10px] font-bold text-green-600 uppercase tracking-tighter">Selesai Ujian</p>
+                <p class="text-3xl font-black text-slate-800">
+                  <%= userStats.finished_exam || 0 %>
+                </p>
+              </div>
+              <div class="bg-amber-50 border border-amber-100 p-4 rounded-xl">
+                <p class="text-[10px] font-bold text-amber-600 uppercase tracking-tighter">Sedang Ujian</p>
+                <p class="text-3xl font-black text-slate-800">
+                  <%= userStats.active_exam || 0 %>
+                </p>
+              </div>
+            </div>
+
+            <div class="lg:col-span-3 h-[250px] relative">
+              <canvas id="userChart"></canvas>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -253,9 +261,8 @@
   <div id="toast" class="fixed bottom-5 right-5 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-xl border-l-4 border-yellow-400 shadow-xl
            translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
   </div>
-
   <script>
-    // Materi per paket
+    // 1. SCRIPT UNTUK DROPDOWN MATERI (Murni UI)
     const materiPerPaket = {
       "Paket SKD/TKD": ["TWK", "TIU", "TKP"],
       "Paket Akademik Polri": ["Pengetahuan Umum", "Wawasan Kebangsaan", "Penalaran Numerik", "Bahasa Indonesia", "Bahasa Inggris"],
@@ -274,12 +281,16 @@
         materiSelect.appendChild(opt);
       });
     }
-    paketSelect.addEventListener('change', updateMateri);
-    updateMateri();
 
-    // Toast
+    if (paketSelect) { // Kasih proteksi biar gak error kalau element gak ketemu
+      paketSelect.addEventListener('change', updateMateri);
+      updateMateri();
+    }
+
+    // 2. SCRIPT TOAST NOTIFICATION
     function showToast(msg) {
       const t = document.getElementById('toast');
+      if (!t) return;
       t.textContent = msg;
       t.classList.remove('translate-y-20', 'opacity-0');
       t.classList.add('translate-y-0', 'opacity-100');
@@ -294,11 +305,38 @@
         const a = form.action;
         if (a.includes('tambah-soal')) showToast('✅ Soal berhasil disimpan!');
         if (a.includes('upload-soal')) showToast('📂 Mengupload file Excel...');
-        if (a.includes('update-durasi')) showToast('⏱️ Durasi berhasil diupdate!');
+        if (a.includes('update-config-paket')) showToast('⚙️ Konfigurasi Paket Berhasil Disimpan!');
       });
     });
-  </script>
 
+    // 3. SCRIPT CHART.JS (Pake data dari Backend)
+    const ctx = document.getElementById('userChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: <%- JSON.stringify(chartData.labels) %>,
+        datasets: [{
+          label: 'Pendaftar Baru',
+          data: <%- JSON.stringify(chartData.values) %>,
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          fill: true,
+          tension: 0.4,
+          borderWidth: 3,
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { stepSize: 1 } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  </script>
 </body>
 
 </html>
