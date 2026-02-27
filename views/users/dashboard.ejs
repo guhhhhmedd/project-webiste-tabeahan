@@ -47,10 +47,13 @@
           
 
             <!-- Status badge -->
+            <%
+              const ujianStatus = user.status_ujian || 'IDLE';
+              const badgeColor = ujianStatus === 'SELESAI' ? '#15803d' : ujianStatus === 'SEDANG_UJIAN' ? '#c8a020' : '#9b6b6b';
+            %>
             <span class="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest"
-              style="background:#ffffff;
-                     color:<%= user.status === 'LUNAS' ? '#15803d' : '#a16207' %>">
-              <%= user.status %>
+              style="background:#ffffff;color:<%= badgeColor %>;border:1px solid <%= badgeColor %>40">
+              <%= ujianStatus.replace('_', ' ') %>
             </span>
 
             <!-- User dropdown -->
