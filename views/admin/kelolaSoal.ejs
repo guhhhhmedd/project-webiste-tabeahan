@@ -1,14 +1,64 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kelola Soal - <%= paket %> | Tabeahan Cendekia</title>
+  <title>Kelola Soal - <%= paket %>
+  </title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <style>
-    .confirm-delete { }
+    /* Toggle switch */
+    .toggle-wrap {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .toggle-wrap input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: #e2e8f0;
+      border-radius: 24px;
+      transition: 0.2s;
+    }
+
+    .toggle-slider:before {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.2s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    input:checked+.toggle-slider {
+      background: #22c55e;
+    }
+
+    input:checked+.toggle-slider:before {
+      transform: translateX(20px);
+    }
+
+    .toggle-wrap.loading .toggle-slider {
+      opacity: 0.5;
+      pointer-events: none;
+    }
   </style>
 </head>
+
 <body class="bg-slate-100 font-sans text-slate-900 min-h-screen">
 
   <!-- NAVBAR -->
@@ -16,136 +66,324 @@
     <div class="max-w-7xl mx-auto px-4 md:px-8 py-3 flex justify-between items-center">
       <div class="flex items-center gap-6">
         <div class="flex items-center gap-2.5">
-          <img src="/logo.png" alt="Logo" class="h-8 w-auto opacity-90">
+          <img src="/asset/logo.png" alt="Logo" class="h-8 w-auto opacity-90">
           <div>
             <span class="font-bold text-sm tracking-wide block leading-tight">TABEAHAN CENDEKIA</span>
-            <span class="bg-yellow-500 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase text-slate-900">Administrator</span>
+            <span
+              class="bg-yellow-500 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase text-slate-900">Administrator</span>
           </div>
         </div>
         <div class="hidden md:flex gap-5 text-[11px] font-bold uppercase tracking-widest">
           <a href="/dashboardAdmin" class="text-slate-400 hover:text-white transition">Dashboard</a>
-          <a href="/admin/daftarPeserta" class="text-slate-400 hover:text-white transition">Peserta Ujian</a>
+          <a href="/admin/daftarPeserta" class="text-slate-400 hover:text-white transition">Peserta</a>
         </div>
       </div>
       <a href="/logout" class="bg-red-600 hover:bg-red-700 px-5 py-1.5 rounded text-xs font-bold transition">Logout</a>
     </div>
   </nav>
 
-  <div class="max-w-6xl mx-auto px-4 py-8">
+  <div class="max-w-7xl mx-auto px-4 py-8">
+
+    <!-- Breadcrumb -->
+    <a href="/dashboardAdmin"
+      class="inline-flex items-center gap-1.5 text-slate-400 hover:text-slate-700 text-xs font-bold uppercase tracking-widest transition mb-4">←
+      Dashboard</a>
 
     <!-- Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
       <div>
-        <a href="/dashboardAdmin"
-          class="inline-flex items-center gap-1.5 text-slate-400 hover:text-slate-700 text-xs font-bold uppercase tracking-widest transition mb-2">
-          ← Dashboard
-        </a>
-        <h1 class="text-2xl font-black text-slate-800">Daftar Soal</h1>
-        <p class="text-sm text-slate-500 mt-0.5">Paket: <span class="font-bold text-slate-700"><%= paket %></span></p>
+        <h1 class="text-2xl font-black text-slate-800">Kelola Soal</h1>
+        <p class="text-sm text-slate-500 mt-0.5 font-semibold">
+          <%= paket %>
+        </p>
       </div>
-      <div class="bg-white px-4 py-2.5 rounded-lg border border-slate-200 shadow-sm">
-        <span class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest">Total Soal</span>
-        <span class="text-xl font-black text-[#0f172a]"><%= soalList.length %></span>
-      </div>
-    </div>
-
-    <!-- Table Card -->
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-
-      <div class="bg-slate-50 border-b border-slate-200 px-5 py-3 flex items-center justify-between">
-        <h3 class="text-xs font-bold text-slate-600 uppercase tracking-widest">📋 Daftar Soal</h3>
-        <span class="text-[10px] text-slate-400 font-semibold">Klik Edit untuk ubah • 🗑️ untuk hapus</span>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-              <th class="px-5 py-3 w-8">#</th>
-              <th class="px-5 py-3">Materi</th>
-              <th class="px-5 py-3">Pertanyaan</th>
-              <th class="px-5 py-3 text-center w-16">Kunci</th>
-              <th class="px-5 py-3 text-right w-32">Aksi</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            <% soalList.forEach((s, i) => { %>
-              <tr class="hover:bg-slate-50 transition group">
-
-                <!-- Nomor -->
-                <td class="px-5 py-3.5">
-                  <span class="text-xs font-bold text-slate-300"><%= i + 1 %></span>
-                </td>
-
-                <!-- Materi -->
-                <td class="px-5 py-3.5">
-                  <span class="px-2 py-1 bg-slate-100 text-slate-600 text-[10px] rounded font-bold uppercase">
-                    <%= s.materi %>
-                  </span>
-                </td>
-
-                <!-- Soal -->
-                <td class="px-5 py-3.5">
-                  <p class="text-sm text-slate-700 font-medium leading-relaxed">
-                    <%= s.soal.length > 110 ? s.soal.substring(0, 110) + '...' : s.soal %>
-                  </p>
-                </td>
-
-                <!-- Kunci -->
-                <td class="px-5 py-3.5 text-center">
-                  <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-green-100 text-green-700 font-black text-xs border border-green-200 uppercase">
-                    <%= s.kunci %>
-                  </span>
-                </td>
-
-                <!-- Aksi -->
-                <td class="px-5 py-3.5">
-                  <div class="flex justify-end items-center gap-2">
-                    <a href="/admin/editSoal/<%= s.id %>"
-                      class="bg-[#0f172a] hover:bg-slate-700 text-white text-[10px] font-bold px-3 py-1.5 rounded transition">
-                      Edit
-                    </a>
-                    <form action="/admin/delete-soal" method="POST" class="confirm-delete">
-                      <input type="hidden" name="id" value="<%= s.id %>">
-                      <input type="hidden" name="paket" value="<%= s.paket %>">
-                      <button type="submit"
-                        class="p-1.5 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded transition cursor-pointer">
-                        🗑️
-                      </button>
-                    </form>
-                  </div>
-                </td>
-
-              </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
-
-      <% if (soalList.length === 0) { %>
-        <div class="p-16 text-center">
-          <div class="text-4xl opacity-20 mb-3">📭</div>
-          <p class="text-slate-400 text-sm font-semibold">Belum ada soal di paket ini.</p>
-          <a href="/dashboardAdmin" class="inline-block mt-4 text-xs font-bold text-blue-600 hover:underline">
-            ← Tambah soal dari Dashboard
-          </a>
+      <!-- Stats -->
+      <div class="flex gap-3 flex-wrap">
+        <div class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-center shadow-sm">
+          <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Total Soal</p>
+          <p class="text-xl font-black text-slate-800">
+            <%= soalList.length %>
+          </p>
         </div>
-      <% } %>
-
+        <div class="bg-white border border-green-200 rounded-xl px-4 py-2.5 text-center shadow-sm">
+          <p class="text-[9px] font-bold text-green-400 uppercase tracking-widest">Aktif</p>
+          <p class="text-xl font-black text-green-600" id="totalAktifDisplay">
+            <%= totalAktif %>
+          </p>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-center shadow-sm">
+          <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Dipakai Ujian</p>
+          <p class="text-xl font-black text-[#b8924a]">
+            <%= config.jumlah_soal %>
+          </p>
+        </div>
+      </div>
     </div>
 
-    <p class="mt-6 text-center text-slate-400 text-[10px] font-bold uppercase tracking-widest">
-      Tabeahan Cendekia Admin Panel
-    </p>
+    <!-- Notifikasi -->
+    <% if (typeof message !=='undefined' && message) { %>
+      <div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm font-semibold">✅
+        <%= message %>
+      </div>
+      <% } %>
+        <% if (typeof error !=='undefined' && error) { %>
+          <div class="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm font-semibold">❌
+            <%= error %>
+          </div>
+          <% } %>
+
+            <!-- ===== PANEL KONFIGURASI ===== -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+
+              <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                <h3 class="font-black text-slate-800 text-sm mb-1">⚙️ Konfigurasi Paket</h3>
+                <p class="text-xs text-slate-400 mb-4">Atur durasi waktu dan jumlah soal yang akan muncul di ujian.</p>
+
+                <form action="/admin/update-config-paket" method="POST" class="space-y-4">
+                  <input type="hidden" name="paket" value="<%= paket %>">
+
+                  <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                      <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Jumlah
+                        Soal</label>
+                      <input type="number" name="jumlah_soal" value="<%= config.jumlah_soal %>" min="1"
+                        max="<%= totalAktif || soalList.length %>"
+                        class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:border-yellow-400"
+                        required title="Jumlah soal yang akan muncul">
+                    </div>
+
+                    <div class="flex-1">
+                      <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Durasi
+                        (Menit)</label>
+                      <div class="relative">
+                        <input type="number" name="durasi_menit" value="<%= config.durasi_menit %>" min="1"
+                          class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:border-yellow-400"
+                          required>
+                        <span class="absolute right-3 top-2 text-[10px] font-bold text-slate-300 uppercase">Min</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button type="submit"
+                    class="w-full py-2.5 bg-[#0f172a] text-white text-xs font-bold rounded-lg hover:bg-slate-800 transition shadow-sm">
+                    Simpan Konfigurasi Paket
+                  </button>
+                </form>
+
+                <p class="text-[10px] text-slate-400 mt-2">
+                  ⚠️ Pastikan jumlah soal ≤ soal aktif (<span class="font-bold text-green-600" id="aktifHint">
+                    <%= totalAktif %>
+                  </span>)
+                </p>
+              </div>
+
+              <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col justify-center">
+                <h3 class="font-black text-slate-800 text-sm mb-1">⚡ Aksi Massal Soal</h3>
+                <p class="text-xs text-slate-400 mb-4">Status semua soal di paket ini.</p>
+                <div class="flex gap-3">
+                  <form action="/admin/toggle-all-soal" method="POST" class="confirm-all flex-1">
+                    <input type="hidden" name="paket" value="<%= paket %>">
+                    <input type="hidden" name="is_active" value="1">
+                    <button type="submit"
+                      class="w-full py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg transition shadow-sm">
+                      ✅ Aktifkan Semua
+                    </button>
+                  </form>
+                  <form action="/admin/toggle-all-soal" method="POST" class="confirm-all flex-1">
+                    <input type="hidden" name="paket" value="<%= paket %>">
+                    <input type="hidden" name="is_active" value="0">
+                    <button type="submit"
+                      class="w-full py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-lg transition shadow-sm">
+                      🚫 Nonaktifkan Semua
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== TABEL SOAL ===== -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <div class="bg-slate-50 border-b border-slate-200 px-5 py-3 flex items-center justify-between">
+                <h3 class="text-xs font-bold text-slate-600 uppercase tracking-widest">📋 Daftar Soal</h3>
+                <!-- Filter -->
+                <div class="flex gap-2">
+                  <button id="filterAll"
+                    class="filter-btn active px-3 py-1 rounded text-[10px] font-bold bg-slate-800 text-white">Semua</button>
+                  <button id="filterAktif"
+                    class="filter-btn px-3 py-1 rounded text-[10px] font-bold bg-slate-100 text-slate-500 hover:bg-slate-200">Aktif</button>
+                  <button id="filterNonaktif"
+                    class="filter-btn px-3 py-1 rounded text-[10px] font-bold bg-slate-100 text-slate-500 hover:bg-slate-200">Non-aktif</button>
+                </div>
+              </div>
+
+              <% if (soalList.length===0) { %>
+                <div class="p-16 text-center">
+                  <div class="text-4xl opacity-20 mb-3">📝</div>
+                  <p class="text-slate-400 text-sm">Belum ada soal untuk paket ini.</p>
+                  <a href="/dashboardAdmin" class="mt-3 inline-block text-xs font-bold text-blue-500 underline">+ Tambah
+                    Soal</a>
+                </div>
+                <% } else { %>
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                      <thead>
+                        <tr
+                          class="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                          <th class="px-4 py-3 w-12">Status</th>
+                          <th class="px-4 py-3 w-10">#</th>
+                          <th class="px-4 py-3">Soal</th>
+                          <th class="px-4 py-3 w-24">Materi</th>
+                          <th class="px-4 py-3 w-16 text-center">Kunci</th>
+                          <th class="px-4 py-3 w-24 text-right">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-slate-100" id="soalTableBody">
+                        <% soalList.forEach((s, i)=> { %>
+                          <tr class="hover:bg-slate-50 transition soal-row" data-active="<%= s.is_active %>">
+                            <!-- Toggle aktif -->
+                            <td class="px-4 py-3">
+                              <label class="toggle-wrap" id="toggle-wrap-<%= s.id %>">
+                                <input type="checkbox" class="soal-toggle" data-id="<%= s.id %>" <%=s.is_active
+                                  ? 'checked' : '' %>>
+                                <span class="toggle-slider"></span>
+                              </label>
+                            </td>
+
+                            <!-- Nomor -->
+                            <td class="px-4 py-3">
+                              <span class="text-xs font-bold text-slate-400">
+                                <%= i + 1 %>
+                              </span>
+                            </td>
+
+                            <!-- Soal text (truncate) -->
+                            <td class="px-4 py-3">
+                              <p class="text-xs text-slate-700 font-medium line-clamp-2 max-w-md <%= s.is_active ? '' : 'opacity-40' %>"
+                                id="soal-text-<%= s.id %>">
+                                <%= s.soal %>
+                              </p>
+                            </td>
+
+                            <!-- Materi -->
+                            <td class="px-4 py-3">
+                              <span class="px-2 py-1 bg-slate-100 text-slate-600 rounded text-[10px] font-bold">
+                                <%= s.materi || '-' %>
+                              </span>
+                            </td>
+
+                            <!-- Kunci -->
+                            <td class="px-4 py-3 text-center">
+                              <span
+                                class="w-7 h-7 rounded-full bg-green-100 text-green-700 font-black text-xs inline-flex items-center justify-center uppercase">
+                                <%= s.kunci %>
+                              </span>
+                            </td>
+
+                            <!-- Aksi -->
+                            <td class="px-4 py-3">
+                              <div class="flex justify-end gap-1.5">
+                                <a href="/admin/editSoal/<%= s.id %>"
+                                  class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-[10px] font-bold transition">Edit</a>
+                                <form action="/admin/delete-soal" method="POST" class="confirm-delete inline">
+                                  <input type="hidden" name="id" value="<%= s.id %>">
+                                  <input type="hidden" name="paket" value="<%= paket %>">
+                                  <button type="submit"
+                                    class="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded text-[10px] font-bold transition cursor-pointer">Hapus</button>
+                                </form>
+                              </div>
+                            </td>
+                          </tr>
+                          <% }) %>
+                      </tbody>
+                    </table>
+                  </div>
+                  <% } %>
+            </div>
+
+            <p class="mt-6 text-center text-slate-400 text-[10px] font-bold uppercase tracking-widest">Tabeahan Cendekia
+              Admin Panel</p>
   </div>
 
   <script>
+    // ── Toggle aktif soal (fetch JSON) ──
+    let totalAktif = <%= totalAktif %>;
+
+    document.querySelectorAll('.soal-toggle').forEach(cb => {
+      cb.addEventListener('change', async function () {
+        const id = this.dataset.id;
+        const isActive = this.checked ? 1 : 0;
+        const wrap = document.getElementById(`toggle-wrap-${id}`);
+        const soalText = document.getElementById(`soal-text-${id}`);
+        const row = this.closest('.soal-row');
+
+        wrap.classList.add('loading');
+
+        try {
+          const res = await fetch('/admin/toggle-soal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, is_active: isActive })
+          });
+          const data = await res.json();
+
+          if (data.ok) {
+            // Update counter
+            totalAktif += isActive ? 1 : -1;
+            document.getElementById('totalAktifDisplay').textContent = totalAktif;
+            document.getElementById('aktifHint').textContent = totalAktif;
+            // Update row visual
+            row.dataset.active = isActive;
+            if (soalText) soalText.classList.toggle('opacity-40', !isActive);
+          } else {
+            this.checked = !this.checked; // rollback
+            alert('Gagal mengubah status soal.');
+          }
+        } catch (e) {
+          this.checked = !this.checked; // rollback
+          alert('Terjadi kesalahan koneksi.');
+        } finally {
+          wrap.classList.remove('loading');
+        }
+      });
+    });
+
+    // ── Filter tampilan ──
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => {
+          b.classList.remove('bg-slate-800', 'text-white', 'active');
+          b.classList.add('bg-slate-100', 'text-slate-500');
+        });
+        btn.classList.add('bg-slate-800', 'text-white', 'active');
+        btn.classList.remove('bg-slate-100', 'text-slate-500');
+
+        const rows = document.querySelectorAll('.soal-row');
+        rows.forEach(row => {
+          const isActive = row.dataset.active === '1';
+          if (btn.id === 'filterAll') row.style.display = '';
+          else if (btn.id === 'filterAktif') row.style.display = isActive ? '' : 'none';
+          else if (btn.id === 'filterNonaktif') row.style.display = !isActive ? '' : 'none';
+        });
+      });
+    });
+
+    // ── Confirm aksi massal ──
+    document.querySelectorAll('.confirm-all').forEach(form => {
+      form.addEventListener('submit', e => {
+        const isAktif = form.querySelector('[name="is_active"]').value === '1';
+        const msg = isAktif ? 'Aktifkan SEMUA soal paket ini?' : 'Nonaktifkan SEMUA soal paket ini?';
+        if (!confirm(msg)) e.preventDefault();
+      });
+    });
+
+    // ── Confirm hapus ──
     document.querySelectorAll('.confirm-delete').forEach(form => {
-      form.addEventListener('submit', function(e) {
-        if (!confirm('Hapus soal ini secara permanen?')) e.preventDefault();
+      form.addEventListener('submit', e => {
+        if (!confirm('Hapus soal ini permanen?')) e.preventDefault();
       });
     });
   </script>
-
 </body>
+
 </html>
