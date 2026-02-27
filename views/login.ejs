@@ -16,7 +16,7 @@
       --muted: #9b6b6b;
     }
     * { box-sizing: border-box; }
-    body { font-family: "DM Sans", sans-serif; background: var(--cream); color: var(--dark); min-height: 100vh; display: flex; }
+    body { font-family: "DM Sans", sans-serif; background: var(--cream); color: var(--dark); min-height: 100vh; display: flex; flex-direction: row; }
     h1, h2 { font-family: "Playfair Display", serif; }
     body::after {
       content: '';
@@ -51,6 +51,37 @@
     .rate-box { background: #fff7ed; border: 1px solid #fed7aa; border-left: 3px solid var(--gold); border-radius: 6px; padding: 0.875rem 1rem; font-size: 0.8rem; color: #92400e; }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     .fade-in { animation: fadeInUp 0.5s ease forwards; }
+
+    /* ── Mobile Responsive ── */
+    @media (max-width: 1023px) {
+      body { flex-direction: column; align-items: stretch; }
+    }
+    @media (max-width: 640px) {
+      .right-panel {
+        padding: 2rem 1.25rem !important;
+        align-items: flex-start;
+      }
+      .form-card {
+        padding-top: 1.5rem;
+      }
+      .form-card h1 {
+        font-size: 1.75rem !important;
+      }
+      .mobile-logo {
+        margin-bottom: 1.75rem !important;
+      }
+      .mobile-logo img {
+        height: 3rem !important;
+      }
+    }
+    @media (max-width: 375px) {
+      .form-card h1 {
+        font-size: 1.5rem !important;
+      }
+      .right-panel {
+        padding: 1.5rem 1rem !important;
+      }
+    }
   </style>
 </head>
 
@@ -93,16 +124,17 @@
   </div>
 
   <!-- Right form panel -->
-  <div class="flex-1 flex items-center justify-center p-6 md:p-12">
-    <div class="w-full max-w-sm fade-in">
+  <div class="right-panel flex-1 flex items-center justify-center p-6 sm:p-10 md:p-12">
+    <div class="form-card w-full max-w-sm fade-in">
 
-      <div class="lg:hidden text-center mb-8">
-
-        <img src="./asset/logo.png" alt="Logo" class="h-14 mx-auto mb-3">
-
-        <span style="font-family:'Playfair Display',serif; color:var(--dark); font-size:1.1rem; font-weight:700">
+      <div class="mobile-logo lg:hidden text-center mb-8">
+        <a href="/" class="inline-block">
+          <img src="./asset/logo.png" alt="Logo" class="h-14 mx-auto mb-3">
+        </a>
+        <p style="font-family:'Playfair Display',serif; color:var(--dark); font-size:1.1rem; font-weight:700; line-height:1.3">
           Tabeahan <span style="color:var(--gold)">Cendekia</span>
-        </span>
+        </p>
+        <p style="font-size:0.7rem; color:var(--muted); margin-top:0.25rem; text-transform:uppercase; letter-spacing:0.15em">Platform CAT Digital</p>
       </div>
 
       <div class="mb-8">

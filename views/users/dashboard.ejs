@@ -44,10 +44,11 @@
           <div class="hidden md:flex items-center gap-5">
             <a href="#fitur" class="nav-link text-sm font-medium">Fitur</a>
             <a href="#paket" class="nav-link text-sm font-medium">Paket</a>
+          
 
             <!-- Status badge -->
             <span class="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest"
-              style="background:<%= user.status === 'LUNAS' ? 'rgba(22,163,74,0.1)' : 'rgba(234,179,8,0.12)' %>;
+              style="background:#ffffff;
                      color:<%= user.status === 'LUNAS' ? '#15803d' : '#a16207' %>">
               <%= user.status %>
             </span>
@@ -55,7 +56,7 @@
             <!-- User dropdown -->
             <div class="user-menu">
               <button class="flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer"
-                style="background:rgba(184,146,74,0.08); border-color:rgba(184,146,74,0.25); color:var(--dark)">
+                style="background:rgb(255, 255, 255); border-color:rgba(184,146,74,0.25); color:var(--dark)">
                 <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white"
                   style="background:var(--gold)">
                   <%= user.username.charAt(0).toUpperCase() %>
@@ -217,14 +218,14 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <%
             const pakets = [
-              { emoji:'🏛️', title:'SKD / TKD', sub:'CPNS · Kedinasan · 90 Menit', desc:'Latihan soal SKD/TKD lengkap untuk seleksi CPNS dan sekolah kedinasan. Mencakup TWK, TIU, dan TKP.', bg:'linear-gradient(135deg,#3a0f0f,#6b1a1a)', popular:false },
-              { emoji:'👮', title:'Akademik Polri', sub:'Bintara · Akpol · 90 Menit', desc:'Persiapan ujian akademik Polri untuk jalur Bintara dan Akpol. Materi lengkap dan terstruktur.', bg:'linear-gradient(135deg,#0f1a3a,#1a2e6b)', popular:true },
-              { emoji:'👨‍🏫', title:'Paket PPPK', sub:'Guru · Teknis · 120 Menit', desc:'Latihan soal PPPK untuk tenaga guru, teknis, dan fungsional. Komprehensif dan sesuai standar.', bg:'linear-gradient(135deg,#0f3a1a,#1a6b2e)', popular:false }
+              { emoji:'🏛️', title:'SKD / TKD', sub:'CPNS · Kedinasan · 90 Menit', desc:'Latihan soal SKD/TKD lengkap untuk seleksi CPNS dan sekolah kedinasan. Mencakup TWK, TIU, dan TKP.', overlay:'linear-gradient(135deg,rgba(58,15,15,0.82),rgba(107,26,26,0.82))', banner:'./asset/catbanner.jpg', popular:false },
+              { emoji:'👮', title:'Akademik Polri', sub:'Bintara · Akpol · 90 Menit', desc:'Persiapan ujian akademik Polri untuk jalur Bintara dan Akpol. Materi lengkap dan terstruktur.', overlay:'linear-gradient(135deg,rgba(15,26,58,0.82),rgba(26,46,107,0.82))', banner:'./asset/polribanner.png', popular:true },
+              { emoji:'👨‍🏫', title:'Paket PPPK', sub:'Guru · Teknis · 120 Menit', desc:'Latihan soal PPPK untuk tenaga guru, teknis, dan fungsional. Komprehensif dan sesuai standar.', overlay:'linear-gradient(135deg,rgba(15,58,26,0.82),rgba(26,107,46,0.82))', banner:'./asset/pppkbanner.png', popular:false }
             ];
           %>
           <% pakets.forEach(p => { %>
           <div class="paket-card rounded-xl overflow-hidden" style="<%= p.popular ? 'border-color:var(--gold);box-shadow:0 12px 40px -12px rgba(184,146,74,0.25)' : '' %>">
-            <div class="p-6 relative" style="background:<%= p.bg %>">
+            <div class="p-6 relative" style="background-image:<%= p.overlay %>,url('<%= p.banner %>');background-size:cover;background-position:center;min-height:180px;">
               <% if(p.popular) { %><div class="absolute top-4 right-4 text-[9px] font-bold px-3 py-1" style="background:var(--gold);color:white">POPULER</div><% } %>
               <div class="text-4xl mb-4"><%= p.emoji %></div>
               <h3 class="font-bold text-white text-lg" style="font-family:'Playfair Display',serif"><%= p.title %></h3>
@@ -250,17 +251,214 @@
       </div>
     </section>
 
+    <!-- ===== VIDEO YOUTUBE ===== -->
+    <section id="video" class="py-24" style="background:white; border-top:3px solid #c8a020">
+      <div class="max-w-6xl mx-auto px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl md:text-5xl font-bold leading-tight" style="color:var(--dark)">Belajar Lebih Mudah<br/>di YouTube Kami.</h2>
+          <p class="text-base mt-4 max-w-xl mx-auto leading-relaxed" style="color:var(--muted);font-weight:300">Akses video pembahasan soal, tips lolos seleksi, dan strategi belajar efektif secara gratis di channel YouTube Tabeahan Cendekia.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <!-- Video 1 -->
+          <a href="https://youtu.be/hkGmsVlO8lM?si=E3bYYvcf2iXRP8K_" target="_blank" rel="noopener noreferrer"
+            class="group block rounded-xl overflow-hidden"
+            style="background:var(--cream);border:1px solid rgba(184,146,74,0.15);transition:transform 0.25s ease,box-shadow 0.25s ease"
+            onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 40px -12px rgba(184,146,74,0.2)'"
+            onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+            <div class="relative w-full overflow-hidden" style="aspect-ratio:16/9;background:#1a0a0a">
+              <div class="absolute inset-0 flex items-center justify-center z-10" style="background:rgba(0,0,0,0.35)">
+                <div class="w-14 h-14 rounded-full flex items-center justify-center yt-play-btn" style="background:var(--gold);box-shadow:0 4px 20px rgba(184,146,74,0.5);transition:background 0.2s ease,box-shadow 0.2s ease">
+                  <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+              </div>
+              <img src="https://img.youtube.com/vi/hkGmsVlO8lM/maxresdefault.jpg" alt="Pembahasan Soal SKD CPNS Terbaru" class="absolute inset-0 w-full h-full object-cover"/>
+            </div>
+            <div class="p-5">
+              <div class="flex items-center gap-2 mb-2"><span class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded" style="background:rgba(184,146,74,0.12);color:var(--gold)">TWK · TIU · TKP</span></div>
+              <h3 class="font-bold text-base mb-1 leading-snug" style="color:var(--dark)">Pembahasan Soal SKD CPNS Terbaru</h3>
+              <p class="text-xs leading-relaxed" style="color:var(--muted)">Bedah soal SKD CPNS tipe terbaru lengkap dengan strategi menjawab cepat dan tepat.</p>
+              <div class="flex items-center gap-1 mt-3" style="color:var(--gold)">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a2.999 2.999 0 00-2.11-2.123C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.388.563A2.999 2.999 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a2.999 2.999 0 002.11 2.123C4.45 20.5 12 20.5 12 20.5s7.55 0 9.388-.563a2.999 2.999 0 002.11-2.123C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
+                <span class="text-xs font-semibold">Tonton di YouTube</span>
+              </div>
+            </div>
+          </a>
+          <!-- Video 2 -->
+          <a href="https://youtu.be/0W0O1ZvKCNk?si=nerpuljljQXDZngo" target="_blank" rel="noopener noreferrer"
+            class="group block rounded-xl overflow-hidden"
+            style="background:var(--cream);border:1px solid rgba(184,146,74,0.15);transition:transform 0.25s ease,box-shadow 0.25s ease"
+            onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 40px -12px rgba(184,146,74,0.2)'"
+            onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+            <div class="relative w-full overflow-hidden" style="aspect-ratio:16/9">
+              <div class="absolute inset-0 flex items-center justify-center z-10" style="background:rgba(0,0,0,0.35)">
+                <div class="w-14 h-14 rounded-full flex items-center justify-center yt-play-btn" style="background:var(--gold);box-shadow:0 4px 20px rgba(184,146,74,0.5)">
+                  <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+              </div>
+              <img src="https://img.youtube.com/vi/0W0O1ZvKCNk/hqdefault.jpg" alt="Tips Lolos Seleksi Akademik Polri" class="absolute inset-0 w-full h-full object-cover"/>
+            </div>
+            <div class="p-5">
+              <div class="flex items-center gap-2 mb-2"><span class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded" style="background:rgba(184,146,74,0.12);color:var(--gold)">Akademik Polri</span></div>
+              <h3 class="font-bold text-base mb-1 leading-snug" style="color:var(--dark)">Tips Lolos Seleksi Akademik Polri</h3>
+              <p class="text-xs leading-relaxed" style="color:var(--muted)">Strategi persiapan ujian akademik Polri dari alumni yang sudah terbukti berhasil lolos.</p>
+              <div class="flex items-center gap-1 mt-3" style="color:var(--gold)">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a2.999 2.999 0 00-2.11-2.123C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.388.563A2.999 2.999 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a2.999 2.999 0 002.11 2.123C4.45 20.5 12 20.5 12 20.5s7.55 0 9.388-.563a2.999 2.999 0 002.11-2.123C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
+                <span class="text-xs font-semibold">Tonton di YouTube</span>
+              </div>
+            </div>
+          </a>
+          <!-- Video 3 -->
+          <a href="https://youtu.be/KdeQUZPYc6A?si=2OqczWa3H8F0ucTd" target="_blank" rel="noopener noreferrer"
+            class="group block rounded-xl overflow-hidden"
+            style="background:var(--cream);border:1px solid rgba(184,146,74,0.15);transition:transform 0.25s ease,box-shadow 0.25s ease"
+            onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 40px -12px rgba(184,146,74,0.2)'"
+            onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+            <div class="relative w-full overflow-hidden" style="aspect-ratio:16/9">
+              <div class="absolute inset-0 flex items-center justify-center z-10" style="background:rgba(0,0,0,0.35)">
+                <div class="w-14 h-14 rounded-full flex items-center justify-center yt-play-btn" style="background:var(--gold);box-shadow:0 4px 20px rgba(184,146,74,0.5)">
+                  <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+              </div>
+              <img src="https://img.youtube.com/vi/KdeQUZPYc6A/hqdefault.jpg" alt="Kisi-Kisi Soal PPPK Guru & Teknis" class="absolute inset-0 w-full h-full object-cover"/>
+            </div>
+            <div class="p-5">
+              <div class="flex items-center gap-2 mb-2"><span class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded" style="background:rgba(184,146,74,0.12);color:var(--gold)">PPPK</span></div>
+              <h3 class="font-bold text-base mb-1 leading-snug" style="color:var(--dark)">Kisi-Kisi Soal PPPK Guru & Teknis</h3>
+              <p class="text-xs leading-relaxed" style="color:var(--muted)">Rangkuman kisi-kisi PPPK terbaru disertai pembahasan soal pilihan yang sering keluar.</p>
+              <div class="flex items-center gap-1 mt-3" style="color:var(--gold)">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a2.999 2.999 0 00-2.11-2.123C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.388.563A2.999 2.999 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a2.999 2.999 0 002.11 2.123C4.45 20.5 12 20.5 12 20.5s7.55 0 9.388-.563a2.999 2.999 0 002.11-2.123C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
+                <span class="text-xs font-semibold">Tonton di YouTube</span>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="text-center">
+          <a href="https://www.youtube.com/@TabeahanCendekia" target="_blank" rel="noopener noreferrer"
+            class="inline-flex items-center gap-3 px-8 py-4 rounded-xl text-sm font-semibold transition-all"
+            style="background:#ff0000;color:white;box-shadow:0 4px 20px rgba(255,0,0,0.25)"
+            onmouseover="this.style.background='#cc0000';this.style.boxShadow='0 6px 28px rgba(255,0,0,0.35)'"
+            onmouseout="this.style.background='#FF0000';this.style.boxShadow='0 4px 20px rgba(255,0,0,0.25)'">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a2.999 2.999 0 00-2.11-2.123C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.388.563A2.999 2.999 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a2.999 2.999 0 002.11 2.123C4.45 20.5 12 20.5 12 20.5s7.55 0 9.388-.563a2.999 2.999 0 002.11-2.123C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
+            Kunjungi Channel YouTube Kami
+          </a>
+          <p class="text-xs mt-3" style="color:var(--muted)">Subscribe gratis — konten baru setiap minggu</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== KELAS FLEKSIBEL ===== -->
+    <section id="kelas" class="py-24" style="background:var(--cream);border-top:3px solid #c8a020">
+      <div class="max-w-6xl mx-auto px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl md:text-5xl font-bold leading-tight" style="color:var(--dark)">Kelas Fleksibel</h2>
+          <p class="text-base mt-4 max-w-xl mx-auto leading-relaxed" style="color:var(--muted);font-weight:300">Pilih metode belajar yang paling nyaman dan sesuai kebutuhanmu — kami hadir di manapun kamu belajar.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <% [
+            { icon:'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', title:'Outlet Class', desc:'Belajar langsung di bimbel kami, dengan fasilitas yang nyaman dan lengkap untuk mendukung proses belajarmu secara optimal.' },
+            { icon:'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', title:'Home Class', desc:'Belajar lebih santai karena guru kami langsung ke rumah kamu. Belajar jadi lebih nyaman, praktis, dan tanpa perlu kemana-mana.' },
+            { icon:'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z', title:'Outing Class', desc:'Belajar di luar ruangan dengan suasana café yang nyaman dan cocok buat kamu yang ingin belajar santai namun tetap terarah.' },
+            { icon:'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', title:'Online Class', desc:'Belajar dari mana saja dan kapan saja namun tetap maksimal dengan sistem pembelajaran daring yang interaktif dan terstruktur.' }
+          ].forEach(k => { %>
+          <div class="feature-card p-8 rounded-2xl flex gap-6 items-start" style="background:white">
+            <div class="w-14 h-14 flex-shrink-0 rounded-xl flex items-center justify-center" style="background:rgba(184,146,74,0.1)">
+              <svg class="w-7 h-7" style="color:var(--gold)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<%= k.icon %>"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-xl font-bold mb-2" style="color:var(--dark)"><%= k.title %></h3>
+              <p class="text-sm leading-relaxed" style="color:var(--muted)"><%= k.desc %></p>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section id="faq" class="py-24" style="background:white;border-top:3px solid #c8a020">
+      <div class="max-w-3xl mx-auto px-6 lg:px-8">
+        <div class="text-center mb-14">
+          <h2 class="text-4xl md:text-5xl font-bold leading-tight" style="color:var(--dark)">Pertanyaan Umum</h2>
+          <p class="text-base mt-4 max-w-xl mx-auto leading-relaxed" style="color:var(--muted);font-weight:300">Ada yang ingin kamu ketahui? Kami rangkum jawaban dari pertanyaan-pertanyaan yang paling sering ditanyakan.</p>
+        </div>
+        <div class="faq-list space-y-3">
+          <% [
+            { q:'Apakah Tabeahan Cendekia hanya untuk persiapan CPNS?', a:'Tidak. Tabeahan Cendekia melayani berbagai jalur seleksi, termasuk CPNS (SKD/TKD), Akademik Polri (Bintara & Akpol), dan PPPK (Guru, Teknis, Fungsional).' },
+            { q:'Bagaimana cara mendaftar tryout?', a:'Pilih paket yang sesuai, lakukan pembayaran, dan token tryout akan dikirimkan setelah verifikasi admin. Setelah itu kamu bisa langsung mengakses soal.' },
+            { q:'Apakah tryout bisa dikerjakan berkali-kali?', a:'Setiap token tryout hanya bisa digunakan satu kali untuk menjaga integritas sistem. Namun kamu bisa membeli paket tambahan untuk mendapatkan akses baru.' },
+            { q:'Apakah tersedia kelas untuk siswa di luar kota?', a:'Ya! Kami memiliki Online Class yang bisa diikuti dari mana saja dan kapan saja dengan bimbingan mentor berpengalaman secara daring.' },
+            { q:'Bagaimana cara melihat skor tryout?', a:'Skor langsung muncul secara real-time begitu kamu menyelesaikan tryout. Kamu juga bisa melihat papan peringkat untuk membandingkan hasil.' },
+            { q:'Bagaimana cara menghubungi admin?', a:'Kamu bisa menghubungi tim admin kami langsung melalui WhatsApp di nomor 082324090580. Tim kami siap membantu verifikasi pembayaran dan pertanyaan teknis.' }
+          ].forEach(f => { %>
+          <div class="faq-item rounded-xl overflow-hidden" style="border:1px solid rgba(184,146,74,0.2)">
+            <button class="faq-btn w-full flex items-center justify-between gap-4 px-6 py-5 text-left" style="background:var(--cream)">
+              <span class="font-semibold text-base" style="color:var(--dark)"><%= f.q %></span>
+              <svg class="faq-icon w-5 h-5 flex-shrink-0 transition-transform duration-300" style="color:var(--gold)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+            <div class="faq-answer" style="max-height:0;overflow:hidden;transition:max-height 0.35s ease">
+              <p class="px-6 py-5 text-sm leading-relaxed" style="color:var(--muted);background:white"><%= f.a %></p>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CTA ===== -->
+    <section class="cta-section py-24" style="background:#5a0a0a">
+      <div class="max-w-6xl mx-auto px-6 lg:px-8 text-center">
+        <div class="ruled-line w-16 mx-auto mb-8" style="background:linear-gradient(90deg,transparent,rgba(184,146,74,0.5),transparent)"></div>
+        <h2 class="text-4xl md:text-6xl font-black mb-6" style="font-family:'Playfair Display',serif;color:var(--cream)">
+          Siap Untuk<br/><span style="color:var(--gold)">Lolos Seleksi?</span>
+        </h2>
+        <p class="text-base mb-10 max-w-md mx-auto" style="color:rgba(255,255,255,0.4);font-weight:300">Kamu sudah terdaftar. Sekarang saatnya berlatih dan buktikan kemampuanmu.</p>
+        <a href="/users/dashboardPembayaranUjian"
+          class="inline-block px-10 py-4 text-sm font-semibold rounded-lg transition"
+          style="background:var(--gold);color:white;letter-spacing:0.05em">
+          <%= user.status === 'LUNAS' ? 'Mulai Ujian Sekarang →' : 'Daftar & Pilih Paket →' %>
+        </a>
+      </div>
+    </section>
+
     <!-- ===== FOOTER ===== -->
     <footer class="pt-16 pb-8" style="background:#3a0a0a;border-top:1px solid rgba(255,255,255,0.06)">
       <div class="max-w-6xl mx-auto px-6 lg:px-8">
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-10 mb-12">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+          <!-- Branding -->
           <div>
             <div class="flex items-center gap-2 mb-4">
               <img src="./asset/logo.png" alt="Logo" class="h-9 w-auto"/>
               <span class="font-bold text-lg" style="font-family:'Playfair Display',serif;color:var(--cream)">Tabeahan <span style="color:var(--gold)">Cendekia</span></span>
             </div>
-            <p class="text-xs leading-relaxed" style="color:rgba(255,255,255,0.35)">Platform belajar dan ujian CAT untuk mempersiapkan seleksi CPNS, Polri, dan PPPK.</p>
+            <p class="text-xs leading-relaxed mb-5" style="color:rgba(255,255,255,0.35)">Platform belajar dan ujian CAT untuk mempersiapkan seleksi CPNS, Polri, dan PPPK secara optimal.</p>
+            <div class="flex items-center gap-3">
+              <a href="https://www.instagram.com/tabeahancendekia.go/" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-9 h-9 rounded-lg transition-opacity hover:opacity-70" style="background:rgba(255,255,255,0.08)">
+                <svg class="w-4 h-4" style="color:var(--gold)" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              </a>
+              <a href="https://www.tiktok.com/@tabeahancendekia.go" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-9 h-9 rounded-lg transition-opacity hover:opacity-70" style="background:rgba(255,255,255,0.08)">
+                <svg class="w-4 h-4" style="color:var(--gold)" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.79 1.54V6.78a4.85 4.85 0 01-1.02-.09z"/></svg>
+              </a>
+              <a href="https://www.youtube.com/@TabeahanCendekia" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-9 h-9 rounded-lg transition-opacity hover:opacity-70" style="background:rgba(255,255,255,0.08)">
+                <svg class="w-4 h-4" style="color:var(--gold)" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              </a>
+            </div>
           </div>
+          <!-- Navigasi -->
+          <div>
+            <h4 class="text-sm font-bold mb-4 uppercase tracking-widest" style="color:var(--gold)">Navigasi</h4>
+            <ul class="space-y-3 text-sm" style="color:rgba(255,255,255,0.45)">
+              <li><a href="#fitur" class="hover:text-white transition">Fitur</a></li>
+              <li><a href="#paket" class="hover:text-white transition">Pilihan Try Out</a></li>
+              <li><a href="#kelas" class="hover:text-white transition">Kelas Fleksibel</a></li>
+              <li><a href="#video" class="hover:text-white transition">Video YouTube</a></li>
+              <li><a href="#faq" class="hover:text-white transition">FAQ</a></li>
+            </ul>
+          </div>
+          <!-- Akun -->
           <div>
             <h4 class="text-sm font-bold mb-4 uppercase tracking-widest" style="color:var(--gold)">Akun Saya</h4>
             <ul class="space-y-3 text-sm" style="color:rgba(255,255,255,0.45)">
@@ -268,11 +466,14 @@
               <li><a href="/logout" class="hover:text-white transition">Logout</a></li>
             </ul>
           </div>
+          <!-- Hubungi -->
           <div>
             <h4 class="text-sm font-bold mb-4 uppercase tracking-widest" style="color:var(--gold)">Hubungi Kami</h4>
             <ul class="space-y-3 text-sm" style="color:rgba(255,255,255,0.45)">
               <li><a href="https://wa.me/6282324090580" target="_blank" class="hover:text-white transition">+62 823-2409-0580</a></li>
               <li><a href="https://www.instagram.com/tabeahancendekia.go/" target="_blank" class="hover:text-white transition">@tabeahancendekia.go</a></li>
+              <li><a href="/terms" class="hover:text-white transition">Terms of Service</a></li>
+              <li><a href="/privacy" class="hover:text-white transition">Privacy Policy</a></li>
             </ul>
           </div>
         </div>
@@ -281,6 +482,9 @@
         </div>
       </div>
     </footer>
+
+
+
 
     <script>
       // Mobile menu
@@ -318,6 +522,26 @@
       document.querySelectorAll(".confirm-hapus").forEach(form => {
         form.addEventListener("submit", e => {
           if(!confirm("Akun akan dihapus permanen! Anda yakin?")) e.preventDefault();
+        });
+      });
+
+      // FAQ Accordion
+      document.querySelectorAll(".faq-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const item = btn.closest(".faq-item");
+          const answer = item.querySelector(".faq-answer");
+          const icon = btn.querySelector(".faq-icon");
+          const isOpen = item.classList.contains("faq-open");
+          document.querySelectorAll(".faq-item.faq-open").forEach(openItem => {
+            openItem.classList.remove("faq-open");
+            openItem.querySelector(".faq-answer").style.maxHeight = "0";
+            openItem.querySelector(".faq-icon").style.transform = "rotate(0deg)";
+          });
+          if (!isOpen) {
+            item.classList.add("faq-open");
+            answer.style.maxHeight = answer.scrollHeight + "px";
+            icon.style.transform = "rotate(180deg)";
+          }
         });
       });
     </script>
