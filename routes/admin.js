@@ -17,6 +17,28 @@ function isAdmin(req, res, next) {
   });
 }
 
+async function isLogin(req, res, next) {
+  if (!req.session.user) return res.redirect("/login");
+
+  try {
+    // Ambil data terbaru dari DB (untuk sinkronisasi expired_at)
+    const [rows] = await db.query(
+      "SELECT expired_at, is_active FROM users WHERE id = ?", 
+      [req.session.user.id]
+    );
+
+    if (rows.length > 0) {
+      // Update session dengan data terbaru dari database
+      req.session.user.expired_at = rows[0].expired_at;
+      req.session.user.is_active = rows[0].is_active;
+    }
+    next();
+  } catch (err) {
+    console.error("Middleware Error:", err);
+    next();
+  }
+}
+
 // ─── Multer Excel ─────────────────────────────────────────
 const storageExcel = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -65,19 +87,28 @@ ORDER BY YEAR(create_at) ASC, MONTH(create_at) ASC;
     const [daftarPaket] = await db.query("SELECT * FROM paket_ujian");
 
     // Ambil semua user non-admin beserta payment PENDING terbaru (jika ada)
-    const [users] = await db.query(`
-      SELECT u.id, u.username, u.email, u.status_ujian, u.skor,
-             p.id AS payment_id, p.paket AS payment_paket,
-             p.bukti_transfer, p.status AS payment_status, p.token_ujian
-      FROM users u
-      LEFT JOIN payments p ON p.id = (
-        SELECT id FROM payments 
-        WHERE user_id = u.id AND status = 'PENDING'
-        ORDER BY created_at DESC LIMIT 1
-      )
-      WHERE u.role != 'admin'
-      ORDER BY u.id DESC
+    // Di bagian query SELECT users, tambahkan u.expired_at
+const [users] = await db.query(`
+  SELECT u.id, u.username, u.email, u.status_ujian, u.skor, u.expired_at, u.is_active,
+         p.id AS payment_id, p.paket AS payment_paket,
+         p.bukti_transfer, p.status AS payment_status, p.token_ujian
+  FROM users u
+  LEFT JOIN payments p ON p.id = (
+    SELECT id FROM payments 
+    WHERE user_id = u.id AND status = 'PENDING'
+    ORDER BY create_at DESC LIMIT 1
+  )
+  WHERE u.role != 'admin'
+  ORDER BY u.id DESC
+`);
+
+    const [[pendingRow]] = await db.query(`
+      SELECT COUNT(DISTINCT p.user_id) AS cnt
+      FROM payments p
+      INNER JOIN users u ON u.id = p.user_id AND u.role != 'admin'
+      WHERE LOWER(p.status) = 'pending'
     `);
+    const pendingCount = pendingRow.cnt || 0;
 
     res.render("admin/dashboardAdmin", {
       statsSoal,
@@ -85,6 +116,7 @@ ORDER BY YEAR(create_at) ASC, MONTH(create_at) ASC;
       users,
       userStats,
       chartData,
+      pendingCount,
       message: req.query.message || null,
       error: req.query.error || null,
     });
@@ -101,7 +133,7 @@ router.get("/admin/daftarPeserta", isAdmin, async (req, res) => {
   try {
     // Ambil semua user dengan semua payments mereka
     const [users] = await db.query(`
-      SELECT u.id, u.username, u.email, u.password, u.status_ujian, u.skor
+      SELECT u.id, u.username, u.email, create_at, u.password, u.status_ujian, u.skor
       FROM users u
       WHERE u.role != 'admin'
       ORDER BY u.id DESC
@@ -141,25 +173,29 @@ router.get("/admin/daftarPeserta", isAdmin, async (req, res) => {
 router.post("/admin/verify/:paymentId", isAdmin, async (req, res) => {
   const { paymentId } = req.params;
   try {
-    const [payments] = await db.query("SELECT * FROM payments WHERE id = ?", [
-      paymentId,
-    ]);
-    if (!payments.length)
-      return res.redirect(
-        "/admin/daftarPeserta?error=Payment+tidak+ditemukan.",
-      );
+    const [payments] = await db.query("SELECT * FROM payments WHERE id = ?", [paymentId]);
+    if (!payments.length) return res.redirect("/admin/daftarPeserta?error=Payment+tidak+ditemukan.");
 
-    // Generate token unik untuk paket ini
+    const userId = payments[0].user_id; // Ambil ID usernya
     const token = crypto.randomBytes(4).toString("hex").toUpperCase();
 
+    // LOGIKA: Set 60 hari dari sekarang
+    const expiredDate = new Date();
+    expiredDate.setDate(expiredDate.getDate() + 60);
+
+    // 1. Update Payment
     await db.query(
       "UPDATE payments SET status = 'LUNAS', token_ujian = ?, tgl_lunas = NOW() WHERE id = ?",
-      [token, paymentId],
+      [token, paymentId]
     );
 
-    res.redirect(
-      `/admin/daftarPeserta?success=Pembayaran+diverifikasi,+token+${token}+digenerate.`,
+    // 2. Update User (Aktifkan Masa Ujian 60 Hari)
+    await db.query(
+      "UPDATE users SET expired_at = ?, is_active = 1 WHERE id = ?",
+      [expiredDate, userId]
     );
+
+    res.redirect(`/admin/daftarPeserta?success=Pembayaran+diverifikasi.+Akses+60+hari+aktif.`);
   } catch (err) {
     console.error("ERROR VERIFIKASI:", err);
     res.redirect("/admin/daftarPeserta?error=Gagal+verifikasi.");

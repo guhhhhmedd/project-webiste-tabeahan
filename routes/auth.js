@@ -43,15 +43,27 @@ router.post("/login", loginLimiter, async (req, res) => {
         error: "Username atau Password salah",
         rateLimited: false,
         resetTime: null,
+        
       });
     }
-    const user = rows[0];
+   const user = rows[0];
+    const userRole = user.role.toLowerCase(); // Kita kecilin semua hurufnya
+
     req.session.user = {
       id: user.id,
       username: user.username,
-      role: user.role.toLowerCase(),
+      role: userRole, 
+      expired_at: user.expired_at, 
+      is_active: user.is_active     
     };
-    res.redirect(user.role === "admin" ? "/dashboardAdmin" : "/dashboard");
+
+    req.session.save(() => {
+      if (userRole === "admin") {
+        res.redirect("/dashboardAdmin");
+      } else {
+        res.redirect("/dashboard");
+      }
+    });
   } catch (err) {
     console.error("ERROR LOGIN:", err);
     res.render("login", {
