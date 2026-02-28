@@ -52,6 +52,27 @@
     /* ── Upload dropzone ── */
     .drop-zone { border:2px dashed rgba(200,160,32,0.4); border-radius:10px; padding:1.25rem; text-align:center; transition:all 0.2s; background:rgba(200,160,32,0.02); }
     .drop-zone:hover { border-color:var(--gold); background:rgba(200,160,32,0.05); }
+
+    /* ── Notifikasi badge ── */
+    .notif-badge {
+      display:inline-flex; align-items:center; justify-content:center;
+      min-width:18px; height:18px; padding:0 5px;
+      background:#dc2626; color:white;
+      border-radius:99px; font-size:10px; font-weight:800;
+      animation: badgePulse 1.8s ease-in-out infinite;
+      margin-left:5px; vertical-align:middle;
+    }
+    @keyframes badgePulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.55); }
+      50%      { box-shadow: 0 0 0 5px rgba(220,38,38,0); }
+    }
+
+    /* ── Pending banner ── */
+    .pending-banner {
+      background: linear-gradient(135deg, #78350f, #92400e);
+      border-bottom: 2px solid var(--gold);
+      padding: 10px 0;
+    }
   </style>
 </head>
 
@@ -72,9 +93,14 @@
             </span>
           </div>
         </div>
-        <div class="hidden md:flex gap-5">
+        <div class="hidden md:flex gap-5 items-center">
           <a href="/dashboardAdmin" class="adm-nav-link active">Dashboard</a>
-          <a href="/admin/daftarPeserta" class="adm-nav-link">Peserta Ujian</a>
+          <a href="/admin/daftarPeserta" class="adm-nav-link" style="display:inline-flex;align-items:center">
+            Peserta Ujian
+            <% if (pendingCount > 0) { %>
+            <span class="notif-badge"><%= pendingCount %></span>
+            <% } %>
+          </a>
         </div>
       </div>
       <a href="/logout"
@@ -85,6 +111,29 @@
       </a>
     </div>
   </nav>
+
+  <!-- ===== PENDING BANNER ===== -->
+  <% if (pendingCount > 0) { %>
+  <div class="pending-banner">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span style="font-size:1.25rem">🔔</span>
+        <div>
+          <p style="font-size:0.75rem;font-weight:800;color:var(--gold);letter-spacing:0.03em">
+            <%= pendingCount %> Permintaan Verifikasi Menunggu!
+          </p>
+          <p style="font-size:0.65rem;color:rgba(255,255,255,0.6);margin-top:1px">
+            Peserta sudah upload bukti transfer dan menunggu konfirmasi admin.
+          </p>
+        </div>
+      </div>
+      <a href="/admin/daftarPeserta"
+        style="background:var(--gold);color:#3a0000;padding:0.4rem 1rem;border-radius:8px;font-size:0.7rem;font-weight:800;text-decoration:none;white-space:nowrap;flex-shrink:0">
+        Verifikasi Sekarang →
+      </a>
+    </div>
+  </div>
+  <% } %>
 
   <!-- ===== MAIN GRID ===== -->
   <div class="max-w-7xl mx-auto px-4 md:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
