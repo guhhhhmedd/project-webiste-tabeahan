@@ -33,6 +33,20 @@
     .badge-used    { background: rgba(122,16,16,0.07);  color: var(--dark); }
     .badge-expired { background: rgba(155,107,107,0.08); color: var(--muted); }
 
+    .btn-green {
+      background: linear-gradient(135deg, #16a34a, #14532d);
+      color: white; border: none; border-radius: 12px;
+      padding: 0.875rem 1.5rem; font-family: 'Playfair Display', serif;
+      font-weight: 700; font-size: 0.9rem; cursor: pointer; width: 100%;
+      box-shadow: 0 4px 12px rgba(22,163,74,0.3), 0 5px 0 #0f4022;
+      transition: all 0.15s; position: relative; top: 0;
+    }
+    .btn-green:hover { filter: brightness(1.08); }
+    .btn-green:active { top: 4px; box-shadow: 0 1px 6px rgba(22,163,74,0.3), 0 1px 0 #0f4022; }
+
+    .riwayat-row { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f0e8d8; }
+    .riwayat-row:last-child { border-bottom: none; }
+
     .token-box {
       background: var(--red-deep); border: 1px solid rgba(200,160,32,0.3);
       border-radius: 12px; padding: 0.75rem 1.25rem;
@@ -290,13 +304,45 @@
                   <button class="btn-dark open-upload-modal" data-paket="<%= p.key %>" data-label="<%= p.label %>">Upload Ulang Bukti →</button>
                 </div>
 
-              <!-- USED / EXPIRED: daftar ulang -->
+              <!-- USED / EXPIRED: Ujian Lagi atau Daftar Ulang -->
               <% } else if (status === 'USED' || status === 'EXPIRED') { %>
+                <%
+                  // Hitung percobaan untuk paket ini dari riwayat
+                  const riwayatPaket = (typeof riwayatUjian !== 'undefined' ? riwayatUjian : []).filter(r => r.paket === p.key);
+                  const jmlPercobaan = riwayatPaket.length;
+                  const skorTerakhir = riwayatPaket.length > 0 ? riwayatPaket[0].skor : (user.skor || 0);
+                  const benarTerakhir = riwayatPaket.length > 0 ? riwayatPaket[0].jml_benar : (user.jml_benar || 0);
+                  const soalTerakhir = riwayatPaket.length > 0 ? riwayatPaket[0].jml_soal : (user.jml_soal || 0);
+                %>
                 <div class="space-y-3">
-                  <p class="text-xs" style="color:var(--muted)">
-                    <% if (status === 'USED') { %>Ujian sudah selesai. Daftar ulang untuk ujian kembali.<% } else { %>Akses kadaluarsa (30 hari). Daftar ulang untuk ujian.<% } %>
-                  </p>
-                  <button class="btn-gold open-upload-modal" data-paket="<%= p.key %>" data-label="<%= p.label %>">Daftar Ulang Paket Ini</button>
+                  <!-- Skor terakhir -->
+                  <div class="p-4 rounded-xl flex items-center gap-4" style="background:rgba(200,160,32,0.06); border:1px solid rgba(200,160,32,0.2)">
+                    <div class="skor-ring" style="width:70px;height:70px;">
+                      <div class="skor-inner" style="width:56px;height:56px;">
+                        <span class="text-lg font-display font-black"><%= skorTerakhir %></span>
+                        <span class="text-[8px] font-bold uppercase tracking-wider" style="color:var(--muted)">Skor</span>
+                      </div>
+                    </div>
+                    <div class="flex-1">
+                      <p class="text-xs font-bold" style="color:var(--dark)">Percobaan ke-<%= jmlPercobaan || 1 %></p>
+                      <p class="text-[11px]" style="color:var(--muted)"><%= benarTerakhir %>/<%= soalTerakhir %> soal benar</p>
+                      <p class="text-[10px] mt-1" style="color:var(--muted)">
+                        <% if (status === 'USED') { %>Ujian selesai · soal diacak ulang tiap percobaan<% } else { %>Akses kadaluarsa<% } %>
+                      </p>
+                    </div>
+                  </div>
+
+                  <% if (status === 'USED') { %>
+                  <!-- Tombol Ujian Lagi (hanya untuk USED, bukan EXPIRED yang sudah kedaluwarsa akses) -->
+                  <button class="btn-green open-reset-modal" data-paket="<%= p.key %>" data-label="<%= p.label %>">
+                    🔄 Ujian Lagi <span class="text-xs opacity-75">(Soal Diacak Ulang)</span>
+                  </button>
+                  <% } %>
+
+                  <!-- Tombol Daftar Paket Baru -->
+                  <button class="btn-dark open-upload-modal" data-paket="<%= p.key %>" data-label="<%= p.label %>">
+                    📋 Daftar Paket Baru
+                  </button>
                 </div>
 
               <!-- BELUM BAYAR -->
@@ -374,6 +420,34 @@
             </div>
           </div>
 
+          <!-- Riwayat Ujian -->
+          <div class="paket-card p-5">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-display font-bold text-base">📜 Riwayat Ujian</h3>
+              <% if (typeof riwayatUjian !== 'undefined' && riwayatUjian.length > 0) { %>
+              <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-full" style="background:rgba(184,146,74,0.1);color:var(--gold)"><%= riwayatUjian.length %> Sesi</span>
+              <% } %>
+            </div>
+            <% if (typeof riwayatUjian !== 'undefined' && riwayatUjian.length > 0) { %>
+              <div class="space-y-0 text-xs max-h-52 overflow-y-auto pr-1">
+                <% riwayatUjian.forEach((r, i) => { %>
+                <div class="riwayat-row">
+                  <div>
+                    <p class="font-semibold truncate max-w-[120px]" style="color:var(--dark)"><%= r.paket.replace('Paket ','') %></p>
+                    <p style="color:var(--muted)" class="text-[10px]">Ke-<%= r.percobaan_ke %> · <%= r.jml_benar %>/<%= r.jml_soal %> benar</p>
+                  </div>
+                  <div class="text-right">
+                    <span class="font-black font-mono" style="color:<%= r.skor >= 70 ? '#16a34a' : r.skor >= 50 ? 'var(--gold)' : '#b91c1c' %>"><%= r.skor %></span>
+                    <p style="color:var(--muted)" class="text-[9px]"><%= r.tgl_selesai ? new Date(r.tgl_selesai).toLocaleDateString('id-ID', {day:'2-digit',month:'short'}) : '-' %></p>
+                  </div>
+                </div>
+                <% }) %>
+              </div>
+            <% } else { %>
+              <p class="text-xs italic text-center py-3" style="color:var(--muted)">Belum ada riwayat ujian.</p>
+            <% } %>
+          </div>
+
           <!-- Bantuan -->
           <div class="paket-card p-5 space-y-3">
             <h3 class="font-display font-bold text-base">💬 Bantuan</h3>
@@ -389,6 +463,39 @@
       </div>
     </div>
   </main>
+
+  <!-- ===== MODAL KONFIRMASI UJIAN LAGI ===== -->
+  <div id="resetModal" class="modal-overlay hidden">
+    <div class="bg-white rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl">
+      <div class="p-5 text-white" style="background:linear-gradient(135deg,#0f3a1a,#1a6b2e)">
+        <h3 class="font-display font-bold text-lg">🔄 Ujian Lagi</h3>
+        <p class="text-xs opacity-70" id="resetModalSubtitle">Konfirmasi pengulangan ujian</p>
+      </div>
+      <div class="p-5 space-y-4">
+        <!-- Info -->
+        <div class="p-3 rounded-xl space-y-2" style="background:rgba(234,179,8,0.07); border:1px solid rgba(234,179,8,0.2)">
+          <p class="text-xs font-bold" style="color:#a16207">⚠️ Yang akan terjadi:</p>
+          <ul class="text-[11px] space-y-1" style="color:var(--muted)">
+            <li>✅ Skor lama disimpan di Riwayat Ujian</li>
+            <li>🔑 Token ujian baru digenerate</li>
+            <li>🔀 Soal diacak ulang (berbeda dari sebelumnya)</li>
+            <li>🗑️ Jawaban lama dihapus</li>
+          </ul>
+        </div>
+        <form id="resetForm" action="/ujian/reset-ujian" method="POST">
+          <input type="hidden" name="paket_pilihan" id="resetPaketInput">
+          <div class="flex gap-2">
+            <button type="button" id="closeResetModal"
+              class="flex-1 py-2.5 text-xs font-bold border rounded-xl hover:bg-slate-50 transition"
+              style="border-color:#e8e0d4; color:var(--muted)">Batal</button>
+            <button type="submit"
+              class="flex-1 py-2.5 text-xs font-bold rounded-xl text-white"
+              style="background:linear-gradient(135deg,#16a34a,#14532d)">🔄 Ya, Ujian Lagi!</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <!-- ===== MODAL UPLOAD ===== -->
   <div id="uploadModal" class="modal-overlay hidden">
@@ -458,7 +565,23 @@
       if (el) { el.classList.add('hide'); setTimeout(() => el.remove(), 300); }
     });
 
-    // ── Modal ──
+    // ── Modal Ujian Lagi ──
+    const resetModal = document.getElementById('resetModal');
+    const closeResetModalBtn = document.getElementById('closeResetModal');
+    const resetPaketInput = document.getElementById('resetPaketInput');
+    const resetModalSubtitle = document.getElementById('resetModalSubtitle');
+
+    document.querySelectorAll('.open-reset-modal').forEach(btn => {
+      btn.addEventListener('click', () => {
+        resetPaketInput.value = btn.dataset.paket;
+        resetModalSubtitle.textContent = btn.dataset.label;
+        resetModal.classList.remove('hidden');
+      });
+    });
+    closeResetModalBtn.addEventListener('click', () => resetModal.classList.add('hidden'));
+    resetModal.addEventListener('click', e => { if (e.target === resetModal) resetModal.classList.add('hidden'); });
+
+    // ── Modal Upload ──
     const modal = document.getElementById('uploadModal');
     const closeModalBtn = document.getElementById('closeModal');
     const inputPaket = document.getElementById('modalPaketInput');

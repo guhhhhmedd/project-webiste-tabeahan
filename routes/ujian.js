@@ -175,7 +175,6 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
         let benar = 0;
         const soalIds = sesi.soalIds;
 
-        // Ambil kunci dengan cara yang aman
         const [soalRows] = await db.query(
             "SELECT id, kunci FROM questions WHERE id IN (?)",
             [soalIds]
@@ -188,20 +187,28 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
         const totalSoal = soalIds.length;
         const skor = totalSoal > 0 ? Math.round((benar / totalSoal) * 100) : 0;
 
-        // Update DB User
-        await db.query(
-            "UPDATE users SET status_ujian = 'SELESAI', skor = ?, tgl_selesai_ujian = NOW() WHERE id = ?",
-            [skor, userId]
+        // Hitung percobaan ke berapa untuk paket ini
+        const [countRows] = await db.query(
+            "SELECT COUNT(*) as cnt FROM riwayat_ujian WHERE user_id = ? AND paket = ?",
+            [userId, sesi.paket]
         );
-        // Di dalam fungsi hitungDanSimpanSkor...
-await db.query(
-    "UPDATE users SET status_ujian = 'IDLE', skor = ?, jml_benar = ?, jml_soal = ? WHERE id = ?",
-    [skor, benar, totalSoal, userId]
-);
+        const percobaan_ke = (countRows[0].cnt || 0) + 1;
+
+        // Simpan ke riwayat ujian
+        await db.query(
+            "INSERT INTO riwayat_ujian (user_id, paket, skor, jml_benar, jml_soal, tgl_selesai, percobaan_ke) VALUES (?, ?, ?, ?, ?, NOW(), ?)",
+            [userId, sesi.paket, skor, benar, totalSoal, percobaan_ke]
+        );
+
+        // Update user: simpan skor dan status selesai
+        await db.query(
+            "UPDATE users SET status_ujian = 'IDLE', skor = ?, jml_benar = ?, jml_soal = ?, tgl_selesai_ujian = NOW() WHERE id = ?",
+            [skor, benar, totalSoal, userId]
+        );
 
         // Hapus sesi agar tidak loop
         delete req.session.ujian;
-        
+
         req.session.save(() => {
             if (jsonResponse) return res.json({ ok: true, redirect: "/ujian/hasil" });
             res.redirect("/ujian/hasil");
@@ -215,6 +222,60 @@ await db.query(
         });
     }
 }
+
+// ─── POST /reset-ujian ─────────────────────────────────
+router.post("/reset-ujian", isLogin, async (req, res) => {
+    const userId = req.session.user.id;
+    const { paket_pilihan } = req.body;
+
+    try {
+        // 1. Validasi: cari payment USED/LUNAS atau EXPIRED untuk paket ini
+        const [payRows] = await db.query(
+            `SELECT id, token_ujian, expired_at, status FROM payments
+             WHERE user_id = ? AND paket = ? AND status IN ('USED', 'LUNAS', 'EXPIRED')
+             ORDER BY created_at DESC LIMIT 1`,
+            [userId, paket_pilihan]
+        );
+
+        if (payRows.length === 0) {
+            return res.redirect("/users/dashboardPembayaranUjian?uploadError=" + encodeURIComponent("Tidak ditemukan akses paket untuk di-reset."));
+        }
+
+        const pay = payRows[0];
+
+        // 2. Generate token baru (8 karakter hex uppercase)
+        const crypto = require("crypto");
+        const tokenBaru = crypto.randomBytes(4).toString("hex").toUpperCase();
+
+        // 3. Reset payment: status LUNAS lagi, token baru, expired_at NULL (belum diaktivasi)
+        await db.query(
+            "UPDATE payments SET status = 'LUNAS', token_ujian = ?, expired_at = NULL WHERE id = ?",
+            [tokenBaru, pay.id]
+        );
+
+        // 4. Reset user: IDLE, reset skor & waktu (riwayat sudah tersimpan waktu selesai ujian)
+        await db.query(
+            "UPDATE users SET status_ujian = 'IDLE', skor = 0, jml_benar = 0, jml_soal = 0, waktu_mulai = NULL, tgl_selesai_ujian = NULL WHERE id = ?",
+            [userId]
+        );
+
+        // 5. Hapus jawaban lama
+        await db.query("DELETE FROM jawaban_peserta WHERE user_id = ?", [userId]);
+
+        // 6. Hapus sesi ujian jika ada
+        if (req.session.ujian) delete req.session.ujian;
+
+        req.session.save(() => {
+            res.redirect("/users/dashboardPembayaranUjian?success=" + encodeURIComponent(
+                "Reset berhasil! Token ujian baru untuk " + paket_pilihan + " adalah: " + tokenBaru + ". Soal akan diacak ulang."
+            ));
+        });
+
+    } catch (err) {
+        console.error("ERROR RESET UJIAN:", err);
+        res.redirect("/users/dashboardPembayaranUjian?uploadError=" + encodeURIComponent("Gagal reset ujian, silakan coba lagi."));
+    }
+});
 
 // ─── GET /hasil ─────────────────────────────────────
 router.get("/hasil", isLogin, async (req, res) => {
