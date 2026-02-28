@@ -28,7 +28,8 @@ CREATE TABLE `jawaban_peserta` (
   `question_id` int DEFAULT NULL,
   `jawaban_user` varchar(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `user_id` (`user_id`,`question_id`)
+  UNIQUE KEY `user_id` (`user_id`,`question_id`),
+  KEY `user_id_2` (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=113 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -38,7 +39,7 @@ CREATE TABLE `jawaban_peserta` (
 
 LOCK TABLES `jawaban_peserta` WRITE;
 /*!40000 ALTER TABLE `jawaban_peserta` DISABLE KEYS */;
-INSERT INTO `jawaban_peserta` VALUES (73,28,13,'c'),(87,41,28,'b'),(88,41,29,'a'),(89,41,30,'a'),(90,41,31,'a'),(91,41,46,'a'),(92,41,47,'a'),(93,41,13,'b'),(94,41,34,'c'),(95,41,36,'e'),(96,41,39,'a'),(97,41,41,'b'),(98,41,42,'b'),(99,41,23,'d'),(100,41,24,'c'),(101,41,25,'c'),(102,41,26,'a'),(103,41,27,'b'),(104,41,43,'c'),(105,41,44,'d'),(106,41,45,'b');
+INSERT INTO `jawaban_peserta` VALUES (73,28,13,'c');
 /*!40000 ALTER TABLE `jawaban_peserta` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -70,7 +71,7 @@ CREATE TABLE `paket_ujian` (
 
 LOCK TABLES `paket_ujian` WRITE;
 /*!40000 ALTER TABLE `paket_ujian` DISABLE KEYS */;
-INSERT INTO `paket_ujian` VALUES (1,'Paket SKD/TKD',90,14,50000,100000,'Latihan soal SKD/TKD lengkap untuk seleksi CPNS dan sekolah kedinasan.',NULL,1),(2,'Paket Akademik Polri',90,100,50000,100000,'Persiapan ujian akademik Polri untuk jalur Bintara dan Akpol.',NULL,1),(3,'Paket PPPK',120,100,50000,100000,'Latihan soal PPPK untuk tenaga guru, teknis, dan fungsional.',NULL,1);
+INSERT INTO `paket_ujian` VALUES (1,'Paket SKD/TKD',90,14,50000,100000,'Latihan soal SKD/TKD lengkap untuk seleksi CPNS dan sekolah kedinasan.',NULL,1),(2,'Paket Akademik Polri',90,100,50000,100000,'Persiapan ujian akademik Polri untuk jalur Bintara dan Akpol.',NULL,1),(3,'Paket PPPK',50,6,50000,100000,'Latihan soal PPPK untuk tenaga guru, teknis, dan fungsional.',NULL,1);
 /*!40000 ALTER TABLE `paket_ujian` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -90,10 +91,11 @@ CREATE TABLE `payments` (
   `bukti_transfer` varchar(255) NOT NULL,
   `status` varchar(20) DEFAULT 'pending',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `expired_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_user_paket` (`user_id`,`paket`),
   KEY `idx_status` (`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -102,7 +104,7 @@ CREATE TABLE `payments` (
 
 LOCK TABLES `payments` WRITE;
 /*!40000 ALTER TABLE `payments` DISABLE KEYS */;
-INSERT INTO `payments` VALUES (1,123,'',NULL,NULL,'cash','pending','2026-02-04 07:57:12'),(2,14,'',NULL,NULL,'bukti-14-1770262648924-626653815.jpeg','pending','2026-02-05 03:37:28'),(7,18,'',NULL,NULL,'bukti-18-1770711982616-991169500.png','pending','2026-02-10 08:26:22'),(8,13,'',NULL,NULL,'bukti-13-1770773881443-136416692.jpeg','pending','2026-02-11 01:38:01'),(9,6,'',NULL,NULL,'bukti-6-1770797000331-332470884.png','pending','2026-02-11 08:03:20'),(11,19,'',NULL,NULL,'bukti-19-1770815324204-780622657.jpeg','pending','2026-02-11 13:08:44'),(13,21,'',NULL,NULL,'bukti-21-1771042626730-239695429.png','LUNAS','2026-02-14 04:17:06'),(14,22,'',NULL,NULL,'bukti-22-1771044039087-723859638.png','LUNAS','2026-02-14 04:40:39'),(27,28,'',NULL,NULL,'bukti-28-1771826818920.png','LUNAS','2026-02-23 06:06:58'),(28,32,'',NULL,NULL,'bukti-32-1772080849848.jpg','LUNAS','2026-02-26 04:40:49'),(40,41,'Paket PPPK','6D94196A','2026-02-26 21:30:47','bukti-41-1772116212552.jpg','USED','2026-02-26 14:30:12'),(41,41,'Paket PPPK','6198FADF','2026-02-26 21:32:23','bukti-41-1772116311812.jpg','USED','2026-02-26 14:31:51'),(42,41,'Paket SKD/TKD','BA586C64','2026-02-26 21:33:35','bukti-41-1772116374056.jpg','USED','2026-02-26 14:32:54'),(43,41,'Paket Akademik Polri','3CE8B709','2026-02-26 21:33:32','bukti-41-1772116381388.jpg','USED','2026-02-26 14:33:01'),(44,41,'Paket SKD/TKD','6D555A3E','2026-02-26 21:55:31','bukti-41-1772117698473.jpg','USED','2026-02-26 14:54:58');
+INSERT INTO `payments` VALUES (1,123,'',NULL,NULL,'cash','pending','2026-02-04 07:57:12',NULL),(2,14,'',NULL,NULL,'bukti-14-1770262648924-626653815.jpeg','pending','2026-02-05 03:37:28',NULL),(7,18,'',NULL,NULL,'bukti-18-1770711982616-991169500.png','pending','2026-02-10 08:26:22',NULL),(8,13,'',NULL,NULL,'bukti-13-1770773881443-136416692.jpeg','pending','2026-02-11 01:38:01',NULL),(9,6,'',NULL,NULL,'bukti-6-1770797000331-332470884.png','pending','2026-02-11 08:03:20',NULL),(11,19,'',NULL,NULL,'bukti-19-1770815324204-780622657.jpeg','pending','2026-02-11 13:08:44',NULL),(13,21,'',NULL,NULL,'bukti-21-1771042626730-239695429.png','LUNAS','2026-02-14 04:17:06',NULL),(14,22,'',NULL,NULL,'bukti-22-1771044039087-723859638.png','LUNAS','2026-02-14 04:40:39',NULL),(27,28,'',NULL,NULL,'bukti-28-1771826818920.png','LUNAS','2026-02-23 06:06:58',NULL),(28,32,'',NULL,NULL,'bukti-32-1772080849848.jpg','LUNAS','2026-02-26 04:40:49',NULL),(45,47,'Paket Akademik Polri','5A981FB1','2026-02-28 00:01:37','bukti-47-1772211667526.jpg','LUNAS','2026-02-27 17:01:07','2026-04-29 00:10:02'),(46,47,'Paket PPPK','71004820','2026-02-28 12:12:07','bukti-47-1772255472814.jpg','LUNAS','2026-02-28 05:11:12','2026-04-29 12:13:01');
 /*!40000 ALTER TABLE `payments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -158,7 +160,11 @@ CREATE TABLE `users` (
   `skor` int DEFAULT '0',
   `status_ujian` varchar(20) DEFAULT 'IDLE',
   `tgl_selesai_ujian` datetime DEFAULT NULL,
+  `expired_at` datetime DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT '0',
   `waktu_mulai` datetime DEFAULT NULL,
+  `jml_benar` int DEFAULT '0',
+  `jml_soal` int DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `username_2` (`username`),
@@ -172,7 +178,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (2,'admin123','admin123','admin@gmail.com','admin','2026-01-27 14:23:38',0,'IDLE',NULL,NULL),(28,'ucup','ucup123','ucup@gmail.com','users','2026-02-23 00:56:50',5,'SELESAI',NULL,'2026-02-23 13:08:52'),(32,'guhu','123456','teguharif5505@gmail.com','users','2026-02-24 16:54:37',0,'IDLE',NULL,NULL),(41,'wwww','123456','www@gmail.com','users','2026-02-26 14:29:45',0,'SELESAI','2026-02-26 21:56:09','2026-02-26 21:55:54'),(42,'user_desember','123','des@test.com','user','2025-12-15 03:00:00',0,'IDLE',NULL,NULL),(43,'user_januari','123','jan@test.com','user','2026-01-10 03:00:00',0,'IDLE',NULL,NULL),(44,'user_januari2','123','jan2@test.com','user','2026-01-20 07:00:00',0,'IDLE',NULL,NULL),(46,'user_januar','123','jin@test.com','user','2026-01-10 03:00:00',0,'IDLE',NULL,NULL),(47,'user_janua','123','jun@test.com','user','2026-01-10 03:00:00',0,'IDLE',NULL,NULL);
+INSERT INTO `users` VALUES (2,'admin123','admin123','admin@gmail.com','admin','2026-01-27 14:23:38',0,'IDLE',NULL,NULL,0,NULL,0,0),(28,'ucup','ucup123','ucup@gmail.com','users','2026-02-23 00:56:50',5,'SELESAI',NULL,NULL,0,'2026-02-23 13:08:52',0,0),(32,'guhu','123456','teguharif5505@gmail.com','users','2026-02-24 16:54:37',0,'IDLE',NULL,NULL,0,NULL,0,0),(42,'user_desember','123','des@test.com','users','2025-12-15 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0),(43,'user_januari','123','jan@test.com','users','2026-01-10 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0),(44,'user_januari2','123','jan2@test.com','users','2026-01-20 07:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0),(46,'user_januar','123','jin@test.com','users','2026-01-10 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0),(47,'user_janua','123','jun@test.com','users','2026-01-10 03:00:00',17,'IDLE','2026-02-28 12:13:20','2026-04-29 12:12:07',1,'2026-02-28 12:13:01',1,6);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -185,4 +191,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-02-27 18:37:21
+-- Dump completed on 2026-02-28 12:15:44

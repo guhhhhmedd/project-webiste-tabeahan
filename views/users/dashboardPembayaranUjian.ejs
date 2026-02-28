@@ -209,9 +209,9 @@
         <div class="lg:col-span-2 space-y-4">
           <%
             const paketConfig = {
-              'Paket SKD/TKD':        { emoji:'🏛️', sub:'CPNS · Kedinasan · 90 Menit',  color:'#3a0f0f', color2:'#6b1a1a' },
-              'Paket Akademik Polri': { emoji:'👮',  sub:'Bintara · Akpol · 90 Menit',  color:'#0f1a3a', color2:'#1a2e6b' },
-              'Paket PPPK':           { emoji:'👨‍🏫', sub:'Guru · Teknis · 120 Menit', color:'#0f3a1a', color2:'#1a6b2e' }
+              'Paket SKD/TKD':        { sub:'CPNS · Kedinasan · 90 Menit',  color:'#3a0f0f', color2:'#6b1a1a' },
+              'Paket Akademik Polri': { sub:'Bintara · Akpol · 90 Menit',  color:'#0f1a3a', color2:'#1a2e6b' },
+              'Paket PPPK':           { sub:'Guru · Teknis · 120 Menit', color:'#0f3a1a', color2:'#1a6b2e' }
             };
             paketList.forEach(p => {
               const cfg = paketConfig[p.key] || { emoji:'📝', sub:'', color:'#333', color2:'#555' };
