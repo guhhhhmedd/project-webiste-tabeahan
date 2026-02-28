@@ -171,7 +171,7 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
     const userId = req.session.user.id;
 
     try {
-        const jawabanUserSesi = sesi.jawaban;
+        const jawabanUserSesi = sesi.jawaban; // { questionId: 'a', ... }
         let benar = 0;
         const soalIds = sesi.soalIds;
 
@@ -187,20 +187,33 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
         const totalSoal = soalIds.length;
         const skor = totalSoal > 0 ? Math.round((benar / totalSoal) * 100) : 0;
 
-        // Hitung percobaan ke berapa untuk paket ini
+        // ── Simpan jawaban ke jawaban_peserta (untuk fitur review) ──
+        // Hapus dulu jawaban lama lalu insert semua sekaligus
+        await db.query("DELETE FROM jawaban_peserta WHERE user_id = ?", [userId]);
+
+        const jawabanEntries = Object.entries(jawabanUserSesi);
+        if (jawabanEntries.length > 0) {
+            const values = jawabanEntries.map(([qId, jwb]) => [userId, parseInt(qId), jwb]);
+            await db.query(
+                "INSERT INTO jawaban_peserta (user_id, question_id, jawaban_user) VALUES ?",
+                [values]
+            );
+        }
+
+        // ── Hitung percobaan ke berapa untuk paket ini ──
         const [countRows] = await db.query(
             "SELECT COUNT(*) as cnt FROM riwayat_ujian WHERE user_id = ? AND paket = ?",
             [userId, sesi.paket]
         );
         const percobaan_ke = (countRows[0].cnt || 0) + 1;
 
-        // Simpan ke riwayat ujian
+        // ── Simpan ke riwayat ujian ──
         await db.query(
             "INSERT INTO riwayat_ujian (user_id, paket, skor, jml_benar, jml_soal, tgl_selesai, percobaan_ke) VALUES (?, ?, ?, ?, ?, NOW(), ?)",
             [userId, sesi.paket, skor, benar, totalSoal, percobaan_ke]
         );
 
-        // Update user: simpan skor dan status selesai
+        // ── Update user ──
         await db.query(
             "UPDATE users SET status_ujian = 'IDLE', skor = ?, jml_benar = ?, jml_soal = ?, tgl_selesai_ujian = NOW() WHERE id = ?",
             [skor, benar, totalSoal, userId]
@@ -222,6 +235,7 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
         });
     }
 }
+
 
 // ─── POST /reset-ujian ─────────────────────────────────
 router.post("/reset-ujian", isLogin, async (req, res) => {
@@ -307,6 +321,65 @@ router.get("/hasil", isLogin, async (req, res) => {
     } catch (err) {
         console.error(err);
         res.redirect("/users/dashboardPembayaranUjian");
+    }
+});
+
+// ─── GET /review ─────────────────────────────────────
+router.get("/review", isLogin, async (req, res) => {
+    try {
+        const userId = req.session.user.id;
+
+        // Ambil jawaban user + data soal lengkap sekaligus
+        const [jawabanRows] = await db.query(
+            `SELECT 
+                jp.question_id,
+                jp.jawaban_user,
+                q.soal, q.paket, q.materi,
+                q.opsi_a, q.opsi_b, q.opsi_c, q.opsi_d, q.opsi_e,
+                q.kunci,
+                CASE WHEN jp.jawaban_user = q.kunci THEN 1 ELSE 0 END AS is_benar
+             FROM jawaban_peserta jp
+             JOIN questions q ON jp.question_id = q.id
+             WHERE jp.user_id = ?
+             ORDER BY q.paket, q.materi, q.id`,
+            [userId]
+        );
+
+        // Jika tidak ada jawaban tersimpan
+        if (jawabanRows.length === 0) {
+            return res.redirect("/users/dashboardPembayaranUjian?uploadError=" +
+                encodeURIComponent("Tidak ada data jawaban untuk di-review. Selesaikan ujian terlebih dahulu."));
+        }
+
+        // Hitung statistik
+        const totalSoal  = jawabanRows.length;
+        const totalBenar = jawabanRows.filter(j => j.is_benar).length;
+        const totalSalah = totalSoal - totalBenar;
+        const skor       = Math.round((totalBenar / totalSoal) * 100);
+
+        // Group per paket → materi
+        const grouped = {};
+        jawabanRows.forEach(j => {
+            if (!grouped[j.paket])          grouped[j.paket] = {};
+            if (!grouped[j.paket][j.materi]) grouped[j.paket][j.materi] = [];
+            grouped[j.paket][j.materi].push(j);
+        });
+
+        const [userRows] = await db.query("SELECT * FROM users WHERE id = ?", [userId]);
+
+        res.render("reviewJawaban", {
+            user:       userRows[0],
+            grouped,
+            totalSoal,
+            totalBenar,
+            totalSalah,
+            skor,
+        });
+
+    } catch (err) {
+        console.error("ERROR REVIEW:", err);
+        res.redirect("/users/dashboardPembayaranUjian?uploadError=" +
+            encodeURIComponent("Gagal memuat review jawaban."));
     }
 });
 

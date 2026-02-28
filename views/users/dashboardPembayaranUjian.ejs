@@ -212,6 +212,11 @@
               🏆 Ranking #<%= typeof myRank !== 'undefined' ? myRank : '?' %>
             </div>
             <p class="text-xs mt-2" style="color:var(--muted)">Ingin ujian paket lain? Daftar di bawah.</p>
+            <a href="/ujian/review"
+              class="inline-flex items-center gap-2 mt-3 px-4 py-2 rounded-xl text-xs font-bold text-white"
+              style="background:var(--red-deep); border:1px solid rgba(200,160,32,0.3)">
+              📝 Review Jawaban Terakhir
+            </a>
           </div>
         </div>
       </div>
@@ -337,6 +342,13 @@
                   <button class="btn-green open-reset-modal" data-paket="<%= p.key %>" data-label="<%= p.label %>">
                     🔄 Ujian Lagi <span class="text-xs opacity-75">(Soal Diacak Ulang)</span>
                   </button>
+
+                  <!-- Tombol Review Jawaban -->
+                  <a href="/ujian/review"
+                    class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold"
+                    style="background:rgba(90,10,10,0.06); color:var(--dark); border:1.5px solid rgba(90,10,10,0.12)">
+                    📝 Review Jawaban
+                  </a>
                   <% } %>
 
                   <!-- Tombol Daftar Paket Baru -->

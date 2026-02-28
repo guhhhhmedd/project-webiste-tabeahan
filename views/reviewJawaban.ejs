@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Review Jawaban - Tabeahan Cendekia</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --gold: #c8a020; --gold-light: #e0b830;
+      --dark: #7a1010; --cream: #fff8f8; --muted: #9b6b6b;
+      --red-deep: #5a0a0a;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--dark); }
+    .font-display { font-family: 'Playfair Display', serif; }
+
+    .nav-glass { background: var(--red-deep); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(200,160,32,0.25); box-shadow: 0 2px 12px rgba(90,10,10,0.18); }
+
+    /* Stat cards */
+    .stat-card { background: white; border-radius: 16px; border: 1.5px solid #f0e8d8; box-shadow: 0 2px 12px rgba(90,10,10,0.05); padding: 1rem 1.5rem; text-align: center; }
+
+    /* Progress bar */
+    .progress-track { height: 8px; background: #f0e8d8; border-radius: 99px; overflow: hidden; }
+    .progress-fill  { height: 100%; border-radius: 99px; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+
+    /* Soal card */
+    .soal-card {
+      background: white; border-radius: 16px;
+      border: 1.5px solid #f0e8d8;
+      box-shadow: 0 2px 10px rgba(90,10,10,0.04);
+      overflow: hidden; margin-bottom: 0.75rem;
+    }
+    .soal-card.benar { border-color: rgba(22,163,74,0.3); }
+    .soal-card.salah { border-color: rgba(220,38,38,0.2); }
+
+    .soal-header { padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.75rem; }
+    .soal-header.benar { background: rgba(22,163,74,0.06); }
+    .soal-header.salah { background: rgba(220,38,38,0.04); }
+
+    .badge-no {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800;
+    }
+    .badge-no.benar { background: #16a34a; color: white; }
+    .badge-no.salah { background: #dc2626; color: white; }
+
+    /* Opsi styling */
+    .opsi-row {
+      display: flex; align-items: flex-start; gap: 0.5rem;
+      padding: 0.5rem 0.75rem; border-radius: 10px; margin-bottom: 0.25rem;
+      font-size: 0.8rem; line-height: 1.4;
+    }
+    .opsi-label {
+      width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 800; border: 1.5px solid #e0d4c0;
+      color: var(--muted); background: white;
+    }
+    .opsi-row.kunci   { background: rgba(22,163,74,0.08);  }
+    .opsi-row.salah-user { background: rgba(220,38,38,0.06); }
+    .opsi-row.kunci   .opsi-label { background: #16a34a; color: white; border-color: #16a34a; }
+    .opsi-row.salah-user .opsi-label { background: #dc2626; color: white; border-color: #dc2626; }
+
+    /* Materi badge */
+    .materi-badge { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; padding: 0.2rem 0.6rem; border-radius: 99px; background: rgba(200,160,32,0.1); color: var(--gold); border: 1px solid rgba(200,160,32,0.2); }
+
+    /* Accordion */
+    .acc-content { display: none; }
+    .acc-content.open { display: block; }
+    .acc-chevron { transition: transform 0.2s; }
+    .acc-header.open .acc-chevron { transform: rotate(180deg); }
+
+    /* Filter tabs */
+    .filter-tab { padding: 0.4rem 0.9rem; border-radius: 99px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1.5px solid #e0d4c0; background: white; color: var(--muted); transition: all 0.15s; }
+    .filter-tab.active { background: var(--red-deep); color: var(--gold); border-color: var(--red-deep); }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    .fade-up { animation: fadeUp 0.4s ease forwards; }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="nav-glass fixed w-full z-50">
+    <div class="max-w-5xl mx-auto px-6 py-3 flex justify-between items-center">
+      <a href="/dashboard" class="flex items-center gap-3">
+        <img src="/asset/logo.png" alt="Logo" class="h-9 w-9 object-cover rounded-full"/>
+        <span class="font-display font-bold text-sm text-white">Tabeahan <span style="color:var(--gold)">Cendekia</span></span>
+      </a>
+      <div class="flex items-center gap-3">
+        <a href="/users/dashboardPembayaranUjian" class="text-xs font-semibold text-white/60 hover:text-white transition">← Dashboard Ujian</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== MAIN ===== -->
+  <main class="pt-24 pb-16 min-h-screen">
+    <div class="max-w-5xl mx-auto px-4 md:px-8">
+
+      <!-- Header -->
+      <div class="mb-6 fade-up">
+        <p class="text-sm font-medium" style="color:var(--muted)">Evaluasi Hasil Belajar</p>
+        <h1 class="text-3xl font-display font-black">Review <span style="color:var(--gold)">Jawaban</span></h1>
+        <p class="text-sm mt-1" style="color:var(--muted)">Tinjau setiap soal, jawaban kamu, dan kunci jawaban yang benar.</p>
+      </div>
+
+      <!-- Stats bar -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 fade-up">
+        <div class="stat-card">
+          <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Skor</p>
+          <p class="text-3xl font-display font-black" style="color:<%= skor >= 70 ? '#16a34a' : skor >= 50 ? 'var(--gold)' : '#dc2626' %>"><%= skor %></p>
+          <p class="text-[10px]" style="color:var(--muted)">dari 100</p>
+        </div>
+        <div class="stat-card">
+          <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Benar</p>
+          <p class="text-3xl font-display font-black text-green-600"><%= totalBenar %></p>
+          <p class="text-[10px]" style="color:var(--muted)">soal</p>
+        </div>
+        <div class="stat-card">
+          <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Salah</p>
+          <p class="text-3xl font-display font-black text-red-600"><%= totalSalah %></p>
+          <p class="text-[10px]" style="color:var(--muted)">soal</p>
+        </div>
+        <div class="stat-card">
+          <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Total</p>
+          <p class="text-3xl font-display font-black" style="color:var(--dark)"><%= totalSoal %></p>
+          <p class="text-[10px]" style="color:var(--muted)">soal dijawab</p>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="bg-white rounded-2xl border p-4 mb-6 fade-up" style="border-color:#f0e8d8">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-xs font-bold" style="color:var(--muted)">Akurasi Jawaban</span>
+          <span class="text-xs font-black" style="color:var(--gold)"><%= totalBenar %>/<%= totalSoal %> Benar</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressBar"
+            style="width: 0%; background: linear-gradient(90deg, #16a34a, #22c55e);"
+            data-width="<%= Math.round((totalBenar/totalSoal)*100) %>%">
+          </div>
+        </div>
+        <div class="flex justify-between mt-2">
+          <span class="text-[10px] font-bold text-green-600">✅ <%= totalBenar %> Benar</span>
+          <span class="text-[10px] font-bold text-red-500">❌ <%= totalSalah %> Salah</span>
+        </div>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="flex flex-wrap gap-2 mb-5 fade-up" id="filterTabs">
+        <button class="filter-tab active" data-filter="all">Semua (<%= totalSoal %>)</button>
+        <button class="filter-tab" data-filter="benar">✅ Benar (<%= totalBenar %>)</button>
+        <button class="filter-tab" data-filter="salah">❌ Salah (<%= totalSalah %>)</button>
+      </div>
+
+      <!-- Soal List grouped by Paket > Materi -->
+      <div id="soalContainer" class="fade-up">
+        <%
+          let noSoal = 0;
+          Object.keys(grouped).forEach(paket => {
+            const materis = grouped[paket];
+        %>
+        <!-- Paket Header -->
+        <div class="mb-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="h-px flex-1" style="background:linear-gradient(90deg,var(--gold),transparent)"></div>
+            <span class="font-display font-bold text-sm px-3 py-1 rounded-full text-white" style="background:var(--red-deep)"><%= paket %></span>
+            <div class="h-px flex-1" style="background:linear-gradient(270deg,var(--gold),transparent)"></div>
+          </div>
+
+          <%
+            Object.keys(materis).forEach(materi => {
+              const soalList = materis[materi];
+              const benarCount = soalList.filter(s => s.is_benar).length;
+          %>
+          <!-- Materi Accordion -->
+          <div class="mb-3">
+            <button class="acc-header w-full flex items-center justify-between p-3 rounded-xl mb-2 text-left transition"
+              style="background:rgba(200,160,32,0.06); border:1px solid rgba(200,160,32,0.15)"
+              data-acc="<%= paket %>-<%= materi %>">
+              <div class="flex items-center gap-2">
+                <span class="materi-badge"><%= materi %></span>
+                <span class="text-xs font-semibold" style="color:var(--dark)"><%= soalList.length %> soal</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold text-green-600"><%= benarCount %> benar</span>
+                <svg class="acc-chevron w-4 h-4" style="color:var(--muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </div>
+            </button>
+
+            <div class="acc-content open" id="acc-<%= (paket + '-' + materi).replace(/[^a-zA-Z0-9]/g, '_') %>">
+            <% soalList.forEach((s, idx) => {
+                noSoal++;
+                const opsiMap = { a: s.opsi_a, b: s.opsi_b, c: s.opsi_c, d: s.opsi_d, e: s.opsi_e };
+                const statusClass = s.is_benar ? 'benar' : 'salah';
+            %>
+              <div class="soal-card <%= statusClass %>" data-status="<%= statusClass %>">
+                <div class="soal-header <%= statusClass %>">
+                  <div class="badge-no <%= statusClass %>"><%= noSoal %></div>
+                  <p class="text-xs font-semibold flex-1 leading-relaxed" style="color:var(--dark)"><%= s.soal %></p>
+                  <span class="text-lg flex-shrink-0"><%= s.is_benar ? '✅' : '❌' %></span>
+                </div>
+                <div class="px-4 py-3 space-y-1">
+                  <% ['a','b','c','d','e'].forEach(k => { %>
+                  <%
+                    let rowClass = '';
+                    if (k === s.kunci) rowClass = 'kunci';
+                    else if (k === s.jawaban_user && !s.is_benar) rowClass = 'salah-user';
+                  %>
+                  <div class="opsi-row <%= rowClass %>">
+                    <div class="opsi-label"><%= k.toUpperCase() %></div>
+                    <span class="flex-1" style="color:<%= k===s.kunci ? '#15803d' : k===s.jawaban_user&&!s.is_benar ? '#b91c1c' : 'var(--muted)' %>">
+                      <%= opsiMap[k] %>
+                    </span>
+                    <% if (k === s.kunci) { %><span class="text-[10px] font-bold text-green-600">✓ Kunci</span><% } %>
+                    <% if (k === s.jawaban_user && !s.is_benar) { %><span class="text-[10px] font-bold text-red-500">← Kamu</span><% } %>
+                    <% if (k === s.jawaban_user && s.is_benar) { %><span class="text-[10px] font-bold text-green-600">← Kamu ✓</span><% } %>
+                  </div>
+                  <% }) %>
+                </div>
+              </div>
+            <% }) %>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+        <% }) %>
+      </div>
+
+      <!-- Bottom CTA -->
+      <div class="text-center mt-8 fade-up">
+        <a href="/users/dashboardPembayaranUjian"
+          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm text-white"
+          style="background:var(--red-deep)">
+          ← Kembali ke Dashboard
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // ── Animate Progress Bar ──
+    window.addEventListener('load', () => {
+      const bar = document.getElementById('progressBar');
+      if (bar) setTimeout(() => { bar.style.width = bar.dataset.width; }, 200);
+    });
+
+    // ── Accordion toggle ──
+    document.querySelectorAll('.acc-header').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.acc.replace(/[^a-zA-Z0-9]/g, '_');
+        const content = document.getElementById('acc-' + key);
+        const isOpen  = content.classList.contains('open');
+        content.classList.toggle('open', !isOpen);
+        btn.classList.toggle('open', !isOpen);
+      });
+    });
+
+    // ── Filter tabs ──
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        const filter = tab.dataset.filter;
+        document.querySelectorAll('.soal-card').forEach(card => {
+          if (filter === 'all') {
+            card.style.display = '';
+          } else {
+            card.style.display = card.dataset.status === filter ? '' : 'none';
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
