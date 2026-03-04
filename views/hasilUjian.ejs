@@ -1,54 +1,100 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hasil Ujian - Tabeahan Cendekia</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    :root { --gold: #b8924a; --dark: #1a1008; --cream: #fdfaf5; }
-    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--dark); }
-    .font-display { font-family: 'Playfair Display', serif; }
-    .card-grad { background: linear-gradient(135deg, #fff 0%, #fcf8f0 100%); border: 1px solid #e8dec9; }
-    .skor-circle {
-      width: 180px; height: 180px; border-radius: 50%;
-      background: white; border: 8px solid var(--gold);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      box-shadow: 0 10px 30px rgba(184, 146, 74, 0.2);
-    }
-  </style>
-</head>
-<body class="min-h-screen flex items-center justify-center p-4">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hasil Ujian - Tabeahan Cendekia</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --gold: #b8924a;
+        --dark: #1a1008;
+        --cream: #fdfaf5;
+      }
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--cream);
+        color: var(--dark);
+      }
+      .font-display {
+        font-family: "Playfair Display", serif;
+      }
+      .card-grad {
+        background: linear-gradient(135deg, #fff 0%, #fcf8f0 100%);
+        border: 1px solid #e8dec9;
+      }
+      .skor-circle {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: white;
+        border: 8px solid var(--gold);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 30px rgba(184, 146, 74, 0.2);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex items-center justify-center p-4">
+    <div
+      class="max-w-md w-full card-grad rounded-3xl p-8 text-center shadow-2xl"
+    >
+      <h1 class="font-display text-2xl font-black mb-2">Ujian Selesai!</h1>
+      <p class="text-sm text-slate-500 mb-8">
+        Hasil evaluasi belajar kamu sudah keluar.
+      </p>
 
-  <div class="max-w-md w-full card-grad rounded-3xl p-8 text-center shadow-2xl">
-    <h1 class="font-display text-2xl font-black mb-2">Ujian Selesai!</h1>
-    <p class="text-sm text-slate-500 mb-8">Hasil evaluasi belajar kamu sudah keluar.</p>
-
-    <div class="skor-circle mx-auto mb-8">
-      <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Skor Anda</span>
-      <span class="text-6xl font-display font-black text-dark"><%= skor %></span>
-      <span class="text-xs font-bold text-gold">/ 100</span>
-    </div>
-
-    <div class="grid grid-cols-2 gap-4 mb-8">
-      <div class="bg-white p-4 rounded-2xl border border-slate-100">
-        <p class="text-[10px] font-bold uppercase text-slate-400">Benar</p>
-        <p class="text-lg font-bold text-green-600"><%= benar %></p>
+      <div class="skor-circle mx-auto mb-8">
+        <span class="text-xs font-bold uppercase tracking-widest text-slate-400"
+          >Skor Anda</span
+        >
+        <span class="text-6xl font-display font-black text-dark"
+          ><%= skor %></span
+        >
+        <span class="text-xs font-bold text-gold">/ 100</span>
       </div>
-      <div class="bg-white p-4 rounded-2xl border border-slate-100">
-        <p class="text-[10px] font-bold uppercase text-slate-400">Total Soal</p>
-        <p class="text-lg font-bold text-slate-700"><%= totalSoal %></p>
+
+      <div class="grid grid-cols-2 gap-4 mb-8">
+        <div class="bg-white p-4 rounded-2xl border border-slate-100">
+          <p class="text-[10px] font-bold uppercase text-slate-400">Benar</p>
+          <p class="text-lg font-bold text-green-600"><%= benar %></p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-100">
+          <p class="text-[10px] font-bold uppercase text-slate-400">
+            Total Soal
+          </p>
+          <p class="text-lg font-bold text-slate-700"><%= totalSoal %></p>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <a
+          href="/ujian/review"
+          class="block w-full py-4 rounded-xl font-bold text-sm text-center transition shadow"
+          style="
+            background: linear-gradient(135deg, #5a0a0a, #7a1a1a);
+            color: #c8a020;
+          "
+        >
+          📝 Review Jawaban
+        </a>
+        <a
+          href="/users/dashboardPembayaranUjian"
+          class="block w-full py-4 bg-dark text-white rounded-xl font-bold text-sm hover:opacity-90 transition shadow-lg text-center"
+          style="background: var(--dark)"
+        >
+          Kembali ke Dashboard
+        </a>
+        <p class="text-[10px] text-slate-400 italic">
+          Nilai ini telah disimpan secara permanen di database.
+        </p>
       </div>
     </div>
-
-    <div class="space-y-3">
-      <a href="/dashboard" class="block w-full py-4 bg-dark text-white rounded-xl font-bold text-sm hover:opacity-90 transition shadow-lg" style="background:var(--dark)">
-        Kembali ke Dashboard
-      </a>
-      <p class="text-[10px] text-slate-400 italic">Nilai ini telah disimpan secara permanen di database.</p>
-    </div>
-  </div>
-
-</body>
+  </body>
 </html>

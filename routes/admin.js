@@ -102,12 +102,21 @@ const [users] = await db.query(`
   ORDER BY u.id DESC
 `);
 
+    const [[pendingRow]] = await db.query(`
+      SELECT COUNT(DISTINCT p.user_id) AS cnt
+      FROM payments p
+      INNER JOIN users u ON u.id = p.user_id AND u.role != 'admin'
+      WHERE LOWER(p.status) = 'pending'
+    `);
+    const pendingCount = pendingRow.cnt || 0;
+
     res.render("admin/dashboardAdmin", {
       statsSoal,
       daftarPaket,
       users,
       userStats,
       chartData,
+      pendingCount,
       message: req.query.message || null,
       error: req.query.error || null,
     });

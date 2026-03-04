@@ -123,21 +123,28 @@ router.get("/users/dashboardPembayaranUjian", isLogin, async (req, res) => {
     // 4. Ambil Leaderboard (Hanya skor yang valid/aktif)
     const [rankingRows] = await db.query(`
       SELECT username, skor FROM users 
-      WHERE status_ujian = 'SELESAI' AND skor IS NOT NULL
+      WHERE skor > 0 AND skor IS NOT NULL
       ORDER BY skor DESC, id ASC
       LIMIT 5
     `);
-    
-    // Cari ranking user (dari seluruh data, bukan cuma limit 5 kalau mau akurat)
+
+    // Cari ranking user
     const myRank = rankingRows.findIndex(r => r.username === user.username) + 1;
 
-    // 5. Render
+    // 5. Ambil riwayat ujian user (semua percobaan)
+    const [riwayatUjian] = await db.query(
+      "SELECT * FROM riwayat_ujian WHERE user_id = ? ORDER BY tgl_selesai DESC",
+      [userId]
+    );
+
+    // 6. Render
     res.render("users/dashboardPembayaranUjian", {
       user,
-      paketList: PAKET_LIST, // Pastikan variabel ini ada (misal dari config)
+      paketList: PAKET_LIST,
       paymentMap: paymentMap,
       rankings: rankingRows,
       myRank: myRank > 0 ? myRank : "-",
+      riwayatUjian: riwayatUjian,
       uploadError: req.query.uploadError ? decodeURIComponent(req.query.uploadError) : null,
       successMsg: req.query.success ? decodeURIComponent(req.query.success) : null,
     });

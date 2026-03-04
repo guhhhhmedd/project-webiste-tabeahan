@@ -7,40 +7,145 @@
   <title>Admin Dashboard | Tabeahan Cendekia</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --cream:#fff8f8; --gold:#c8a020; --dark:#7a1010; --red-deep:#5a0a0a; --muted:#9b6b6b; }
+    *, *::before, *::after { box-sizing:border-box; }
+    body { font-family:"DM Sans",sans-serif; background:var(--cream); color:var(--dark); min-height:100vh; }
+    h1,h2,h3,h4 { font-family:"Playfair Display",serif; }
+
+    /* ── Navbar ── */
+    .adm-nav { background:var(--red-deep); border-bottom:1px solid rgba(200,160,32,0.25); position:sticky; top:0; z-index:50; box-shadow:0 2px 12px rgba(90,10,10,0.18); }
+    .adm-nav-link { color:rgba(255,255,255,0.5); font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; transition:color 0.2s; }
+    .adm-nav-link:hover, .adm-nav-link.active { color:var(--gold); }
+
+    /* ── Cards ── */
+    .adm-card { background:white; border-radius:12px; border:1px solid rgba(200,160,32,0.12); box-shadow:0 2px 16px rgba(90,10,10,0.06); overflow:hidden; }
+    .adm-hd { background:linear-gradient(135deg, var(--red-deep), #6b1a1a); padding:0.875rem 1.25rem; display:flex; align-items:center; gap:0.5rem; border-bottom:1px solid rgba(200,160,32,0.15); }
+    .adm-hd h3 { color:white; font-size:0.875rem; margin:0; font-family:"Playfair Display",serif; }
+    .adm-hd .sub { margin-left:auto; font-size:0.6rem; color:rgba(255,255,255,0.45); font-weight:600; }
+
+    /* ── Form fields ── */
+    .adm-input { width:100%; border:1px solid #ddd6cc; border-radius:8px; padding:0.625rem 0.875rem; font-size:0.85rem; font-family:"DM Sans",sans-serif; color:var(--dark); background:#fdfaf8; outline:none; transition:all 0.2s; }
+    .adm-input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(200,160,32,0.1); }
+    textarea.adm-input { resize:none; height:6rem; }
+    label.adm-lbl { display:block; font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:var(--muted); margin-bottom:0.3rem; }
+
+    /* ── Buttons ── */
+    .adm-btn { background:var(--red-deep); color:white; border:none; padding:0.625rem 1.25rem; border-radius:8px; font-size:0.75rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; font-family:"DM Sans",sans-serif; }
+    .adm-btn:hover { background:var(--gold); }
+    .adm-btn-green { background:#15803d; color:white; border:none; width:100%; padding:0.65rem; border-radius:8px; font-size:0.75rem; font-weight:700; cursor:pointer; transition:background 0.2s; font-family:"DM Sans",sans-serif; }
+    .adm-btn-green:hover { background:#166534; }
+
+    /* ── Stat boxes ── */
+    .adm-stat-red   { background:rgba(90,10,10,0.05);   border:1px solid rgba(90,10,10,0.1);   border-left:3px solid var(--red-deep); border-radius:10px; padding:1rem; }
+    .adm-stat-green { background:rgba(21,128,61,0.06);  border:1px solid rgba(21,128,61,0.12); border-left:3px solid #15803d; border-radius:10px; padding:1rem; }
+    .adm-stat-gold  { background:rgba(200,160,32,0.06); border:1px solid rgba(200,160,32,0.18);border-left:3px solid var(--gold); border-radius:10px; padding:1rem; }
+
+    /* ── Kelola paket cards ── */
+    .kelola-card { border:1px solid rgba(200,160,32,0.15); border-left:3px solid var(--red-deep); border-radius:10px; padding:1rem; transition:box-shadow 0.2s; }
+    .kelola-card:hover { box-shadow:0 6px 20px rgba(90,10,10,0.1); }
+
+    /* ── Toast ── */
+    .adm-toast { background:var(--red-deep); border-left:4px solid var(--gold); }
+
+    /* ── Upload dropzone ── */
+    .drop-zone { border:2px dashed rgba(200,160,32,0.4); border-radius:10px; padding:1.25rem; text-align:center; transition:all 0.2s; background:rgba(200,160,32,0.02); }
+    .drop-zone:hover { border-color:var(--gold); background:rgba(200,160,32,0.05); }
+
+    /* ── Notifikasi badge ── */
+    .notif-badge {
+      display:inline-flex; align-items:center; justify-content:center;
+      min-width:18px; height:18px; padding:0 5px;
+      background:#dc2626; color:white;
+      border-radius:99px; font-size:10px; font-weight:800;
+      animation: badgePulse 1.8s ease-in-out infinite;
+      margin-left:5px; vertical-align:middle;
+    }
+    @keyframes badgePulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.55); }
+      50%      { box-shadow: 0 0 0 5px rgba(220,38,38,0); }
+    }
+
+    /* ── Pending banner ── */
+    .pending-banner {
+      background: linear-gradient(135deg, #78350f, #92400e);
+      border-bottom: 2px solid var(--gold);
+      padding: 10px 0;
+    }
+  </style>
 </head>
 
-<body class="bg-neutral-300 font-sans text-slate-900 min-h-screen">
+<body>
 
-  <!-- NAVBAR -->
-  <nav class="bg-[#0f172a] text-white shadow-lg sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 md:px-8 py-3 flex justify-between items-center">
+  <!-- ===== NAVBAR ===== -->
+  <nav class="adm-nav">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 py-3.5 flex justify-between items-center">
       <div class="flex items-center gap-6">
         <div class="flex items-center gap-2.5">
-          <img src="./asset/logo.png" alt="Logo" class="h-8 w-auto opacity-90">
+          <img src="./asset/logo.png" alt="Logo" class="h-9 w-auto">
           <div>
-            <span class="font-bold text-sm tracking-wide block leading-tight">TABEAHAN CENDEKIA</span>
-            <span
-              class="bg-yellow-500 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase text-slate-900">Administrator</span>
+            <span style="font-family:'Playfair Display',serif;color:white;font-size:1rem;font-weight:700;display:block;line-height:1.2">
+              Tabeahan <span style="color:var(--gold)">Cendekia</span>
+            </span>
+            <span style="display:inline-block;background:var(--gold);color:#3a0000;font-size:0.55rem;padding:0.1rem 0.45rem;border-radius:4px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px">
+              Administrator
+            </span>
           </div>
         </div>
-        <div class="hidden md:flex gap-5 text-[11px] font-bold uppercase tracking-widest">
-          <a href="/dashboardAdmin" class="text-yellow-400 border-b border-yellow-400 pb-0.5">Dashboard</a>
-          <a href="/admin/daftarPeserta" class="text-slate-400 hover:text-white transition">Peserta Ujian</a>
+        <div class="hidden md:flex gap-5 items-center">
+          <a href="/dashboardAdmin" class="adm-nav-link active">Dashboard</a>
+          <a href="/admin/daftarPeserta" class="adm-nav-link" style="display:inline-flex;align-items:center">
+            Peserta Ujian
+            <% if (pendingCount > 0) { %>
+            <span class="notif-badge"><%= pendingCount %></span>
+            <% } %>
+          </a>
         </div>
       </div>
-      <a href="/logout" class="bg-red-600 hover:bg-red-700 px-5 py-1.5 rounded text-xs font-bold transition">Logout</a>
+      <a href="/logout"
+        style="background:rgb(255, 255, 255);color:rgba(0, 0, 0, 0.7);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:0.35rem 1rem;font-size:0.75rem;font-weight:700;transition:all 0.2s;text-decoration:none"
+        onmouseover="this.style.background='rgba(200,160,32,0.2)';this.style.color='#c8a020'"
+        onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.7)'">
+        Logout
+      </a>
     </div>
   </nav>
 
+  <!-- ===== PENDING BANNER ===== -->
+  <% if (pendingCount > 0) { %>
+  <div class="pending-banner">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span style="font-size:1.25rem">🔔</span>
+        <div>
+          <p style="font-size:0.75rem;font-weight:800;color:var(--gold);letter-spacing:0.03em">
+            <%= pendingCount %> Permintaan Verifikasi Menunggu!
+          </p>
+          <p style="font-size:0.65rem;color:rgba(255,255,255,0.6);margin-top:1px">
+            Peserta sudah upload bukti transfer dan menunggu konfirmasi admin.
+          </p>
+        </div>
+      </div>
+      <a href="/admin/daftarPeserta"
+        style="background:var(--gold);color:#3a0000;padding:0.4rem 1rem;border-radius:8px;font-size:0.7rem;font-weight:800;text-decoration:none;white-space:nowrap;flex-shrink:0">
+        Verifikasi Sekarang →
+      </a>
+    </div>
+  </div>
+  <% } %>
+
+  <!-- ===== MAIN GRID ===== -->
   <div class="max-w-7xl mx-auto px-4 md:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
 
+    <!-- ===== KOLOM KIRI ===== -->
     <div class="lg:col-span-5 space-y-5">
 
       <!-- Form Tambah Soal Manual -->
-      <div class="bg-white shadow-sm border border-slate-200 overflow-hidden">
-        <div class="bg-sky-500 border-b border-slate-200 px-5 py-3 flex items-center gap-2">
+      <div class="adm-card">
+        <div class="adm-hd">
           <span class="text-base">📝</span>
-          <h3 class="font-bold text-slate-800 text-sm">Tambah Soal CAT</h3>
+          <h3>Tambah Soal CAT</h3>
         </div>
         <div class="p-5">
           <form action="/admin/tambah-soal" method="POST" class="space-y-3">
@@ -48,60 +153,42 @@
             <!-- Paket & Materi sejajar -->
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Pilih Paket</label>
-                <select name="paket"
-                  class="w-full border border-slate-300 p-2.5 rounded-lg bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                  required>
+                <label class="adm-lbl">Pilih Paket</label>
+                <select name="paket" class="adm-input" required>
                   <option value="Paket SKD/TKD">Paket SKD/TKD</option>
                   <option value="Paket Akademik Polri">Paket Akademik Polri</option>
                   <option value="Paket PPPK">Paket PPPK</option>
                 </select>
               </div>
               <div>
-                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Kategori Materi</label>
-                <select name="materi"
-                  class="w-full border border-slate-300 p-2.5 rounded-lg bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                  required></select>
+                <label class="adm-lbl">Kategori Materi</label>
+                <select name="materi" class="adm-input" required></select>
               </div>
             </div>
 
             <!-- Pertanyaan -->
             <div>
-              <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Pertanyaan</label>
-              <textarea name="soal" placeholder="Tulis soal di sini..."
-                class="w-full border border-slate-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none h-24"
-                required></textarea>
+              <label class="adm-lbl">Pertanyaan</label>
+              <textarea name="soal" placeholder="Tulis soal di sini..." class="adm-input" required></textarea>
             </div>
 
-            <!-- Opsi A-E dalam 2 kolom -->
+            <!-- Opsi A-E -->
             <div>
-              <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Pilihan Jawaban</label>
+              <label class="adm-lbl">Pilihan Jawaban</label>
               <div class="grid grid-cols-2 gap-2">
-                <input type="text" name="a" placeholder="A. ..."
-                  class="border border-slate-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                  required>
-                <input type="text" name="b" placeholder="B. ..."
-                  class="border border-slate-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                  required>
-                <input type="text" name="c" placeholder="C. ..."
-                  class="border border-slate-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                  required>
-                <input type="text" name="d" placeholder="D. ..."
-                  class="border border-slate-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                  required>
-                <input type="text" name="e" placeholder="E. ..."
-                  class="col-span-2 border border-slate-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                  required>
+                <input type="text" name="a" placeholder="A. ..." class="adm-input" required>
+                <input type="text" name="b" placeholder="B. ..." class="adm-input" required>
+                <input type="text" name="c" placeholder="C. ..." class="adm-input" required>
+                <input type="text" name="d" placeholder="D. ..." class="adm-input" required>
+                <input type="text" name="e" placeholder="E. ..." class="col-span-2 adm-input" required>
               </div>
             </div>
 
-            <!-- Kunci + Submit sejajar -->
+            <!-- Kunci + Submit -->
             <div class="flex items-end gap-3">
               <div class="flex-1">
-                <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Kunci Jawaban</label>
-                <select name="kunci"
-                  class="w-full border-2 border-yellow-400 p-2.5 rounded-lg bg-yellow-50 font-bold text-sm outline-none"
-                  required>
+                <label class="adm-lbl">Kunci Jawaban</label>
+                <select name="kunci" class="adm-input font-bold" style="border-color:var(--gold);background:rgba(200,160,32,0.04)" required>
                   <option value="a">Opsi A</option>
                   <option value="b">Opsi B</option>
                   <option value="c">Opsi C</option>
@@ -109,10 +196,7 @@
                   <option value="e">Opsi E</option>
                 </select>
               </div>
-              <button type="submit"
-                class="bg-[#0f172a] hover:bg-slate-800 active:scale-95 text-white px-5 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer shadow">
-                SIMPAN SOAL
-              </button>
+              <button type="submit" class="adm-btn">SIMPAN SOAL</button>
             </div>
 
           </form>
@@ -120,49 +204,46 @@
       </div>
 
       <!-- Form Import Excel -->
-      <div class="bg-white overflow-hidden">
-        <div class="bg-sky-500 border-b border-slate-200 px-5 py-3 flex items-center gap-2">
-          <span class="text-base"></span>
-          <h3 class="font-bold text-slate-800 text-sm">Bulk Import Excel</h3>
-          <span class="ml-auto text-[10px] text-black-400 font-semibold">Upload banyak soal sekaligus</span>
+      <div class="adm-card">
+        <div class="adm-hd">
+          <span class="text-base">📊</span>
+          <h3>Bulk Import Excel</h3>
+          <span class="sub">Upload banyak soal sekaligus</span>
         </div>
         <div class="p-5 space-y-4">
           <form action="/admin/upload-soal" method="POST" enctype="multipart/form-data" class="space-y-3">
 
             <!-- Drop zone -->
-            <div
-              class="border-2 border-dashed border-slate-300 hover:border-green-400 rounded-xl p-5 text-center transition bg-slate-50 hover:bg-green-50">
-              <div class="text-3xl mb-2">📊</div>
-              <p class="text-xs font-semibold text-slate-600 mb-1">Pilih file Excel</p>
-              <p class="text-[10px] text-slate-400 mb-3">Format .xlsx atau .xls</p>
+            <div class="drop-zone">
+              <div class="text-3xl mb-2">�</div>
+              <p class="text-xs font-semibold mb-1" style="color:var(--dark)">Pilih file Excel</p>
+              <p class="text-[10px] mb-3" style="color:var(--muted)">Format .xlsx atau .xls</p>
               <input type="file" name="fileExcel" accept=".xlsx,.xls" required
-                class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-green-100 file:text-green-700 hover:file:bg-green-200 cursor-pointer">
+                class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 cursor-pointer">
             </div>
 
             <!-- Info format -->
-            <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
-              <p class="text-[10px] font-bold text-slate-500 uppercase mb-1">Format Kolom Excel:</p>
-              <p class="text-[11px] text-slate-600 font-mono">paket | materi | soal | a | b | c | d | e | kunci</p>
+            <div class="rounded-lg p-3" style="background:rgba(200,160,32,0.04);border:1px solid rgba(200,160,32,0.15)">
+              <p class="text-[10px] font-bold uppercase mb-1" style="color:var(--muted)">Format Kolom Excel:</p>
+              <p class="text-[11px] font-mono" style="color:var(--dark)">paket | materi | soal | a | b | c | d | e | kunci</p>
             </div>
 
             <!-- Peringatan ENUM -->
-            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-              <p class="text-[10px] font-bold text-yellow-700 uppercase mb-1">⚠️ Nama paket harus tepat:</p>
-              <ul class="text-[10px] text-yellow-700 space-y-0.5 pl-3 list-disc">
+            <div class="rounded-lg p-3" style="background:rgba(200,160,32,0.06);border:1px solid rgba(200,160,32,0.2)">
+              <p class="text-[10px] font-bold uppercase mb-1" style="color:var(--gold)">⚠️ Nama paket harus tepat:</p>
+              <ul class="text-[10px] space-y-0.5 pl-3 list-disc" style="color:var(--dark)">
                 <li>Paket SKD/TKD</li>
                 <li>Paket Akademik Polri</li>
                 <li>Paket PPPK</li>
               </ul>
             </div>
 
-            <button type="submit"
-              class="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-lg text-xs font-bold transition cursor-pointer">
-              UPLOAD & PROSES EXCEL
-            </button>
+            <button type="submit" class="adm-btn-green">UPLOAD & PROSES EXCEL</button>
 
             <a href="/template_import_soal.xlsx" download
-              class="w-full flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-300 py-2.5 rounded-lg text-xs font-bold transition">
-              Download Template Excel
+              class="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition"
+              style="background:rgba(90,10,10,0.04);color:var(--dark);border:1px solid rgba(90,10,10,0.1)">
+              ⬇ Download Template Excel
             </a>
           </form>
         </div>
@@ -174,76 +255,71 @@
     <div class="lg:col-span-7 space-y-5">
 
       <!-- Soal Per Paket -->
-      <div class="bg-white  shadow-sm border border-slate-200 overflow-hidden">
-        <div class="bg-sky-500 border-b border-slate-200 px-5 py-3 flex items-center gap-2">
-          <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">Kelola Soal Per Paket</h3>
-          <span class="text-[10px] text-black-400 font-semibold">Klik tombol untuk edit/hapus soal</span>
+      <div class="adm-card">
+        <div class="adm-hd">
+          <h3>Kelola Soal Per Paket</h3>
+          <span class="sub">Klik tombol untuk edit / hapus soal</span>
         </div>
         <div class="p-5">
-          <% if (statsSoal.length> 0) { %>
+          <% if (statsSoal.length > 0) { %>
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-              <% statsSoal.forEach((s, i)=> { %>
-                <% const colors=['border-l-slate-800', 'border-l-blue-600' , 'border-l-green-600' ]; const
-                  textColors=['text-slate-800', 'text-blue-600' , 'text-green-600' ]; const
-                  bgColors=['bg-slate-800', 'bg-blue-600' , 'bg-green-600' ]; const cl=colors[i] || colors[0]; const
-                  tc=textColors[i] || textColors[0]; const bc=bgColors[i] || bgColors[0]; %>
-                  <div
-                    class="border border-slate-200 border-l-4 <%= cl %> rounded-xl p-4 hover:shadow-md transition-all group flex flex-col justify-between gap-3">
-                    <div>
-                      <p class="text-[9px] text-slate-400 uppercase font-bold tracking-widest mb-1">Paket Ujian</p>
-                      <h4 class="text-sm font-black text-slate-700 leading-tight">
-                        <%= s.paket %>
-                      </h4>
-                    </div>
-                    <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-                      <p class="text-2xl font-black <%= tc %> leading-none">
-                        <%= s.total %><span class="text-xs font-normal text-slate-400 ml-1">soal</span>
-                      </p>
-                      <a href="/admin/kelola-soal/<%= encodeURIComponent(s.paket) %>"
-                        class="<%= bc %> text-white px-3 py-1.5 rounded-lg text-[10px] font-bold transition opacity-80 group-hover:opacity-100">
-                        KELOLA →
-                      </a>
-                    </div>
+              <% statsSoal.forEach((s, i) => {
+                const borderColors = ['var(--red-deep)', 'var(--gold)', '#15803d'];
+                const textColors   = ['var(--dark)',     'var(--gold)', '#15803d'];
+                const btnColors    = ['var(--red-deep)', 'var(--gold)', '#15803d'];
+                const bc = borderColors[i] || borderColors[0];
+                const tc = textColors[i]   || textColors[0];
+                const btn = btnColors[i]   || btnColors[0];
+              %>
+                <div class="kelola-card" style="border-left-color:<%= bc %>">
+                  <div>
+                    <p style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted)">Paket Ujian</p>
+                    <h4 style="font-size:0.875rem;font-weight:900;color:var(--dark);font-family:'Playfair Display',serif;line-height:1.2;margin-top:0.25rem"><%= s.paket %></h4>
                   </div>
-                  <% }) %>
+                  <div class="flex items-center justify-between pt-3 mt-3" style="border-top:1px solid rgba(200,160,32,0.1)">
+                    <p style="font-size:1.5rem;font-weight:900;color:<%= tc %>;font-family:'Playfair Display',serif;line-height:1">
+                      <%= s.total %><span style="font-size:0.7rem;font-weight:400;color:var(--muted);margin-left:0.25rem">soal</span>
+                    </p>
+                    <a href="/admin/kelola-soal/<%= encodeURIComponent(s.paket) %>"
+                      style="background:<%= btn %>;color:white;padding:0.375rem 0.75rem;border-radius:6px;font-size:0.65rem;font-weight:700;text-decoration:none;letter-spacing:0.05em;transition:opacity 0.2s"
+                      onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                      KELOLA →
+                    </a>
+                  </div>
+                </div>
+              <% }) %>
             </div>
-            <% } else { %>
-              <div class="text-center py-10 text-slate-400">
-                <div class="text-4xl mb-2 opacity-30">📭</div>
-                <p class="text-xs font-semibold">Belum ada soal yang diinput.</p>
-              </div>
-              <% } %>
+          <% } else { %>
+            <div class="text-center py-10">
+              <div class="text-4xl mb-2 opacity-30">📭</div>
+              <p class="text-xs font-semibold" style="color:var(--muted)">Belum ada soal yang diinput.</p>
+            </div>
+          <% } %>
         </div>
       </div>
 
-      <!-- stats -->
-      <div class="bg-white shadow-md border border-slate-200 rounded-xl overflow-hidden mb-6">
-        <div class="bg-[#0f172a] px-5 py-3 flex items-center justify-between">
-          <h3 class="text-white font-bold text-sm">📈 Tren Pertumbuhan Peserta</h3>
-          <span class="text-[10px] text-slate-400 font-mono uppercase">6 Bulan Terakhir</span>
+      <!-- Stats & Chart -->
+      <div class="adm-card mb-6">
+        <div class="adm-hd" style="justify-content:space-between">
+          <h3>📈 Tren Pertumbuhan Peserta</h3>
+          <span class="sub" style="text-transform:uppercase;letter-spacing:0.1em">6 Bulan Terakhir</span>
         </div>
 
         <div class="p-6">
           <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
             <div class="space-y-3">
-              <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl">
-                <p class="text-[10px] font-bold text-blue-600 uppercase tracking-tighter">Total Pendaftar</p>
-                <p class="text-3xl font-black text-slate-800">
-                  <%= userStats.total_users || 0 %>
-                </p>
+              <div class="adm-stat-red">
+                <p style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted)">Total Pendaftar</p>
+                <p style="font-size:1.75rem;font-weight:900;font-family:'Playfair Display',serif;color:var(--dark)"><%= userStats.total_users || 0 %></p>
               </div>
-              <div class="bg-green-50 border border-green-100 p-4 rounded-xl">
-                <p class="text-[10px] font-bold text-green-600 uppercase tracking-tighter">Selesai Ujian</p>
-                <p class="text-3xl font-black text-slate-800">
-                  <%= userStats.finished_exam || 0 %>
-                </p>
+              <div class="adm-stat-green">
+                <p style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#15803d">Selesai Ujian</p>
+                <p style="font-size:1.75rem;font-weight:900;font-family:'Playfair Display',serif;color:#15803d"><%= userStats.finished_exam || 0 %></p>
               </div>
-              <div class="bg-amber-50 border border-amber-100 p-4 rounded-xl">
-                <p class="text-[10px] font-bold text-amber-600 uppercase tracking-tighter">Sedang Ujian</p>
-                <p class="text-3xl font-black text-slate-800">
-                  <%= userStats.active_exam || 0 %>
-                </p>
+              <div class="adm-stat-gold">
+                <p style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold)">Sedang Ujian</p>
+                <p style="font-size:1.75rem;font-weight:900;font-family:'Playfair Display',serif;color:var(--gold)"><%= userStats.active_exam || 0 %></p>
               </div>
             </div>
 
@@ -258,9 +334,10 @@
   </div>
 
   <!-- Toast -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-xl border-l-4 border-yellow-400 shadow-xl
+  <div id="toast" class="adm-toast fixed bottom-5 right-5 z-50 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-xl
            translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
   </div>
+
   <script>
     // 1. SCRIPT UNTUK DROPDOWN MATERI (Murni UI)
     const materiPerPaket = {
@@ -282,7 +359,7 @@
       });
     }
 
-    if (paketSelect) { // Kasih proteksi biar gak error kalau element gak ketemu
+    if (paketSelect) {
       paketSelect.addEventListener('change', updateMateri);
       updateMateri();
     }
@@ -318,12 +395,13 @@
         datasets: [{
           label: 'Pendaftar Baru',
           data: <%- JSON.stringify(chartData.values) %>,
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          borderColor: '#c8a020',
+          backgroundColor: 'rgba(200,160,32,0.08)',
           fill: true,
           tension: 0.4,
           borderWidth: 3,
-          pointRadius: 4
+          pointRadius: 4,
+          pointBackgroundColor: '#c8a020'
         }]
       },
       options: {

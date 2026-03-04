@@ -5,158 +5,221 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daftar Peserta | Tabeahan Cendekia</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-</head>
-<body class="bg-slate-100 font-sans text-slate-900 min-h-screen">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --cream:#fff8f8; --gold:#c8a020; --dark:#7a1010; --red-deep:#5a0a0a; --muted:#9b6b6b; }
+    *, *::before, *::after { box-sizing:border-box; }
+    body { font-family:"DM Sans",sans-serif; background:var(--cream); color:var(--dark); min-height:100vh; }
+    h1,h2,h3,h4 { font-family:"Playfair Display",serif; }
 
-  <!-- NAVBAR -->
-  <nav class="bg-[#0f172a] text-white shadow-lg sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 md:px-8 py-3 flex justify-between items-center">
+    /* Navbar */
+    .adm-nav { background:var(--red-deep); border-bottom:1px solid rgba(200,160,32,0.25); position:sticky; top:0; z-index:50; box-shadow:0 2px 12px rgba(90,10,10,0.18); }
+    .adm-nav-link { color:rgba(255,255,255,0.5); font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; transition:color 0.2s; }
+    .adm-nav-link:hover, .adm-nav-link.active { color:var(--gold); }
+
+    /* Table card */
+    .tbl-card { background:white; border-radius:12px; border:1px solid rgba(200,160,32,0.12); box-shadow:0 2px 16px rgba(90,10,10,0.06); overflow:hidden; }
+    .tbl-hd { background:linear-gradient(135deg, var(--red-deep), #6b1a1a); padding:0.875rem 1.25rem; border-bottom:1px solid rgba(200,160,32,0.15); }
+    .tbl-hd h3 { color:white; font-size:0.875rem; margin:0; font-family:"Playfair Display",serif; }
+
+    /* Table */
+    table { width:100%; border-collapse:collapse; }
+    thead tr { background:rgba(90,10,10,0.04); border-bottom:2px solid rgba(200,160,32,0.15); }
+    thead th { padding:0.75rem 1.25rem; font-size:0.6rem; font-weight:800; text-transform:uppercase; letter-spacing:0.12em; color:var(--muted); text-align:left; }
+    tbody tr { border-bottom:1px solid rgba(200,160,32,0.07); transition:background 0.15s; }
+    tbody tr:hover { background:rgba(200,160,32,0.03); }
+    tbody td { padding:1rem 1.25rem; vertical-align:top; }
+
+    /* Status badges */
+    .badge { display:inline-block; padding:0.2rem 0.6rem; border-radius:5px; font-size:0.6rem; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; }
+    .badge-lunas   { background:rgba(21,128,61,0.1);   color:#15803d; border:1px solid rgba(21,128,61,0.2); }
+    .badge-pending { background:rgba(200,160,32,0.1);  color:#a16207; border:1px solid rgba(200,160,32,0.25); }
+    .badge-ditolak { background:rgba(220,38,38,0.08);  color:#b91c1c; border:1px solid rgba(220,38,38,0.18); }
+    .badge-used    { background:rgba(122,16,16,0.07);  color:var(--dark); border:1px solid rgba(122,16,16,0.15); }
+    .badge-idle    { background:rgba(155,107,107,0.08);color:var(--muted); border:1px solid rgba(155,107,107,0.15); }
+
+    /* Stat box */
+    .stat-box { background:white; border:1px solid rgba(200,160,32,0.15); border-left:3px solid var(--gold); border-radius:10px; padding:0.75rem 1.25rem; }
+
+    /* Payment row */
+    .pay-row { border:1px solid rgba(200,160,32,0.12); border-radius:8px; padding:0.625rem 0.875rem; font-size:0.7rem; }
+
+    /* Buttons */
+    .btn-verify { background:#15803d; color:white; border:none; padding:0.3rem 0.75rem; border-radius:6px; font-size:0.65rem; font-weight:700; cursor:pointer; transition:background 0.2s; }
+    .btn-verify:hover { background:#166534; }
+    .btn-reject { background:var(--red-deep); color:white; border:none; padding:0.3rem 0.75rem; border-radius:6px; font-size:0.65rem; font-weight:700; cursor:pointer; transition:background 0.2s; }
+    .btn-reject:hover { background:#3a0000; }
+    .btn-bukti { background:rgba(200,160,32,0.08); color:var(--dark); border:1px solid rgba(200,160,32,0.2); padding:0.3rem 0.75rem; border-radius:6px; font-size:0.65rem; font-weight:700; cursor:pointer; transition:all 0.2s; text-decoration:none; display:inline-block; }
+    .btn-bukti:hover { background:rgba(200,160,32,0.16); }
+
+    /* Password blur */
+    .pw-hidden { filter:blur(4px); user-select:none; }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="adm-nav">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 py-3.5 flex justify-between items-center">
       <div class="flex items-center gap-6">
         <div class="flex items-center gap-2.5">
-          <img src="../asset/logo.png" alt="Logo" class="h-8 w-auto opacity-90">
+          <img src="../asset/logo.png" alt="Logo" class="h-9 w-auto">
           <div>
-            <span class="font-bold text-sm tracking-wide block leading-tight">TABEAHAN CENDEKIA</span>
-            <span class="bg-yellow-500 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase text-slate-900">Administrator</span>
+            <span style="font-family:'Playfair Display',serif;color:white;font-size:1rem;font-weight:700;display:block;line-height:1.2">
+              Tabeahan <span style="color:var(--gold)">Cendekia</span>
+            </span>
+            <span style="display:inline-block;background:var(--gold);color:#3a0000;font-size:0.55rem;padding:0.1rem 0.45rem;border-radius:4px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px">
+              Administrator
+            </span>
           </div>
         </div>
-        <div class="hidden md:flex gap-5 text-[11px] font-bold uppercase tracking-widest">
-          <a href="/dashboardAdmin" class="text-slate-400 hover:text-white transition">Dashboard</a>
-          <a href="/admin/daftarPeserta" class="text-white border-b border-yellow-500 pb-0.5">Peserta Ujian</a>
+        <div class="hidden md:flex gap-5">
+          <a href="/dashboardAdmin" class="adm-nav-link">Dashboard</a>
+          <a href="/admin/daftarPeserta" class="adm-nav-link active">Peserta Ujian</a>
         </div>
       </div>
-      <a href="/logout" class="bg-red-600 hover:bg-red-700 px-5 py-1.5 rounded text-xs font-bold transition">Logout</a>
+      <a href="/logout"
+        style="background:rgb(255, 255, 255);color:rgba(0, 0, 0, 0.7);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:0.35rem 1rem;font-size:0.75rem;font-weight:700;transition:all 0.2s;text-decoration:none"
+        onmouseover="this.style.background='rgba(200,160,32,0.2)';this.style.color='#c8a020'"
+        onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.7)'">
+        Logout
+      </a>
     </div>
   </nav>
 
+  <!-- ===== MAIN ===== -->
   <div class="max-w-7xl mx-auto px-4 py-8">
 
     <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
       <div>
-        <a href="/dashboardAdmin" class="inline-flex items-center gap-1.5 text-slate-400 hover:text-slate-700 text-xs font-bold uppercase tracking-widest transition mb-2">← Dashboard</a>
-        <h1 class="text-2xl font-black text-slate-800">Daftar Peserta</h1>
-        <p class="text-sm text-slate-500 mt-0.5">Verifikasi pembayaran per paket ujian</p>
+        <a href="/dashboardAdmin"
+          class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest transition mb-2"
+          style="color:var(--muted)"
+          onmouseover="this.style.color='var(--dark)'" onmouseout="this.style.color='var(--muted)'">
+          ← Dashboard
+        </a>
+        <h1 style="font-size:1.75rem;font-weight:900;color:var(--dark);margin:0">Daftar Peserta</h1>
+        <p style="font-size:0.875rem;color:var(--muted);margin-top:0.25rem">Verifikasi pembayaran per paket ujian</p>
       </div>
-      <div class="bg-white px-4 py-2.5 rounded-lg border border-slate-200 shadow-sm">
-        <span class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest">Total Peserta</span>
-        <span class="text-xl font-black text-[#0f172a]"><%= users.length %></span>
+      <div class="stat-box text-right">
+        <span style="display:block;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted)">Total Peserta</span>
+        <span style="font-size:1.75rem;font-weight:900;font-family:'Playfair Display',serif;color:var(--dark)"><%= users.length %></span>
       </div>
     </div>
 
     <!-- Toast notifikasi -->
     <% if (typeof message !== 'undefined' && message) { %>
-    <div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm font-semibold flex items-center gap-2">
+    <div class="mb-4 px-4 py-3 rounded-lg text-sm font-semibold flex items-center gap-2"
+      style="background:rgba(21,128,61,0.08);border:1px solid rgba(21,128,61,0.2);color:#15803d">
       ✅ <%= message %>
     </div>
     <% } %>
     <% if (typeof error !== 'undefined' && error) { %>
-    <div class="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm font-semibold flex items-center gap-2">
+    <div class="mb-4 px-4 py-3 rounded-lg text-sm font-semibold flex items-center gap-2"
+      style="background:rgba(220,38,38,0.07);border:1px solid rgba(220,38,38,0.18);color:#b91c1c">
       ❌ <%= error %>
     </div>
     <% } %>
 
     <!-- Tabel Peserta -->
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-      <div class="bg-slate-50 border-b border-slate-200 px-5 py-3">
-        <h3 class="text-xs font-bold text-slate-600 uppercase tracking-widest">👥 Data Peserta & Status Pembayaran Per Paket</h3>
+    <div class="tbl-card">
+      <div class="tbl-hd">
+        <h3>👥 Data Peserta & Status Pembayaran Per Paket</h3>
       </div>
 
       <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
+        <table>
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-              <th class="px-5 py-3">#</th>
-              <th class="px-5 py-3">Peserta</th>
-              <th class="px-5 py-3">Password</th>
-              <th class="px-5 py-3">Status Ujian</th>
-              <th class="px-5 py-3">Pembayaran Per Paket</th>
-              <th class="px-5 py-3 text-right">Aksi Akun</th>
+            <tr>
+              <th>#</th>
+              <th>Peserta</th>
+              <th>Password</th>
+              <th>Status Ujian</th>
+              <th>Pembayaran Per Paket</th>
+              <th style="text-align:right">Aksi Akun</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100">
+          <tbody>
             <% users.forEach((u, i) => {
               const userPayments = paymentsMap[u.id] || [];
             %>
-            <tr class="hover:bg-slate-50 transition align-top">
+            <tr>
 
               <!-- Nomor -->
-              <td class="px-5 py-4">
-                <span class="text-xs font-bold text-slate-300"><%= i + 1 %></span>
+              <td>
+                <span style="font-size:0.75rem;font-weight:700;color:rgba(155,107,107,0.5)"><%= i + 1 %></span>
               </td>
 
               <!-- Info User -->
-              <td class="px-5 py-4">
-                <p class="text-sm font-bold text-slate-800"><%= u.username %></p>
-                <p class="text-[11px] text-slate-400 truncate max-w-[160px]"><%= u.email %></p>
-                <p class="text-[10px] text-slate-300 mt-0.5">ID #<%= u.id %></p>
+              <td>
+                <div class="flex items-center gap-2.5">
+                  <div style="width:2rem;height:2rem;border-radius:50%;background:linear-gradient(135deg,var(--red-deep),#6b1a1a);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:0.75rem;font-weight:800;flex-shrink:0">
+                    <%= u.username.charAt(0).toUpperCase() %>
+                  </div>
+                  <div>
+                    <p style="font-size:0.875rem;font-weight:700;color:var(--dark);margin:0"><%= u.username %></p>
+                    <p style="font-size:0.7rem;color:var(--muted);margin:0;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><%= u.email %></p>
+                    <p style="font-size:0.6rem;color:rgba(155,107,107,0.5);margin:0">ID #<%= u.id %></p>
+                  </div>
+                </div>
               </td>
 
               <!-- Password (blur) -->
-              <td class="px-5 py-4">
+              <td>
                 <div class="flex items-center gap-2">
-                  <span id="pw-<%= i %>" class="text-xs font-mono text-slate-600 pw-hidden"><%= u.password %></span>
-                  <button class="pw-toggle text-slate-300 hover:text-slate-600 transition text-sm cursor-pointer" data-idx="<%= i %>">👁️</button>
+                  <span id="pw-<%= i %>" class="pw-hidden" style="font-size:0.75rem;font-family:monospace;color:var(--dark)"><%= u.password %></span>
+                  <button class="pw-toggle cursor-pointer transition" style="color:var(--muted);font-size:1rem;background:none;border:none" data-idx="<%= i %>">👁️</button>
                 </div>
               </td>
 
               <!-- Status Ujian -->
-              <td class="px-5 py-4">
+              <td>
                 <% if (u.status_ujian === 'SELESAI') { %>
-                  <span class="inline-block px-2 py-1 rounded text-[10px] font-black uppercase bg-purple-50 text-purple-700 border border-purple-200">Selesai</span>
-                  <p class="text-xs font-black text-slate-700 mt-1">Skor: <%= u.skor || 0 %></p>
+                  <span class="badge" style="background:rgba(122,16,16,0.07);color:var(--dark);border:1px solid rgba(122,16,16,0.15)">🎓 Selesai</span>
+                  <p style="font-size:0.75rem;font-weight:800;color:var(--gold);margin-top:0.25rem">Skor: <%= u.skor || 0 %></p>
                 <% } else if (u.status_ujian === 'SEDANG_UJIAN') { %>
-                  <span class="inline-block px-2 py-1 rounded text-[10px] font-black uppercase bg-blue-50 text-blue-700 border border-blue-200 animate-pulse">Sedang Ujian</span>
+                  <span class="badge badge-pending" style="animation:pulse 2s infinite">⏱ Sedang Ujian</span>
                 <% } else { %>
-                  <span class="inline-block px-2 py-1 rounded text-[10px] font-black uppercase bg-slate-100 text-slate-500">Belum Ujian</span>
+                  <span class="badge badge-idle">Belum Ujian</span>
                 <% } %>
               </td>
 
               <!-- Pembayaran per paket -->
-              <td class="px-5 py-4">
+              <td>
                 <% if (userPayments.length === 0) { %>
-                  <p class="text-[11px] italic text-slate-400">Belum ada pembayaran</p>
+                  <p style="font-size:0.7rem;font-style:italic;color:var(--muted)">Belum ada pembayaran</p>
                 <% } else { %>
                   <div class="space-y-2">
                     <% userPayments.forEach(pay => { %>
-                    <div class="border border-slate-200 rounded-lg p-2.5 text-[11px]">
+                    <div class="pay-row">
                       <div class="flex items-center justify-between gap-2 flex-wrap">
-                        <!-- Paket & status -->
                         <div>
-                          <p class="font-bold text-slate-700 text-xs"><%= pay.paket %></p>
-                          <div class="flex items-center gap-2 mt-0.5">
-                            <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase
-                              <%= pay.status === 'LUNAS' ? 'bg-green-100 text-green-700' :
-                                  pay.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
-                                  pay.status === 'DITOLAK' ? 'bg-red-100 text-red-700' :
-                                  pay.status === 'USED' ? 'bg-purple-100 text-purple-700' :
-                                  'bg-slate-100 text-slate-500' %>">
+                          <p style="font-size:0.75rem;font-weight:700;color:var(--dark);margin:0"><%= pay.paket %></p>
+                          <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.25rem;flex-wrap:wrap">
+                            <span class="badge
+                              <%= pay.status === 'LUNAS'   ? 'badge-lunas'   :
+                                  pay.status === 'PENDING' ? 'badge-pending' :
+                                  pay.status === 'DITOLAK' ? 'badge-ditolak' :
+                                  pay.status === 'USED'    ? 'badge-used'    : 'badge-idle' %>">
                               <%= pay.status %>
                             </span>
                             <% if (pay.token_ujian) { %>
-                              <span class="font-mono font-bold text-[10px] text-blue-600">Token: <%= pay.token_ujian %></span>
+                              <span style="font-family:monospace;font-size:0.65rem;font-weight:700;color:var(--gold)">Token: <%= pay.token_ujian %></span>
                             <% } %>
                           </div>
                         </div>
 
-                        <!-- Bukti & tombol aksi -->
-                        <div class="flex items-center gap-1.5 flex-wrap">
+                        <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap">
                           <% if (pay.bukti_transfer) { %>
-                            <a href="/uploads/bukti/<%= pay.bukti_transfer %>" target="_blank"
-                              class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-[10px] font-bold transition">
-                              📄 Bukti
-                            </a>
+                            <a href="/uploads/bukti/<%= pay.bukti_transfer %>" target="_blank" class="btn-bukti">📄 Bukti</a>
                           <% } %>
-
                           <% if (pay.status === 'PENDING') { %>
-                            <form action="/admin/verify/<%= pay.id %>" method="POST" class="confirm-verify inline">
-                              <button type="submit" class="px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-[10px] font-bold transition cursor-pointer">
-                                ✅ Verifikasi
-                              </button>
+                            <form action="/admin/verify/<%= pay.id %>" method="POST" class="confirm-verify" style="display:inline">
+                              <button type="submit" class="btn-verify">✅ Verifikasi</button>
                             </form>
-                            <form action="/admin/reject/<%= pay.id %>" method="POST" class="confirm-reject inline">
-                              <button type="submit" class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-[10px] font-bold transition cursor-pointer">
-                                ❌ Tolak
-                              </button>
+                            <form action="/admin/reject/<%= pay.id %>" method="POST" class="confirm-reject" style="display:inline">
+                              <button type="submit" class="btn-reject">❌ Tolak</button>
                             </form>
                           <% } %>
                         </div>
@@ -168,15 +231,15 @@
               </td>
 
               <!-- Aksi Akun -->
-              <td class="px-5 py-4">
-                <div class="flex justify-end">
-                  <form action="/deleteAccountFromAdmin" method="POST" class="confirm-delete-admin">
-                    <input type="hidden" name="id" value="<%= u.id %>">
-                    <button type="submit" class="p-1.5 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded transition cursor-pointer">
-                      🗑️
-                    </button>
-                  </form>
-                </div>
+              <td style="text-align:right">
+                <form action="/deleteAccountFromAdmin" method="POST" class="confirm-delete-admin" style="display:inline">
+                  <input type="hidden" name="id" value="<%= u.id %>">
+                  <button type="submit" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;padding:0.375rem;border-radius:6px;transition:all 0.2s"
+                    onmouseover="this.style.background='rgba(220,38,38,0.08)';this.style.color='#b91c1c'"
+                    onmouseout="this.style.background='none';this.style.color='var(--muted)'">
+                    🗑️
+                  </button>
+                </form>
               </td>
 
             </tr>
@@ -186,24 +249,20 @@
       </div>
 
       <% if (users.length === 0) { %>
-        <div class="p-16 text-center">
-          <div class="text-4xl opacity-20 mb-3">👤</div>
-          <p class="text-slate-400 text-sm font-semibold">Belum ada peserta terdaftar.</p>
+        <div style="padding:4rem;text-align:center">
+          <div style="font-size:2.5rem;opacity:0.2;margin-bottom:0.75rem">👤</div>
+          <p style="color:var(--muted);font-size:0.875rem;font-weight:600">Belum ada peserta terdaftar.</p>
         </div>
       <% } %>
     </div>
 
-    <p class="mt-6 text-center text-slate-400 text-[10px] font-bold uppercase tracking-widest">
-      Tabeahan Cendekia Admin Panel
+    <p style="margin-top:1.5rem;text-align:center;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:rgba(155,107,107,0.4)">
+      Tabeahan Cendekia · Admin Panel
     </p>
   </div>
 
-  <style>
-    .pw-hidden { filter: blur(4px); user-select: none; }
-  </style>
-
   <script>
-    // Password toggle per baris
+    // Password toggle
     const pwVisible = {};
     document.querySelectorAll('.pw-toggle').forEach(btn => {
       btn.addEventListener('click', function() {
@@ -220,21 +279,18 @@
       });
     });
 
-    // Confirm verify
     document.querySelectorAll('.confirm-verify').forEach(form => {
       form.addEventListener('submit', e => {
         if (!confirm('Verifikasi pembayaran ini dan generate token?')) e.preventDefault();
       });
     });
 
-    // Confirm reject
     document.querySelectorAll('.confirm-reject').forEach(form => {
       form.addEventListener('submit', e => {
         if (!confirm('Tolak pembayaran ini?')) e.preventDefault();
       });
     });
 
-    // Confirm hapus akun
     document.querySelectorAll('.confirm-delete-admin').forEach(form => {
       form.addEventListener('submit', e => {
         if (!confirm('Hapus akun ini secara permanen?')) e.preventDefault();
