@@ -7,11 +7,12 @@ const rateLimit = require("express-rate-limit");
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
-  standardHeaders: true,
+  standardHeaders: "draft-7",
   legacyHeaders: false,
-  skipSuccessfulRequests: true,
+  keyGenerator: (req) => req.ip,
   handler: (req, res) => {
-    const retryAfter = Math.ceil(req.rateLimit.resetTime / 1000);
+    const resetDate = new Date(req.rateLimit.resetTime);
+    const retryAfter = Math.ceil((resetDate.getTime() - Date.now()) / 1000);
     res.status(429).render("login", {
       error: null,
       rateLimited: true,
@@ -19,12 +20,18 @@ const loginLimiter = rateLimit({
     });
   },
 });
-
 // Rate limiter register
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 5,
-  message: "Terlalu banyak registrasi, coba lagi 1 jam lagi.",
+  max: 10,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  keyGenerator: (req) => req.socket.remoteAddress || req.ip,
+  handler: (req, res) => {
+    res.status(429).render("register", {
+      err: "Terlalu banyak percobaan registrasi. Coba lagi 1 jam lagi.",
+    });
+  },
 });
 
 // GET /login
@@ -35,6 +42,8 @@ router.get("/login", (req, res) => {
 
 // POST /login
 router.post("/login", loginLimiter, async (req, res) => {
+   console.log("IP:", req.ip);
+  console.log("Rate limit info:", req.rateLimit);
   const { username, password } = req.body;
   try {
     const [rows] = await db.query("SELECT * FROM users WHERE username = ?", [username]);

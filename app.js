@@ -52,6 +52,10 @@ app.use(
     },
   })
 );
+// Aktifkan hanya di production
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
 
 // No cache — biar reload tidak bisa balik ke halaman sebelumnya
 app.use((req, res, next) => {
@@ -64,6 +68,7 @@ app.use((req, res, next) => {
 // ========================
 app.set("view engine", "ejs");
 app.set("views", "views");
+
 
 // ========================
 // ROUTES
