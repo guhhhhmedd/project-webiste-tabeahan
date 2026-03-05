@@ -5,16 +5,15 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-// ─── Middleware ───────────────────────────────────────────
+// Middleware 
 function isLogin(req, res, next) {
   if (req.session.user) return next();
   res.redirect("/login");
 }
 
-// ─── Multer config ────────────────────────────────────────
+// Multer config 
 const storageBukti = multer.diskStorage({
 destination: (req, file, cb) => {
-    // process.cwd() akan mengarah ke root project lu
     const uploadPath = path.join(process.cwd(), "public", "uploads", "bukti");
     cb(null, uploadPath);
   },
@@ -35,15 +34,13 @@ const uploadBukti = multer({
   },
 });
 
-// ─── Daftar paket valid ───────────────────────────────────
+// Daftar paket valid 
 const PAKET_LIST = [
   { key: "Paket SKD/TKD",        label: "Paket SKD/TKD",        durasi: 90  },
   { key: "Paket Akademik Polri",  label: "Paket Akademik Polri",  durasi: 90  },
   { key: "Paket PPPK",            label: "Paket PPPK",            durasi: 120 },
 ];
 
-// ─── Helper: build paymentMap dari array payments ─────────
-// Kembalikan object { "Paket SKD/TKD": paymentObj, ... }
 function buildPaymentMap(payments) {
   const map = {};
   for (const p of payments) {
@@ -53,7 +50,7 @@ function buildPaymentMap(payments) {
   return map;
 }
 
-// ─── GET /dashboard ───────────────────────────────────────
+// dashboard 
 router.get("/dashboard", isLogin, async (req, res) => {
   try {
     const userId = req.session.user.id;
@@ -91,36 +88,30 @@ router.get("/dashboard", isLogin, async (req, res) => {
   }
 });
 
-// ─── GET /users/dashboardPembayaranUjian ──────────────────
+// dashboardPembayaranUjian 
 router.get("/users/dashboardPembayaranUjian", isLogin, async (req, res) => {
   try {
     const userId = req.session.user.id;
     
-    // 1. Ambil data user terbaru
     const [rows] = await db.query("SELECT * FROM users WHERE id = ?", [userId]);
     let user = rows[0];
 
-    // Jika sedang ujian, paksa balik ke halaman soal
     if (user.status_ujian === "SEDANG_UJIAN") {
       return res.send(`<script>alert('Ujian sedang berlangsung!');window.location.href='/ujian/soal';</script>`);
     }
 
-    // 2. Ambil SEMUA data payment user ini (termasuk expired_at)
     const [paymentRows] = await db.query(
       "SELECT * FROM payments WHERE user_id = ? ORDER BY created_at DESC",
       [userId]
     );
 
-    // 3. Bangun Payment Map (Gunakan loop tunggal agar efisien)
     const paymentMap = {};
     paymentRows.forEach(row => {
-      // Kita simpan payment terbaru untuk setiap paket
       if (!paymentMap[row.paket]) {
         paymentMap[row.paket] = row;
       }
     });
 
-    // 4. Ambil Leaderboard (Hanya skor yang valid/aktif)
     const [rankingRows] = await db.query(`
       SELECT username, skor FROM users 
       WHERE skor > 0 AND skor IS NOT NULL
@@ -131,13 +122,11 @@ router.get("/users/dashboardPembayaranUjian", isLogin, async (req, res) => {
     // Cari ranking user
     const myRank = rankingRows.findIndex(r => r.username === user.username) + 1;
 
-    // 5. Ambil riwayat ujian user (semua percobaan)
     const [riwayatUjian] = await db.query(
       "SELECT * FROM riwayat_ujian WHERE user_id = ? ORDER BY tgl_selesai DESC",
       [userId]
     );
 
-    // 6. Render
     res.render("users/dashboardPembayaranUjian", {
       user,
       paketList: PAKET_LIST,
@@ -155,7 +144,7 @@ router.get("/users/dashboardPembayaranUjian", isLogin, async (req, res) => {
   }
 });
 
-// ─── POST /users/upload-bukti ─────────────────────────────
+//  /users/upload-bukti 
 // router.post(
 //   "/users/upload-bukti",
 //   isLogin,
@@ -228,11 +217,8 @@ router.get("/users/dashboardPembayaranUjian", isLogin, async (req, res) => {
 //   }
 // );
 
-router.post(
-  "/users/upload-bukti",
-  isLogin,
-  (req, res, next) => {
-    uploadBukti.single("bukti")(req, res, (err) => {
+router.post( "/users/upload-bukti", isLogin, (req, res, next) => {
+   uploadBukti.single("bukti")(req, res, (err) => {
       if (err instanceof multer.MulterError) {
         if (err.code === "LIMIT_FILE_SIZE")
           return res.redirect("/users/dashboardPembayaranUjian?uploadError=File+terlalu+besar!+Maksimal+2MB.");
@@ -292,7 +278,7 @@ router.post(
   }
 );
 
-// ─── POST /deleteAccount ──────────────────────────────────
+//  POST /deleteAccount 
 router.post("/deleteAccount", isLogin, async (req, res) => {
   const userId = req.session.user.id;
   try {

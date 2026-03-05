@@ -4,12 +4,13 @@ const db = require("../config/db");
 const rateLimit = require("express-rate-limit");
 
 // Rate limiter login
+
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
   standardHeaders: "draft-7",
   legacyHeaders: false,
-  keyGenerator: (req) => req.ip,
+  skipSuccessfulRequests: true,
   handler: (req, res) => {
     const resetDate = new Date(req.rateLimit.resetTime);
     const retryAfter = Math.ceil((resetDate.getTime() - Date.now()) / 1000);
@@ -26,7 +27,6 @@ const registerLimiter = rateLimit({
   max: 10,
   standardHeaders: "draft-7",
   legacyHeaders: false,
-  keyGenerator: (req) => req.socket.remoteAddress || req.ip,
   handler: (req, res) => {
     res.status(429).render("register", {
       err: "Terlalu banyak percobaan registrasi. Coba lagi 1 jam lagi.",
@@ -42,28 +42,29 @@ router.get("/login", (req, res) => {
 
 // POST /login
 router.post("/login", loginLimiter, async (req, res) => {
-   console.log("IP:", req.ip);
+  console.log("IP:", req.ip);
   console.log("Rate limit info:", req.rateLimit);
   const { username, password } = req.body;
   try {
-    const [rows] = await db.query("SELECT * FROM users WHERE username = ?", [username]);
+    const [rows] = await db.query("SELECT * FROM users WHERE username = ?", [
+      username,
+    ]);
     if (rows.length === 0 || password !== rows[0].password) {
-      return res.render("login", {
+      return res.status(401).render("login", {
         error: "Username atau Password salah",
         rateLimited: false,
         resetTime: null,
-        
       });
     }
-   const user = rows[0];
+    const user = rows[0];
     const userRole = user.role.toLowerCase(); // Kita kecilin semua hurufnya
 
     req.session.user = {
       id: user.id,
       username: user.username,
-      role: userRole, 
-      expired_at: user.expired_at, 
-      is_active: user.is_active     
+      role: userRole,
+      expired_at: user.expired_at,
+      is_active: user.is_active,
     };
 
     req.session.save(() => {
@@ -96,8 +97,8 @@ router.post("/register", registerLimiter, async (req, res) => {
   if (!username || !password || !email)
     return res.render("register", { err: "Semua form wajib diisi!" });
 
-  if (username.length < 3 || username.length > 20)
-    return res.render("register", { err: "Username harus 3-20 karakter!" });
+  if (username.length < 1 || username.length > 20)
+    return res.render("register", { err: "Username harus 1-20 karakter!" });
 
   if (password.length < 6)
     return res.render("register", { err: "Password minimal 6 karakter!" });
@@ -108,7 +109,7 @@ router.post("/register", registerLimiter, async (req, res) => {
   try {
     await db.query(
       "INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, 'users')",
-      [username, password, email]
+      [username, password, email],
     );
     res.redirect("/login");
   } catch (err) {

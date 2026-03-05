@@ -1,4 +1,4 @@
-﻿-- MySQL dump 10.13  Distrib 8.0.44, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.44, for Win64 (x86_64)
 --
 -- Host: localhost    Database: db_pencatatan
 -- ------------------------------------------------------
@@ -44,6 +44,32 @@ INSERT INTO `jawaban_peserta` VALUES (73,28,13,'c');
 UNLOCK TABLES;
 
 --
+-- Table structure for table `materi_list`
+--
+
+DROP TABLE IF EXISTS `materi_list`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `materi_list` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nama_paket` enum('Paket SKD/TKD','Paket Akademik Polri','Paket PPPK') NOT NULL,
+  `nama_materi` varchar(100) NOT NULL,
+  `urutan_materi` int NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `materi_list`
+--
+
+LOCK TABLES `materi_list` WRITE;
+/*!40000 ALTER TABLE `materi_list` DISABLE KEYS */;
+INSERT INTO `materi_list` VALUES (1,'Paket SKD/TKD','TWK',1),(2,'Paket SKD/TKD','TIU',2),(3,'Paket SKD/TKD','TKP',3),(4,'Paket Akademik Polri','Pengetahuan Umum',1),(5,'Paket Akademik Polri','Wawasan Kebangsaan',2),(6,'Paket Akademik Polri','Penalaran Numerik',3),(7,'Paket Akademik Polri','Bahasa Indonesia',4),(8,'Paket Akademik Polri','Bahasa Inggris',5),(9,'Paket PPPK','Kompetensi Teknis',1),(10,'Paket PPPK','Kompetensi Manajerial',2),(11,'Paket PPPK','Kompetensi Sosial-Kultural',3),(12,'Paket PPPK','Kompetensi Wawancara',4);
+/*!40000 ALTER TABLE `materi_list` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `paket_ujian`
 --
 
@@ -71,7 +97,7 @@ CREATE TABLE `paket_ujian` (
 
 LOCK TABLES `paket_ujian` WRITE;
 /*!40000 ALTER TABLE `paket_ujian` DISABLE KEYS */;
-INSERT INTO `paket_ujian` VALUES (1,'Paket SKD/TKD',90,14,50000,100000,'Latihan soal SKD/TKD lengkap untuk seleksi CPNS dan sekolah kedinasan.',NULL,1),(2,'Paket Akademik Polri',90,100,50000,100000,'Persiapan ujian akademik Polri untuk jalur Bintara dan Akpol.',NULL,1),(3,'Paket PPPK',50,6,50000,100000,'Latihan soal PPPK untuk tenaga guru, teknis, dan fungsional.',NULL,1);
+INSERT INTO `paket_ujian` VALUES (1,'Paket SKD/TKD',91,3,50000,100000,'Latihan soal SKD/TKD lengkap untuk seleksi CPNS dan sekolah kedinasan.',NULL,1),(2,'Paket Akademik Polri',90,100,50000,100000,'Persiapan ujian akademik Polri untuk jalur Bintara dan Akpol.',NULL,1),(3,'Paket PPPK',50,6,50000,100000,'Latihan soal PPPK untuk tenaga guru, teknis, dan fungsional.',NULL,1);
 /*!40000 ALTER TABLE `paket_ujian` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -118,7 +144,9 @@ DROP TABLE IF EXISTS `questions`;
 CREATE TABLE `questions` (
   `id` int NOT NULL AUTO_INCREMENT,
   `paket` enum('Paket SKD/TKD','Paket Akademik Polri','Paket PPPK') NOT NULL,
-  `materi` varchar(100) NOT NULL,
+  `nomor_to` int NOT NULL,
+  `materi_id` int DEFAULT NULL,
+  `nomor_urut` int NOT NULL,
   `soal` text NOT NULL,
   `opsi_a` text NOT NULL,
   `opsi_b` text NOT NULL,
@@ -129,8 +157,9 @@ CREATE TABLE `questions` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `bobot_nilai` int DEFAULT '5',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_soal` (`paket`,`nomor_to`,`materi_id`,`nomor_urut`),
   KEY `idx_paket_active` (`paket`,`is_active`)
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -139,8 +168,37 @@ CREATE TABLE `questions` (
 
 LOCK TABLES `questions` WRITE;
 /*!40000 ALTER TABLE `questions` DISABLE KEYS */;
-INSERT INTO `questions` VALUES (1,'Paket SKD/TKD','TWK','Apa lambang sila ke-3?','Bintang','Rantai','Pohon Beringin','Banteng','Padi Kapas','c',1,5),(9,'Paket SKD/TKD','TWK','Apa ibukota Indonesia?','Jakarta','Bandung','Medan','Surabaya','Palembang','a',1,5),(12,'Paket SKD/TKD','TIU','Ibu kota Jawa Barat?','Bekasi','Depok','Bandung','Cirebon','Garut','c',1,5),(13,'Paket SKD/TKD','TWK','Lambang sila ke-1 yang benar apa?','Pohon','Rantai','Bintang','Padi','Banteng','c',1,5),(23,'Paket Akademik Polri','Pengetahuan Umum','apa itu polisis','anjing','kucing','kelinci','buaya','polisi','a',1,5),(24,'Paket Akademik Polri','Wawasan Kebangsaan','apa itu polisis','anjing','kucing','kelinci','buaya','polisi','b',1,5),(25,'Paket Akademik Polri','Penalaran Numerik','apa itu polisis','anjing','kucing','kelinci','buaya','polisi','a',1,5),(26,'Paket Akademik Polri','Bahasa Indonesia','apa itu polisis','anjing','kucing','kelinci','buaya','polisi','a',1,5),(27,'Paket Akademik Polri','Bahasa Inggris','apa itu polisis','anjing','kucing','kelinci','buaya','polisi','a',1,5),(28,'Paket PPPK','Kompetensi Teknis','Pertanyaan soal...','...','...','...','...','...','b',1,5),(29,'Paket PPPK','Kompetensi Manajerial','Pertanyaan soal...','...','...','...','...','...','b',1,5),(30,'Paket PPPK','Kompetensi Sosial-Kultural','Pertanyaan soal...','...','...','...','...','...','b',1,5),(31,'Paket PPPK','Kompetensi-Wawancara','Pertanyaan soal...','...','...','...','...','...','b',1,5),(33,'Paket SKD/TKD','TKP','Siapa penemu lampu pijar?','Tesla','Edison','Einstein','Newton','Galilieo','b',1,5),(34,'Paket SKD/TKD','TIU','1 + 1 berapa, Bre?','1','2','3','4','5','b',1,5),(35,'Paket SKD/TKD','TWK','Apa itu Murasaki?','Merah','Biru','Kuning','Ungu','Hijau','d',1,5),(36,'Paket SKD/TKD','TKP','Siapa penemu lampu pijar?','Tesla','Edison','Einstein','Newton','Galilieo','b',1,5),(37,'Paket SKD/TKD','TKP','Siapa penemu lampu pijar?','Tesla','Edison','Einstein','Newton','Galilieo','b',1,5),(38,'Paket SKD/TKD','TWK','Pancasila sebagai dasar negara Indonesia disahkan pada tanggal?','17 Agustus 1945','18 Agustus 1945','1 Juni 1945','5 Juli 1959','1 Oktober 1965','b',1,5),(39,'Paket SKD/TKD','TWK','Lambang negara Indonesia adalah?','Burung Elang','Burung Garuda','Burung Merak','Burung Rajawali','Burung Phoenix','b',1,5),(40,'Paket SKD/TKD','TIU','Jika 2x + 4 = 10, maka nilai x adalah?','2','3','4','5','6','b',1,5),(41,'Paket SKD/TKD','TIU','Antonim dari kata KUAT adalah?','Tegap','Sehat','Lemah','Kokoh','Gagah','c',1,5),(42,'Paket SKD/TKD','TKP','Ketika rekan kerja Anda melakukan kesalahan, sikap Anda adalah?','Diam saja','Melaporkan ke atasan langsung','Menegur dengan sopan dan membantu memperbaiki','Menyalahkan di depan umum','Membiarkan saja','c',1,5),(43,'Paket Akademik Polri','Pengetahuan Umum','Ibu kota negara Indonesia saat ini adalah?','Jakarta','Surabaya','Bandung','Nusantara','Yogyakarta','a',1,5),(44,'Paket Akademik Polri','Wawasan Kebangsaan','Semboyan negara Indonesia adalah?','Bhineka Tunggal Ika','Pancasila','Persatuan Indonesia','Tut Wuri Handayani','Garuda Pancasila','a',1,5),(45,'Paket Akademik Polri','Bahasa Indonesia','Penulisan yang benar adalah?','di rumah','dirumah','Di rumah','diRumah','Di Rumah','a',1,5),(46,'Paket PPPK','Kompetensi Teknis','Aparatur Sipil Negara diatur dalam Undang-Undang nomor?','UU No. 5 Tahun 2014','UU No. 8 Tahun 1974','UU No. 43 Tahun 1999','UU No. 11 Tahun 2017','UU No. 20 Tahun 2023','a',1,5),(47,'Paket PPPK','Kompetensi Manajerial','Dalam mengelola tim, hal pertama yang harus dilakukan pemimpin adalah?','Membagi tugas secara merata','Memahami kemampuan tiap anggota','Menetapkan target tinggi','Memberikan sanksi tegas','Mengevaluasi kinerja','b',1,5);
 /*!40000 ALTER TABLE `questions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `riwayat_ujian`
+--
+
+DROP TABLE IF EXISTS `riwayat_ujian`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `riwayat_ujian` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `paket` varchar(100) NOT NULL,
+  `skor` int DEFAULT '0',
+  `jml_benar` int DEFAULT '0',
+  `jml_soal` int DEFAULT '0',
+  `tgl_selesai` datetime DEFAULT NULL,
+  `percobaan_ke` int DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `riwayat_ujian`
+--
+
+LOCK TABLES `riwayat_ujian` WRITE;
+/*!40000 ALTER TABLE `riwayat_ujian` DISABLE KEYS */;
+/*!40000 ALTER TABLE `riwayat_ujian` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -169,7 +227,7 @@ CREATE TABLE `users` (
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `username_2` (`username`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -181,28 +239,6 @@ LOCK TABLES `users` WRITE;
 INSERT INTO `users` VALUES (2,'admin123','admin123','admin@gmail.com','admin','2026-01-27 14:23:38',0,'IDLE',NULL,NULL,0,NULL,0,0),(28,'ucup','ucup123','ucup@gmail.com','users','2026-02-23 00:56:50',5,'SELESAI',NULL,NULL,0,'2026-02-23 13:08:52',0,0),(32,'guhu','123456','teguharif5505@gmail.com','users','2026-02-24 16:54:37',0,'IDLE',NULL,NULL,0,NULL,0,0),(42,'user_desember','123','des@test.com','users','2025-12-15 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0),(43,'user_januari','123','jan@test.com','users','2026-01-10 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0),(44,'user_januari2','123','jan2@test.com','users','2026-01-20 07:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0),(46,'user_januar','123','jin@test.com','users','2026-01-10 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0),(47,'user_janua','123','jun@test.com','users','2026-01-10 03:00:00',17,'IDLE','2026-02-28 12:13:20','2026-04-29 12:12:07',1,'2026-02-28 12:13:01',1,6);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `riwayat_ujian`
---
-
-DROP TABLE IF EXISTS `riwayat_ujian`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `riwayat_ujian` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `paket` varchar(100) NOT NULL,
-  `skor` int DEFAULT '0',
-  `jml_benar` int DEFAULT '0',
-  `jml_soal` int DEFAULT '0',
-  `tgl_selesai` datetime DEFAULT NULL,
-  `percobaan_ke` int DEFAULT '1',
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -213,4 +249,4 @@ CREATE TABLE `riwayat_ujian` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-02-28 12:15:44
+-- Dump completed on 2026-03-06  1:21:44

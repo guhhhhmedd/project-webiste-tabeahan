@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
 
-// --- MIDDLEWARE ---
+// MIDDLEWARE 
 function isSedangUjian(req, res, next) {
     if (req.session.ujian) return next();
     res.redirect("/users/dashboardPembayaranUjian");
@@ -26,117 +26,101 @@ async function isLogin(req, res, next) {
     }
 }
 
-// ─── POST /mulai ────────────────────────────────────
+// POST /mulai 
 router.post("/mulai", isLogin, async (req, res) => {
+    const { paket_pilihan } = req.body;
     const userId = req.session.user.id;
-    const { paket_pilihan, token_input } = req.body;
 
     try {
-        // 1. Cek Pembayaran & Token
-        const [activePayment] = await db.query(
-            `SELECT id, expired_at FROM payments WHERE user_id = ? AND paket = ? AND status = 'LUNAS' AND (expired_at > NOW() OR expired_at IS NULL) LIMIT 1`,
+        // 1. Ambil data payment & sisa kuota
+        const [payment] = await db.query(
+            `SELECT id, sisa_kuota FROM payments 
+             WHERE user_id = ? AND paket = ? AND status = 'LUNAS' 
+             AND (expired_at > NOW() OR expired_at IS NULL) AND sisa_kuota > 0`,
             [userId, paket_pilihan]
         );
 
-        if (activePayment.length === 0) {
-            return res.send(`<script>alert('Akses paket tidak ditemukan atau belum lunas!');window.location.href='/users/dashboardPembayaranUjian';</script>`);
+        if (payment.length === 0) {
+            return res.send("<script>alert('Kuota habis atau akses expired!'); window.location.href='/dashboard';</script>");
         }
 
-        const pay = activePayment[0];
+        // 2. Ambil konfigurasi durasi dari tabel paket_ujian
+        const [config] = await db.query("SELECT durasi_menit FROM paket_ujian WHERE nama_paket = ?", [paket_pilihan]);
+        const durasiMenit = config.length > 0 ? config[0].durasi_menit : 100; // default 100 mnt
 
-        // 2. Aktivasi Token Jika Belum
-        if (!pay.expired_at) {
-            const [tokenCheck] = await db.query(
-                `SELECT id FROM payments WHERE id = ? AND token_ujian = ?`,
-                [pay.id, token_input ? token_input.trim().toUpperCase() : ""]
-            );
+        // 3. Tentukan nomor TO (Misal kuota 10, sisa 10 -> TO 1. Sisa 9 -> TO 2)
+        const totalKuotaAwal = 10; 
+        const nomorTO = (totalKuotaAwal - payment[0].sisa_kuota) + 1;
 
-            if (tokenCheck.length === 0) {
-                return res.send(`<script>alert('Token aktivasi salah!');window.location.href='/users/dashboardPembayaranUjian';</script>`);
-            }
-
-            const expiredDate = new Date();
-            expiredDate.setDate(expiredDate.getDate() + 60);
-            await db.query("UPDATE payments SET expired_at = ? WHERE id = ?", [expiredDate, pay.id]);
-        }
-
-        // 3. ANTI-DOUBLE SESSION (Ditingkatkan)
-        const [userStatus] = await db.query("SELECT status_ujian FROM users WHERE id = ?", [userId]);
-        if (userStatus[0].status_ujian === 'SEDANG_UJIAN') {
-            if (req.session.ujian) {
-                return res.redirect("/ujian/soal");
-            } else {
-                // Reset status jika session hilang tapi DB masih nyangkut
-                await db.query("UPDATE users SET status_ujian = 'BELUM_UJIAN' WHERE id = ?", [userId]);
-            }
-        }
-
-        // 4. Ambil Config & Soal
-        const [config] = await db.query("SELECT durasi_menit, jumlah_soal FROM paket_ujian WHERE nama_paket = ? LIMIT 1", [paket_pilihan]);
-        const durasi = config.length ? config[0].durasi_menit : 90;
-        const jmlSoal = config.length ? config[0].jumlah_soal : 100;
-
-        const [soalList] = await db.query(
-            "SELECT id FROM questions WHERE paket = ? AND is_active = 1 ORDER BY RAND() LIMIT ?",
-            [paket_pilihan, jmlSoal]
+        // 4. Ambil soal berdasarkan paket & nomor_to, urutkan sesuai materi_list
+        const [soal] = await db.query(
+            `SELECT q.id FROM questions q
+             JOIN materi_list m ON q.materi_id = m.id
+             WHERE q.paket = ? AND q.nomor_to = ? AND q.is_active = 1
+             ORDER BY m.urutan_materi ASC, q.nomor_urut ASC`,
+            [paket_pilihan, nomorTO]
         );
 
-        // 5. Inisialisasi Sesi Ujian
+        if (soal.length === 0) {
+            return res.send(`<script>alert('Soal untuk ${paket_pilihan} TO ${nomorTO} belum tersedia!'); window.location.href='/dashboard';</script>`);
+        }
+
+        // 5. Kurangi kuota saat mulai (Optional: atau kurangi saat selesai)
+        await db.query("UPDATE payments SET sisa_kuota = sisa_kuota - 1 WHERE id = ?", [payment[0].id]);
+
+        // 6. Set Session
         req.session.ujian = {
+            paymentId: payment[0].id,
             paket: paket_pilihan,
-            soalIds: soalList.map(s => s.id),
+            nomorTO: nomorTO,
+            soalIds: soal.map(s => s.id),
+            jawaban: {},
             startTime: Date.now(),
-            durasiMs: durasi * 60 * 1000,
-            jawaban: {}
+            durasiMs: durasiMenit * 60 * 1000 // SEKARANG DURASI ADA DI SINI
         };
 
-        await db.query("UPDATE users SET status_ujian = 'SEDANG_UJIAN', waktu_mulai = NOW() WHERE id = ?", [userId]);
-        await db.query("DELETE FROM jawaban_peserta WHERE user_id = ?", [userId]);
-
-        req.session.save(() => res.redirect("/ujian/soal"));
+        res.redirect("/ujian/soal/1"); 
 
     } catch (err) {
-        console.error("ERROR MULAI:", err);
-        res.send(`<script>alert('Sistem Error');window.location.href='/users/dashboardPembayaranUjian';</script>`);
+        console.error(err);
+        res.status(500).send("Server Error");
     }
 });
 
-// ─── GET /soal ──────────────────────────────────────
-router.get("/soal", isLogin, isSedangUjian, async (req, res) => {
+// GET /soal 
+router.get("/soal/:index", isLogin, isSedangUjian, async (req, res) => {
+    const sesi = req.session.ujian;
+    const index = parseInt(req.params.index) - 1; // index array mulai dari 0
+
+    if (index < 0 || index >= sesi.soalIds.length) {
+        return res.redirect("/ujian/soal/1");
+    }
+
+    const currentSoalId = sesi.soalIds[index];
+    
+    // Cek sisa waktu
+    const elapsed = Date.now() - sesi.startTime;
+    if (elapsed >= sesi.durasiMs) return res.redirect("/ujian/selesai-paksa");
+
     try {
-        const sesi = req.session.ujian;
-        const elapsed = Date.now() - sesi.startTime;
-
-        if (elapsed >= sesi.durasiMs) {
-            return res.redirect("/ujian/selesai-paksa");
-        }
-
-        const [soalRows] = await db.query(
-            "SELECT * FROM questions WHERE id IN (?)",
-            [sesi.soalIds]
-        );
-
-        const soalMap = {};
-        soalRows.forEach((s) => { soalMap[s.id] = s; });
-        const soal = sesi.soalIds.map((id) => soalMap[id]).filter(Boolean);
-
-        const [userRows] = await db.query("SELECT * FROM users WHERE id = ?", [req.session.user.id]);
-
+        const [soalRow] = await db.query("SELECT * FROM questions WHERE id = ?", [currentSoalId]);
+        
         res.render("ujian-soal", {
-            soal,
-            user: userRows[0],
+            soal: soalRow[0],
+            currentIndex: index + 1,
+            totalSoal: sesi.soalIds.length,
+            jawaban: sesi.jawaban,
             waktuMulai: sesi.startTime,
             durasiMs: sesi.durasiMs,
-            jawaban: sesi.jawaban,
             paket: sesi.paket,
+            nomorTO: sesi.nomorTO
         });
     } catch (err) {
-        console.error("Error GET /soal:", err);
-        res.status(500).send("Terjadi kesalahan.");
+        res.status(500).send("Error");
     }
 });
 
-// ─── POST /simpan-jawaban ───────────────────────────
+// simpan-jawaban 
 router.post("/simpan-jawaban", isLogin, isSedangUjian, async (req, res) => {
     const sesi = req.session.ujian;
     const { questionId, jawaban } = req.body;
@@ -154,7 +138,7 @@ router.post("/simpan-jawaban", isLogin, isSedangUjian, async (req, res) => {
     }
 });
 
-// ─── POST /selesai ─────────────────────────────────
+// selesai 
 router.post("/selesai", isLogin, async (req, res) => {
     if (!req.session.ujian) return res.json({ ok: false, redirect: "/users/dashboardPembayaranUjian" });
     await hitungDanSimpanSkor(req, res, true);
@@ -165,7 +149,7 @@ router.get("/selesai-paksa", isLogin, async (req, res) => {
     await hitungDanSimpanSkor(req, res, false);
 });
 
-// ─── HELPER: HITUNG SKOR ──────────────────
+//  HITUNG SKOR 
 async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
     const sesi = req.session.ujian;
     const userId = req.session.user.id;
@@ -187,7 +171,7 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
         const totalSoal = soalIds.length;
         const skor = totalSoal > 0 ? Math.round((benar / totalSoal) * 100) : 0;
 
-        // ── Simpan jawaban ke jawaban_peserta (untuk fitur review) ──
+        // Simpan jawaban ke jawaban_peserta (untuk fitur review)
         // Hapus dulu jawaban lama lalu insert semua sekaligus
         await db.query("DELETE FROM jawaban_peserta WHERE user_id = ?", [userId]);
 
@@ -200,20 +184,18 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
             );
         }
 
-        // ── Hitung percobaan ke berapa untuk paket ini ──
+        // Hitung percobaan ke berapa untuk paket ini 
         const [countRows] = await db.query(
             "SELECT COUNT(*) as cnt FROM riwayat_ujian WHERE user_id = ? AND paket = ?",
             [userId, sesi.paket]
         );
         const percobaan_ke = (countRows[0].cnt || 0) + 1;
 
-        // ── Simpan ke riwayat ujian ──
         await db.query(
             "INSERT INTO riwayat_ujian (user_id, paket, skor, jml_benar, jml_soal, tgl_selesai, percobaan_ke) VALUES (?, ?, ?, ?, ?, NOW(), ?)",
             [userId, sesi.paket, skor, benar, totalSoal, percobaan_ke]
         );
 
-        // ── Update user ──
         await db.query(
             "UPDATE users SET status_ujian = 'IDLE', skor = ?, jml_benar = ?, jml_soal = ?, tgl_selesai_ujian = NOW() WHERE id = ?",
             [skor, benar, totalSoal, userId]
@@ -236,14 +218,12 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
     }
 }
 
-
-// ─── POST /reset-ujian ─────────────────────────────────
+// reset-ujian 
 router.post("/reset-ujian", isLogin, async (req, res) => {
     const userId = req.session.user.id;
     const { paket_pilihan } = req.body;
 
     try {
-        // 1. Validasi: cari payment USED/LUNAS atau EXPIRED untuk paket ini
         const [payRows] = await db.query(
             `SELECT id, token_ujian, expired_at, status FROM payments
              WHERE user_id = ? AND paket = ? AND status IN ('USED', 'LUNAS', 'EXPIRED')
@@ -257,26 +237,20 @@ router.post("/reset-ujian", isLogin, async (req, res) => {
 
         const pay = payRows[0];
 
-        // 2. Generate token baru (8 karakter hex uppercase)
+        // Generate token baru (8 karakter hex uppercase)
         const crypto = require("crypto");
         const tokenBaru = crypto.randomBytes(4).toString("hex").toUpperCase();
-
-        // 3. Reset payment: status LUNAS lagi, token baru, expired_at NULL (belum diaktivasi)
         await db.query(
             "UPDATE payments SET status = 'LUNAS', token_ujian = ?, expired_at = NULL WHERE id = ?",
             [tokenBaru, pay.id]
         );
-
-        // 4. Reset user: IDLE, reset skor & waktu (riwayat sudah tersimpan waktu selesai ujian)
         await db.query(
             "UPDATE users SET status_ujian = 'IDLE', skor = 0, jml_benar = 0, jml_soal = 0, waktu_mulai = NULL, tgl_selesai_ujian = NULL WHERE id = ?",
             [userId]
         );
 
-        // 5. Hapus jawaban lama
         await db.query("DELETE FROM jawaban_peserta WHERE user_id = ?", [userId]);
 
-        // 6. Hapus sesi ujian jika ada
         if (req.session.ujian) delete req.session.ujian;
 
         req.session.save(() => {
@@ -291,31 +265,22 @@ router.post("/reset-ujian", isLogin, async (req, res) => {
     }
 });
 
-// ─── GET /hasil ─────────────────────────────────────
+// hasil 
 router.get("/hasil", isLogin, async (req, res) => {
     try {
-        // Ambil data skor dan status dari database
         const [rows] = await db.query(
             "SELECT skor, status_ujian FROM users WHERE id = ?",
             [req.session.user.id]
         );
 
-        // Jika user belum selesai ujian tapi coba-coba buka halaman hasil, tendang balik
         if (rows.length === 0) {
             return res.redirect("/users/dashboardPembayaranUjian");
         }
 
-        // --- TAMBAHAN LOGIKA UNTUK MENGHITUNG ULANG JUMLAH BENAR ---
-        // Karena di DB kita cuma simpan 'skor' (0-100), kita butuh variabel 'benar'
-        // Opsional: Jika lu mau simpan kolom 'jml_benar' di DB itu lebih bagus,
-        // tapi kalau mau simpel, kita kirim skor aja atau hitung manual.
-        
         res.render("hasilUjian", { 
             skor: rows[0].skor,
-            // Jika lu belum simpan jml_benar di DB, kita kasih nilai default atau 0
-            // supaya EJS-nya gak error 'is not defined'
-            benar: Math.round((rows[0].skor / 100) * 100), // Ini estimasi (asumsi soal 100)
-            totalSoal: 100, // Sesuaikan dengan jumlah soal paket lu
+            benar: Math.round((rows[0].skor / 100) * 100), 
+            totalSoal: 100, 
             user: req.session.user 
         });
     } catch (err) {
@@ -324,7 +289,7 @@ router.get("/hasil", isLogin, async (req, res) => {
     }
 });
 
-// ─── GET /review ─────────────────────────────────────
+// review 
 router.get("/review", isLogin, async (req, res) => {
     try {
         const userId = req.session.user.id;
@@ -345,7 +310,6 @@ router.get("/review", isLogin, async (req, res) => {
             [userId]
         );
 
-        // Jika tidak ada jawaban tersimpan
         if (jawabanRows.length === 0) {
             return res.redirect("/users/dashboardPembayaranUjian?uploadError=" +
                 encodeURIComponent("Tidak ada data jawaban untuk di-review. Selesaikan ujian terlebih dahulu."));
