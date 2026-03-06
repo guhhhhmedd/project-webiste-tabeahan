@@ -6,7 +6,6 @@
   <title>Ujian - Tabeahan Cendekia</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="/css/style.css"/>
   <style>
     :root {
       --gold: #c8a020; --gold-light: #e0b830;
@@ -16,7 +15,12 @@
     body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--dark); }
     .font-display { font-family: 'Playfair Display', serif; }
 
-    .nav-glass { background: var(--red-deep); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(200,160,32,0.25); box-shadow: 0 2px 12px rgba(90,10,10,0.18); }
+    .nav-glass {
+      background: var(--red-deep);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(200,160,32,0.25);
+      box-shadow: 0 2px 12px rgba(90,10,10,0.18);
+    }
 
     .paket-card {
       background: white; border-radius: 20px;
@@ -25,79 +29,70 @@
       overflow: hidden; transition: all 0.25s;
     }
     .paket-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(90,10,10,0.12); }
-    .paket-card.active-card { border-color: var(--gold); box-shadow: 0 4px 24px rgba(200,160,32,0.2); }
 
-    .badge-lunas   { background: rgba(22,163,74,0.1);   color: #15803d; }
-    .badge-pending { background: rgba(234,179,8,0.12);  color: #a16207; }
-    .badge-ditolak { background: rgba(220,38,38,0.1);   color: #b91c1c; }
-    .badge-used    { background: rgba(122,16,16,0.07);  color: var(--dark); }
-    .badge-expired { background: rgba(155,107,107,0.08); color: var(--muted); }
-
-    .btn-green {
-      background: linear-gradient(135deg, #16a34a, #14532d);
-      color: white; border: none; border-radius: 12px;
-      padding: 0.875rem 1.5rem; font-family: 'Playfair Display', serif;
-      font-weight: 700; font-size: 0.9rem; cursor: pointer; width: 100%;
-      box-shadow: 0 4px 12px rgba(22,163,74,0.3), 0 5px 0 #0f4022;
-      transition: all 0.15s; position: relative; top: 0;
-    }
-    .btn-green:hover { filter: brightness(1.08); }
-    .btn-green:active { top: 4px; box-shadow: 0 1px 6px rgba(22,163,74,0.3), 0 1px 0 #0f4022; }
+    .to-card-lunas   { background: rgba(22,163,74,0.05);  border-color: rgba(22,163,74,0.2) !important; }
+    .to-card-pending { background: rgba(234,179,8,0.05);  border-color: rgba(234,179,8,0.2)  !important; }
+    .to-card-ditolak { background: rgba(220,38,38,0.05);  border-color: rgba(220,38,38,0.2)  !important; }
+    .to-card-kosong  { background: white;                 border-color: #f0e8d8              !important; }
 
     .riwayat-row { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f0e8d8; }
     .riwayat-row:last-child { border-bottom: none; }
 
     .token-box {
       background: var(--red-deep); border: 1px solid rgba(200,160,32,0.3);
-      border-radius: 12px; padding: 0.75rem 1.25rem;
-      letter-spacing: 0.18em; display: inline-block;
+      border-radius: 8px; padding: 0.3rem 0.75rem;
+      letter-spacing: 0.12em; display: block; width: 100%; text-align: center;
+    }
+
+    .paket-selector {
+      appearance: none; -webkit-appearance: none;
+      background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c8a020' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 1rem center;
+      border: 2px solid rgba(200,160,32,0.3); border-radius: 14px;
+      padding: 0.9rem 3rem 0.9rem 1.25rem;
+      font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1rem;
+      color: var(--dark); cursor: pointer; width: 100%;
+      box-shadow: 0 2px 12px rgba(90,10,10,0.06); transition: all 0.2s;
+    }
+    .paket-selector:focus {
+      outline: none; border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(200,160,32,0.15);
     }
 
     .form-input {
-      width: 100%; padding: 0.8rem 1rem;
+      width: 100%; padding: 0.75rem 1rem;
       border: 1.5px solid #e8e0d4; border-radius: 10px;
       font-size: 0.875rem; color: var(--dark); background: #fff8f8; outline: none;
-      transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.15em;
-      font-weight: 700; text-align: center; font-family: 'DM Sans', sans-serif;
+      transition: all 0.2s; font-weight: 600; font-family: 'DM Sans', sans-serif;
     }
     .form-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200,160,32,0.12); }
 
+    .btn-green {
+      background: linear-gradient(135deg, #16a34a, #14532d);
+      color: white; border: none; border-radius: 10px;
+      padding: 0.6rem 1rem; font-family: 'Playfair Display', serif;
+      font-weight: 700; font-size: 0.8rem; cursor: pointer; width: 100%;
+      box-shadow: 0 3px 10px rgba(22,163,74,0.3), 0 4px 0 #0f4022;
+      transition: all 0.15s; position: relative; top: 0; display: block; text-align: center;
+    }
+    .btn-green:hover { filter: brightness(1.08); }
+    .btn-green:active { top: 3px; box-shadow: 0 1px 4px rgba(22,163,74,0.3), 0 1px 0 #0f4022; }
+
     .btn-gold {
       background: linear-gradient(135deg, var(--gold), #a88010);
-      color: white; border: none; border-radius: 12px;
-      padding: 0.875rem 1.5rem; font-family: 'Playfair Display', serif;
-      font-weight: 700; font-size: 0.9rem; cursor: pointer; width: 100%;
-      box-shadow: 0 4px 12px rgba(200,160,32,0.3), 0 5px 0 #7a6010;
+      color: white; border: none; border-radius: 10px;
+      padding: 0.6rem 1rem; font-family: 'Playfair Display', serif;
+      font-weight: 700; font-size: 0.8rem; cursor: pointer; width: 100%;
+      box-shadow: 0 3px 10px rgba(200,160,32,0.3), 0 4px 0 #7a6010;
       transition: all 0.15s; position: relative; top: 0;
     }
     .btn-gold:hover { filter: brightness(1.07); }
-    .btn-gold:active { top: 4px; box-shadow: 0 1px 6px rgba(200,160,32,0.3), 0 1px 0 #7a6010; }
-
-    .btn-dark {
-      background: var(--red-deep); color: var(--gold);
-      border: none; border-radius: 12px;
-      padding: 0.875rem 1.5rem; font-weight: 700; font-size: 0.875rem;
-      cursor: pointer; width: 100%; transition: all 0.2s; letter-spacing: 0.05em;
-    }
-    .btn-dark:hover { background: #3a0000; }
+    .btn-gold:active { top: 3px; box-shadow: 0 1px 4px rgba(200,160,32,0.3), 0 1px 0 #7a6010; }
 
     .upload-zone {
       border: 2px dashed #d4c5a8; border-radius: 12px;
-      padding: 1.5rem; text-align: center; cursor: pointer;
-      position: relative; transition: all 0.2s;
+      padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s;
     }
     .upload-zone:hover { border-color: var(--gold); background: rgba(200,160,32,0.04); }
-
-    .skor-ring {
-      width: 140px; height: 140px; border-radius: 50%;
-      background: conic-gradient(var(--gold) 0%, var(--gold-light) 100%);
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 6px 24px rgba(200,160,32,0.3); margin: 0 auto;
-    }
-    .skor-inner {
-      width: 114px; height: 114px; border-radius: 50%; background: white;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-    }
 
     .rank-row { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border-radius: 8px; transition: background 0.15s; }
     .rank-row:hover { background: rgba(200,160,32,0.05); }
@@ -110,9 +105,13 @@
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem; }
     .modal-overlay.hidden { display: none; }
 
-    @keyframes slideIn { from { transform: translateX(120%); opacity:0; } to { transform: translateX(0); opacity:1; } }
+    @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes fadeUp  { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     .toast { animation: slideIn 0.3s ease forwards; }
     .toast.hide { opacity: 0; transition: opacity 0.3s; }
+
+    .paket-section { display: none; }
+    .paket-section.active { display: block; animation: fadeUp 0.25s ease forwards; }
   </style>
 </head>
 <body>
@@ -126,7 +125,7 @@
         <p class="font-bold text-red-600 text-xs uppercase">Gagal</p>
         <p class="text-xs text-slate-600 mt-0.5"><%= uploadError %></p>
       </div>
-      <button id="closeToast" class="text-slate-300 hover:text-slate-500 cursor-pointer">×</button>
+      <button id="closeToast" class="text-slate-300 hover:text-slate-500 cursor-pointer text-lg leading-none">×</button>
     </div>
   </div>
   <% } %>
@@ -151,7 +150,6 @@
         <img src="/asset/logo.png" alt="Logo" class="h-10 w-10 object-cover rounded-full"/>
         <span class="font-display font-bold text-base text-white">Tabeahan <span style="color:var(--gold)">Cendekia</span></span>
       </a>
-
       <div class="hidden md:flex items-center gap-4">
         <a href="/dashboard" class="text-sm font-medium text-white/60 hover:text-white transition">Beranda</a>
         <div class="user-menu">
@@ -180,8 +178,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Mobile -->
       <a href="/dashboard" class="md:hidden text-white/60 hover:text-white text-sm">← Beranda</a>
     </div>
   </nav>
@@ -190,198 +186,182 @@
   <main class="pt-24 min-h-screen">
     <div class="max-w-6xl mx-auto px-4 md:px-8 py-8">
 
-      <div class="mb-8">
+      <div class="mb-6">
         <p class="text-sm font-medium" style="color:var(--muted)">Dashboard Ujian</p>
         <h1 class="text-3xl font-display font-black">Halo, <span style="color:var(--gold)"><%= user.username %></span> 👋</h1>
-        <p class="text-sm mt-1" style="color:var(--muted)">Pilih paket ujian di bawah ini</p>
+        <p class="text-sm mt-1" style="color:var(--muted)">Pilih paket, lalu pilih nomor try out yang ingin dikerjakan</p>
       </div>
-
-      <!-- Skor (jika ujian sudah selesai) -->
-      <% if (user.status_ujian === 'SELESAI') { %>
-      <div class="paket-card mb-6 p-6">
-        <div class="flex flex-col md:flex-row items-center gap-6">
-          <div class="skor-ring">
-            <div class="skor-inner">
-              <span class="text-3xl font-display font-black"><%= user.skor || 0 %></span>
-              <span class="text-[10px] font-bold uppercase tracking-widest" style="color:var(--muted)">Skor</span>
-            </div>
-          </div>
-          <div class="text-center md:text-left">
-            <h2 class="text-2xl font-display font-bold">Ujian Selesai 🎓</h2>
-            <div class="inline-flex items-center gap-2 mt-2 px-4 py-1.5 rounded-full font-bold text-sm" style="background:var(--dark); color:var(--gold)">
-              🏆 Ranking #<%= typeof myRank !== 'undefined' ? myRank : '?' %>
-            </div>
-            <p class="text-xs mt-2" style="color:var(--muted)">Ingin ujian paket lain? Daftar di bawah.</p>
-            <a href="/ujian/review"
-              class="inline-flex items-center gap-2 mt-3 px-4 py-2 rounded-xl text-xs font-bold text-white"
-              style="background:var(--red-deep); border:1px solid rgba(200,160,32,0.3)">
-              📝 Review Jawaban Terakhir
-            </a>
-          </div>
-        </div>
-      </div>
-      <% } %>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <!-- PAKET CARDS -->
-        <div class="lg:col-span-2 space-y-4">
-          <%
-            const paketConfig = {
-              'Paket SKD/TKD':        { sub:'CPNS · Kedinasan · 90 Menit',  color:'#3a0f0f', color2:'#6b1a1a' },
-              'Paket Akademik Polri': { sub:'Bintara · Akpol · 90 Menit',  color:'#0f1a3a', color2:'#1a2e6b' },
-              'Paket PPPK':           { sub:'Guru · Teknis · 120 Menit', color:'#0f3a1a', color2:'#1a6b2e' }
-            };
-            paketList.forEach(p => {
-              const cfg = paketConfig[p.key] || { emoji:'📝', sub:'', color:'#333', color2:'#555' };
-              const payment = paymentMap[p.key];
-              // Normalize ke uppercase agar aman meski DB simpan lowercase
-              const status = payment ? payment.status.toUpperCase() : null;
-          %>
-          <div class="paket-card <%= status === 'LUNAS' ? 'active-card' : '' %>">
+        <!-- ===== KONTEN UTAMA ===== -->
+        <div class="lg:col-span-2 space-y-5">
 
-            <!-- Header -->
-            <div class="flex items-center gap-4 p-4 text-white" style="background:linear-gradient(135deg,<%= cfg.color %>,<%= cfg.color2 %>)">
-              <span class="text-3xl"><%= cfg.emoji %></span>
-              <div class="flex-1">
-                <h3 class="font-display font-bold text-base"><%= p.label %></h3>
-                <p class="text-xs opacity-60"><%= cfg.sub %></p>
-              </div>
-              <!-- Badge status -->
-              <% if (status === 'LUNAS') { %>
-                <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-full badge-lunas">✅ Aktif</span>
-              <% } else if (status === 'PENDING') { %>
-                <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-full badge-pending">⏳ Pending</span>
-              <% } else if (status === 'DITOLAK') { %>
-                <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-full badge-ditolak">❌ Ditolak</span>
-              <% } else if (status === 'USED') { %>
-                <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-full badge-used">🎓 Selesai</span>
-              <% } else if (status === 'EXPIRED') { %>
-                <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-full badge-expired">⏰ Expired</span>
-              <% } else { %>
-                <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-full" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6)">Belum Bayar</span>
+          <!-- DROPDOWN PILIH PAKET -->
+          <div class="paket-card p-5">
+            <label class="block text-[10px] font-bold uppercase tracking-widest mb-2" style="color:var(--muted)">
+              📚 Pilih Paket Ujian
+            </label>
+            <select id="paketDropdown" class="paket-selector">
+              <option value="">— Pilih Paket —</option>
+              <% if (typeof paketList !== 'undefined') { %>
+                <% paketList.forEach((p) => { %>
+                  <option value="<%= p.key %>"><%= p.label %> · <%= p.durasi %> menit</option>
+                <% }) %>
               <% } %>
+            </select>
+          </div>
+
+          <!-- PLACEHOLDER -->
+          <div id="placeholderPilih" class="paket-card p-12 text-center">
+            <p class="text-5xl mb-4">☝️</p>
+            <p class="font-display font-bold text-xl">Pilih Paket Dulu</p>
+            <p class="text-sm mt-2" style="color:var(--muted)">Setelah memilih paket di atas, semua 10 Try Out akan ditampilkan di sini.</p>
+          </div>
+
+          <!-- ===== SECTION PER PAKET ===== -->
+          <% if (typeof paketList !== 'undefined') { %>
+          <% paketList.forEach((paket, idx) => {
+               const sectionId = 'section-' + paket.key.replace(/\//g, '-').replace(/\s+/g, '_');
+               const gradients = [
+                 'linear-gradient(135deg,#1a1a2e,#16213e)',
+                 'linear-gradient(135deg,#0f3a1a,#1a6b2e)',
+                 'linear-gradient(135deg,#3a0f0f,#6b1a1a)'
+               ];
+               const grad = gradients[idx % 3];
+
+               // Hitung TO yang LUNAS untuk paket ini
+               let lunasCount = 0;
+               for (let t = 1; t <= 10; t++) {
+                 if (paymentMap[paket.key + '_' + t] && paymentMap[paket.key + '_' + t].status === 'LUNAS') lunasCount++;
+               }
+          %>
+          <div id="<%= sectionId %>" class="paket-section space-y-4">
+
+            <!-- Info header paket -->
+            <div class="paket-card overflow-hidden">
+              <div class="p-5 text-white" style="background:<%= grad %>">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Paket Aktif</p>
+                    <h2 class="font-display font-bold text-2xl"><%= paket.label %></h2>
+                    <p class="text-xs text-white/60 mt-1">⏱ Durasi <%= paket.durasi %> menit per sesi ujian</p>
+                  </div>
+                  <% if (lunasCount > 0) { %>
+                  <div class="text-center px-5 py-3 rounded-2xl" style="background:rgba(255,255,255,0.1)">
+                    <p class="text-3xl font-display font-black" style="color:var(--gold)"><%= lunasCount %></p>
+                    <p class="text-[9px] text-white/50 uppercase font-bold tracking-widest">TO Aktif</p>
+                  </div>
+                  <% } %>
+                </div>
+              </div>
             </div>
 
-            <!-- Body -->
-            <div class="p-5">
+            <!-- Grid 10 TO cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <% for (let toNum = 1; toNum <= 10; toNum++) {
+                   const mapKey  = paket.key + '_' + toNum;
+                   const payment = paymentMap[mapKey] || null;
+                   const status  = payment ? payment.status : 'KOSONG';
+                   const cardClass = status === 'LUNAS' ? 'to-card-lunas' :
+                                     status === 'PENDING' ? 'to-card-pending' :
+                                     status === 'DITOLAK' ? 'to-card-ditolak' : 'to-card-kosong';
+              %>
 
-              <!-- LUNAS: token + form mulai ujian -->
-              <% if (status === 'LUNAS') { %>
-                <div class="text-center space-y-4">
-                  <div>
-                    <p class="text-[10px] font-bold uppercase tracking-widest mb-2" style="color:var(--muted)">Token Ujian Anda</p>
-                    <div class="token-box">
-                      <span class="text-xl font-display font-black" style="color:var(--gold)"><%= payment.token_ujian %></span>
+              <div class="rounded-2xl border-2 p-4 transition-all <%= cardClass %>">
+
+                <!-- Row: nomor + badge status -->
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center font-display font-black text-base text-white flex-shrink-0"
+                      style="background:<%= status === 'LUNAS' ? '#16a34a' : status === 'PENDING' ? '#a16207' : status === 'DITOLAK' ? '#b91c1c' : 'var(--muted)' %>">
+                      <%= toNum %>
                     </div>
-                  </div>
-                  <form action="/ujian/mulai" method="POST" class="space-y-3 text-left confirm-mulai">
-                    <input type="hidden" name="paket_pilihan" value="<%= p.key %>">
                     <div>
-                      <label class="block text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Konfirmasi Token</label>
-                      <input type="text" name="token_input" placeholder="KETIK TOKEN DI SINI" class="form-input" required>
-                    </div>
-                    <button type="submit" class="btn-gold">Mulai Ujian <%= p.label %></button>
-                  </form>
-                </div>
-
-              <!-- PENDING: menunggu verifikasi -->
-              <% } else if (status === 'PENDING') { %>
-                <div class="p-4 rounded-xl text-center space-y-2" style="background:rgba(234,179,8,0.07); border:1px solid rgba(234,179,8,0.2)">
-                  <p class="text-sm font-bold" style="color:#a16207">⏳ Sedang Diverifikasi Admin</p>
-                  <p class="text-xs" style="color:var(--muted)">Bukti transfer sedang dicek. Tunggu konfirmasi.</p>
-                  <a href="https://wa.me/6282324090580?text=Halo+min,+saya+sudah+transfer+untuk+<%= encodeURIComponent(p.key) %>+mohon+dicek"
-                    target="_blank" class="inline-block text-xs font-bold underline" style="color:#a16207">
-                    Konfirmasi via WhatsApp →
-                  </a>
-                </div>
-
-              <!-- DITOLAK: upload ulang -->
-              <% } else if (status === 'DITOLAK') { %>
-                <div class="space-y-3">
-                  <div class="p-3 rounded-xl flex items-start gap-2" style="background:rgba(220,38,38,0.06); border:1px solid rgba(220,38,38,0.15)">
-                    <span>❌</span>
-                    <div>
-                      <p class="text-xs font-bold text-red-600">Pembayaran Ditolak</p>
-                      <p class="text-[11px]" style="color:var(--muted)">Bukti tidak valid. Upload ulang yang jelas.</p>
+                      <p class="text-sm font-bold leading-tight" style="color:var(--dark)">Try Out #<%= toNum %></p>
+                      <p class="text-[10px]" style="color:var(--muted)"><%= paket.durasi %> mnt</p>
                     </div>
                   </div>
-                  <button class="btn-dark open-upload-modal" data-paket="<%= p.key %>" data-label="<%= p.label %>">Upload Ulang Bukti →</button>
+                  <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full"
+                    style="<%= status === 'LUNAS'   ? 'background:rgba(22,163,74,0.12);color:#15803d'   :
+                               status === 'PENDING' ? 'background:rgba(234,179,8,0.15);color:#a16207'  :
+                               status === 'DITOLAK' ? 'background:rgba(220,38,38,0.12);color:#b91c1c'  :
+                                                      'background:#f0e8d8;color:var(--muted)' %>">
+                    <%= status === 'LUNAS' ? '✅ Aktif' : status === 'PENDING' ? '⏳ Proses' : status === 'DITOLAK' ? '❌ Ditolak' : '— Beli' %>
+                  </span>
                 </div>
 
-              <!-- USED / EXPIRED: Ujian Lagi atau Daftar Ulang -->
-              <% } else if (status === 'USED' || status === 'EXPIRED') { %>
-                <%
-                  // Hitung percobaan untuk paket ini dari riwayat
-                  const riwayatPaket = (typeof riwayatUjian !== 'undefined' ? riwayatUjian : []).filter(r => r.paket === p.key);
-                  const jmlPercobaan = riwayatPaket.length;
-                  const skorTerakhir = riwayatPaket.length > 0 ? riwayatPaket[0].skor : (user.skor || 0);
-                  const benarTerakhir = riwayatPaket.length > 0 ? riwayatPaket[0].jml_benar : (user.jml_benar || 0);
-                  const soalTerakhir = riwayatPaket.length > 0 ? riwayatPaket[0].jml_soal : (user.jml_soal || 0);
-                %>
-                <div class="space-y-3">
-                  <!-- Skor terakhir -->
-                  <div class="p-4 rounded-xl flex items-center gap-4" style="background:rgba(200,160,32,0.06); border:1px solid rgba(200,160,32,0.2)">
-                    <div class="skor-ring" style="width:70px;height:70px;">
-                      <div class="skor-inner" style="width:56px;height:56px;">
-                        <span class="text-lg font-display font-black"><%= skorTerakhir %></span>
-                        <span class="text-[8px] font-bold uppercase tracking-wider" style="color:var(--muted)">Skor</span>
-                      </div>
-                    </div>
-                    <div class="flex-1">
-                      <p class="text-xs font-bold" style="color:var(--dark)">Percobaan ke-<%= jmlPercobaan || 1 %></p>
-                      <p class="text-[11px]" style="color:var(--muted)"><%= benarTerakhir %>/<%= soalTerakhir %> soal benar</p>
-                      <p class="text-[10px] mt-1" style="color:var(--muted)">
-                        <% if (status === 'USED') { %>Ujian selesai · soal diacak ulang tiap percobaan<% } else { %>Akses kadaluarsa<% } %>
-                      </p>
-                    </div>
+                <!-- Token (hanya jika LUNAS) -->
+                <% if (status === 'LUNAS' && payment.token_ujian) { %>
+                <div class="mb-3">
+                  <div class="token-box">
+                    <span class="font-display font-black text-sm" style="color:var(--gold)"><%= payment.token_ujian %></span>
                   </div>
+                </div>
+                <% } %>
 
-                  <% if (status === 'USED') { %>
-                  <!-- Tombol Ujian Lagi (hanya untuk USED, bukan EXPIRED yang sudah kedaluwarsa akses) -->
-                  <button class="btn-green open-reset-modal" data-paket="<%= p.key %>" data-label="<%= p.label %>">
-                    🔄 Ujian Lagi <span class="text-xs opacity-75">(Soal Diacak Ulang)</span>
-                  </button>
+                <!-- Aksi -->
+                <% if (status === 'LUNAS') { %>
 
-                  <!-- Tombol Review Jawaban -->
-                  <a href="/ujian/review"
-                    class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold"
-                    style="background:rgba(90,10,10,0.06); color:var(--dark); border:1.5px solid rgba(90,10,10,0.12)">
-                    📝 Review Jawaban
-                  </a>
+                  <% if (user.status_ujian === 'SEDANG_UJIAN') { %>
+                    <a href="/ujian/soal/1" class="btn-green">▶️ Lanjutkan Ujian</a>
+                  <% } else { %>
+                    <form action="/ujian/mulai" method="POST" class="confirm-mulai">
+                      <input type="hidden" name="paket_pilihan" value="<%= paket.key %>">
+                      <input type="hidden" name="nomor_to"      value="<%= toNum %>">
+                      <button type="submit" class="btn-green">🚀 Mulai Ujian</button>
+                    </form>
+                    <a href="/ujian/review?nomor_to=<%= toNum %>"
+                      class="block text-center text-[10px] font-semibold mt-2"
+                      style="color:var(--muted)">
+                      📝 Lihat Review Jawaban
+                    </a>
                   <% } %>
 
-                  <!-- Tombol Daftar Paket Baru -->
-                  <button class="btn-dark open-upload-modal" data-paket="<%= p.key %>" data-label="<%= p.label %>">
-                    📋 Daftar Paket Baru
-                  </button>
-                </div>
+                <% } else if (status === 'PENDING') { %>
 
-              <!-- BELUM BAYAR -->
-              <% } else { %>
-                <div class="space-y-3">
-                  <div class="grid grid-cols-2 gap-3">
-                    <div class="p-3 rounded-xl text-center" style="background:rgba(184,146,74,0.07); border:1px solid rgba(184,146,74,0.15)">
-                      <p class="text-[10px]" style="color:var(--muted)">Harga</p>
-                      <p class="text-lg font-display font-black">Rp 50.000</p>
-                      <p class="text-[9px] line-through" style="color:#ccc">Rp 100.000</p>
-                    </div>
-                    <div class="p-3 rounded-xl" style="background:var(--dark)">
-                      <p class="text-[10px] text-white/40">Rekening BCA</p>
-                      <p class="text-xs font-bold" style="color:var(--gold)">1234-567-890</p>
-                      <p class="text-[9px] text-white/40">a.n Tabeahan Cendekia</p>
-                    </div>
+                  <div class="rounded-xl p-2.5 text-center" style="background:rgba(234,179,8,0.08)">
+                    <p class="text-[11px] font-semibold" style="color:#a16207">⏳ Menunggu verifikasi</p>
+                    <p class="text-[10px] mt-0.5" style="color:var(--muted)">Proses 1×24 jam</p>
                   </div>
-                  <button class="btn-gold open-upload-modal" data-paket="<%= p.key %>" data-label="<%= p.label %>">Upload Bukti Pembayaran</button>
-                </div>
-              <% } %>
 
+                <% } else if (status === 'DITOLAK') { %>
+
+                  <button type="button"
+                    class="open-upload-modal btn-gold"
+                    data-paket="<%= paket.key %>"
+                    data-label="<%= paket.label %>"
+                    data-nomor-to="<%= toNum %>">
+                    🔄 Upload Ulang Bukti
+                  </button>
+
+                <% } else { %>
+
+                  <button type="button"
+                    class="open-upload-modal btn-gold"
+                    data-paket="<%= paket.key %>"
+                    data-label="<%= paket.label %>"
+                    data-nomor-to="<%= toNum %>">
+                    💳 Beli TO ini
+                  </button>
+
+                <% } %>
+
+              </div>
+              <% } /* end for toNum */ %>
             </div>
-          </div>
-          <% }) %>
-        </div>
+            <!-- /grid TO -->
 
-        <!-- SIDEBAR -->
+          </div>
+          <!-- /paket-section -->
+
+          <% }) %>
+          <% } %>
+
+        </div>
+        <!-- /KONTEN UTAMA -->
+
+        <!-- ===== SIDEBAR ===== -->
         <div class="space-y-4">
 
           <!-- Leaderboard -->
@@ -400,7 +380,8 @@
                              color:<%= i<3?'white':'var(--muted)' %>">
                       <%= i+1 %>
                     </span>
-                    <span class="text-xs font-semibold truncate max-w-[100px]" style="color:<%= r.username===user.username?'var(--gold)':'var(--dark)' %>">
+                    <span class="text-xs font-semibold truncate max-w-[100px]"
+                      style="color:<%= r.username===user.username?'var(--gold)':'var(--dark)' %>">
                       <%= r.username %>
                     </span>
                   </div>
@@ -411,21 +392,36 @@
                 <p class="text-xs italic text-center py-4" style="color:var(--muted)">Belum ada data.</p>
               <% } %>
             </div>
+            <% if (myRank && myRank !== '-') { %>
+            <div class="mt-3 pt-3 text-center" style="border-top:1px solid #f0e8d8">
+              <p class="text-[10px]" style="color:var(--muted)">Ranking kamu</p>
+              <p class="font-display font-black text-xl" style="color:var(--gold)">#<%= myRank %></p>
+            </div>
+            <% } %>
           </div>
 
           <!-- Info Akun -->
           <div class="paket-card p-5">
             <h3 class="font-display font-bold text-base mb-3">👤 Info Akun</h3>
-            <div class="space-y-0 text-xs">
-              <div class="flex justify-between py-2 border-b" style="border-color:#f0e8d8"><span style="color:var(--muted)">Username</span><span class="font-bold"><%= user.username %></span></div>
-              <div class="flex justify-between py-2 border-b" style="border-color:#f0e8d8"><span style="color:var(--muted)">Email</span><span class="font-semibold truncate max-w-[130px]"><%= user.email %></span></div>
+            <div class="text-xs">
+              <div class="flex justify-between py-2 border-b" style="border-color:#f0e8d8">
+                <span style="color:var(--muted)">Username</span>
+                <span class="font-bold"><%= user.username %></span>
+              </div>
+              <div class="flex justify-between py-2 border-b" style="border-color:#f0e8d8">
+                <span style="color:var(--muted)">Email</span>
+                <span class="font-semibold truncate max-w-[130px]"><%= user.email %></span>
+              </div>
               <div class="flex justify-between py-2 border-b" style="border-color:#f0e8d8">
                 <span style="color:var(--muted)">Status Ujian</span>
-                <span class="font-bold text-[10px] uppercase"><%= user.status_ujian || 'IDLE' %></span>
+                <span class="font-bold text-[10px] uppercase
+                  <%= user.status_ujian === 'SEDANG_UJIAN' ? 'text-yellow-600' : '' %>">
+                  <%= user.status_ujian || 'IDLE' %>
+                </span>
               </div>
-              <% if (user.status_ujian === 'SELESAI') { %>
+              <% if (user.skor > 0) { %>
               <div class="flex justify-between py-2">
-                <span style="color:var(--muted)">Skor</span>
+                <span style="color:var(--muted)">Skor Terakhir</span>
                 <span class="font-black" style="color:var(--gold)"><%= user.skor %></span>
               </div>
               <% } %>
@@ -437,20 +433,32 @@
             <div class="flex items-center justify-between mb-3">
               <h3 class="font-display font-bold text-base">📜 Riwayat Ujian</h3>
               <% if (typeof riwayatUjian !== 'undefined' && riwayatUjian.length > 0) { %>
-              <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-full" style="background:rgba(184,146,74,0.1);color:var(--gold)"><%= riwayatUjian.length %> Sesi</span>
+              <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-full"
+                style="background:rgba(184,146,74,0.1);color:var(--gold)">
+                <%= riwayatUjian.length %> Sesi
+              </span>
               <% } %>
             </div>
             <% if (typeof riwayatUjian !== 'undefined' && riwayatUjian.length > 0) { %>
               <div class="space-y-0 text-xs max-h-52 overflow-y-auto pr-1">
-                <% riwayatUjian.forEach((r, i) => { %>
+                <% riwayatUjian.forEach((r) => { %>
                 <div class="riwayat-row">
                   <div>
-                    <p class="font-semibold truncate max-w-[120px]" style="color:var(--dark)"><%= r.paket.replace('Paket ','') %></p>
-                    <p style="color:var(--muted)" class="text-[10px]">Ke-<%= r.percobaan_ke %> · <%= r.jml_benar %>/<%= r.jml_soal %> benar</p>
+                    <p class="font-semibold" style="color:var(--dark)">
+                      <%= r.paket %> <span style="color:var(--muted);font-weight:400">TO#<%= r.nomor_to %></span>
+                    </p>
+                    <p style="color:var(--muted)" class="text-[10px]"><%= r.jml_benar %>/<%= r.jml_soal %> benar</p>
                   </div>
                   <div class="text-right">
-                    <span class="font-black font-mono" style="color:<%= r.skor >= 70 ? '#16a34a' : r.skor >= 50 ? 'var(--gold)' : '#b91c1c' %>"><%= r.skor %></span>
-                    <p style="color:var(--muted)" class="text-[9px]"><%= r.tgl_selesai ? new Date(r.tgl_selesai).toLocaleDateString('id-ID', {day:'2-digit',month:'short'}) : '-' %></p>
+                    <span class="font-black font-mono"
+                      style="color:<%= r.skor >= 70 ? '#16a34a' : r.skor >= 50 ? 'var(--gold)' : '#b91c1c' %>">
+                      <%= r.skor %>
+                    </span>
+                    <p style="color:var(--muted)" class="text-[9px]">
+                      <%= r.tgl_selesai ? new Date(r.tgl_selesai).toLocaleDateString('id-ID',{day:'2-digit',month:'short'}) : '-' %>
+                    </p>
+                    <a href="/ujian/review?nomor_to=<%= r.nomor_to %>"
+                      class="text-[9px] font-semibold" style="color:var(--muted)">📝 review</a>
                   </div>
                 </div>
                 <% }) %>
@@ -472,157 +480,156 @@
           </div>
 
         </div>
+        <!-- /SIDEBAR -->
+
       </div>
     </div>
   </main>
 
-  <!-- ===== MODAL KONFIRMASI UJIAN LAGI ===== -->
-  <div id="resetModal" class="modal-overlay hidden">
-    <div class="bg-white rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl">
-      <div class="p-5 text-white" style="background:linear-gradient(135deg,#0f3a1a,#1a6b2e)">
-        <h3 class="font-display font-bold text-lg">🔄 Ujian Lagi</h3>
-        <p class="text-xs opacity-70" id="resetModalSubtitle">Konfirmasi pengulangan ujian</p>
-      </div>
-      <div class="p-5 space-y-4">
-        <!-- Info -->
-        <div class="p-3 rounded-xl space-y-2" style="background:rgba(234,179,8,0.07); border:1px solid rgba(234,179,8,0.2)">
-          <p class="text-xs font-bold" style="color:#a16207">⚠️ Yang akan terjadi:</p>
-          <ul class="text-[11px] space-y-1" style="color:var(--muted)">
-            <li>✅ Skor lama disimpan di Riwayat Ujian</li>
-            <li>🔑 Token ujian baru digenerate</li>
-            <li>🔀 Soal diacak ulang (berbeda dari sebelumnya)</li>
-            <li>🗑️ Jawaban lama dihapus</li>
-          </ul>
-        </div>
-        <form id="resetForm" action="/ujian/reset-ujian" method="POST">
-          <input type="hidden" name="paket_pilihan" id="resetPaketInput">
-          <div class="flex gap-2">
-            <button type="button" id="closeResetModal"
-              class="flex-1 py-2.5 text-xs font-bold border rounded-xl hover:bg-slate-50 transition"
-              style="border-color:#e8e0d4; color:var(--muted)">Batal</button>
-            <button type="submit"
-              class="flex-1 py-2.5 text-xs font-bold rounded-xl text-white"
-              style="background:linear-gradient(135deg,#16a34a,#14532d)">🔄 Ya, Ujian Lagi!</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== MODAL UPLOAD ===== -->
+  <!-- ===== MODAL UPLOAD BUKTI ===== -->
   <div id="uploadModal" class="modal-overlay hidden">
     <div class="bg-white rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl">
-      <div class="p-5 text-white" style="background:linear-gradient(135deg,#3a0f0f,#6b1a1a)">
-        <h3 class="font-display font-bold text-lg" id="modalTitle">Upload Bukti Pembayaran</h3>
-        <p class="text-xs opacity-60" id="modalSubtitle">Pilih Paket</p>
+      <div class="p-5 text-white flex justify-between items-start" style="background:linear-gradient(135deg,#3a0f0f,#6b1a1a)">
+        <div>
+          <h3 class="font-display font-bold text-lg">💳 Upload Bukti Pembayaran</h3>
+          <p class="text-xs opacity-60" id="modalSubtitle">—</p>
+        </div>
+        <button id="closeModal" class="text-white/50 hover:text-white text-xl leading-none cursor-pointer mt-0.5">×</button>
       </div>
+
       <form action="/users/upload-bukti" method="POST" enctype="multipart/form-data" class="p-5 space-y-4">
         <input type="hidden" name="paket_pilihan" id="modalPaketInput">
+        <input type="hidden" name="nomor_to"      id="modalNomorToInput">
 
-        <!-- Info rekening -->
+        <!-- Info TO yang dibeli (readonly, sudah dikunci dari tombol) -->
+        <div class="flex items-center gap-3 p-3 rounded-xl" style="background:rgba(184,146,74,0.07); border:1px solid rgba(184,146,74,0.15)">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center font-display font-black text-white flex-shrink-0" style="background:var(--gold)" id="modalToNumBadge">—</div>
+          <div>
+            <p class="text-xs font-bold" style="color:var(--dark)" id="modalPaketLabel">—</p>
+            <p class="text-[10px]" style="color:var(--muted)" id="modalToLabel">Try Out #—</p>
+          </div>
+        </div>
+
+        <!-- Harga & rekening -->
         <div class="grid grid-cols-2 gap-2 text-center">
-          <div class="p-2 rounded-xl" style="background:rgba(184,146,74,0.07); border:1px solid rgba(184,146,74,0.15)">
+          <div class="p-2.5 rounded-xl" style="background:rgba(184,146,74,0.07); border:1px solid rgba(184,146,74,0.15)">
             <p class="text-[10px]" style="color:var(--muted)">Biaya</p>
             <p class="font-display font-black text-base">Rp 50.000</p>
           </div>
-          <div class="p-2 rounded-xl" style="background:var(--dark)">
+          <div class="p-2.5 rounded-xl" style="background:var(--dark)">
             <p class="text-[10px] text-white/40">BCA</p>
             <p class="font-bold text-xs" style="color:var(--gold)">1234-567-890</p>
             <p class="text-[9px] text-white/40">a.n Tabeahan Cendekia</p>
           </div>
         </div>
 
-        <!-- Upload zone -->
-        <div id="dropZone" class="upload-zone">
-          <input type="file" name="bukti" id="buktiInput" accept="image/jpeg,image/png,image/jpg"
-            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" required>
-          <div id="dropContent">
-            <p class="text-3xl mb-2">📸</p>
-            <p class="text-xs font-bold">Klik atau drag bukti transfer</p>
-            <p class="text-[10px]" style="color:var(--muted)">JPG / PNG · Maks 2MB</p>
+        <!-- Drop zone -->
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-widest mb-1.5" style="color:var(--muted)">Bukti Transfer</label>
+          <div id="dropZone" class="upload-zone" onclick="document.getElementById('buktiInput').click()">
+            <input type="file" id="buktiInput" name="bukti" accept="image/jpeg,image/png,image/jpg" class="hidden">
+            <div id="dropContent">
+              <p class="text-3xl mb-2">📎</p>
+              <p class="text-xs font-semibold" style="color:var(--dark)">Klik atau drag & drop foto bukti</p>
+              <p class="text-[10px] mt-1" style="color:var(--muted)">JPG / PNG · Maks 2MB</p>
+            </div>
+            <div id="filePreview" class="hidden">
+              <img id="previewImg" src="" alt="Preview" class="max-h-32 mx-auto rounded-lg object-contain mb-2">
+              <p id="fileName" class="text-xs font-semibold truncate" style="color:var(--dark)"></p>
+              <p id="fileSize" class="text-[10px]" style="color:var(--muted)"></p>
+              <button type="button" id="gantiBtn"
+                class="mt-2 text-[10px] font-bold px-3 py-1 rounded-full"
+                style="background:rgba(220,38,38,0.1); color:#b91c1c">
+                ✕ Ganti Foto
+              </button>
+            </div>
           </div>
-          <div id="filePreview" class="hidden">
-            <img id="previewImg" src="" class="max-h-32 mx-auto rounded-lg mb-2 object-contain">
-            <p id="fileName" class="text-xs font-bold truncate"></p>
-            <p id="fileSize" class="text-[10px]" style="color:var(--muted)"></p>
+          <div id="fileError" class="hidden mt-2 p-2.5 rounded-lg" style="background:rgba(220,38,38,0.07); border:1px solid rgba(220,38,38,0.2)">
+            <p id="fileErrorText" class="text-[11px] font-semibold" style="color:#b91c1c"></p>
           </div>
         </div>
 
-        <div id="fileError" class="hidden p-3 rounded-xl flex items-center gap-2" style="background:rgba(220,38,38,0.06); border:1px solid rgba(220,38,38,0.15)">
-          <span>⚠️</span>
-          <p id="fileErrorText" class="text-xs text-red-600 font-semibold"></p>
-        </div>
-
-        <div class="flex gap-2">
-          <button type="button" id="closeModal" class="flex-1 py-2.5 text-xs font-bold border rounded-xl hover:bg-slate-50 transition" style="border-color:#e8e0d4; color:var(--muted)">Batal</button>
-          <button type="submit" class="flex-1 py-2.5 text-xs font-bold rounded-xl" style="background:var(--dark); color:var(--gold)">Kirim Sekarang →</button>
-        </div>
+        <button type="submit" id="submitUpload" disabled
+          class="btn-gold" style="opacity:0.5; cursor:not-allowed;">
+          📤 Kirim Bukti Pembayaran
+        </button>
       </form>
     </div>
   </div>
 
   <script>
+    // ── Dropdown paket ──
+    const dropdown    = document.getElementById('paketDropdown');
+    const placeholder = document.getElementById('placeholderPilih');
+    const allSections = document.querySelectorAll('.paket-section');
+
+    dropdown.addEventListener('change', () => {
+      const val = dropdown.value;
+      placeholder.style.display = val ? 'none' : 'block';
+      allSections.forEach(s => s.classList.remove('active'));
+      if (!val) return;
+      // Konversi key ke section id: '/' → '-', spasi → '_'
+      const id = 'section-' + val.replace(/\//g, '-').replace(/\s+/g, '_');
+      const target = document.getElementById(id);
+      if (target) target.classList.add('active');
+    });
+
     // ── Toast ──
     function autoHide(id) {
       const el = document.getElementById(id);
       if (!el) return;
-      setTimeout(() => { el.classList.add('hide'); setTimeout(() => el.remove(), 300); }, 4000);
+      setTimeout(() => { el.classList.add('hide'); setTimeout(() => el.remove(), 300); }, 4500);
     }
     autoHide('toast');
     autoHide('toastSuccess');
-
     const closeToastBtn = document.getElementById('closeToast');
     if (closeToastBtn) closeToastBtn.addEventListener('click', () => {
       const el = document.getElementById('toast');
       if (el) { el.classList.add('hide'); setTimeout(() => el.remove(), 300); }
     });
 
-    // ── Modal Ujian Lagi ──
-    const resetModal = document.getElementById('resetModal');
-    const closeResetModalBtn = document.getElementById('closeResetModal');
-    const resetPaketInput = document.getElementById('resetPaketInput');
-    const resetModalSubtitle = document.getElementById('resetModalSubtitle');
-
-    document.querySelectorAll('.open-reset-modal').forEach(btn => {
-      btn.addEventListener('click', () => {
-        resetPaketInput.value = btn.dataset.paket;
-        resetModalSubtitle.textContent = btn.dataset.label;
-        resetModal.classList.remove('hidden');
-      });
-    });
-    closeResetModalBtn.addEventListener('click', () => resetModal.classList.add('hidden'));
-    resetModal.addEventListener('click', e => { if (e.target === resetModal) resetModal.classList.add('hidden'); });
-
     // ── Modal Upload ──
-    const modal = document.getElementById('uploadModal');
-    const closeModalBtn = document.getElementById('closeModal');
-    const inputPaket = document.getElementById('modalPaketInput');
-    const modalSubtitle = document.getElementById('modalSubtitle');
+    const uploadModal      = document.getElementById('uploadModal');
+    const closeModalBtn    = document.getElementById('closeModal');
+    const modalPaket       = document.getElementById('modalPaketInput');
+    const modalNomorTo     = document.getElementById('modalNomorToInput');
+    const modalSubtitle    = document.getElementById('modalSubtitle');
+    const modalToNumBadge  = document.getElementById('modalToNumBadge');
+    const modalPaketLabel  = document.getElementById('modalPaketLabel');
+    const modalToLabel     = document.getElementById('modalToLabel');
 
     document.querySelectorAll('.open-upload-modal').forEach(btn => {
       btn.addEventListener('click', () => {
-        inputPaket.value = btn.dataset.paket;
-        modalSubtitle.textContent = btn.dataset.label;
-        // Reset state modal setiap dibuka
-        document.getElementById('dropContent').classList.remove('hidden');
-        document.getElementById('filePreview').classList.add('hidden');
-        document.getElementById('fileError').classList.add('hidden');
-        document.getElementById('buktiInput').value = '';
-        modal.classList.remove('hidden');
+        const paket   = btn.dataset.paket;
+        const label   = btn.dataset.label;
+        const nomorTo = btn.dataset.nomorTo;
+
+        modalPaket.value          = paket;
+        modalNomorTo.value        = nomorTo;
+        modalSubtitle.textContent = label + ' · TO #' + nomorTo;
+        modalToNumBadge.textContent = nomorTo;
+        modalPaketLabel.textContent = label;
+        modalToLabel.textContent    = 'Try Out #' + nomorTo;
+
+        resetUpload();
+        uploadModal.classList.remove('hidden');
       });
     });
 
-    closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
-    modal.addEventListener('click', e => { if (e.target === modal) modal.classList.add('hidden'); });
+    closeModalBtn.addEventListener('click', () => uploadModal.classList.add('hidden'));
+    uploadModal.addEventListener('click', e => { if (e.target === uploadModal) uploadModal.classList.add('hidden'); });
 
-    // ── File preview & validasi ──
-    const MAX_SIZE = 2 * 1024 * 1024;
-    const ALLOWED = ['image/jpeg', 'image/png', 'image/jpg'];
+    // ── File upload ──
+    const MAX_SIZE   = 2 * 1024 * 1024;
+    const ALLOWED    = ['image/jpeg', 'image/png', 'image/jpg'];
     const buktiInput = document.getElementById('buktiInput');
-    const dropZone = document.getElementById('dropZone');
+    const dropZone   = document.getElementById('dropZone');
+    const submitBtn  = document.getElementById('submitUpload');
+    const gantiBtn   = document.getElementById('gantiBtn');
 
-    buktiInput.addEventListener('change', () => { if (buktiInput.files[0]) validateAndPreview(buktiInput.files[0]); });
-
+    buktiInput.addEventListener('change', () => {
+      if (buktiInput.files[0]) validateAndPreview(buktiInput.files[0]);
+    });
     dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = 'var(--gold)'; });
     dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = '#d4c5a8'; });
     dropZone.addEventListener('drop', e => {
@@ -631,31 +638,41 @@
       const dt = new DataTransfer(); dt.items.add(file); buktiInput.files = dt.files;
       validateAndPreview(file);
     });
+    gantiBtn.addEventListener('click', e => { e.stopPropagation(); resetUpload(); });
 
     function validateAndPreview(file) {
       document.getElementById('fileError').classList.add('hidden');
       if (!ALLOWED.includes(file.type)) return showFileError('Format tidak didukung! Gunakan JPG atau PNG.');
       if (file.size > MAX_SIZE) return showFileError('File terlalu besar! Maksimal 2MB.');
       const reader = new FileReader();
-      reader.onload = e => {
-        document.getElementById('previewImg').src = e.target.result;
+      reader.onload = ev => {
+        document.getElementById('previewImg').src       = ev.target.result;
         document.getElementById('fileName').textContent = file.name;
         document.getElementById('fileSize').textContent = (file.size / 1024).toFixed(0) + ' KB';
         document.getElementById('dropContent').classList.add('hidden');
         document.getElementById('filePreview').classList.remove('hidden');
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+        submitBtn.style.cursor  = 'pointer';
       };
       reader.readAsDataURL(file);
     }
-
     function showFileError(msg) {
       document.getElementById('fileErrorText').textContent = msg;
       document.getElementById('fileError').classList.remove('hidden');
+      resetUpload();
+    }
+    function resetUpload() {
       buktiInput.value = '';
       document.getElementById('dropContent').classList.remove('hidden');
       document.getElementById('filePreview').classList.add('hidden');
+      document.getElementById('fileError').classList.add('hidden');
+      submitBtn.disabled      = true;
+      submitBtn.style.opacity = '0.5';
+      submitBtn.style.cursor  = 'not-allowed';
     }
 
-    // ── Confirm mulai ujian (CSP-safe, no inline onclick) ──
+    // ── Confirm mulai ujian ──
     document.querySelectorAll('.confirm-mulai').forEach(form => {
       form.addEventListener('submit', e => {
         if (!confirm('Waktu akan mulai berjalan. Pastikan koneksi dan baterai stabil. Siap?')) e.preventDefault();

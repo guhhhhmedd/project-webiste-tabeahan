@@ -44,8 +44,10 @@ const PAKET_LIST = [
 function buildPaymentMap(payments) {
   const map = {};
   for (const p of payments) {
-    // Ambil yang terbaru per paket
-    if (!map[p.paket]) map[p.paket] = p;
+    // Key-nya unik berdasarkan Paket + Nomor TO
+    const key = `${p.paket}_${p.nomor_to}`;
+    // Simpan objeknya (karena sudah ORDER BY created_at DESC, yang pertama dapet adalah yang terbaru)
+    if (!map[key]) map[key] = p; 
   }
   return map;
 }
@@ -105,12 +107,7 @@ router.get("/users/dashboardPembayaranUjian", isLogin, async (req, res) => {
       [userId]
     );
 
-    const paymentMap = {};
-    paymentRows.forEach(row => {
-      if (!paymentMap[row.paket]) {
-        paymentMap[row.paket] = row;
-      }
-    });
+   const paymentMap = buildPaymentMap(paymentRows);
 
     const [rankingRows] = await db.query(`
       SELECT username, skor FROM users 
@@ -144,139 +141,32 @@ router.get("/users/dashboardPembayaranUjian", isLogin, async (req, res) => {
   }
 });
 
-//  /users/upload-bukti 
-// router.post(
-//   "/users/upload-bukti",
-//   isLogin,
-//   (req, res, next) => {
-//     uploadBukti.single("bukti")(req, res, (err) => {
-//       if (err instanceof multer.MulterError) {
-//         if (err.code === "LIMIT_FILE_SIZE")
-//           return res.redirect("/users/dashboardPembayaranUjian?uploadError=File+terlalu+besar!+Maksimal+2MB.");
-//         return res.redirect("/users/dashboardPembayaranUjian?uploadError=Error+upload+file.");
-//       } else if (err) {
-//         return res.redirect(`/users/dashboardPembayaranUjian?uploadError=${encodeURIComponent(err.message)}`);
-//       }
-//       next();
-//     });
-//   },
-//   async (req, res) => {
-//     if (!req.file)
-//       return res.redirect("/users/dashboardPembayaranUjian?uploadError=Mohon+pilih+file+terlebih+dahulu.");
+// Ganti 'upload' jadi 'uploadBukti'
+router.post("/upload-bukti", isLogin, uploadBukti.single('bukti'), async (req, res) => {
+  const { paket_pilihan, nomor_to } = req.body;
+  const userId = req.session.user.id;
+  
+  // Pastikan ambil nama filenya aja buat disimpen di DB
+  const buktiFilename = req.file ? req.file.filename : null;
 
-//     const { paket_pilihan } = req.body;
-//     const userId = req.session.user.id;
-
-//     // Validasi paket
-//     const validPaket = PAKET_LIST.map(p => p.key);
-//     if (!paket_pilihan || !validPaket.includes(paket_pilihan)) {
-//       return res.redirect("/users/dashboardPembayaranUjian?uploadError=Pilih+paket+terlebih+dahulu.");
-//     }
-
-//     try {
-//       // Cek status payment terbaru untuk paket ini
-//       // Tambahkan pengecekan expired_at di query existing
-// const [existing] = await db.query(
-//   `SELECT * FROM payments 
-//    WHERE user_id = ? AND paket = ? AND status IN ('PENDING', 'LUNAS') 
-//    AND (expired_at IS NULL OR expired_at > NOW())
-//    ORDER BY created_at DESC LIMIT 1`,
-//   [userId, paket_pilihan]
-// );
-
-//       if (existing.length > 0) {
-//         const st = existing[0].status;
-//         if (st === "LUNAS") {
-//           // Hapus file yang baru diupload karena tidak dipakai
-//           fs.unlink(path.join("public/uploads/bukti/", req.file.filename), () => {});
-//           return res.redirect("/users/dashboardPembayaranUjian?uploadError=Anda+sudah+memiliki+akses+aktif+untuk+paket+ini.");
-//         }
-//         if (st === "PENDING") {
-//           fs.unlink(path.join("public/uploads/bukti/", req.file.filename), () => {});
-//           return res.redirect("/users/dashboardPembayaranUjian?uploadError=Pembayaran+paket+ini+masih+menunggu+verifikasi.");
-//         }
-//       }
-
-//       // Insert payment baru
-//       await db.query(
-//         "INSERT INTO payments (user_id, paket, bukti_transfer, status) VALUES (?, ?, ?, 'PENDING')",
-//         [userId, paket_pilihan, req.file.filename]
-//       );
-
-//       // Gantinya path.join("public/uploads/bukti/", ...)
-// const fullPath = path.join(process.cwd(), "public", "uploads", "bukti", req.file.filename);
-// fs.unlink(fullPath, (err) => {
-//   if (err) console.error("Gagal hapus file:", err);
-// });
-
-//       res.redirect(`/users/dashboardPembayaranUjian?success=${encodeURIComponent("Bukti pembayaran " + paket_pilihan + " berhasil dikirim! Menunggu verifikasi admin.")}`);
-//     } catch (err) {
-//       console.error(err);
-//       res.redirect("/users/dashboardPembayaranUjian?uploadError=Gagal+upload,+silakan+coba+lagi.");
-//     }
-//   }
-// );
-
-router.post( "/users/upload-bukti", isLogin, (req, res, next) => {
-   uploadBukti.single("bukti")(req, res, (err) => {
-      if (err instanceof multer.MulterError) {
-        if (err.code === "LIMIT_FILE_SIZE")
-          return res.redirect("/users/dashboardPembayaranUjian?uploadError=File+terlalu+besar!+Maksimal+2MB.");
-        return res.redirect("/users/dashboardPembayaranUjian?uploadError=Error+upload+file.");
-      } else if (err) {
-        return res.redirect(`/users/dashboardPembayaranUjian?uploadError=${encodeURIComponent(err.message)}`);
-      }
-      next();
-    });
-  },
-  async (req, res) => {
-    if (!req.file)
-      return res.redirect("/users/dashboardPembayaranUjian?uploadError=Mohon+pilih+file+terlebih+dahulu.");
-
-    const { paket_pilihan } = req.body;
-    const userId = req.session.user.id;
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "bukti", req.file.filename);
-
-    const validPaket = PAKET_LIST.map(p => p.key);
-    if (!paket_pilihan || !validPaket.includes(paket_pilihan)) {
-      if (fs.existsSync(uploadDir)) fs.unlinkSync(uploadDir); 
-      return res.redirect("/users/dashboardPembayaranUjian?uploadError=Pilih+paket+terlebih+dahulu.");
-    }
-
-    try {
-      const [existing] = await db.query(
-        `SELECT * FROM payments 
-         WHERE user_id = ? AND paket = ? AND status IN ('PENDING', 'LUNAS') 
-         AND (expired_at IS NULL OR expired_at > NOW())
-         ORDER BY created_at DESC LIMIT 1`,
-        [userId, paket_pilihan]
-      );
-
-      if (existing.length > 0) {
-        if (fs.existsSync(uploadDir)) fs.unlinkSync(uploadDir); 
-        
-        const st = existing[0].status;
-        if (st === "LUNAS") {
-          return res.redirect("/users/dashboardPembayaranUjian?uploadError=Anda+sudah+memiliki+akses+aktif+untuk+paket+ini.");
-        }
-        if (st === "PENDING") {
-          return res.redirect("/users/dashboardPembayaranUjian?uploadError=Pembayaran+masih+menunggu+verifikasi.");
-        }
-      }
-
-      await db.query(
-        "INSERT INTO payments (user_id, paket, bukti_transfer, status) VALUES (?, ?, ?, 'PENDING')",
-        [userId, paket_pilihan, req.file.filename]
-      );
-
-      res.redirect(`/users/dashboardPembayaranUjian?success=${encodeURIComponent("Bukti pembayaran " + paket_pilihan + " berhasil dikirim!")}`);
-    } catch (err) {
-      console.error(err);
-      if (fs.existsSync(uploadDir)) fs.unlinkSync(uploadDir); 
-      res.redirect("/users/dashboardPembayaranUjian?uploadError=Gagal+upload,+silakan+coba+lagi.");
-    }
+  if (!buktiFilename) {
+    return res.redirect("/users/dashboardPembayaranUjian?uploadError=" + encodeURIComponent("File bukti transfer wajib diunggah!"));
   }
-);
+
+  try {
+    // Simpan ke tabel payments dengan nomor_to-nya
+    await db.query(
+      `INSERT INTO payments (user_id, paket, nomor_to, bukti_transfer, status) 
+       VALUES (?, ?, ?, ?, 'PENDING')`,
+      [userId, paket_pilihan, nomor_to, buktiFilename]
+    );
+
+    res.redirect("/users/dashboardPembayaranUjian?success=" + encodeURIComponent("Bukti terupload! Admin akan segera memverifikasi."));
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Gagal menyimpan data.");
+  }
+});
 
 //  POST /deleteAccount 
 router.post("/deleteAccount", isLogin, async (req, res) => {

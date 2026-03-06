@@ -112,6 +112,7 @@ CREATE TABLE `payments` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `paket` varchar(60) NOT NULL DEFAULT '',
+  `nomor_to` int NOT NULL DEFAULT '1',
   `token_ujian` varchar(20) DEFAULT NULL,
   `tgl_lunas` datetime DEFAULT NULL,
   `bukti_transfer` varchar(255) NOT NULL,
@@ -130,7 +131,7 @@ CREATE TABLE `payments` (
 
 LOCK TABLES `payments` WRITE;
 /*!40000 ALTER TABLE `payments` DISABLE KEYS */;
-INSERT INTO `payments` VALUES (1,123,'',NULL,NULL,'cash','pending','2026-02-04 07:57:12',NULL),(2,14,'',NULL,NULL,'bukti-14-1770262648924-626653815.jpeg','pending','2026-02-05 03:37:28',NULL),(7,18,'',NULL,NULL,'bukti-18-1770711982616-991169500.png','pending','2026-02-10 08:26:22',NULL),(8,13,'',NULL,NULL,'bukti-13-1770773881443-136416692.jpeg','pending','2026-02-11 01:38:01',NULL),(9,6,'',NULL,NULL,'bukti-6-1770797000331-332470884.png','pending','2026-02-11 08:03:20',NULL),(11,19,'',NULL,NULL,'bukti-19-1770815324204-780622657.jpeg','pending','2026-02-11 13:08:44',NULL),(13,21,'',NULL,NULL,'bukti-21-1771042626730-239695429.png','LUNAS','2026-02-14 04:17:06',NULL),(14,22,'',NULL,NULL,'bukti-22-1771044039087-723859638.png','LUNAS','2026-02-14 04:40:39',NULL),(27,28,'',NULL,NULL,'bukti-28-1771826818920.png','LUNAS','2026-02-23 06:06:58',NULL),(28,32,'',NULL,NULL,'bukti-32-1772080849848.jpg','LUNAS','2026-02-26 04:40:49',NULL),(45,47,'Paket Akademik Polri','5A981FB1','2026-02-28 00:01:37','bukti-47-1772211667526.jpg','LUNAS','2026-02-27 17:01:07','2026-04-29 00:10:02'),(46,47,'Paket PPPK','71004820','2026-02-28 12:12:07','bukti-47-1772255472814.jpg','LUNAS','2026-02-28 05:11:12','2026-04-29 12:13:01');
+INSERT INTO `payments` VALUES (1,123,'',1,NULL,NULL,'cash','pending','2026-02-04 07:57:12',NULL),(2,14,'',1,NULL,NULL,'bukti-14-1770262648924-626653815.jpeg','pending','2026-02-05 03:37:28',NULL),(7,18,'',1,NULL,NULL,'bukti-18-1770711982616-991169500.png','pending','2026-02-10 08:26:22',NULL),(8,13,'',1,NULL,NULL,'bukti-13-1770773881443-136416692.jpeg','pending','2026-02-11 01:38:01',NULL),(9,6,'',1,NULL,NULL,'bukti-6-1770797000331-332470884.png','pending','2026-02-11 08:03:20',NULL),(11,19,'',1,NULL,NULL,'bukti-19-1770815324204-780622657.jpeg','pending','2026-02-11 13:08:44',NULL),(13,21,'',1,NULL,NULL,'bukti-21-1771042626730-239695429.png','LUNAS','2026-02-14 04:17:06',NULL),(14,22,'',1,NULL,NULL,'bukti-22-1771044039087-723859638.png','LUNAS','2026-02-14 04:40:39',NULL),(27,28,'',1,NULL,NULL,'bukti-28-1771826818920.png','LUNAS','2026-02-23 06:06:58',NULL),(28,32,'',1,NULL,NULL,'bukti-32-1772080849848.jpg','LUNAS','2026-02-26 04:40:49',NULL),(45,47,'Paket Akademik Polri',1,'5A981FB1','2026-02-28 00:01:37','bukti-47-1772211667526.jpg','LUNAS','2026-02-27 17:01:07','2026-04-29 00:10:02'),(46,47,'Paket PPPK',1,'71004820','2026-02-28 12:12:07','bukti-47-1772255472814.jpg','LUNAS','2026-02-28 05:11:12','2026-04-29 12:13:01');
 /*!40000 ALTER TABLE `payments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -159,7 +160,7 @@ CREATE TABLE `questions` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_soal` (`paket`,`nomor_to`,`materi_id`,`nomor_urut`),
   KEY `idx_paket_active` (`paket`,`is_active`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -168,6 +169,7 @@ CREATE TABLE `questions` (
 
 LOCK TABLES `questions` WRITE;
 /*!40000 ALTER TABLE `questions` DISABLE KEYS */;
+INSERT INTO `questions` VALUES (1,'Paket SKD/TKD',1,1,1,'Contoh soal TWK: Lambang sila ke-1 adalah...','Bintang','Rantai','Pohon','Banteng','Padi','A',1,5),(2,'Paket SKD/TKD',1,2,31,'Contoh soal TIU: 2, 4, 8, ...','10','12','14','16','18','D',1,5),(3,'Paket SKD/TKD',1,3,66,'Contoh soal TKP: Jika rekan kerja curang...','Diam','Lapor','Ikut','Kesal','Acuh','B',1,5),(4,'Paket Akademik Polri',1,4,1,'Contoh soal PU: Ibu kota Indonesia adalah...','Jakarta','Bandung','Medan','Surabaya','IKN','E',1,5),(5,'Paket Akademik Polri',1,5,26,'Contoh soal WK: Pancasila lahir tanggal...','46174','17 Ags','46296','46144','46336','A',1,5),(6,'Paket Akademik Polri',1,6,51,'Contoh soal Numerik: 10 + 10 x 0 = ...','20','0','10','100','5','C',1,5),(7,'Paket Akademik Polri',1,7,76,'Contoh soal B.Indo: Antonim besar adalah...','Luas','Kecil','Lebar','Tinggi','Jauh','B',1,5),(8,'Paket Akademik Polri',1,8,101,'Contoh soal B.Inggris: I ... a student.','Is','Are','Am','Was','Were','C',1,5),(9,'Paket PPPK',1,9,1,'Contoh soal Teknis: Jelaskan tupoksi...','A','B','C','D','E','A',1,5),(10,'Paket PPPK',1,10,91,'Contoh soal Manajerial: Cara memimpin...','A','B','C','D','E','B',1,5),(11,'Paket PPPK',1,11,116,'Contoh soal Sosio: Toleransi adalah...','A','B','C','D','E','C',1,5),(12,'Paket PPPK',1,12,136,'Contoh soal Wawancara: Alasan mendaftar...','A','B','C','D','E','D',1,5);
 /*!40000 ALTER TABLE `questions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -249,4 +251,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-06  1:21:44
+-- Dump completed on 2026-03-07  0:53:13

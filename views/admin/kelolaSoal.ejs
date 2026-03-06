@@ -192,19 +192,24 @@
                 <h3 class="font-black text-slate-800 text-sm mb-1">⚡ Aksi Massal Soal</h3>
                 <p class="text-xs text-slate-400 mb-4">Status semua soal di paket ini.</p>
                 <div class="flex gap-3">
-                  <form action="/admin/toggle-all-soal" method="POST" class="confirm-all flex-1">
+                  <form action="/admin/toggle-all-soal" method="POST" class="flex-1">
                     <input type="hidden" name="paket" value="<%= paket %>">
                     <input type="hidden" name="is_active" value="1">
-                    <input type="hidden" name="current_to" value="<%= currentTo %>"> <!-- ← tambah ini -->
-                    ...
+                    <input type="hidden" name="current_to" value="<%= currentTo %>">
+                    <button type="submit" onclick="return confirm('Aktifkan semua soal TO <%= currentTo %>?')"
+                      class="w-full py-2.5 bg-green-600 text-white text-[10px] font-bold rounded-lg hover:bg-green-700 transition shadow-sm">
+                      AKTIFKAN SEMUA TO <%= currentTo %>
+                    </button>
                   </form>
 
-                  <!-- Form Nonaktifkan Semua -->
-                  <form action="/admin/toggle-all-soal" method="POST" class="confirm-all flex-1">
+                  <form action="/admin/toggle-all-soal" method="POST" class="flex-1">
                     <input type="hidden" name="paket" value="<%= paket %>">
                     <input type="hidden" name="is_active" value="0">
-                    <input type="hidden" name="current_to" value="<%= currentTo %>"> <!-- ← tambah ini -->
-                    ...
+                    <input type="hidden" name="current_to" value="<%= currentTo %>">
+                    <button type="submit" onclick="return confirm('Nonaktifkan semua soal TO <%= currentTo %>?')"
+                      class="w-full py-2.5 bg-slate-400 text-white text-[10px] font-bold rounded-lg hover:bg-slate-500 transition shadow-sm">
+                      MATIKAN SEMUA TO <%= currentTo %>
+                    </button>
                   </form>
                 </div>
               </div>
@@ -251,7 +256,7 @@
                           <tr class="hover:bg-slate-50 transition soal-row" data-active="<%= s.is_active %>">
                             <td class="px-4 py-3">
                               <label class="toggle-wrap" id="toggle-wrap-<%= s.id %>">
-                                <input type="checkbox" class="soal-toggle" data-id="<%= s.id %>" <%=s.is_active
+                                <input type="checkbox" class="toggle-soal-input" data-id="<%= s.id %>" <%=s.is_active
                                   ? 'checked' : '' %>>
                                 <span class="toggle-slider"></span>
                               </label>
@@ -312,15 +317,16 @@
     // ── Toggle aktif soal (fetch JSON) ──
     let totalAktif = <%= totalAktif %>;
 
-    document.querySelectorAll('.soal-toggle').forEach(cb => {
-      cb.addEventListener('change', async function () {
+    // SCRIPT UNTUK TOGGLE SATUAN (ON/OFF SOAL TANPA REFRESH)
+    document.querySelectorAll('.toggle-soal-input').forEach(input => {
+      input.addEventListener('change', async function () {
         const id = this.dataset.id;
         const isActive = this.checked ? 1 : 0;
-        const wrap = document.getElementById(`toggle-wrap-${id}`);
-        const soalText = document.getElementById(`soal-text-${id}`);
-        const row = this.closest('.soal-row');
+        const wrapper = this.closest('.toggle-wrap');
 
-        wrap.classList.add('loading');
+        // Tambah efek loading (biar admin tau lagi proses)
+        wrapper.style.opacity = '0.5';
+        wrapper.style.pointerEvents = 'none';
 
         try {
           const res = await fetch('/admin/toggle-soal', {
@@ -331,22 +337,25 @@
           const data = await res.json();
 
           if (data.ok) {
-            // Update counter
-            totalAktif += isActive ? 1 : -1;
-            document.getElementById('totalAktifDisplay').textContent = totalAktif;
-            document.getElementById('aktifHint').textContent = totalAktif;
-            // Update row visual
-            row.dataset.active = isActive;
-            if (soalText) soalText.classList.toggle('opacity-40', !isActive);
+            // Update angka "Total Aktif" di atas secara otomatis
+            const aktifDisplay = document.getElementById('totalAktifDisplay');
+            const aktifHint = document.getElementById('aktifHint');
+            let current = parseInt(aktifDisplay.innerText);
+
+            isActive ? current++ : current--;
+
+            aktifDisplay.innerText = current;
+            if (aktifHint) aktifHint.innerText = current;
           } else {
-            this.checked = !this.checked; // rollback
-            alert('Gagal mengubah status soal.');
+            alert('Gagal update status soal!');
+            this.checked = !this.checked; // Balikin posisi toggle kalau gagal
           }
-        } catch (e) {
-          this.checked = !this.checked; // rollback
-          alert('Terjadi kesalahan koneksi.');
+        } catch (err) {
+          console.error('Error toggle:', err);
+          this.checked = !this.checked;
         } finally {
-          wrap.classList.remove('loading');
+          wrapper.style.opacity = '1';
+          wrapper.style.pointerEvents = 'auto';
         }
       });
     });

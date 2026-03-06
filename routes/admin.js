@@ -160,82 +160,89 @@ router.get("/admin/daftarPeserta", isAdmin, async (req, res) => {
 
 // SOAL — KELOLA PER PAKET
 router.get("/admin/kelola-soal/:paket", isAdmin, async (req, res) => {
-  const namaPaket = decodeURIComponent(req.params.paket);
-  const filterTo = req.query.to || 1; 
-  try {
-    const [soalList] = await db.query(
-      `SELECT q.*, m.nama_materi 
-   FROM questions q 
-   LEFT JOIN materi_list m ON q.materi_id = m.id 
-   WHERE TRIM(q.paket) = ? AND q.nomor_to = ? 
-   ORDER BY q.nomor_urut ASC`,
-      [namaPaket, filterTo],
-    );
+    const namaPaket = decodeURIComponent(req.params.paket);
+    const filterTo = parseInt(req.query.to) || 1; 
+    
+    try {
+        // 1. Ambil soal yang sesuai Paket dan Nomor TO
+        const [soalList] = await db.query(
+            `SELECT q.*, m.nama_materi 
+             FROM questions q 
+             LEFT JOIN materi_list m ON q.materi_id = m.id 
+             WHERE TRIM(q.paket) = ? AND q.nomor_to = ? 
+             ORDER BY q.nomor_urut ASC`,
+            [namaPaket, filterTo]
+        );
 
-    const [configRows] = await db.query(
-      "SELECT * FROM paket_ujian WHERE nama_paket = ? LIMIT 1",
-      [namaPaket],
-    );
+        // 2. Hitung total soal yang aktif (buat ditampilin di box hijau)
+        const totalAktif = soalList.filter(s => s.is_active == 1).length;
 
-    const [availTo] = await db.query(
-      "SELECT DISTINCT nomor_to FROM questions WHERE TRIM(paket) = ? ORDER BY nomor_to ASC",
-      [namaPaket],
-    );
+        // 3. Ambil konfigurasi paket (durasi & jumlah soal yang tampil)
+        // Sesuaikan nama tabel 'paket_list' dengan tabel lu ya, Bre
+        const [configRows] = await db.query(
+            "SELECT jumlah_soal, durasi_menit FROM paket_ujian WHERE nama_paket = ?",
+            [namaPaket]
+        );
+        
+        // Kasih nilai default kalau config belum ada di DB biar gak crash
+        const config = configRows[0] || { jumlah_soal: 0, durasi_menit: 0 };
 
-    const config = configRows[0] || { jumlah_soal: 110, durasi_menit: 100 };
-    const totalAktif = soalList.filter((s) => s.is_active).length;
+        // 4. Ambil daftar TO yang tersedia (buat dropdown filter)
+        const [availTo] = await db.query(
+            "SELECT DISTINCT nomor_to FROM questions WHERE TRIM(paket) = ? ORDER BY nomor_to ASC",
+            [namaPaket]
+        );
 
-    res.render("admin/kelolaSoal", {
-      paket: namaPaket,
-      soalList,
-      config,
-      totalAktif,
-      currentTo: filterTo,
-      availTo: availTo.map((r) => r.nomor_to), 
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Gagal mengambil data soal.");
-  }
+        // 5. Kirim semua ke EJS
+        res.render("admin/kelolaSoal", {
+            paket: namaPaket,
+            soalList,
+            totalAktif,      // <-- WAJIB ADA
+            config,          // <-- WAJIB ADA
+            currentTo: filterTo,
+            availTo: availTo.map(r => r.nomor_to),
+            message: req.query.msg || null, // Tambahan buat notif sukses
+            error: req.query.err || null    // Tambahan buat notif error
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Gagal mengambil data soal.");
+    }
 });
 
 // VERIFIKASI PEMBAYARAN — by paymentId
 router.post("/admin/verify/:paymentId", isAdmin, async (req, res) => {
-  const { paymentId } = req.params;
-  try {
-    const [payments] = await db.query("SELECT * FROM payments WHERE id = ?", [
-      paymentId,
-    ]);
-    if (!payments.length)
-      return res.redirect(
-        "/admin/daftarPeserta?error=Payment+tidak+ditemukan.",
-      );
+    const { paymentId } = req.params;
+    try {
+        const [payments] = await db.query("SELECT user_id, paket, nomor_to FROM payments WHERE id = ?", [paymentId]);
+        if (!payments.length) return res.redirect("/admin/daftarPeserta?error=Data+tidak+ada");
 
-    const userId = payments[0].user_id;
-    const token = crypto.randomBytes(4).toString("hex").toUpperCase();
+        const userId = payments[0].user_id;
+        const token = crypto.randomBytes(4).toString("hex").toUpperCase();
 
-    // LOGIKA: Set 60 hari dari sekarang
-    const expiredDate = new Date();
-    expiredDate.setDate(expiredDate.getDate() + 60);
+        // AMBIL EXPIRED LAMA USER
+        const [userRows] = await db.query("SELECT expired_at FROM users WHERE id = ?", [userId]);
+        let currentExpired = userRows[0].expired_at;
+        let newExpiredDate = new Date();
 
-    await db.query(
-      "UPDATE payments SET status = 'LUNAS', token_ujian = ?, tgl_lunas = NOW() WHERE id = ?",
-      [token, paymentId],
-    );
+        // Jika masih aktif, tambahkan 60 hari dari tanggal expired lama
+        if (currentExpired && new Date(currentExpired) > new Date()) {
+            newExpiredDate = new Date(currentExpired);
+        }
+        newExpiredDate.setDate(newExpiredDate.getDate() + 60);
 
-    //Update User (Aktifkan Masa Ujian 60 Hari)
-    await db.query(
-      "UPDATE users SET expired_at = ?, is_active = 1 WHERE id = ?",
-      [expiredDate, userId],
-    );
+        // Update Payment & User
+        await Promise.all([
+            db.query("UPDATE payments SET status = 'LUNAS', token_ujian = ?, tgl_lunas = NOW() WHERE id = ?", [token, paymentId]),
+            db.query("UPDATE users SET expired_at = ?, is_active = 1 WHERE id = ?", [newExpiredDate, userId])
+        ]);
 
-    res.redirect(
-      `/admin/daftarPeserta?success=Pembayaran+diverifikasi.+Akses+60+hari+aktif.`,
-    );
-  } catch (err) {
-    console.error("ERROR VERIFIKASI:", err);
-    res.redirect("/admin/daftarPeserta?error=Gagal+verifikasi.");
-  }
+        res.redirect(`/admin/daftarPeserta?success=Pembayaran+berhasil+diverifikasi`);
+    } catch (err) {
+        console.error(err);
+        res.redirect("/admin/daftarPeserta?error=Gagal+verifikasi");
+    }
 });
 
 // TOLAK PEMBAYARAN — by paymentId
@@ -334,12 +341,12 @@ router.post("/admin/upload-soal", isAdmin, uploadExcel.single("fileExcel"), asyn
 
     for (const row of rows) {
       const paket = (row.paket || "").trim();
-      const nomorTo = parseInt(row.nomor_to) || 1;
+      const nomorTo = parseInt(row.nomor_to);
       const nomorUrut = row.nomor_urut;
 
-      if (!validPaket.includes(paket)) {
-        skipped++;
-        continue;
+     if (!nomorTo || isNaN(nomorTo)) {
+    skipped++;
+    continue;
       }
 
       try {
@@ -405,15 +412,18 @@ router.post("/admin/toggle-soal", isAdmin, async (req, res) => {
 
 // SOAL — AKTIFKAN / NONAKTIFKAN SEMUA
 router.post("/admin/toggle-all-soal", isAdmin, async (req, res) => {
-  const { paket, is_active, current_to } = req.body;  
-  try {
-    await db.query("UPDATE questions SET is_active = ? WHERE paket = ?", [is_active, paket]);
-    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${current_to || 1}&message=Semua+soal+berhasil+diperbarui.`);
-  } catch (err) {
-    console.error(err);
-    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${current_to || 1}&error=Gagal+update.`);
-  }
+    const { paket, is_active, current_to } = req.body;  
+    try {
+        await db.query(
+            "UPDATE questions SET is_active = ? WHERE paket = ? AND nomor_to = ?", 
+            [is_active, paket, current_to]
+        );
+        res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${current_to}&message=Status+TO+Nomor+${current_to}+berhasil+diubah`);
+    } catch (err) {
+        res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${current_to}&error=Gagal+update`);
+    }
 });
+
 // PAKET — UPDATE JUMLAH SOAL
 router.post("/admin/update-config-paket", isAdmin, async (req, res) => {
   const { paket, jumlah_soal, durasi_menit } = req.body; // Nangkep 3 data sekaligus
@@ -477,32 +487,30 @@ router.post("/admin/update-durasi", isAdmin, async (req, res) => {
 
 // HAPUS AKUN DARI ADMIN
 router.post("/deleteAccountFromAdmin", isAdmin, async (req, res) => {
-  const { id } = req.body;
-  try {
-    const [payments] = await db.query(
-      "SELECT bukti_transfer FROM payments WHERE user_id = ?",
-      [id],
-    );
-    payments.forEach((p) => {
-      if (p.bukti_transfer) {
-        const filePath = path.join(
-          __dirname,
-          "../public/uploads/bukti/",
-          p.bukti_transfer,
-        );
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-      }
-    });
+    const { id } = req.body;
+    try {
+        // 1. Cari & Hapus Bukti Transfer di Folder
+        const [payments] = await db.query("SELECT bukti_transfer FROM payments WHERE user_id = ?", [id]);
+        payments.forEach((p) => {
+            if (p.bukti_transfer) {
+                const filePath = path.join(process.cwd(), "public", "uploads", "bukti", p.bukti_transfer);
+                if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+            }
+        });
 
-    await db.query("DELETE FROM jawaban_peserta WHERE user_id = ?", [id]);
-    await db.query("DELETE FROM payments WHERE user_id = ?", [id]);
-    await db.query("DELETE FROM users WHERE id = ?", [id]);
+        // 2. Hapus Semua Data Terkait (Gunakan Promise.all agar cepat)
+        await Promise.all([
+            db.query("DELETE FROM jawaban_peserta WHERE user_id = ?", [id]),
+            db.query("DELETE FROM riwayat_ujian WHERE user_id = ?", [id]),
+            db.query("DELETE FROM payments WHERE user_id = ?", [id]),
+            db.query("DELETE FROM users WHERE id = ?", [id])
+        ]);
 
-    res.redirect("/dashboardAdmin?message=Akun+berhasil+dihapus");
-  } catch (err) {
-    console.error("Gagal hapus akun:", err);
-    res.status(500).send("Database error!");
-  }
+        res.redirect("/dashboardAdmin?message=Akun+dan+seluruh+data+terkait+berhasil+dihapus");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Gagal hapus data.");
+    }
 });
 
 module.exports = router;
