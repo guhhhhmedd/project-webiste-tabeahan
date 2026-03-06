@@ -143,6 +143,8 @@ router.get("/users/dashboardPembayaranUjian", isLogin, async (req, res) => {
 
 // Ganti 'upload' jadi 'uploadBukti'
 router.post("/upload-bukti", isLogin, uploadBukti.single('bukti'), async (req, res) => {
+  console.log(req.file); // Cek apakah filenya muncul di terminal console
+    console.log(req.body);
   const { paket_pilihan, nomor_to } = req.body;
   const userId = req.session.user.id;
   

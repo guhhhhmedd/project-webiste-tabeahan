@@ -30,30 +30,69 @@
     tbody tr:hover { background:rgba(200,160,32,0.03); }
     tbody td { padding:1rem 1.25rem; vertical-align:top; }
 
-    /* Status badges */
+    /* Badges */
     .badge { display:inline-block; padding:0.2rem 0.6rem; border-radius:5px; font-size:0.6rem; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; }
     .badge-lunas   { background:rgba(21,128,61,0.1);   color:#15803d; border:1px solid rgba(21,128,61,0.2); }
     .badge-pending { background:rgba(200,160,32,0.1);  color:#a16207; border:1px solid rgba(200,160,32,0.25); }
     .badge-ditolak { background:rgba(220,38,38,0.08);  color:#b91c1c; border:1px solid rgba(220,38,38,0.18); }
-    .badge-used    { background:rgba(122,16,16,0.07);  color:var(--dark); border:1px solid rgba(122,16,16,0.15); }
+    .badge-selesai { background:rgba(122,16,16,0.07);  color:var(--dark); border:1px solid rgba(122,16,16,0.15); }
     .badge-idle    { background:rgba(155,107,107,0.08);color:var(--muted); border:1px solid rgba(155,107,107,0.15); }
 
     /* Stat box */
     .stat-box { background:white; border:1px solid rgba(200,160,32,0.15); border-left:3px solid var(--gold); border-radius:10px; padding:0.75rem 1.25rem; }
 
-    /* Payment row */
-    .pay-row { border:1px solid rgba(200,160,32,0.12); border-radius:8px; padding:0.625rem 0.875rem; font-size:0.7rem; }
+    /* Paket group */
+    .paket-group {
+      border: 1px solid rgba(200,160,32,0.15);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+    .paket-group:last-child { margin-bottom: 0; }
+    .paket-group-header {
+      background: rgba(90,10,10,0.04);
+      padding: 0.5rem 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(200,160,32,0.1);
+    }
+
+    /* TO row */
+    .to-row {
+      padding: 0.5rem 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      border-bottom: 1px solid rgba(200,160,32,0.07);
+      flex-wrap: wrap;
+    }
+    .to-row:last-child { border-bottom: none; }
+
+    /* TO number badge */
+    .to-num {
+      width: 1.75rem; height: 1.75rem;
+      border-radius: 6px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: "Playfair Display", serif; font-weight: 900; font-size: 0.7rem;
+      color: white; flex-shrink: 0;
+    }
 
     /* Buttons */
-    .btn-verify { background:#15803d; color:white; border:none; padding:0.3rem 0.75rem; border-radius:6px; font-size:0.65rem; font-weight:700; cursor:pointer; transition:background 0.2s; }
+    .btn-verify { background:#15803d; color:white; border:none; padding:0.3rem 0.65rem; border-radius:6px; font-size:0.62rem; font-weight:700; cursor:pointer; transition:background 0.2s; white-space:nowrap; }
     .btn-verify:hover { background:#166534; }
-    .btn-reject { background:var(--red-deep); color:white; border:none; padding:0.3rem 0.75rem; border-radius:6px; font-size:0.65rem; font-weight:700; cursor:pointer; transition:background 0.2s; }
+    .btn-reject { background:var(--red-deep); color:white; border:none; padding:0.3rem 0.65rem; border-radius:6px; font-size:0.62rem; font-weight:700; cursor:pointer; transition:background 0.2s; white-space:nowrap; }
     .btn-reject:hover { background:#3a0000; }
-    .btn-bukti { background:rgba(200,160,32,0.08); color:var(--dark); border:1px solid rgba(200,160,32,0.2); padding:0.3rem 0.75rem; border-radius:6px; font-size:0.65rem; font-weight:700; cursor:pointer; transition:all 0.2s; text-decoration:none; display:inline-block; }
+    .btn-bukti { background:rgba(200,160,32,0.08); color:var(--dark); border:1px solid rgba(200,160,32,0.2); padding:0.3rem 0.65rem; border-radius:6px; font-size:0.62rem; font-weight:700; cursor:pointer; transition:all 0.2s; text-decoration:none; display:inline-block; white-space:nowrap; }
     .btn-bukti:hover { background:rgba(200,160,32,0.16); }
 
     /* Password blur */
     .pw-hidden { filter:blur(4px); user-select:none; }
+
+    /* Filter tabs */
+    .filter-tab { padding:0.35rem 0.9rem; border-radius:8px; font-size:0.65rem; font-weight:700; cursor:pointer; border:1px solid rgba(200,160,32,0.2); background:white; color:var(--muted); transition:all 0.2s; }
+    .filter-tab.active, .filter-tab:hover { background:var(--red-deep); color:var(--gold); border-color:transparent; }
   </style>
 </head>
 <body>
@@ -79,7 +118,7 @@
         </div>
       </div>
       <a href="/logout"
-        style="background:rgb(255, 255, 255);color:rgba(0, 0, 0, 0.7);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:0.35rem 1rem;font-size:0.75rem;font-weight:700;transition:all 0.2s;text-decoration:none"
+        style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:0.35rem 1rem;font-size:0.75rem;font-weight:700;transition:all 0.2s;text-decoration:none"
         onmouseover="this.style.background='rgba(200,160,32,0.2)';this.style.color='#c8a020'"
         onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.7)'">
         Logout
@@ -100,11 +139,29 @@
           ← Dashboard
         </a>
         <h1 style="font-size:1.75rem;font-weight:900;color:var(--dark);margin:0">Daftar Peserta</h1>
-        <p style="font-size:0.875rem;color:var(--muted);margin-top:0.25rem">Verifikasi pembayaran per paket ujian</p>
+        <p style="font-size:0.875rem;color:var(--muted);margin-top:0.25rem">Verifikasi pembayaran per Try Out</p>
       </div>
-      <div class="stat-box text-right">
-        <span style="display:block;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted)">Total Peserta</span>
-        <span style="font-size:1.75rem;font-weight:900;font-family:'Playfair Display',serif;color:var(--dark)"><%= users.length %></span>
+
+      <!-- Stats -->
+      <div class="flex items-center gap-3 flex-wrap">
+        <%
+          // Hitung total pending di semua user
+          let totalPending = 0;
+          users.forEach(u => {
+            const pays = paymentsMap[u.id] || [];
+            totalPending += pays.filter(p => p.status === 'PENDING').length;
+          });
+        %>
+        <% if (totalPending > 0) { %>
+        <div class="stat-box" style="border-left-color:#a16207">
+          <span style="display:block;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted)">Menunggu</span>
+          <span style="font-size:1.5rem;font-weight:900;font-family:'Playfair Display',serif;color:#a16207"><%= totalPending %></span>
+        </div>
+        <% } %>
+        <div class="stat-box">
+          <span style="display:block;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted)">Total Peserta</span>
+          <span style="font-size:1.5rem;font-weight:900;font-family:'Playfair Display',serif;color:var(--dark)"><%= users.length %></span>
+        </div>
       </div>
     </div>
 
@@ -122,10 +179,19 @@
     </div>
     <% } %>
 
-    <!-- Tabel Peserta -->
+    <!-- Filter cepat -->
+    <div class="flex items-center gap-2 mb-4 flex-wrap">
+      <span style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted)">Filter:</span>
+      <button class="filter-tab active" data-filter="all">Semua</button>
+      <button class="filter-tab" data-filter="pending">⏳ Ada Pending</button>
+      <button class="filter-tab" data-filter="active">✅ Ada Aktif</button>
+    </div>
+
+    <!-- Tabel -->
     <div class="tbl-card">
-      <div class="tbl-hd">
-        <h3>👥 Data Peserta & Status Pembayaran Per Paket</h3>
+      <div class="tbl-hd flex items-center justify-between">
+        <h3>👥 Data Peserta & Pembayaran Per Try Out</h3>
+        <span style="font-size:0.65rem;color:rgba(255,255,255,0.5)"><%= users.length %> peserta</span>
       </div>
 
       <div class="overflow-x-auto">
@@ -136,15 +202,30 @@
               <th>Peserta</th>
               <th>Password</th>
               <th>Status Ujian</th>
-              <th>Pembayaran Per Paket</th>
-              <th style="text-align:right">Aksi Akun</th>
+              <th>Pembayaran Per TO</th>
+              <th style="text-align:right">Aksi</th>
             </tr>
           </thead>
           <tbody>
             <% users.forEach((u, i) => {
               const userPayments = paymentsMap[u.id] || [];
+
+              /*
+               * Group payment berdasarkan paket
+               * Hasil: { "Paket SKD/TKD": [pay1, pay2, ...], ... }
+               */
+              const grouped = {};
+              userPayments.forEach(pay => {
+                if (!grouped[pay.paket]) grouped[pay.paket] = [];
+                grouped[pay.paket].push(pay);
+              });
+
+              const hasPending = userPayments.some(p => p.status === 'PENDING');
+              const hasActive  = userPayments.some(p => p.status === 'LUNAS');
             %>
-            <tr>
+            <tr class="peserta-row"
+              data-has-pending="<%= hasPending ? '1' : '0' %>"
+              data-has-active="<%= hasActive ? '1' : '0' %>">
 
               <!-- Nomor -->
               <td>
@@ -165,76 +246,112 @@
                 </div>
               </td>
 
-              <!-- Password (blur) -->
+              <!-- Password -->
               <td>
-                <div class="flex items-center gap-2">
-                  <span id="pw-<%= i %>" class="pw-hidden" style="font-size:0.75rem;font-family:monospace;color:var(--dark)"><%= u.password %></span>
-                  <button class="pw-toggle cursor-pointer transition" style="color:var(--muted);font-size:1rem;background:none;border:none" data-idx="<%= i %>">👁️</button>
+                <div class="flex items-center gap-1.5">
+                  <span id="pw-<%= i %>" class="pw-hidden" style="font-size:0.7rem;font-family:monospace;color:var(--dark);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block"><%= u.password %></span>
+                  <button class="pw-toggle cursor-pointer transition" style="color:var(--muted);font-size:0.9rem;background:none;border:none;flex-shrink:0" data-idx="<%= i %>">👁️</button>
                 </div>
               </td>
 
               <!-- Status Ujian -->
               <td>
                 <% if (u.status_ujian === 'SELESAI') { %>
-                  <span class="badge" style="background:rgba(122,16,16,0.07);color:var(--dark);border:1px solid rgba(122,16,16,0.15)">🎓 Selesai</span>
+                  <span class="badge badge-selesai">🎓 Selesai</span>
                   <p style="font-size:0.75rem;font-weight:800;color:var(--gold);margin-top:0.25rem">Skor: <%= u.skor || 0 %></p>
                 <% } else if (u.status_ujian === 'SEDANG_UJIAN') { %>
-                  <span class="badge badge-pending" style="animation:pulse 2s infinite">⏱ Sedang Ujian</span>
+                  <span class="badge badge-pending">⏱ Ujian</span>
                 <% } else { %>
-                  <span class="badge badge-idle">Belum Ujian</span>
+                  <span class="badge badge-idle">Idle</span>
                 <% } %>
               </td>
 
-              <!-- Pembayaran per paket -->
-              <td>
+              <!-- Pembayaran per TO — digroup per paket -->
+              <td style="min-width:320px">
                 <% if (userPayments.length === 0) { %>
                   <p style="font-size:0.7rem;font-style:italic;color:var(--muted)">Belum ada pembayaran</p>
                 <% } else { %>
-                  <div class="space-y-2">
-                    <% userPayments.forEach(pay => { %>
-                    <div class="pay-row">
-                      <div class="flex items-center justify-between gap-2 flex-wrap">
-                        <div>
-                          <p style="font-size:0.75rem;font-weight:700;color:var(--dark);margin:0"><%= pay.paket %></p>
-                          <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.25rem;flex-wrap:wrap">
-                            <span class="badge
-                              <%= pay.status === 'LUNAS'   ? 'badge-lunas'   :
-                                  pay.status === 'PENDING' ? 'badge-pending' :
-                                  pay.status === 'DITOLAK' ? 'badge-ditolak' :
-                                  pay.status === 'USED'    ? 'badge-used'    : 'badge-idle' %>">
-                              <%= pay.status %>
-                            </span>
-                            <% if (pay.token_ujian) { %>
-                              <span style="font-family:monospace;font-size:0.65rem;font-weight:700;color:var(--gold)">Token: <%= pay.token_ujian %></span>
-                            <% } %>
-                          </div>
-                        </div>
+                  <% Object.keys(grouped).forEach(namaP => {
+                       const paysInPaket = grouped[namaP];
+                       // Sort by nomor_to
+                       paysInPaket.sort((a,b) => a.nomor_to - b.nomor_to);
+                  %>
+                  <div class="paket-group">
 
-                        <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap">
-                          <% if (pay.bukti_transfer) { %>
-                            <a href="/uploads/bukti/<%= pay.bukti_transfer %>" target="_blank" class="btn-bukti">📄 Bukti</a>
-                          <% } %>
-                          <% if (pay.status === 'PENDING') { %>
-                            <form action="/admin/verify/<%= pay.id %>" method="POST" class="confirm-verify" style="display:inline">
-                              <button type="submit" class="btn-verify">✅ Verifikasi</button>
-                            </form>
-                            <form action="/admin/reject/<%= pay.id %>" method="POST" class="confirm-reject" style="display:inline">
-                              <button type="submit" class="btn-reject">❌ Tolak</button>
-                            </form>
-                          <% } %>
-                        </div>
+                    <!-- Header grup paket -->
+                    <div class="paket-group-header">
+                      <span style="font-size:0.7rem;font-weight:800;color:var(--dark)"><%= namaP %></span>
+                      <div style="display:flex;gap:0.25rem;flex-wrap:wrap">
+                        <%
+                          const lCount = paysInPaket.filter(p=>p.status==='LUNAS').length;
+                          const pCount = paysInPaket.filter(p=>p.status==='PENDING').length;
+                          const dCount = paysInPaket.filter(p=>p.status==='DITOLAK').length;
+                        %>
+                        <% if (lCount > 0) { %><span class="badge badge-lunas"><%= lCount %> Aktif</span><% } %>
+                        <% if (pCount > 0) { %><span class="badge badge-pending"><%= pCount %> Pending</span><% } %>
+                        <% if (dCount > 0) { %><span class="badge badge-ditolak"><%= dCount %> Tolak</span><% } %>
                       </div>
                     </div>
-                    <% }) %>
+
+                    <!-- Baris per TO -->
+                    <% paysInPaket.forEach(pay => { %>
+                    <div class="to-row">
+
+                      <!-- Nomor TO + status -->
+                      <div style="display:flex;align-items:center;gap:0.6rem;flex-shrink:0">
+                        <div class="to-num"
+                          style="background:<%= pay.status==='LUNAS'?'#16a34a':pay.status==='PENDING'?'#a16207':pay.status==='DITOLAK'?'#b91c1c':'var(--muted)' %>">
+                          <%= pay.nomor_to %>
+                        </div>
+                        <div>
+                          <p style="font-size:0.7rem;font-weight:700;color:var(--dark);margin:0;line-height:1.2">TO #<%= pay.nomor_to %></p>
+                          <span class="badge
+                            <%= pay.status==='LUNAS'  ?'badge-lunas':
+                                pay.status==='PENDING'?'badge-pending':
+                                pay.status==='DITOLAK'?'badge-ditolak':'badge-idle' %>"
+                            style="margin-top:2px;display:inline-block">
+                            <%= pay.status %>
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- Token (jika ada) -->
+                      <% if (pay.token_ujian) { %>
+                      <div style="text-align:center;flex-shrink:0">
+                        <p style="font-size:0.55rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:0">Token</p>
+                        <span style="font-family:monospace;font-size:0.7rem;font-weight:800;color:var(--gold)"><%= pay.token_ujian %></span>
+                      </div>
+                      <% } %>
+
+                      <!-- Aksi -->
+                      <div style="display:flex;align-items:center;gap:0.35rem;flex-wrap:wrap;flex-shrink:0">
+                        <% if (pay.bukti_transfer) { %>
+                          <a href="/uploads/bukti/<%= pay.bukti_transfer %>" target="_blank" class="btn-bukti">📄 Bukti</a>
+                        <% } %>
+                        <% if (pay.status === 'PENDING') { %>
+                          <form action="/admin/verify/<%= pay.id %>" method="POST" class="confirm-verify" style="display:inline">
+                            <button type="submit" class="btn-verify">✅ Verifikasi</button>
+                          </form>
+                          <form action="/admin/reject/<%= pay.id %>" method="POST" class="confirm-reject" style="display:inline">
+                            <button type="submit" class="btn-reject">❌ Tolak</button>
+                          </form>
+                        <% } %>
+                      </div>
+
+                    </div>
+                    <% }) /* end paysInPaket */ %>
+
                   </div>
+                  <% }) /* end grouped */ %>
                 <% } %>
               </td>
 
-              <!-- Aksi Akun -->
-              <td style="text-align:right">
+              <!-- Hapus akun -->
+              <td style="text-align:right;white-space:nowrap">
                 <form action="/deleteAccountFromAdmin" method="POST" class="confirm-delete-admin" style="display:inline">
                   <input type="hidden" name="id" value="<%= u.id %>">
-                  <button type="submit" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;padding:0.375rem;border-radius:6px;transition:all 0.2s"
+                  <button type="submit"
+                    style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;padding:0.375rem;border-radius:6px;transition:all 0.2s"
                     onmouseover="this.style.background='rgba(220,38,38,0.08)';this.style.color='#b91c1c'"
                     onmouseout="this.style.background='none';this.style.color='var(--muted)'">
                     🗑️
@@ -243,7 +360,7 @@
               </td>
 
             </tr>
-            <% }) %>
+            <% }) /* end users.forEach */ %>
           </tbody>
         </table>
       </div>
@@ -262,10 +379,10 @@
   </div>
 
   <script>
-    // Password toggle
+    // ── Password toggle ──
     const pwVisible = {};
     document.querySelectorAll('.pw-toggle').forEach(btn => {
-      btn.addEventListener('click', function() {
+      btn.addEventListener('click', function () {
         const idx = this.dataset.idx;
         pwVisible[idx] = !pwVisible[idx];
         const el = document.getElementById('pw-' + idx);
@@ -279,21 +396,39 @@
       });
     });
 
-    document.querySelectorAll('.confirm-verify').forEach(form => {
-      form.addEventListener('submit', e => {
-        if (!confirm('Verifikasi pembayaran ini dan generate token?')) e.preventDefault();
+    // ── Filter tabs ──
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', function () {
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+
+        const filter = this.dataset.filter;
+        document.querySelectorAll('.peserta-row').forEach(row => {
+          if (filter === 'all') {
+            row.style.display = '';
+          } else if (filter === 'pending') {
+            row.style.display = row.dataset.hasPending === '1' ? '' : 'none';
+          } else if (filter === 'active') {
+            row.style.display = row.dataset.hasActive === '1' ? '' : 'none';
+          }
+        });
       });
     });
 
+    // ── Konfirmasi ──
+    document.querySelectorAll('.confirm-verify').forEach(form => {
+      form.addEventListener('submit', e => {
+        if (!confirm('Verifikasi pembayaran ini dan generate token ujian?')) e.preventDefault();
+      });
+    });
     document.querySelectorAll('.confirm-reject').forEach(form => {
       form.addEventListener('submit', e => {
         if (!confirm('Tolak pembayaran ini?')) e.preventDefault();
       });
     });
-
     document.querySelectorAll('.confirm-delete-admin').forEach(form => {
       form.addEventListener('submit', e => {
-        if (!confirm('Hapus akun ini secara permanen?')) e.preventDefault();
+        if (!confirm('Hapus akun ini secara permanen beserta seluruh datanya?')) e.preventDefault();
       });
     });
   </script>

@@ -28,71 +28,54 @@
       box-shadow: 0 2px 16px rgba(90,10,10,0.06);
       overflow: hidden; transition: all 0.25s;
     }
-    .paket-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(90,10,10,0.12); }
+    .paket-card:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(90,10,10,0.1); }
 
-    .to-card-lunas   { background: rgba(22,163,74,0.05);  border-color: rgba(22,163,74,0.2) !important; }
-    .to-card-pending { background: rgba(234,179,8,0.05);  border-color: rgba(234,179,8,0.2)  !important; }
-    .to-card-ditolak { background: rgba(220,38,38,0.05);  border-color: rgba(220,38,38,0.2)  !important; }
-    .to-card-kosong  { background: white;                 border-color: #f0e8d8              !important; }
-
-    .riwayat-row { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f0e8d8; }
-    .riwayat-row:last-child { border-bottom: none; }
-
-    .token-box {
-      background: var(--red-deep); border: 1px solid rgba(200,160,32,0.3);
-      border-radius: 8px; padding: 0.3rem 0.75rem;
-      letter-spacing: 0.12em; display: block; width: 100%; text-align: center;
-    }
+    .to-card-lunas   { background: rgba(22,163,74,0.05);  border-color: rgba(22,163,74,0.25)  !important; }
+    .to-card-pending { background: rgba(234,179,8,0.05);  border-color: rgba(234,179,8,0.25)  !important; }
+    .to-card-ditolak { background: rgba(220,38,38,0.05);  border-color: rgba(220,38,38,0.25)  !important; }
+    .to-card-kosong  { background: white;                 border-color: #f0e8d8               !important; }
 
     .paket-selector {
       appearance: none; -webkit-appearance: none;
       background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c8a020' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 1rem center;
-      border: 2px solid rgba(200,160,32,0.3); border-radius: 14px;
+      border: 2px solid rgba(200,160,32,0.35); border-radius: 14px;
       padding: 0.9rem 3rem 0.9rem 1.25rem;
       font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1rem;
       color: var(--dark); cursor: pointer; width: 100%;
-      box-shadow: 0 2px 12px rgba(90,10,10,0.06); transition: all 0.2s;
+      box-shadow: 0 2px 12px rgba(90,10,10,0.05); transition: all 0.2s;
     }
-    .paket-selector:focus {
-      outline: none; border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(200,160,32,0.15);
-    }
-
-    .form-input {
-      width: 100%; padding: 0.75rem 1rem;
-      border: 1.5px solid #e8e0d4; border-radius: 10px;
-      font-size: 0.875rem; color: var(--dark); background: #fff8f8; outline: none;
-      transition: all 0.2s; font-weight: 600; font-family: 'DM Sans', sans-serif;
-    }
-    .form-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200,160,32,0.12); }
+    .paket-selector:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200,160,32,0.15); }
 
     .btn-green {
       background: linear-gradient(135deg, #16a34a, #14532d);
       color: white; border: none; border-radius: 10px;
-      padding: 0.6rem 1rem; font-family: 'Playfair Display', serif;
-      font-weight: 700; font-size: 0.8rem; cursor: pointer; width: 100%;
-      box-shadow: 0 3px 10px rgba(22,163,74,0.3), 0 4px 0 #0f4022;
-      transition: all 0.15s; position: relative; top: 0; display: block; text-align: center;
+      padding: 0.65rem 1rem; font-family: 'Playfair Display', serif;
+      font-weight: 700; font-size: 0.82rem; cursor: pointer; width: 100%;
+      box-shadow: 0 4px 0 #0f4022; transition: all 0.15s;
+      position: relative; top: 0; display: block; text-align: center;
     }
     .btn-green:hover { filter: brightness(1.08); }
-    .btn-green:active { top: 3px; box-shadow: 0 1px 4px rgba(22,163,74,0.3), 0 1px 0 #0f4022; }
+    .btn-green:active { top: 3px; box-shadow: 0 1px 0 #0f4022; }
 
     .btn-gold {
       background: linear-gradient(135deg, var(--gold), #a88010);
       color: white; border: none; border-radius: 10px;
-      padding: 0.6rem 1rem; font-family: 'Playfair Display', serif;
-      font-weight: 700; font-size: 0.8rem; cursor: pointer; width: 100%;
-      box-shadow: 0 3px 10px rgba(200,160,32,0.3), 0 4px 0 #7a6010;
-      transition: all 0.15s; position: relative; top: 0;
+      padding: 0.65rem 1rem; font-family: 'Playfair Display', serif;
+      font-weight: 700; font-size: 0.82rem; cursor: pointer; width: 100%;
+      box-shadow: 0 4px 0 #7a6010; transition: all 0.15s;
+      position: relative; top: 0;
     }
     .btn-gold:hover { filter: brightness(1.07); }
-    .btn-gold:active { top: 3px; box-shadow: 0 1px 4px rgba(200,160,32,0.3), 0 1px 0 #7a6010; }
+    .btn-gold:active { top: 3px; box-shadow: 0 1px 0 #7a6010; }
 
-    .upload-zone {
-      border: 2px dashed #d4c5a8; border-radius: 12px;
-      padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s;
+    .token-box {
+      background: var(--red-deep); border: 1px solid rgba(200,160,32,0.35);
+      border-radius: 8px; padding: 0.3rem 0.75rem;
+      letter-spacing: 0.12em; display: block; width: 100%; text-align: center;
     }
-    .upload-zone:hover { border-color: var(--gold); background: rgba(200,160,32,0.04); }
+
+    .riwayat-row { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f0e8d8; }
+    .riwayat-row:last-child { border-bottom: none; }
 
     .rank-row { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border-radius: 8px; transition: background 0.15s; }
     .rank-row:hover { background: rgba(200,160,32,0.05); }
@@ -102,23 +85,31 @@
     .user-menu-dropdown { display: none; position: absolute; right: 0; top: calc(100% + 8px); width: 220px; background: white; border-radius: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.07); overflow: hidden; z-index: 100; }
     .user-menu:hover .user-menu-dropdown { display: block; }
 
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem; }
-    .modal-overlay.hidden { display: none; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 1rem; }
 
-    @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    @keyframes fadeUp  { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .upload-zone { border: 2px dashed #d4c5a8; border-radius: 12px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; }
+    .upload-zone:hover { border-color: var(--gold); background: rgba(200,160,32,0.04); }
+
+    @keyframes slideIn { from { transform: translateX(120%); opacity:0; } to { transform: translateX(0); opacity:1; } }
     .toast { animation: slideIn 0.3s ease forwards; }
     .toast.hide { opacity: 0; transition: opacity 0.3s; }
 
     .paket-section { display: none; }
     .paket-section.active { display: block; animation: fadeUp 0.25s ease forwards; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    .grad-0 { background: linear-gradient(135deg,#1a1a2e,#16213e); }
+    .grad-1 { background: linear-gradient(135deg,#0f3a1a,#1a6b2e); }
+    .grad-2 { background: linear-gradient(135deg,#3a0f0f,#6b1a1a); }
+
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
   <!-- ===== TOAST ERROR ===== -->
   <% if (typeof uploadError !== 'undefined' && uploadError) { %>
-  <div id="toast" class="toast fixed top-4 right-4 z-[999] max-w-sm">
+  <div id="toast" class="toast fixed top-4 right-4 z-[9998] max-w-sm">
     <div class="bg-white rounded-xl shadow-2xl p-4 flex items-start gap-3 border-l-4 border-red-500">
       <span class="text-xl">❌</span>
       <div class="flex-1">
@@ -132,7 +123,7 @@
 
   <!-- ===== TOAST SUCCESS ===== -->
   <% if (typeof successMsg !== 'undefined' && successMsg) { %>
-  <div id="toastSuccess" class="toast fixed top-4 right-4 z-[999] max-w-sm">
+  <div id="toastSuccess" class="toast fixed top-4 right-4 z-[9998] max-w-sm">
     <div class="bg-white rounded-xl shadow-2xl p-4 flex items-start gap-3 border-l-4 border-green-500">
       <span class="text-xl">✅</span>
       <div class="flex-1">
@@ -178,7 +169,7 @@
           </div>
         </div>
       </div>
-      <a href="/dashboard" class="md:hidden text-white/60 hover:text-white text-sm">← Beranda</a>
+      <a href="/dashboard" class="md:hidden text-white/60 hover:text-white text-sm font-medium">← Beranda</a>
     </div>
   </nav>
 
@@ -197,7 +188,7 @@
         <!-- ===== KONTEN UTAMA ===== -->
         <div class="lg:col-span-2 space-y-5">
 
-          <!-- DROPDOWN PILIH PAKET -->
+          <!-- Dropdown -->
           <div class="paket-card p-5">
             <label class="block text-[10px] font-bold uppercase tracking-widest mb-2" style="color:var(--muted)">
               📚 Pilih Paket Ujian
@@ -212,40 +203,33 @@
             </select>
           </div>
 
-          <!-- PLACEHOLDER -->
+          <!-- Placeholder -->
           <div id="placeholderPilih" class="paket-card p-12 text-center">
             <p class="text-5xl mb-4">☝️</p>
             <p class="font-display font-bold text-xl">Pilih Paket Dulu</p>
-            <p class="text-sm mt-2" style="color:var(--muted)">Setelah memilih paket di atas, semua 10 Try Out akan ditampilkan di sini.</p>
+            <p class="text-sm mt-2" style="color:var(--muted)">Setelah memilih paket di atas, 10 Try Out akan muncul di sini.</p>
           </div>
 
           <!-- ===== SECTION PER PAKET ===== -->
           <% if (typeof paketList !== 'undefined') { %>
           <% paketList.forEach((paket, idx) => {
                const sectionId = 'section-' + paket.key.replace(/\//g, '-').replace(/\s+/g, '_');
-               const gradients = [
-                 'linear-gradient(135deg,#1a1a2e,#16213e)',
-                 'linear-gradient(135deg,#0f3a1a,#1a6b2e)',
-                 'linear-gradient(135deg,#3a0f0f,#6b1a1a)'
-               ];
-               const grad = gradients[idx % 3];
-
-               // Hitung TO yang LUNAS untuk paket ini
                let lunasCount = 0;
                for (let t = 1; t <= 10; t++) {
-                 if (paymentMap[paket.key + '_' + t] && paymentMap[paket.key + '_' + t].status === 'LUNAS') lunasCount++;
+                 const mk = paket.key + '_' + t;
+                 if (paymentMap[mk] && paymentMap[mk].status === 'LUNAS') lunasCount++;
                }
           %>
           <div id="<%= sectionId %>" class="paket-section space-y-4">
 
-            <!-- Info header paket -->
+            <!-- Header info paket -->
             <div class="paket-card overflow-hidden">
-              <div class="p-5 text-white" style="background:<%= grad %>">
+              <div class="p-5 text-white grad-<%= idx % 3 %>">
                 <div class="flex items-center justify-between">
                   <div>
                     <p class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Paket Aktif</p>
                     <h2 class="font-display font-bold text-2xl"><%= paket.label %></h2>
-                    <p class="text-xs text-white/60 mt-1">⏱ Durasi <%= paket.durasi %> menit per sesi ujian</p>
+                    <p class="text-xs text-white/60 mt-1">⏱ Durasi <%= paket.durasi %> menit per sesi</p>
                   </div>
                   <% if (lunasCount > 0) { %>
                   <div class="text-center px-5 py-3 rounded-2xl" style="background:rgba(255,255,255,0.1)">
@@ -257,104 +241,85 @@
               </div>
             </div>
 
-            <!-- Grid 10 TO cards -->
+            <!-- Grid 10 TO -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <% for (let toNum = 1; toNum <= 10; toNum++) {
-                   const mapKey  = paket.key + '_' + toNum;
-                   const payment = paymentMap[mapKey] || null;
-                   const status  = payment ? payment.status : 'KOSONG';
-                   const cardClass = status === 'LUNAS' ? 'to-card-lunas' :
-                                     status === 'PENDING' ? 'to-card-pending' :
-                                     status === 'DITOLAK' ? 'to-card-ditolak' : 'to-card-kosong';
+              <% for (let i = 1; i <= 10; i++) {
+                   const key    = paket.key + '_' + i;
+                   const pay    = paymentMap[key] || null;
+                   const status = pay ? pay.status : 'KOSONG';
+                   const cardCls = status==='LUNAS'   ? 'to-card-lunas'   :
+                                   status==='PENDING' ? 'to-card-pending' :
+                                   status==='DITOLAK' ? 'to-card-ditolak' : 'to-card-kosong';
               %>
+              <div class="paket-card border-2 p-4 <%= cardCls %>">
 
-              <div class="rounded-2xl border-2 p-4 transition-all <%= cardClass %>">
-
-                <!-- Row: nomor + badge status -->
+                <!-- Header TO -->
                 <div class="flex items-center justify-between mb-3">
                   <div class="flex items-center gap-2.5">
                     <div class="w-10 h-10 rounded-xl flex items-center justify-center font-display font-black text-base text-white flex-shrink-0"
-                      style="background:<%= status === 'LUNAS' ? '#16a34a' : status === 'PENDING' ? '#a16207' : status === 'DITOLAK' ? '#b91c1c' : 'var(--muted)' %>">
-                      <%= toNum %>
+                      style="background:<%= status==='LUNAS'?'#16a34a':status==='PENDING'?'#a16207':status==='DITOLAK'?'#b91c1c':'var(--muted)' %>">
+                      <%= i %>
                     </div>
                     <div>
-                      <p class="text-sm font-bold leading-tight" style="color:var(--dark)">Try Out #<%= toNum %></p>
-                      <p class="text-[10px]" style="color:var(--muted)"><%= paket.durasi %> mnt</p>
+                      <p class="text-sm font-bold leading-tight" style="color:var(--dark)">Try Out #<%= i %></p>
+                      <p class="text-[10px]" style="color:var(--muted)"><%= paket.durasi %> menit</p>
                     </div>
                   </div>
                   <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full"
-                    style="<%= status === 'LUNAS'   ? 'background:rgba(22,163,74,0.12);color:#15803d'   :
-                               status === 'PENDING' ? 'background:rgba(234,179,8,0.15);color:#a16207'  :
-                               status === 'DITOLAK' ? 'background:rgba(220,38,38,0.12);color:#b91c1c'  :
-                                                      'background:#f0e8d8;color:var(--muted)' %>">
-                    <%= status === 'LUNAS' ? '✅ Aktif' : status === 'PENDING' ? '⏳ Proses' : status === 'DITOLAK' ? '❌ Ditolak' : '— Beli' %>
+                    style="<%= status==='LUNAS'  ?'background:rgba(22,163,74,0.12);color:#15803d':
+                               status==='PENDING'?'background:rgba(234,179,8,0.15);color:#a16207':
+                               status==='DITOLAK'?'background:rgba(220,38,38,0.12);color:#b91c1c':
+                                                  'background:#f0e8d8;color:var(--muted)' %>">
+                    <%= status==='LUNAS'?'✅ Aktif':status==='PENDING'?'⏳ Proses':status==='DITOLAK'?'❌ Ditolak':'— Beli' %>
                   </span>
                 </div>
 
-                <!-- Token (hanya jika LUNAS) -->
-                <% if (status === 'LUNAS' && payment.token_ujian) { %>
+                <!-- Token jika LUNAS -->
+                <% if (status === 'LUNAS' && pay.token_ujian) { %>
                 <div class="mb-3">
                   <div class="token-box">
-                    <span class="font-display font-black text-sm" style="color:var(--gold)"><%= payment.token_ujian %></span>
+                    <span class="font-display font-black text-sm" style="color:var(--gold)"><%= pay.token_ujian %></span>
                   </div>
                 </div>
                 <% } %>
 
                 <!-- Aksi -->
                 <% if (status === 'LUNAS') { %>
-
                   <% if (user.status_ujian === 'SEDANG_UJIAN') { %>
                     <a href="/ujian/soal/1" class="btn-green">▶️ Lanjutkan Ujian</a>
                   <% } else { %>
                     <form action="/ujian/mulai" method="POST" class="confirm-mulai">
                       <input type="hidden" name="paket_pilihan" value="<%= paket.key %>">
-                      <input type="hidden" name="nomor_to"      value="<%= toNum %>">
+                      <input type="hidden" name="nomor_to"      value="<%= i %>">
                       <button type="submit" class="btn-green">🚀 Mulai Ujian</button>
                     </form>
-                    <a href="/ujian/review?nomor_to=<%= toNum %>"
+                    <a href="/ujian/review?nomor_to=<%= i %>"
                       class="block text-center text-[10px] font-semibold mt-2"
-                      style="color:var(--muted)">
-                      📝 Lihat Review Jawaban
-                    </a>
+                      style="color:var(--muted)">📝 Lihat Review Jawaban</a>
                   <% } %>
 
                 <% } else if (status === 'PENDING') { %>
-
                   <div class="rounded-xl p-2.5 text-center" style="background:rgba(234,179,8,0.08)">
                     <p class="text-[11px] font-semibold" style="color:#a16207">⏳ Menunggu verifikasi</p>
                     <p class="text-[10px] mt-0.5" style="color:var(--muted)">Proses 1×24 jam</p>
                   </div>
 
-                <% } else if (status === 'DITOLAK') { %>
-
-                  <button type="button"
-                    class="open-upload-modal btn-gold"
-                    data-paket="<%= paket.key %>"
-                    data-label="<%= paket.label %>"
-                    data-nomor-to="<%= toNum %>">
-                    🔄 Upload Ulang Bukti
-                  </button>
-
                 <% } else { %>
-
+                  <!-- KOSONG / DITOLAK: tombol buka modal upload -->
                   <button type="button"
                     class="open-upload-modal btn-gold"
                     data-paket="<%= paket.key %>"
                     data-label="<%= paket.label %>"
-                    data-nomor-to="<%= toNum %>">
-                    💳 Beli TO ini
+                    data-to="<%= i %>">
+                    <%= status === 'DITOLAK' ? '🔄 Upload Ulang' : '💳 Beli TO ini' %>
                   </button>
-
                 <% } %>
 
               </div>
-              <% } /* end for toNum */ %>
+              <% } /* end for */ %>
             </div>
-            <!-- /grid TO -->
 
           </div>
-          <!-- /paket-section -->
-
           <% }) %>
           <% } %>
 
@@ -414,8 +379,7 @@
               </div>
               <div class="flex justify-between py-2 border-b" style="border-color:#f0e8d8">
                 <span style="color:var(--muted)">Status Ujian</span>
-                <span class="font-bold text-[10px] uppercase
-                  <%= user.status_ujian === 'SEDANG_UJIAN' ? 'text-yellow-600' : '' %>">
+                <span class="font-bold text-[10px] uppercase <%= user.status_ujian==='SEDANG_UJIAN'?'text-yellow-600':'' %>">
                   <%= user.status_ujian || 'IDLE' %>
                 </span>
               </div>
@@ -433,8 +397,7 @@
             <div class="flex items-center justify-between mb-3">
               <h3 class="font-display font-bold text-base">📜 Riwayat Ujian</h3>
               <% if (typeof riwayatUjian !== 'undefined' && riwayatUjian.length > 0) { %>
-              <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-full"
-                style="background:rgba(184,146,74,0.1);color:var(--gold)">
+              <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-full" style="background:rgba(184,146,74,0.1);color:var(--gold)">
                 <%= riwayatUjian.length %> Sesi
               </span>
               <% } %>
@@ -451,7 +414,7 @@
                   </div>
                   <div class="text-right">
                     <span class="font-black font-mono"
-                      style="color:<%= r.skor >= 70 ? '#16a34a' : r.skor >= 50 ? 'var(--gold)' : '#b91c1c' %>">
+                      style="color:<%= r.skor>=70?'#16a34a':r.skor>=50?'var(--gold)':'#b91c1c' %>">
                       <%= r.skor %>
                     </span>
                     <p style="color:var(--muted)" class="text-[9px]">
@@ -489,28 +452,32 @@
   <!-- ===== MODAL UPLOAD BUKTI ===== -->
   <div id="uploadModal" class="modal-overlay hidden">
     <div class="bg-white rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl">
+
+      <!-- Header -->
       <div class="p-5 text-white flex justify-between items-start" style="background:linear-gradient(135deg,#3a0f0f,#6b1a1a)">
         <div>
-          <h3 class="font-display font-bold text-lg">💳 Upload Bukti Pembayaran</h3>
-          <p class="text-xs opacity-60" id="modalSubtitle">—</p>
+          <h3 class="font-display font-bold text-lg">💳 Upload Bukti Bayar</h3>
+          <p class="text-xs opacity-60" id="mSubtitle">—</p>
         </div>
-        <button id="closeModal" class="text-white/50 hover:text-white text-xl leading-none cursor-pointer mt-0.5">×</button>
+        <button onclick="closeModal()" class="text-white/50 hover:text-white text-2xl font-bold leading-none cursor-pointer mt-0.5">×</button>
       </div>
 
-      <form action="/users/upload-bukti" method="POST" enctype="multipart/form-data" class="p-5 space-y-4">
-        <input type="hidden" name="paket_pilihan" id="modalPaketInput">
-        <input type="hidden" name="nomor_to"      id="modalNomorToInput">
+      <!-- Form — field name harus sesuai route: paket_pilihan + nomor_to + bukti -->
+      <form action="/upload-bukti" method="POST" enctype="multipart/form-data" class="p-5 space-y-4" id="formUploadMain">
+        <input type="hidden" name="paket_pilihan" id="mPaket">
+        <input type="hidden" name="nomor_to"      id="mTo">
 
-        <!-- Info TO yang dibeli (readonly, sudah dikunci dari tombol) -->
+        <!-- Info TO yang dipilih -->
         <div class="flex items-center gap-3 p-3 rounded-xl" style="background:rgba(184,146,74,0.07); border:1px solid rgba(184,146,74,0.15)">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center font-display font-black text-white flex-shrink-0" style="background:var(--gold)" id="modalToNumBadge">—</div>
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center font-display font-black text-lg text-white flex-shrink-0"
+            style="background:var(--gold)" id="mToBadge">—</div>
           <div>
-            <p class="text-xs font-bold" style="color:var(--dark)" id="modalPaketLabel">—</p>
-            <p class="text-[10px]" style="color:var(--muted)" id="modalToLabel">Try Out #—</p>
+            <p class="text-xs font-bold"  style="color:var(--dark)"  id="mPaketLabel">—</p>
+            <p class="text-[10px]"        style="color:var(--muted)" id="mToLabel">Try Out #—</p>
           </div>
         </div>
 
-        <!-- Harga & rekening -->
+        <!-- Rekening -->
         <div class="grid grid-cols-2 gap-2 text-center">
           <div class="p-2.5 rounded-xl" style="background:rgba(184,146,74,0.07); border:1px solid rgba(184,146,74,0.15)">
             <p class="text-[10px]" style="color:var(--muted)">Biaya</p>
@@ -523,153 +490,140 @@
           </div>
         </div>
 
-        <!-- Drop zone -->
+        <!-- Upload zone — klik area mana pun trigger input file -->
         <div>
           <label class="block text-[10px] font-bold uppercase tracking-widest mb-1.5" style="color:var(--muted)">Bukti Transfer</label>
-          <div id="dropZone" class="upload-zone" onclick="document.getElementById('buktiInput').click()">
-            <input type="file" id="buktiInput" name="bukti" accept="image/jpeg,image/png,image/jpg" class="hidden">
-            <div id="dropContent">
-              <p class="text-3xl mb-2">📎</p>
-              <p class="text-xs font-semibold" style="color:var(--dark)">Klik atau drag & drop foto bukti</p>
+          <div class="upload-zone" id="dropZoneArea">
+            <input type="file" name="bukti" id="fileInp" class="hidden" accept=".jpg,.jpeg,.png">
+
+            <div id="promptUpload" class="pointer-events-none">
+              <p class="text-3xl mb-2">🖼️</p>
+              <p class="text-xs font-semibold" style="color:var(--dark)">Klik untuk pilih foto bukti</p>
               <p class="text-[10px] mt-1" style="color:var(--muted)">JPG / PNG · Maks 2MB</p>
             </div>
-            <div id="filePreview" class="hidden">
-              <img id="previewImg" src="" alt="Preview" class="max-h-32 mx-auto rounded-lg object-contain mb-2">
-              <p id="fileName" class="text-xs font-semibold truncate" style="color:var(--dark)"></p>
-              <p id="fileSize" class="text-[10px]" style="color:var(--muted)"></p>
-              <button type="button" id="gantiBtn"
-                class="mt-2 text-[10px] font-bold px-3 py-1 rounded-full"
-                style="background:rgba(220,38,38,0.1); color:#b91c1c">
-                ✕ Ganti Foto
-              </button>
+
+            <div id="previewArea" class="hidden pointer-events-none">
+              <img id="imgPrev" class="max-h-32 mx-auto rounded-lg object-contain shadow-sm mb-2" src="" alt="preview">
+              <p id="fileNameDisplay" class="text-[10px] text-center font-mono truncate" style="color:var(--muted)"></p>
             </div>
           </div>
-          <div id="fileError" class="hidden mt-2 p-2.5 rounded-lg" style="background:rgba(220,38,38,0.07); border:1px solid rgba(220,38,38,0.2)">
-            <p id="fileErrorText" class="text-[11px] font-semibold" style="color:#b91c1c"></p>
-          </div>
+
+          <p id="errTxt" class="hidden text-[11px] text-red-600 font-bold mt-2 p-2.5 rounded-lg text-center"
+            style="background:rgba(220,38,38,0.07); border:1px solid rgba(220,38,38,0.2)"></p>
         </div>
 
-        <button type="submit" id="submitUpload" disabled
-          class="btn-gold" style="opacity:0.5; cursor:not-allowed;">
-          📤 Kirim Bukti Pembayaran
+        <button type="submit" id="btnSub" disabled
+          class="btn-gold opacity-50 cursor-not-allowed uppercase text-xs tracking-widest">
+          📤 Kirim Bukti Sekarang
         </button>
       </form>
     </div>
   </div>
 
   <script>
-    // ── Dropdown paket ──
-    const dropdown    = document.getElementById('paketDropdown');
-    const placeholder = document.getElementById('placeholderPilih');
-    const allSections = document.querySelectorAll('.paket-section');
-
-    dropdown.addEventListener('change', () => {
-      const val = dropdown.value;
-      placeholder.style.display = val ? 'none' : 'block';
-      allSections.forEach(s => s.classList.remove('active'));
-      if (!val) return;
-      // Konversi key ke section id: '/' → '-', spasi → '_'
-      const id = 'section-' + val.replace(/\//g, '-').replace(/\s+/g, '_');
-      const target = document.getElementById(id);
-      if (target) target.classList.add('active');
-    });
-
     // ── Toast ──
-    function autoHide(id) {
+    ['toast','toastSuccess'].forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
       setTimeout(() => { el.classList.add('hide'); setTimeout(() => el.remove(), 300); }, 4500);
-    }
-    autoHide('toast');
-    autoHide('toastSuccess');
-    const closeToastBtn = document.getElementById('closeToast');
-    if (closeToastBtn) closeToastBtn.addEventListener('click', () => {
+    });
+    const ctb = document.getElementById('closeToast');
+    if (ctb) ctb.addEventListener('click', () => {
       const el = document.getElementById('toast');
       if (el) { el.classList.add('hide'); setTimeout(() => el.remove(), 300); }
     });
 
-    // ── Modal Upload ──
-    const uploadModal      = document.getElementById('uploadModal');
-    const closeModalBtn    = document.getElementById('closeModal');
-    const modalPaket       = document.getElementById('modalPaketInput');
-    const modalNomorTo     = document.getElementById('modalNomorToInput');
-    const modalSubtitle    = document.getElementById('modalSubtitle');
-    const modalToNumBadge  = document.getElementById('modalToNumBadge');
-    const modalPaketLabel  = document.getElementById('modalPaketLabel');
-    const modalToLabel     = document.getElementById('modalToLabel');
+    // ── Dropdown paket ──
+    const dp = document.getElementById('paketDropdown');
+    const ph = document.getElementById('placeholderPilih');
+    dp.addEventListener('change', () => {
+      ph.style.display = dp.value ? 'none' : 'block';
+      document.querySelectorAll('.paket-section').forEach(s => s.classList.remove('active'));
+      if (!dp.value) return;
+      const id = 'section-' + dp.value.replace(/\//g, '-').replace(/\s+/g, '_');
+      const t  = document.getElementById(id);
+      if (t) t.classList.add('active');
+    });
+
+    // ── Modal ──
+    const modal = document.getElementById('uploadModal');
+
+    function closeModal() { modal.classList.add('hidden'); }
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
     document.querySelectorAll('.open-upload-modal').forEach(btn => {
       btn.addEventListener('click', () => {
-        const paket   = btn.dataset.paket;
-        const label   = btn.dataset.label;
-        const nomorTo = btn.dataset.nomorTo;
+        const paket = btn.dataset.paket;
+        const label = btn.dataset.label;
+        const to    = btn.dataset.to;
 
-        modalPaket.value          = paket;
-        modalNomorTo.value        = nomorTo;
-        modalSubtitle.textContent = label + ' · TO #' + nomorTo;
-        modalToNumBadge.textContent = nomorTo;
-        modalPaketLabel.textContent = label;
-        modalToLabel.textContent    = 'Try Out #' + nomorTo;
+        document.getElementById('mPaket').value         = paket;
+        document.getElementById('mTo').value            = to;
+        document.getElementById('mSubtitle').textContent  = label + ' · TO #' + to;
+        document.getElementById('mToBadge').textContent   = to;
+        document.getElementById('mPaketLabel').textContent = label;
+        document.getElementById('mToLabel').textContent   = 'Try Out #' + to;
 
-        resetUpload();
-        uploadModal.classList.remove('hidden');
+        resetForm();
+        modal.classList.remove('hidden');
       });
     });
 
-    closeModalBtn.addEventListener('click', () => uploadModal.classList.add('hidden'));
-    uploadModal.addEventListener('click', e => { if (e.target === uploadModal) uploadModal.classList.add('hidden'); });
+    // ── Upload logic (dari kode yang terbukti jalan) ──
+    const zone   = document.getElementById('dropZoneArea');
+    const input  = document.getElementById('fileInp');
+    const btnSub = document.getElementById('btnSub');
+    const errTxt = document.getElementById('errTxt');
 
-    // ── File upload ──
-    const MAX_SIZE   = 2 * 1024 * 1024;
-    const ALLOWED    = ['image/jpeg', 'image/png', 'image/jpg'];
-    const buktiInput = document.getElementById('buktiInput');
-    const dropZone   = document.getElementById('dropZone');
-    const submitBtn  = document.getElementById('submitUpload');
-    const gantiBtn   = document.getElementById('gantiBtn');
+    // Klik di area manapun di zona → trigger input file
+    zone.addEventListener('click', () => input.click());
 
-    buktiInput.addEventListener('change', () => {
-      if (buktiInput.files[0]) validateAndPreview(buktiInput.files[0]);
-    });
-    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = 'var(--gold)'; });
-    dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = '#d4c5a8'; });
-    dropZone.addEventListener('drop', e => {
-      e.preventDefault(); dropZone.style.borderColor = '#d4c5a8';
-      const file = e.dataTransfer.files[0]; if (!file) return;
-      const dt = new DataTransfer(); dt.items.add(file); buktiInput.files = dt.files;
-      validateAndPreview(file);
-    });
-    gantiBtn.addEventListener('click', e => { e.stopPropagation(); resetUpload(); });
+    input.addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
 
-    function validateAndPreview(file) {
-      document.getElementById('fileError').classList.add('hidden');
-      if (!ALLOWED.includes(file.type)) return showFileError('Format tidak didukung! Gunakan JPG atau PNG.');
-      if (file.size > MAX_SIZE) return showFileError('File terlalu besar! Maksimal 2MB.');
+      // Blokir double extension (misal: shell.php.jpg)
+      const parts = file.name.toLowerCase().split('.');
+      const ext   = parts.pop();
+      if (!['jpg','jpeg','png'].includes(ext) || parts.length > 1) {
+        showError('🚨 Format ditolak! Harus .jpg atau .png murni.');
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        showError('❌ Ukuran terlalu besar! Maks 2MB.');
+        return;
+      }
+
+      // File valid → aktifkan tombol + tampilkan preview
+      errTxt.classList.add('hidden');
+      btnSub.disabled = false;
+      btnSub.classList.remove('opacity-50', 'cursor-not-allowed');
+
       const reader = new FileReader();
-      reader.onload = ev => {
-        document.getElementById('previewImg').src       = ev.target.result;
-        document.getElementById('fileName').textContent = file.name;
-        document.getElementById('fileSize').textContent = (file.size / 1024).toFixed(0) + ' KB';
-        document.getElementById('dropContent').classList.add('hidden');
-        document.getElementById('filePreview').classList.remove('hidden');
-        submitBtn.disabled = false;
-        submitBtn.style.opacity = '1';
-        submitBtn.style.cursor  = 'pointer';
+      reader.onload = e => {
+        document.getElementById('imgPrev').src             = e.target.result;
+        document.getElementById('fileNameDisplay').innerText = file.name;
+        document.getElementById('promptUpload').classList.add('hidden');
+        document.getElementById('previewArea').classList.remove('hidden');
       };
       reader.readAsDataURL(file);
+    });
+
+    function showError(msg) {
+      errTxt.innerText = msg;
+      errTxt.classList.remove('hidden');
+      input.value = '';
+      btnSub.disabled = true;
+      btnSub.classList.add('opacity-50', 'cursor-not-allowed');
     }
-    function showFileError(msg) {
-      document.getElementById('fileErrorText').textContent = msg;
-      document.getElementById('fileError').classList.remove('hidden');
-      resetUpload();
-    }
-    function resetUpload() {
-      buktiInput.value = '';
-      document.getElementById('dropContent').classList.remove('hidden');
-      document.getElementById('filePreview').classList.add('hidden');
-      document.getElementById('fileError').classList.add('hidden');
-      submitBtn.disabled      = true;
-      submitBtn.style.opacity = '0.5';
-      submitBtn.style.cursor  = 'not-allowed';
+
+    function resetForm() {
+      document.getElementById('formUploadMain').reset();
+      document.getElementById('promptUpload').classList.remove('hidden');
+      document.getElementById('previewArea').classList.add('hidden');
+      errTxt.classList.add('hidden');
+      btnSub.disabled = true;
+      btnSub.classList.add('opacity-50', 'cursor-not-allowed');
     }
 
     // ── Confirm mulai ujian ──
