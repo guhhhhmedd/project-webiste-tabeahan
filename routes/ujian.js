@@ -2,23 +2,17 @@ const express = require("express");
 const router  = express.Router();
 const db      = require("../config/db");
 
-// ─────────────────────────────────────────────
 // MIDDLEWARE
-// ─────────────────────────────────────────────
-
-// Cek user sedang ujian (ada session ujian)
 function isSedangUjian(req, res, next) {
   if (req.session.ujian) return next();
   res.redirect("/dashboardPembayaranUjian");
 }
 
-// Cek role admin
 function isAdmin(req, res, next) {
   if (req.session.user && req.session.user.role === "admin") return next();
   res.status(403).send("Akses Ditolak: Hanya Admin yang bisa mereset ujian!");
 }
 
-// Cek sudah login + sync data user dari DB
 async function isLogin(req, res, next) {
   if (!req.session.user) return res.redirect("/login");
   try {
@@ -37,17 +31,12 @@ async function isLogin(req, res, next) {
   }
 }
 
-// ─────────────────────────────────────────────
 // POST /ujian/mulai
-// Dipanggil dari dashboard saat user klik "Mulai Ujian TO #X"
-// Syarat: payment status LUNAS untuk paket + nomor_to tersebut
-// ─────────────────────────────────────────────
 router.post("/mulai", isLogin, async (req, res) => {
   const { paket_pilihan, nomor_to } = req.body;
   const userId = req.session.user.id;
 
   try {
-    // 1. Cek payment LUNAS untuk TO ini
     const [payment] = await db.query(
       `SELECT id FROM payments
        WHERE user_id = ? AND TRIM(paket) = TRIM(?) AND nomor_to = ? AND UPPER(status) = 'LUNAS'`,
@@ -61,7 +50,6 @@ router.post("/mulai", isLogin, async (req, res) => {
       </script>`);
     }
 
-    // 2. Cek soal tersedia untuk TO ini
     const [soalCheck] = await db.query(
       "SELECT COUNT(*) AS total FROM questions WHERE TRIM(paket) = TRIM(?) AND nomor_to = ? AND is_active = 1",
       [paket_pilihan, nomor_to]
@@ -74,15 +62,12 @@ router.post("/mulai", isLogin, async (req, res) => {
       </script>`);
     }
 
-    // 3. Ambil durasi dari konfigurasi paket
     const [config] = await db.query(
       "SELECT durasi_menit FROM paket_ujian WHERE TRIM(nama_paket) = TRIM(?)",
       [paket_pilihan]
     );
     const durasiMs = (config[0]?.durasi_menit || 100) * 60 * 1000;
 
-    // 4. Buat session ujian
-    // soalIds tidak disimpan di sini — diambil fresh dari DB saat render
     req.session.ujian = {
       paymentId: payment[0].id,
       paket:     paket_pilihan,
@@ -92,7 +77,6 @@ router.post("/mulai", isLogin, async (req, res) => {
       durasiMs:  durasiMs,
     };
 
-    // 5. Update status user jadi SEDANG_UJIAN
     await db.query(
       "UPDATE users SET status_ujian = 'SEDANG_UJIAN' WHERE id = ?",
       [userId]
@@ -105,21 +89,15 @@ router.post("/mulai", isLogin, async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────
 // GET /ujian/soal/:index
-// Render SEMUA soal sekaligus — navigasi via JS (show/hide)
-// :index hanya dipakai sebagai entry point (misal /soal/1)
-// ─────────────────────────────────────────────
 router.get("/soal/:index", isLogin, isSedangUjian, async (req, res) => {
   const sesi = req.session.ujian;
 
-  // Cek waktu habis
   if (Date.now() - sesi.startTime >= sesi.durasiMs) {
     return res.redirect("/ujian/selesai-paksa");
   }
 
   try {
-    // Ambil semua soal untuk paket + TO ini, urut by nomor_urut
     const [soalRows] = await db.query(
       `SELECT * FROM questions
        WHERE TRIM(paket) = TRIM(?) AND nomor_to = ? AND is_active = 1
@@ -135,8 +113,8 @@ router.get("/soal/:index", isLogin, isSedangUjian, async (req, res) => {
     }
 
     res.render("ujian-soal", {
-      soal:       soalRows,       // array semua soal — EJS pakai soal.forEach()
-      jawaban:    sesi.jawaban,   // jawaban yang sudah disimpan (untuk restore)
+      soal:       soalRows,       
+      jawaban:    sesi.jawaban,   
       waktuMulai: sesi.startTime,
       durasiMs:   sesi.durasiMs,
       paket:      sesi.paket,
@@ -149,16 +127,11 @@ router.get("/soal/:index", isLogin, isSedangUjian, async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────
 // POST /ujian/simpan-jawaban
-// AJAX — dipanggil setiap user pilih opsi jawaban
-// Body: { questionId, jawaban } sebagai JSON
-// ─────────────────────────────────────────────
 router.post("/simpan-jawaban", isLogin, isSedangUjian, async (req, res) => {
   const sesi = req.session.ujian;
   const { questionId, jawaban } = req.body;
 
-  // Cek waktu habis
   if (Date.now() - sesi.startTime >= sesi.durasiMs) {
     return res.json({ ok: false, expired: true });
   }
@@ -172,35 +145,26 @@ router.post("/simpan-jawaban", isLogin, isSedangUjian, async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────
 // POST /ujian/selesai
-// Dipanggil dari tombol "Kumpulkan" via fetch
-// ─────────────────────────────────────────────
 router.post("/selesai", isLogin, async (req, res) => {
   if (!req.session.ujian)
     return res.json({ ok: false, redirect: "/dashboardPembayaranUjian" });
   await hitungDanSimpanSkor(req, res, true);
 });
 
-// ─────────────────────────────────────────────
 // GET /ujian/selesai-paksa
-// Dipanggil otomatis jika waktu habis
-// ─────────────────────────────────────────────
 router.get("/selesai-paksa", isLogin, async (req, res) => {
   if (!req.session.ujian)
     return res.redirect("/dashboardPembayaranUjian");
   await hitungDanSimpanSkor(req, res, false);
 });
 
-// ─────────────────────────────────────────────
 // HITUNG & SIMPAN SKOR
-// ─────────────────────────────────────────────
 async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
   const sesi   = req.session.ujian;
   const userId = req.session.user.id;
 
   try {
-    // Ambil semua soal + kunci jawaban untuk TO ini
     const [soalRows] = await db.query(
       `SELECT id, kunci FROM questions
        WHERE TRIM(paket) = TRIM(?) AND nomor_to = ? AND is_active = 1`,
@@ -210,7 +174,6 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
     let benar = 0;
     const jawabanUserSesi = sesi.jawaban;
 
-    // Simpan semua jawaban + hitung skor
     const simpanPromises = soalRows.map((s) => {
       const jawabanUser = jawabanUserSesi[s.id] || null;
       if (jawabanUser && jawabanUser === s.kunci) benar++;
@@ -228,27 +191,23 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
     const totalSoal = soalRows.length;
     const skor      = totalSoal > 0 ? Math.round((benar / totalSoal) * 100) : 0;
 
-    // Simpan riwayat + update status payment & user
     await Promise.all([
       db.query(
         `INSERT INTO riwayat_ujian (user_id, paket, nomor_to, skor, jml_benar, jml_soal, tgl_selesai)
          VALUES (?, ?, ?, ?, ?, ?, NOW())`,
         [userId, sesi.paket, sesi.nomorTO, skor, benar, totalSoal]
       ),
-      // Status payment → SELESAI (user tidak bisa ujian TO ini lagi)
       db.query(
         `UPDATE payments SET status = 'SELESAI'
          WHERE user_id = ? AND TRIM(paket) = TRIM(?) AND nomor_to = ? AND UPPER(status) = 'LUNAS'`,
         [userId, sesi.paket, sesi.nomorTO]
       ),
-      // Status user kembali IDLE
       db.query(
         "UPDATE users SET status_ujian = 'IDLE' WHERE id = ?",
         [userId]
       ),
     ]);
 
-    // Hapus session ujian
     delete req.session.ujian;
 
     req.session.save(() => {
@@ -262,10 +221,7 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
   }
 }
 
-// ─────────────────────────────────────────────
 // POST /ujian/reset-ujian (admin only)
-// Reset TO tertentu: payment kembali LUNAS + hapus jawaban lama
-// ─────────────────────────────────────────────
 router.post("/reset-ujian", isLogin, isAdmin, async (req, res) => {
   const { userIdTarget, paket_pilihan, nomor_to } = req.body;
 
@@ -296,10 +252,7 @@ router.post("/reset-ujian", isLogin, isAdmin, async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────
 // GET /ujian/hasil
-// Tampilkan hasil ujian terakhir
-// ─────────────────────────────────────────────
 router.get("/hasil", isLogin, async (req, res) => {
   try {
     const userId = req.session.user.id;
@@ -325,10 +278,7 @@ router.get("/hasil", isLogin, async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────
 // GET /ujian/review?nomor_to=X
-// Review jawaban per TO yang sudah selesai
-// ─────────────────────────────────────────────
 router.get("/review", isLogin, async (req, res) => {
   const { nomor_to, paket } = req.query;
   const userId = req.session.user.id;
@@ -368,7 +318,6 @@ router.get("/review", isLogin, async (req, res) => {
     const totalSalah = totalSoal - totalBenar;
     const skor       = Math.round((totalBenar / totalSoal) * 100);
 
-    // Ambil riwayat ujian untuk TO ini
     const [riwayat] = await db.query(
       "SELECT * FROM riwayat_ujian WHERE user_id = ? AND nomor_to = ? ORDER BY tgl_selesai DESC LIMIT 1",
       [userId, nomor_to]

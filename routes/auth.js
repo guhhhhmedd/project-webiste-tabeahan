@@ -3,8 +3,7 @@ const router = express.Router();
 const db = require("../config/db");
 const rateLimit = require("express-rate-limit");
 
-// Rate limiter login
-
+// limiter login
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
@@ -21,7 +20,7 @@ const loginLimiter = rateLimit({
     });
   },
 });
-// Rate limiter register
+// limiter register
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 10,
@@ -57,7 +56,7 @@ router.post("/login", loginLimiter, async (req, res) => {
       });
     }
     const user = rows[0];
-    const userRole = user.role.toLowerCase(); // Kita kecilin semua hurufnya
+    const userRole = user.role.toLowerCase(); 
 
     req.session.user = {
       id: user.id,
