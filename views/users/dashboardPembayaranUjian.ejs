@@ -217,7 +217,7 @@
                let lunasCount = 0;
                for (let t = 1; t <= 10; t++) {
                  const mk = paket.key + '_' + t;
-                 if (paymentMap[mk] && paymentMap[mk].status === 'LUNAS') lunasCount++;
+                 if (paymentMap[mk] && paymentMap[mk].status.toUpperCase() === 'LUNAS') lunasCount++;
                }
           %>
           <div id="<%= sectionId %>" class="paket-section space-y-4">
@@ -246,7 +246,7 @@
               <% for (let i = 1; i <= 10; i++) {
                    const key    = paket.key + '_' + i;
                    const pay    = paymentMap[key] || null;
-                   const status = pay ? pay.status : 'KOSONG';
+                   const status = pay ? pay.status.toUpperCase() : 'KOSONG';
                    const cardCls = status==='LUNAS'   ? 'to-card-lunas'   :
                                    status==='PENDING' ? 'to-card-pending' :
                                    status==='DITOLAK' ? 'to-card-ditolak' : 'to-card-kosong';
@@ -286,14 +286,16 @@
                 <!-- Aksi -->
                 <% if (status === 'LUNAS') { %>
                   <% if (user.status_ujian === 'SEDANG_UJIAN') { %>
+                    <%# User sedang ujian — hanya tampilkan tombol lanjut, jangan bisa mulai TO lain %>
                     <a href="/ujian/soal/1" class="btn-green">▶️ Lanjutkan Ujian</a>
+                    <p class="text-[10px] text-center mt-1.5" style="color:var(--muted)">Selesaikan ujian aktifmu dulu</p>
                   <% } else { %>
                     <form action="/ujian/mulai" method="POST" class="confirm-mulai">
                       <input type="hidden" name="paket_pilihan" value="<%= paket.key %>">
                       <input type="hidden" name="nomor_to"      value="<%= i %>">
-                      <button type="submit" class="btn-green">🚀 Mulai Ujian</button>
+                      <button type="submit" class="btn-green">🚀 Mulai Ujian TO #<%= i %></button>
                     </form>
-                    <a href="/ujian/review?nomor_to=<%= i %>"
+                    <a href="/ujian/review?nomor_to=<%= i %>&paket=<%= encodeURIComponent(paket.key) %>"
                       class="block text-center text-[10px] font-semibold mt-2"
                       style="color:var(--muted)">📝 Lihat Review Jawaban</a>
                   <% } %>
@@ -420,7 +422,7 @@
                     <p style="color:var(--muted)" class="text-[9px]">
                       <%= r.tgl_selesai ? new Date(r.tgl_selesai).toLocaleDateString('id-ID',{day:'2-digit',month:'short'}) : '-' %>
                     </p>
-                    <a href="/ujian/review?nomor_to=<%= r.nomor_to %>"
+                    <a href="/ujian/review?nomor_to=<%= r.nomor_to %>&paket=<%= encodeURIComponent(r.paket) %>"
                       class="text-[9px] font-semibold" style="color:var(--muted)">📝 review</a>
                   </div>
                 </div>

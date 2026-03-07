@@ -90,7 +90,7 @@ router.get("/dashboardAdmin", isAdmin, async (req, res) => {
       FROM users u
       LEFT JOIN payments p ON p.id = (
         SELECT id FROM payments 
-        WHERE user_id = u.id AND status = 'PENDING'
+        WHERE user_id = u.id AND UPPER(status) = 'PENDING'
         ORDER BY created_at DESC LIMIT 1
       )
       WHERE u.role != 'admin'
@@ -102,7 +102,7 @@ router.get("/dashboardAdmin", isAdmin, async (req, res) => {
       SELECT COUNT(DISTINCT p.user_id) AS cnt
       FROM payments p
       INNER JOIN users u ON u.id = p.user_id AND u.role != 'admin'
-      WHERE p.status = 'PENDING'
+      WHERE UPPER(p.status) = 'PENDING'
     `);
     const pendingCount = pendingRow.cnt || 0;
 
@@ -134,10 +134,11 @@ router.get("/admin/daftarPeserta", isAdmin, async (req, res) => {
       ORDER BY u.id DESC
     `);
 
-    // Ambil semua payment — pakai created_at (sesuai schema tabel payments)
+    // Ambil semua payment — status di-UPPER agar konsisten di EJS
     const [allPayments] = await db.query(`
       SELECT p.id, p.user_id, p.paket, p.nomor_to, p.token_ujian,
-             p.tgl_lunas, p.bukti_transfer, p.status, p.created_at, p.expired_at
+             p.tgl_lunas, p.bukti_transfer, UPPER(p.status) AS status,
+             p.created_at, p.expired_at
       FROM payments p
       JOIN users u ON u.id = p.user_id
       WHERE u.role != 'admin'
@@ -495,3 +496,55 @@ router.post("/deleteAccountFromAdmin", isAdmin, async (req, res) => {
 });
 
 module.exports = router;
+
+// ─────────────────────────────────────────────
+// RESET UJIAN USER (admin)
+// Kembalikan ke LUNAS + hapus jawaban lama + reset status IDLE
+// ─────────────────────────────────────────────
+router.post("/admin/reset-ujian-user", isAdmin, async (req, res) => {
+  const { userIdTarget, paket_pilihan, nomor_to } = req.body;
+  try {
+    await Promise.all([
+      db.query(
+        "UPDATE payments SET status = 'LUNAS' WHERE user_id = ? AND paket = ? AND nomor_to = ?",
+        [userIdTarget, paket_pilihan, nomor_to]
+      ),
+      db.query(
+        `DELETE FROM jawaban_peserta
+         WHERE user_id = ?
+           AND question_id IN (SELECT id FROM questions WHERE paket = ? AND nomor_to = ?)`,
+        [userIdTarget, paket_pilihan, nomor_to]
+      ),
+      db.query(
+        "UPDATE users SET status_ujian = 'IDLE' WHERE id = ?",
+        [userIdTarget]
+      ),
+    ]);
+    res.redirect("/admin/daftarPeserta?success=Ujian+berhasil+direset%2C+user+bisa+ujian+kembali");
+  } catch (err) {
+    console.error(err);
+    res.redirect("/admin/daftarPeserta?error=Gagal+reset+ujian");
+  }
+});
+
+// ─────────────────────────────────────────────
+// HAPUS SATU RIWAYAT PAYMENT (per TO)
+// ─────────────────────────────────────────────
+router.post("/admin/delete-payment", isAdmin, async (req, res) => {
+  const { paymentId } = req.body;
+  try {
+    const [rows] = await db.query(
+      "SELECT bukti_transfer FROM payments WHERE id = ?",
+      [paymentId]
+    );
+    if (rows.length > 0 && rows[0].bukti_transfer) {
+      const filePath = path.join(process.cwd(), "public", "uploads", "bukti", rows[0].bukti_transfer);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
+    await db.query("DELETE FROM payments WHERE id = ?", [paymentId]);
+    res.redirect("/admin/daftarPeserta?success=Riwayat+pembayaran+berhasil+dihapus");
+  } catch (err) {
+    console.error(err);
+    res.redirect("/admin/daftarPeserta?error=Gagal+hapus+riwayat");
+  }
+});
