@@ -15,7 +15,7 @@
     h1,h2,h3,h4 { font-family:"Playfair Display",serif; }
 
     .adm-nav { background:var(--red-deep); border-bottom:1px solid rgba(200,160,32,0.25); position:sticky; top:0; z-index:50; box-shadow:0 2px 12px rgba(90,10,10,0.18); }
-    .adm-nav-link { color:rgba(255,255,255,0.5); font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; transition:color 0.2s; }
+    .adm-nav-link { color:rgba(255,255,255,0.5); font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; transition:color 0.2s; text-decoration:none; }
     .adm-nav-link:hover, .adm-nav-link.active { color:var(--gold); }
 
     .adm-card { background:white; border-radius:12px; border:1px solid rgba(200,160,32,0.12); box-shadow:0 2px 16px rgba(90,10,10,0.06); overflow:hidden; }
@@ -63,6 +63,16 @@
       border-bottom: 2px solid var(--gold);
       padding: 10px 0;
     }
+
+    .quick-link {
+      display:flex; align-items:center; gap:0.75rem;
+      padding:0.875rem 1rem; border-radius:10px;
+      border:1px solid rgba(200,160,32,0.15);
+      background:white; text-decoration:none;
+      transition:all 0.2s; color:var(--dark);
+    }
+    .quick-link:hover { border-color:var(--gold); box-shadow:0 4px 12px rgba(90,10,10,0.08); transform:translateX(2px); }
+    .quick-link-icon { width:2.25rem; height:2.25rem; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
   </style>
 </head>
 
@@ -91,6 +101,7 @@
             <span class="notif-badge"><%= pendingCount %></span>
             <% } %>
           </a>
+          <a href="/admin/anggota" class="adm-nav-link">Anggota Offline</a>
         </div>
       </div>
       <a href="/logout"
@@ -137,8 +148,43 @@
   </div>
   <% } %>
 
+  <!-- QUICK ACCESS BAR -->
+  <div class="max-w-7xl mx-auto px-4 md:px-8 pt-5">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+
+      <a href="/admin/daftarPeserta" class="quick-link">
+        <div class="quick-link-icon" style="background:rgba(90,10,10,0.07)">👥</div>
+        <div class="flex-1 min-w-0">
+          <p style="font-size:0.75rem;font-weight:800;color:var(--dark);margin:0">Daftar Peserta</p>
+          <p style="font-size:0.65rem;color:var(--muted);margin:0">Verifikasi pembayaran TO</p>
+        </div>
+        <% if (pendingCount > 0) { %>
+        <span class="notif-badge" style="position:static;animation:none;background:#dc2626"><%= pendingCount %></span>
+        <% } %>
+      </a>
+
+      <a href="/admin/anggota" class="quick-link">
+        <div class="quick-link-icon" style="background:rgba(21,128,61,0.08)">🎓</div>
+        <div class="flex-1 min-w-0">
+          <p style="font-size:0.75rem;font-weight:800;color:var(--dark);margin:0">Anggota Offline</p>
+          <p style="font-size:0.65rem;color:var(--muted);margin:0">Kelola akses gratis semua TO</p>
+        </div>
+        <span style="font-size:0.6rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:99px;background:rgba(21,128,61,0.1);color:#15803d">Gratis</span>
+      </a>
+
+      <a href="/admin/kelola-soal/Paket%20SKD%2FTKD" class="quick-link">
+        <div class="quick-link-icon" style="background:rgba(200,160,32,0.08)">📝</div>
+        <div class="flex-1 min-w-0">
+          <p style="font-size:0.75rem;font-weight:800;color:var(--dark);margin:0">Kelola Soal</p>
+          <p style="font-size:0.65rem;color:var(--muted);margin:0">Edit, hapus, atau tambah soal</p>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
   <!-- MAIN GRID -->
-  <div class="max-w-7xl mx-auto px-4 md:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <div class="max-w-7xl mx-auto px-4 md:px-8 py-5 grid grid-cols-1 lg:grid-cols-12 gap-6">
 
     <!-- KOLOM KIRI -->
     <div class="lg:col-span-5 space-y-5">
@@ -152,7 +198,6 @@
         <div class="p-5">
           <form action="/admin/tambah-soal" method="POST" class="space-y-3">
 
-            <!-- Paket & Materi -->
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="adm-lbl">Pilih Paket</label>
@@ -168,7 +213,6 @@
               </div>
             </div>
 
-            <!-- Nomor TO & Nomor Urut -->
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="adm-lbl">Nomor TO</label>
@@ -180,13 +224,11 @@
               </div>
             </div>
 
-            <!-- Pertanyaan -->
             <div>
               <label class="adm-lbl">Pertanyaan</label>
               <textarea name="soal" placeholder="Tulis soal di sini..." class="adm-input" required></textarea>
             </div>
 
-            <!-- Opsi A-E -->
             <div>
               <label class="adm-lbl">Pilihan Jawaban</label>
               <div class="grid grid-cols-2 gap-2">
@@ -198,7 +240,6 @@
               </div>
             </div>
 
-            <!-- Kunci + Submit -->
             <div class="flex items-end gap-3">
               <div class="flex-1">
                 <label class="adm-lbl">Kunci Jawaban</label>
@@ -235,13 +276,11 @@
                 class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 cursor-pointer">
             </div>
 
-            <!-- Info format kolom -->
             <div class="rounded-lg p-3" style="background:rgba(200,160,32,0.04);border:1px solid rgba(200,160,32,0.15)">
               <p class="text-[10px] font-bold uppercase mb-1" style="color:var(--muted)">Format Kolom Excel:</p>
               <p class="text-[11px] font-mono" style="color:var(--dark)">paket | nomor_to | materi_id | nomor_urut | soal | a | b | c | d | e | kunci</p>
             </div>
 
-            <!-- Peringatan nama paket -->
             <div class="rounded-lg p-3" style="background:rgba(200,160,32,0.06);border:1px solid rgba(200,160,32,0.2)">
               <p class="text-[10px] font-bold uppercase mb-1" style="color:var(--gold)">⚠️ Nama paket harus tepat:</p>
               <ul class="text-[10px] space-y-0.5 pl-3 list-disc" style="color:var(--dark)">
@@ -251,7 +290,6 @@
               </ul>
             </div>
 
-            <!-- Peringatan kunci -->
             <div class="rounded-lg p-3" style="background:rgba(90,10,10,0.04);border:1px solid rgba(90,10,10,0.1)">
               <p class="text-[10px] font-bold uppercase mb-1" style="color:var(--dark)">⚠️ Kolom kunci:</p>
               <p class="text-[10px]" style="color:var(--muted)">Isi huruf kapital: <strong>A / B / C / D / E</strong></p>
@@ -349,12 +387,9 @@
     </div>
   </div>
 
-  <!-- Toast -->
-  <div id="toast" class="adm-toast fixed bottom-5 right-5 z-50 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-xl
-       translate-y-20 opacity-0 transition-all duration-300 pointer-events-none"></div>
+  <div id="toast" class="adm-toast fixed bottom-5 right-5 z-50 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-xl translate-y-20 opacity-0 transition-all duration-300 pointer-events-none"></div>
 
   <script>
-    // ── Dropdown materi dinamis (value = materi_id angka) ──
     const materiPerPaket = {
       "Paket SKD/TKD": [
         { id: 1, nama: "TWK — Tes Wawasan Kebangsaan" },
@@ -384,7 +419,7 @@
       materiSelect.innerHTML = '';
       list.forEach(m => {
         const opt = document.createElement('option');
-        opt.value = m.id;       // kirim ID angka ke backend
+        opt.value = m.id;
         opt.textContent = m.nama;
         materiSelect.appendChild(opt);
       });
@@ -395,7 +430,6 @@
       updateMateri();
     }
 
-    // ── Toast ──
     function showToast(msg) {
       const t = document.getElementById('toast');
       if (!t) return;
@@ -417,7 +451,6 @@
       });
     });
 
-    // ── Chart.js ──
     const ctx = document.getElementById('userChart').getContext('2d');
     new Chart(ctx, {
       type: 'line',

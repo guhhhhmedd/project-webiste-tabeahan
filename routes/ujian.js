@@ -43,12 +43,16 @@ router.post("/mulai", isLogin, async (req, res) => {
       [userId, paket_pilihan, nomor_to]
     );
 
-    if (payment.length === 0) {
+    const isAnggota = req.session.user.is_anggota == 1;
+
+    if (payment.length === 0 && !isAnggota) {
       return res.send(`<script>
         alert('Akses tidak ditemukan! Pembayaran TO ini belum diverifikasi atau sudah digunakan.');
         window.location.href='/dashboardPembayaranUjian';
       </script>`);
     }
+
+    const paymentId = payment.length > 0 ? payment[0].id : null;
 
     const [soalCheck] = await db.query(
       "SELECT COUNT(*) AS total FROM questions WHERE TRIM(paket) = TRIM(?) AND nomor_to = ? AND is_active = 1",
@@ -68,8 +72,8 @@ router.post("/mulai", isLogin, async (req, res) => {
     );
     const durasiMs = (config[0]?.durasi_menit || 100) * 60 * 1000;
 
-    req.session.ujian = {
-      paymentId: payment[0].id,
+      req.session.ujian = {
+      paymentId: paymentId,
       paket:     paket_pilihan,
       nomorTO:   parseInt(nomor_to),
       jawaban:   {},
@@ -93,6 +97,7 @@ router.post("/mulai", isLogin, async (req, res) => {
 router.get("/soal/:index", isLogin, isSedangUjian, async (req, res) => {
   const sesi = req.session.ujian;
 
+  // Cek waktu habis
   if (Date.now() - sesi.startTime >= sesi.durasiMs) {
     return res.redirect("/ujian/selesai-paksa");
   }
@@ -174,6 +179,7 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
     let benar = 0;
     const jawabanUserSesi = sesi.jawaban;
 
+    // Simpan semua jawaban + hitung skor
     const simpanPromises = soalRows.map((s) => {
       const jawabanUser = jawabanUserSesi[s.id] || null;
       if (jawabanUser && jawabanUser === s.kunci) benar++;
@@ -197,11 +203,13 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
          VALUES (?, ?, ?, ?, ?, ?, NOW())`,
         [userId, sesi.paket, sesi.nomorTO, skor, benar, totalSoal]
       ),
-      db.query(
-        `UPDATE payments SET status = 'SELESAI'
-         WHERE user_id = ? AND TRIM(paket) = TRIM(?) AND nomor_to = ? AND UPPER(status) = 'LUNAS'`,
-        [userId, sesi.paket, sesi.nomorTO]
-      ),
+      sesi.paymentId
+        ? db.query(
+            `UPDATE payments SET status = 'SELESAI'
+             WHERE user_id = ? AND TRIM(paket) = TRIM(?) AND nomor_to = ? AND UPPER(status) = 'LUNAS'`,
+            [userId, sesi.paket, sesi.nomorTO]
+          )
+        : Promise.resolve(),
       db.query(
         "UPDATE users SET status_ujian = 'IDLE' WHERE id = ?",
         [userId]

@@ -34,16 +34,18 @@ const uploadBukti = multer({
   },
 });
 
-
-// DAFTAR PAKET (hardcoded — sync dengan paket_ujian di DB)
 const PAKET_LIST = [
   { key: "Paket SKD/TKD",       label: "Paket SKD/TKD",       durasi: 90  },
   { key: "Paket Akademik Polri", label: "Paket Akademik Polri", durasi: 90  },
   { key: "Paket PPPK",           label: "Paket PPPK",           durasi: 120 },
 ];
 
-// fungsi cek pembayaran
-function buildPaymentMap(payments) {
+// ─────────────────────────────────────────────
+// HELPER: Bangun paymentMap dari array payments
+// Key: "NamaPaket_nomor_to" → ambil yang terbaru (ORDER BY created_at DESC)
+// Status di-UPPER agar konsisten dengan pengecekan di EJS
+// ─────────────────────────────────────────────
+function buildPaymentMap(payments, user = null) {
   const map = {};
   for (const p of payments) {
     const key = `${p.paket}_${p.nomor_to}`;
@@ -54,6 +56,27 @@ function buildPaymentMap(payments) {
       };
     }
   }
+
+  if (user && user.is_anggota) {
+    for (const paket of PAKET_LIST) {
+      for (let to = 1; to <= 10; to++) {
+        const key = `${paket.key}_${to}`;
+        if (!map[key]) {
+          map[key] = {
+            id:            null,
+            user_id:       user.id,
+            paket:         paket.key,
+            nomor_to:      to,
+            status:        "LUNAS",
+            token_ujian:   null,
+            bukti_transfer: null,
+            is_gratis:     true,   
+          };
+        }
+      }
+    }
+  }
+
   return map;
 }
 
@@ -85,7 +108,7 @@ router.get("/dashboard", isLogin, async (req, res) => {
     res.render("users/dashboard", {
       user,
       payments,
-      paymentMap: buildPaymentMap(payments),
+      paymentMap: buildPaymentMap(payments, user),
       rankings:   rankingRows.slice(0, 5),
       myRank:     myRank > 0 ? myRank : "-",
     });
@@ -103,6 +126,7 @@ router.get("/dashboardPembayaranUjian", isLogin, async (req, res) => {
     const [rows] = await db.query("SELECT * FROM users WHERE id = ?", [userId]);
     const user = rows[0];
 
+    // Kalau sedang ujian, langsung ke halaman soal (jangan terjebak di dashboard)
     if (user.status_ujian === "SEDANG_UJIAN") {
       return res.redirect("/ujian/soal/1");
     }
@@ -111,7 +135,7 @@ router.get("/dashboardPembayaranUjian", isLogin, async (req, res) => {
       "SELECT * FROM payments WHERE user_id = ? ORDER BY created_at DESC",
       [userId]
     );
-    const paymentMap = buildPaymentMap(paymentRows);
+    const paymentMap = buildPaymentMap(paymentRows, user);
 
     const [rankingRows] = await db.query(`
       SELECT username, skor FROM users
@@ -163,6 +187,7 @@ router.post("/upload-bukti", isLogin, uploadBukti.single("bukti"), async (req, r
     );
   }
 
+  // Validasi paket ada di PAKET_LIST
   const paketValid = PAKET_LIST.find(p => p.key === paket_pilihan);
   if (!paketValid) {
     return res.redirect(
@@ -190,6 +215,7 @@ router.post("/upload-bukti", isLogin, uploadBukti.single("bukti"), async (req, r
       );
     }
 
+    // Simpan ke tabel payments
     await db.query(
       `INSERT INTO payments (user_id, paket, nomor_to, bukti_transfer, status)
        VALUES (?, ?, ?, ?, 'PENDING')`,
@@ -225,6 +251,7 @@ router.post("/deleteAccount", isLogin, async (req, res) => {
       }
     });
 
+    // Hapus semua data user
     await db.query("DELETE FROM jawaban_peserta WHERE user_id = ?", [userId]);
     await db.query("DELETE FROM riwayat_ujian WHERE user_id = ?",   [userId]);
     await db.query("DELETE FROM payments WHERE user_id = ?",         [userId]);

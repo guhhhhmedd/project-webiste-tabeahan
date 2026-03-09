@@ -275,7 +275,14 @@
                 </div>
 
                 <!-- Token jika LUNAS -->
-                <% if (status === 'LUNAS' && pay.token_ujian) { %>
+                <% if (status === 'LUNAS' && pay && pay.is_gratis) { %>
+                <div class="mb-3 text-center">
+                  <span class="text-[10px] font-black uppercase px-3 py-1 rounded-full"
+                    style="background:rgba(21,128,61,0.12);color:#15803d;border:1px solid rgba(21,128,61,0.2)">
+                    🎓 Gratis — Anggota Kelas Offline
+                  </span>
+                </div>
+                <% } else if (status === 'LUNAS' && pay && pay.token_ujian) { %>
                 <div class="mb-3">
                   <div class="token-box">
                     <span class="font-display font-black text-sm" style="color:var(--gold)"><%= pay.token_ujian %></span>

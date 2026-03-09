@@ -1,9 +1,9 @@
-const express = require("express");
-const router = express.Router();
-const db = require("../config/db");
+const express  = require("express");
+const router   = express.Router();
+const db       = require("../config/db");
 const rateLimit = require("express-rate-limit");
 
-// limiter login
+// RATE LIMITER — Login
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
@@ -11,7 +11,7 @@ const loginLimiter = rateLimit({
   legacyHeaders: false,
   skipSuccessfulRequests: true,
   handler: (req, res) => {
-    const resetDate = new Date(req.rateLimit.resetTime);
+    const resetDate  = new Date(req.rateLimit.resetTime);
     const retryAfter = Math.ceil((resetDate.getTime() - Date.now()) / 1000);
     res.status(429).render("login", {
       error: null,
@@ -20,7 +20,8 @@ const loginLimiter = rateLimit({
     });
   },
 });
-// limiter register
+
+// RATE LIMITER — Register
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 10,
@@ -33,6 +34,28 @@ const registerLimiter = rateLimit({
   },
 });
 
+// HELPER — Cek & sync status anggota offline
+async function syncStatusAnggota(userId, email) {
+  const [anggota] = await db.query(
+    "SELECT id FROM anggota_offline WHERE LOWER(email) = LOWER(?)",
+    [email]
+  );
+  if (anggota.length > 0) {
+    await Promise.all([
+      db.query(
+        "UPDATE users SET is_anggota = 1 WHERE id = ?",
+        [userId]
+      ),
+      db.query(
+        "UPDATE anggota_offline SET user_id = ? WHERE LOWER(email) = LOWER(?)",
+        [userId, email]
+      ),
+    ]);
+    return true;
+  }
+  return false;
+}
+
 // GET /login
 router.get("/login", (req, res) => {
   if (req.session.user) return res.redirect("/dashboard");
@@ -41,13 +64,14 @@ router.get("/login", (req, res) => {
 
 // POST /login
 router.post("/login", loginLimiter, async (req, res) => {
-  console.log("IP:", req.ip);
-  console.log("Rate limit info:", req.rateLimit);
   const { username, password } = req.body;
+
   try {
-    const [rows] = await db.query("SELECT * FROM users WHERE username = ?", [
-      username,
-    ]);
+    const [rows] = await db.query(
+      "SELECT * FROM users WHERE username = ?",
+      [username]
+    );
+
     if (rows.length === 0 || password !== rows[0].password) {
       return res.status(401).render("login", {
         error: "Username atau Password salah",
@@ -55,15 +79,26 @@ router.post("/login", loginLimiter, async (req, res) => {
         resetTime: null,
       });
     }
-    const user = rows[0];
-    const userRole = user.role.toLowerCase(); 
+
+    const user     = rows[0];
+    const userRole = user.role.toLowerCase();
+
+     await syncStatusAnggota(user.id, user.email);
+
+    const [fresh] = await db.query(
+      "SELECT is_anggota, status_ujian FROM users WHERE id = ?",
+      [user.id]
+    );
 
     req.session.user = {
-      id: user.id,
-      username: user.username,
-      role: userRole,
-      expired_at: user.expired_at,
-      is_active: user.is_active,
+      id:           user.id,
+      username:     user.username,
+      email:        user.email,
+      role:         userRole,
+      expired_at:   user.expired_at,
+      is_active:    user.is_active,
+      is_anggota:   fresh[0].is_anggota,   
+      status_ujian: fresh[0].status_ujian,
     };
 
     req.session.save(() => {
@@ -106,11 +141,16 @@ router.post("/register", registerLimiter, async (req, res) => {
     return res.render("register", { err: "Format email tidak valid!" });
 
   try {
-    await db.query(
+    const [result] = await db.query(
       "INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, 'users')",
-      [username, password, email],
+      [username, password, email]
     );
-    res.redirect("/login");
+
+   await syncStatusAnggota(result.insertId, email);
+
+    res.redirect("/login?success=" + encodeURIComponent(
+      "Registrasi berhasil! Silakan login."
+    ));
   } catch (err) {
     console.error("ERROR REGISTER:", err);
     let pesanError = "Gagal registrasi.";

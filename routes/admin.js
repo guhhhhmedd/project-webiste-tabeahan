@@ -7,7 +7,6 @@ const fs = require("fs");
 const crypto = require("crypto");
 const XLSX = require("xlsx");
 
-
 // MIDDLEWARE
 function isAdmin(req, res, next) {
   if (req.session.user && req.session.user.role === "admin") return next();
@@ -77,6 +76,7 @@ router.get("/dashboardAdmin", isAdmin, async (req, res) => {
 
     const [daftarPaket] = await db.query("SELECT * FROM paket_ujian");
 
+    // Ambil user + 1 payment PENDING terbaru (untuk preview di dashboard)
     const [users] = await db.query(`
       SELECT u.id, u.username, u.email, u.status_ujian, u.skor, u.expired_at, u.is_active,
              p.id AS payment_id, p.paket AS payment_paket, p.nomor_to,
@@ -91,6 +91,7 @@ router.get("/dashboardAdmin", isAdmin, async (req, res) => {
       ORDER BY u.id DESC
     `);
 
+    // Hitung user yang punya minimal 1 payment PENDING
     const [[pendingRow]] = await db.query(`
       SELECT COUNT(DISTINCT p.user_id) AS cnt
       FROM payments p
@@ -167,6 +168,7 @@ router.post("/admin/verify/:paymentId", isAdmin, async (req, res) => {
     const userId = payments[0].user_id;
     const token  = crypto.randomBytes(4).toString("hex").toUpperCase();
 
+    // Expired: tambah 60 hari dari sekarang (atau dari expired lama jika masih aktif)
     const [userRows] = await db.query(
       "SELECT expired_at FROM users WHERE id = ?",
       [userId]
@@ -457,8 +459,6 @@ router.post("/deleteAccountFromAdmin", isAdmin, async (req, res) => {
   }
 });
 
-module.exports = router;
-
 // RESET UJIAN USER (admin)
 router.post("/admin/reset-ujian-user", isAdmin, async (req, res) => {
   const { userIdTarget, paket_pilihan, nomor_to } = req.body;
@@ -505,3 +505,76 @@ router.post("/admin/delete-payment", isAdmin, async (req, res) => {
     res.redirect("/admin/daftarPeserta?error=Gagal+hapus+riwayat");
   }
 });
+
+// GET /admin/anggota — halaman kelola anggota offline
+router.get("/admin/anggota", isAdmin, async (req, res) => {
+  try {
+    const [anggota] = await db.query(
+      "SELECT * FROM anggota_offline ORDER BY created_at DESC"
+    );
+    const [userCount] = await db.query(
+      "SELECT COUNT(*) AS total FROM users WHERE is_anggota = 1"
+    );
+    res.render("admin/anggota", {
+      anggota,
+      totalAktif: userCount[0].total,
+      message: req.query.success ? decodeURIComponent(req.query.success) : null,
+      error:   req.query.error   ? decodeURIComponent(req.query.error)   : null,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Gagal memuat data anggota.");
+  }
+});
+
+// POST /admin/anggota/tambah — tambah email anggota
+router.post("/admin/anggota/tambah", isAdmin, async (req, res) => {
+  const { email, nama, catatan } = req.body;
+
+  if (!email || !email.includes("@")) {
+    return res.redirect("/admin/anggota?error=" + encodeURIComponent("Email tidak valid."));
+  }
+
+  try {
+    // Insert ke whitelist
+    await db.query(
+      "INSERT INTO anggota_offline (email, nama, catatan) VALUES (?, ?, ?)",
+      [email.toLowerCase().trim(), nama || null, catatan || null]
+    );
+
+    // Kalau user dengan email ini sudah terdaftar, langsung set is_anggota = 1
+    await db.query(
+      "UPDATE users SET is_anggota = 1 WHERE LOWER(email) = LOWER(?)",
+      [email.trim()]
+    );
+
+    res.redirect("/admin/anggota?success=" + encodeURIComponent(`Email ${email} berhasil ditambahkan.`));
+  } catch (err) {
+    if (err.code === "ER_DUP_ENTRY") {
+      return res.redirect("/admin/anggota?error=" + encodeURIComponent("Email sudah terdaftar di whitelist."));
+    }
+    console.error(err);
+    res.redirect("/admin/anggota?error=" + encodeURIComponent("Gagal menambahkan email."));
+  }
+});
+
+// POST /admin/anggota/hapus — hapus email dari whitelist
+router.post("/admin/anggota/hapus", isAdmin, async (req, res) => {
+  const { id, email } = req.body;
+
+  try {
+    await db.query("DELETE FROM anggota_offline WHERE id = ?", [id]);
+
+    await db.query(
+      "UPDATE users SET is_anggota = 0 WHERE LOWER(email) = LOWER(?)",
+      [email]
+    );
+
+    res.redirect("/admin/anggota?success=" + encodeURIComponent("Email berhasil dihapus dari whitelist."));
+  } catch (err) {
+    console.error(err);
+    res.redirect("/admin/anggota?error=" + encodeURIComponent("Gagal menghapus email."));
+  }
+});
+
+module.exports = router;

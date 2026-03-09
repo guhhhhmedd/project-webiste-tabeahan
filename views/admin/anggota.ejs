@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anggota Offline | Tabeahan Cendekia</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --cream:#fff8f8; --gold:#c8a020; --dark:#7a1010; --red-deep:#5a0a0a; --muted:#9b6b6b; }
+    *, *::before, *::after { box-sizing:border-box; }
+    body { font-family:"DM Sans",sans-serif; background:var(--cream); color:var(--dark); min-height:100vh; }
+    h1,h2,h3,h4 { font-family:"Playfair Display",serif; }
+
+    .adm-nav { background:var(--red-deep); border-bottom:1px solid rgba(200,160,32,0.25); position:sticky; top:0; z-index:50; box-shadow:0 2px 12px rgba(90,10,10,0.18); }
+    .adm-nav-link { color:rgba(255,255,255,0.5); font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; transition:color 0.2s; text-decoration:none; }
+    .adm-nav-link:hover, .adm-nav-link.active { color:var(--gold); }
+
+    .card { background:white; border-radius:12px; border:1px solid rgba(200,160,32,0.12); box-shadow:0 2px 16px rgba(90,10,10,0.06); overflow:hidden; }
+    .card-hd { background:linear-gradient(135deg,var(--red-deep),#6b1a1a); padding:0.875rem 1.25rem; border-bottom:1px solid rgba(200,160,32,0.15); }
+    .card-hd h3 { color:white; font-size:0.875rem; margin:0; }
+
+    .stat-box { background:white; border:1px solid rgba(200,160,32,0.15); border-left:3px solid var(--gold); border-radius:10px; padding:0.75rem 1.25rem; }
+
+    table { width:100%; border-collapse:collapse; }
+    thead tr { background:rgba(90,10,10,0.04); border-bottom:2px solid rgba(200,160,32,0.15); }
+    thead th { padding:0.75rem 1.25rem; font-size:0.6rem; font-weight:800; text-transform:uppercase; letter-spacing:0.12em; color:var(--muted); text-align:left; }
+    tbody tr { border-bottom:1px solid rgba(200,160,32,0.07); transition:background 0.15s; }
+    tbody tr:hover { background:rgba(200,160,32,0.03); }
+    tbody td { padding:0.875rem 1.25rem; vertical-align:middle; }
+
+    .badge-aktif { background:rgba(21,128,61,0.1); color:#15803d; border:1px solid rgba(21,128,61,0.2); display:inline-block; padding:0.2rem 0.6rem; border-radius:5px; font-size:0.6rem; font-weight:800; text-transform:uppercase; }
+    .badge-belum { background:rgba(155,107,107,0.08); color:var(--muted); border:1px solid rgba(155,107,107,0.15); display:inline-block; padding:0.2rem 0.6rem; border-radius:5px; font-size:0.6rem; font-weight:800; text-transform:uppercase; }
+
+    .form-input { width:100%; border:1.5px solid rgba(200,160,32,0.25); border-radius:8px; padding:0.6rem 0.9rem; font-size:0.8rem; font-family:"DM Sans",sans-serif; color:var(--dark); background:white; transition:border-color 0.2s; outline:none; }
+    .form-input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(200,160,32,0.1); }
+    .form-label { display:block; font-size:0.6rem; font-weight:800; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:0.35rem; }
+
+    .btn-primary { background:linear-gradient(135deg,var(--red-deep),#6b1a1a); color:white; border:none; padding:0.6rem 1.25rem; border-radius:8px; font-size:0.75rem; font-weight:700; cursor:pointer; transition:filter 0.2s; }
+    .btn-primary:hover { filter:brightness(1.1); }
+    .btn-danger { background:none; border:1px solid rgba(220,38,38,0.2); color:#b91c1c; padding:0.3rem 0.7rem; border-radius:6px; font-size:0.62rem; font-weight:700; cursor:pointer; transition:all 0.2s; }
+    .btn-danger:hover { background:rgba(220,38,38,0.08); }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="adm-nav">
+  <div class="max-w-7xl mx-auto px-4 md:px-8 py-3.5 flex justify-between items-center">
+    <div class="flex items-center gap-6">
+      <div class="flex items-center gap-2.5">
+        <img src="../asset/logo.png" alt="Logo" class="h-9 w-auto">
+        <div>
+          <span style="font-family:'Playfair Display',serif;color:white;font-size:1rem;font-weight:700;display:block;line-height:1.2">
+            Tabeahan <span style="color:var(--gold)">Cendekia</span>
+          </span>
+          <span style="display:inline-block;background:var(--gold);color:#3a0000;font-size:0.55rem;padding:0.1rem 0.45rem;border-radius:4px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px">
+            Administrator
+          </span>
+        </div>
+      </div>
+      <div class="hidden md:flex gap-5">
+        <a href="/dashboardAdmin" class="adm-nav-link">Dashboard</a>
+        <a href="/admin/daftarPeserta" class="adm-nav-link">Peserta</a>
+        <a href="/admin/anggota" class="adm-nav-link active">Anggota Offline</a>
+      </div>
+    </div>
+    <a href="/logout"
+      style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:0.35rem 1rem;font-size:0.75rem;font-weight:700;transition:all 0.2s;text-decoration:none"
+      onmouseover="this.style.background='rgba(200,160,32,0.2)';this.style.color='#c8a020'"
+      onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.7)'">
+      Logout
+    </a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="max-w-5xl mx-auto px-4 py-8">
+
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <div>
+      <a href="/dashboardAdmin" class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest mb-2"
+        style="color:var(--muted)" onmouseover="this.style.color='var(--dark)'" onmouseout="this.style.color='var(--muted)'">
+        ← Dashboard
+      </a>
+      <h1 style="font-size:1.75rem;font-weight:900;color:var(--dark);margin:0">Anggota Kelas Offline</h1>
+      <p style="font-size:0.875rem;color:var(--muted);margin-top:0.25rem">
+        Email yang terdaftar di sini mendapat akses <strong>semua TO gratis</strong>
+      </p>
+    </div>
+    <div class="flex gap-3">
+      <div class="stat-box">
+        <span style="display:block;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted)">Total Whitelist</span>
+        <span style="font-size:1.5rem;font-weight:900;font-family:'Playfair Display',serif;color:var(--dark)"><%= anggota.length %></span>
+      </div>
+      <div class="stat-box" style="border-left-color:#15803d">
+        <span style="display:block;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted)">Sudah Daftar</span>
+        <span style="font-size:1.5rem;font-weight:900;font-family:'Playfair Display',serif;color:#15803d"><%= totalAktif %></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <% if (message) { %>
+  <div class="mb-4 px-4 py-3 rounded-lg text-sm font-semibold"
+    style="background:rgba(21,128,61,0.08);border:1px solid rgba(21,128,61,0.2);color:#15803d">
+    ✅ <%= message %>
+  </div>
+  <% } %>
+  <% if (error) { %>
+  <div class="mb-4 px-4 py-3 rounded-lg text-sm font-semibold"
+    style="background:rgba(220,38,38,0.07);border:1px solid rgba(220,38,38,0.18);color:#b91c1c">
+    ❌ <%= error %>
+  </div>
+  <% } %>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Form tambah -->
+    <div class="lg:col-span-1">
+      <div class="card">
+        <div class="card-hd">
+          <h3>➕ Tambah Anggota</h3>
+        </div>
+        <form action="/admin/anggota/tambah" method="POST" class="p-5 space-y-4">
+
+          <div>
+            <label class="form-label">Email Anggota *</label>
+            <input type="email" name="email" class="form-input" placeholder="contoh@email.com" required>
+            <p style="font-size:0.65rem;color:var(--muted);margin-top:0.35rem">
+              Email ini akan mendapat akses semua TO secara gratis
+            </p>
+          </div>
+
+          <div>
+            <label class="form-label">Nama Anggota</label>
+            <input type="text" name="nama" class="form-input" placeholder="Nama lengkap (opsional)">
+          </div>
+
+          <div>
+            <label class="form-label">Catatan</label>
+            <input type="text" name="catatan" class="form-input" placeholder="Mis: Kelas Polri Batch 3">
+          </div>
+
+          <button type="submit" class="btn-primary w-full">
+            ✅ Tambahkan ke Whitelist
+          </button>
+        </form>
+      </div>
+
+      <!-- Info box -->
+      <div class="mt-4 p-4 rounded-xl" style="background:rgba(200,160,32,0.07);border:1px solid rgba(200,160,32,0.2)">
+        <p style="font-size:0.7rem;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.5rem">ℹ️ Cara Kerja</p>
+        <ul style="font-size:0.72rem;color:var(--muted);line-height:1.8;padding-left:1rem;list-style:disc">
+          <li>Masukkan email anggota kelas offline</li>
+          <li>Sistem otomatis cek saat registrasi & login</li>
+          <li>Kalau email cocok → semua 10 TO di 3 paket gratis</li>
+          <li>Menghapus email akan mencabut akses gratis</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Tabel whitelist -->
+    <div class="lg:col-span-2">
+      <div class="card">
+        <div class="card-hd flex items-center justify-between">
+          <h3>📋 Daftar Email Whitelist</h3>
+          <span style="font-size:0.65rem;color:rgba(255,255,255,0.5)"><%= anggota.length %> email</span>
+        </div>
+
+        <% if (anggota.length === 0) { %>
+        <div style="padding:4rem;text-align:center">
+          <div style="font-size:2.5rem;opacity:0.2;margin-bottom:0.75rem">📭</div>
+          <p style="color:var(--muted);font-size:0.875rem;font-weight:600">Belum ada email terdaftar.</p>
+          <p style="color:var(--muted);font-size:0.75rem;margin-top:0.25rem">Tambahkan email anggota kelas offline di form sebelah.</p>
+        </div>
+        <% } else { %>
+        <div class="overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Email</th>
+                <th>Nama</th>
+                <th>Catatan</th>
+                <th>Status Akun</th>
+                <th>Ditambahkan</th>
+                <th style="text-align:right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% anggota.forEach((a, i) => { %>
+              <tr>
+                <td>
+                  <span style="font-size:0.75rem;font-weight:700;color:rgba(155,107,107,0.5)"><%= i + 1 %></span>
+                </td>
+                <td>
+                  <span style="font-size:0.8rem;font-weight:700;color:var(--dark);font-family:monospace">
+                    <%= a.email %>
+                  </span>
+                </td>
+                <td>
+                  <span style="font-size:0.78rem;color:var(--dark)"><%= a.nama || '—' %></span>
+                </td>
+                <td>
+                  <span style="font-size:0.72rem;color:var(--muted)"><%= a.catatan || '—' %></span>
+                </td>
+                <td>
+                  <% if (a.user_id) { %>
+                    <span class="badge-aktif">✅ Terdaftar</span>
+                  <% } else { %>
+                    <span class="badge-belum">⏳ Belum Daftar</span>
+                  <% } %>
+                </td>
+                <td>
+                  <span style="font-size:0.7rem;color:var(--muted)">
+                    <%= a.created_at ? new Date(a.created_at).toLocaleDateString('id-ID', {day:'2-digit',month:'short',year:'numeric'}) : '—' %>
+                  </span>
+                </td>
+                <td style="text-align:right">
+                  <form action="/admin/anggota/hapus" method="POST" class="confirm-hapus-anggota" style="display:inline">
+                    <input type="hidden" name="id"    value="<%= a.id %>">
+                    <input type="hidden" name="email" value="<%= a.email %>">
+                    <button type="submit" class="btn-danger">🗑️ Hapus</button>
+                  </form>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+        <% } %>
+      </div>
+    </div>
+
+  </div>
+
+  <p style="margin-top:1.5rem;text-align:center;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:rgba(155,107,107,0.4)">
+    Tabeahan Cendekia · Admin Panel
+  </p>
+
+</div>
+
+<script>
+  document.querySelectorAll('.confirm-hapus-anggota').forEach(f =>
+    f.addEventListener('submit', e => {
+      const email = f.querySelector('input[name="email"]').value;
+      if (!confirm(`Hapus ${email} dari whitelist? Akses gratis akan dicabut.`)) e.preventDefault();
+    })
+  );
+</script>
+
+</body>
+</html>

@@ -16,6 +16,37 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `anggota_offline`
+--
+
+DROP TABLE IF EXISTS `anggota_offline`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `anggota_offline` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) NOT NULL,
+  `nama` varchar(255) DEFAULT NULL,
+  `catatan` varchar(255) DEFAULT NULL,
+  `user_id` int DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `anggota_offline_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `anggota_offline`
+--
+
+LOCK TABLES `anggota_offline` WRITE;
+/*!40000 ALTER TABLE `anggota_offline` DISABLE KEYS */;
+INSERT INTO `anggota_offline` VALUES (1,'jono@gmail.com','jono','anggota regu ular',49,'2026-03-09 07:18:47');
+/*!40000 ALTER TABLE `anggota_offline` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `jawaban_peserta`
 --
 
@@ -30,7 +61,7 @@ CREATE TABLE `jawaban_peserta` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`,`question_id`),
   KEY `user_id_2` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=156 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=162 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -39,7 +70,7 @@ CREATE TABLE `jawaban_peserta` (
 
 LOCK TABLES `jawaban_peserta` WRITE;
 /*!40000 ALTER TABLE `jawaban_peserta` DISABLE KEYS */;
-INSERT INTO `jawaban_peserta` VALUES (73,28,13,'c'),(136,48,4,NULL),(137,48,5,NULL),(138,48,6,NULL),(139,48,7,NULL),(140,48,8,NULL),(141,48,40,NULL),(142,48,41,NULL),(143,48,43,NULL),(144,48,42,NULL),(145,48,44,NULL);
+INSERT INTO `jawaban_peserta` VALUES (73,28,13,'c'),(136,48,4,NULL),(137,48,5,NULL),(138,48,6,NULL),(139,48,7,NULL),(140,48,8,NULL),(141,48,40,NULL),(142,48,41,NULL),(143,48,43,NULL),(144,48,42,NULL),(145,48,44,NULL),(156,49,2,'d'),(157,49,1,'d'),(158,49,3,'a'),(159,49,37,'e'),(160,49,39,'c'),(161,49,38,'c');
 /*!40000 ALTER TABLE `jawaban_peserta` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -225,11 +256,12 @@ CREATE TABLE `users` (
   `waktu_mulai` datetime DEFAULT NULL,
   `jml_benar` int DEFAULT '0',
   `jml_soal` int DEFAULT '0',
+  `is_anggota` tinyint(1) NOT NULL DEFAULT '0' COMMENT '1 = anggota kelas offline, akses semua TO gratis',
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `username_2` (`username`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -238,7 +270,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (2,'admin123','admin123','admin@gmail.com','admin','2026-01-27 14:23:38',0,'IDLE',NULL,NULL,0,NULL,0,0),(28,'ucup','ucup123','ucup@gmail.com','users','2026-02-23 00:56:50',5,'IDLE',NULL,NULL,0,'2026-02-23 13:08:52',0,0),(32,'guhu','123456','teguharif5505@gmail.com','users','2026-02-24 16:54:37',0,'IDLE',NULL,'2026-05-06 17:26:06',1,NULL,0,0),(42,'user_desember','123','des@test.com','users','2025-12-15 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0),(43,'user_januari','123','jan@test.com','users','2026-01-10 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0),(44,'user_januari2','123','jan2@test.com','users','2026-01-20 07:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0),(46,'user_januar','123','jin@test.com','users','2026-01-10 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0),(48,'wwww','123456','w@gmail.com','users','2026-03-06 17:58:32',0,'SEDANG_UJIAN',NULL,'2026-07-05 01:37:21',1,NULL,0,0);
+INSERT INTO `users` VALUES (2,'admin123','admin123','admin@gmail.com','admin','2026-01-27 14:23:38',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(28,'ucup','ucup123','ucup@gmail.com','users','2026-02-23 00:56:50',5,'IDLE',NULL,NULL,0,'2026-02-23 13:08:52',0,0,0),(32,'guhu','123456','teguharif5505@gmail.com','users','2026-02-24 16:54:37',0,'IDLE',NULL,'2026-05-06 17:26:06',1,NULL,0,0,0),(42,'user_desember','123','des@test.com','users','2025-12-15 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(43,'user_januari','123','jan@test.com','users','2026-01-10 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(44,'user_januari2','123','jan2@test.com','users','2026-01-20 07:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(46,'user_januar','123','jin@test.com','users','2026-01-10 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(48,'wwww','123456','w@gmail.com','users','2026-03-06 17:58:32',0,'SEDANG_UJIAN',NULL,'2026-07-05 01:37:21',1,NULL,0,0,0),(49,'jono','123456','jono@gmail.com','users','2026-03-09 07:10:06',0,'IDLE',NULL,NULL,0,NULL,0,0,1);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -251,4 +283,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-07 18:19:41
+-- Dump completed on 2026-03-09 22:49:12
