@@ -193,17 +193,24 @@
         <div class="nomor-badge <%= statusClass %>"><%= idx + 1 %></div>
         <div>
           <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted)">Soal #<%= item.nomor_urut %></span>
-          <% if (!item.is_benar) { %>
+          <% if (!item.is_benar && item.tipe_penilaian !== 'BOBOT_OPSI') { %>
           <p style="font-size:0.65rem;color:#b91c1c;font-weight:700;margin:0">
-            Jawabanmu: <strong><%= jawabanLower.toUpperCase() %></strong> · Kunci: <strong><%= kunciLower.toUpperCase() %></strong>
+            Jawabanmu: <strong><%= jawabanLower ? jawabanLower.toUpperCase() : '-' %></strong> · Kunci: <strong><%= kunciLower.toUpperCase() || '-' %></strong>
+          </p>
+          <% } else if (item.tipe_penilaian === 'BOBOT_OPSI') { %>
+          <p style="font-size:0.65rem;color:#15803d;font-weight:700;margin:0">
+            Jawabanmu: <strong><%= jawabanLower ? jawabanLower.toUpperCase() : '-' %></strong>
+            <% if (jawabanLower) { %> (<%= item['bobot_'+jawabanLower] || 0 %> Poin) <% } %>
           </p>
           <% } %>
         </div>
       </div>
-      <% if (item.is_benar) { %>
+      <% if (item.is_benar && item.tipe_penilaian !== 'BOBOT_OPSI') { %>
         <span style="font-size:0.75rem;color:#15803d;font-weight:800">✅ Benar</span>
-      <% } else { %>
+      <% } else if (!item.is_benar && item.tipe_penilaian !== 'BOBOT_OPSI') { %>
         <span style="font-size:0.75rem;color:#b91c1c;font-weight:800">❌ Salah</span>
+      <% } else if (item.tipe_penilaian === 'BOBOT_OPSI') { %>
+        <span style="font-size:0.75rem;color:#15803d;font-weight:800">✅ Terjawab</span>
       <% } %>
     </div>
 
@@ -220,15 +227,20 @@
           let rowClass   = 'normal';
           let hurufClass = 'normal';
           let icon       = '';
+          let isBobotOpsi = item.tipe_penilaian === 'BOBOT_OPSI';
 
-          if (huruf === kunciLower) {
+          if (!isBobotOpsi && huruf === kunciLower) {
             rowClass   = 'kunci';
             hurufClass = 'kunci';
             icon       = '✅ ';
-          } else if (huruf === jawabanLower && !item.is_benar) {
+          } else if (!isBobotOpsi && huruf === jawabanLower && !item.is_benar) {
             rowClass   = 'salah-user';
             hurufClass = 'salah-user';
             icon       = '❌ ';
+          } else if (isBobotOpsi && huruf === jawabanLower) {
+            rowClass   = 'kunci'; // Menggunakan gaya border hijau untuk user
+            hurufClass = 'kunci';
+            icon       = '👉 ';
           }
         %>
         <div class="opsi-row <%= rowClass %>">
@@ -239,10 +251,26 @@
       </div>
 
       <!-- Keterangan Jawaban -->
-      <% if (item.pembahasan && item.pembahasan.trim() !== '') { %>
+      <% if ((item.pembahasan && item.pembahasan.trim() !== '') || item.tipe_penilaian === 'BOBOT_OPSI') { %>
       <div class="keterangan-box">
-        <span class="keterangan-label">Pembahasan</span>
-        <p class="keterangan-text"><%= item.pembahasan %></p>
+        <span class="keterangan-label">Pembahasan & Penilaian</span>
+        
+        <% if (item.tipe_penilaian === 'BOBOT_OPSI') { %>
+          <div style="margin-bottom:0.75rem; font-size:0.75rem; color:var(--dark); font-family:'Playfair Display',serif;">
+            <p style="margin-bottom:0.25rem; font-weight:800;">Bobot Poin Tiap Opsi Jawaban:</p>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <% ['a','b','c','d','e'].forEach(h => { %>
+                <span style="background:rgba(200,160,32,0.1); padding:0.15rem 0.6rem; border-radius:4px; border:1px solid rgba(200,160,32,0.25);">
+                  <strong><%= h.toUpperCase() %>:</strong> <%= item['bobot_' + h] || 0 %>
+                </span>
+              <% }) %>
+            </div>
+          </div>
+        <% } %>
+
+        <% if (item.pembahasan && item.pembahasan.trim() !== '') { %>
+          <p class="keterangan-text"><%= item.pembahasan %></p>
+        <% } %>
       </div>
       <% } %>
 
