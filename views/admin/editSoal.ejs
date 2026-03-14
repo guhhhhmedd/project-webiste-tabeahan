@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Edit Soal | Tabeahan Cendekia</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
+
 <body class="bg-slate-100 font-sans text-slate-900 min-h-screen">
 
   <!-- NAVBAR -->
@@ -22,6 +24,7 @@
         <div class="hidden md:flex gap-5 text-[11px] font-bold uppercase tracking-widest">
           <a href="/dashboardAdmin" class="text-slate-400 hover:text-white transition">Dashboard</a>
           <a href="/admin/daftarPeserta" class="text-slate-400 hover:text-white transition">Peserta Ujian</a>
+          <a href="/admin/anggota" class="text-slate-400 hover:text-white transition">Anggota Offline</a>
         </div>
       </div>
       <a href="/logout" class="bg-red-600 hover:bg-red-700 px-5 py-1.5 rounded text-xs font-bold transition">Logout</a>
@@ -49,7 +52,6 @@
     <!-- Form Card -->
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
 
-      <!-- Card top bar -->
       <div class="bg-[#0f172a] px-5 py-3">
         <p class="text-white/50 text-[10px] font-bold uppercase tracking-[0.2em] text-center">Pastikan semua data terisi dengan benar</p>
       </div>
@@ -61,16 +63,31 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Kategori Paket</label>
-            <select name="paket"
-              class="w-full border border-slate-300 p-2.5 rounded-lg bg-slate-50 text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" required>
-              <option value="Paket SKD/TKD"       <%= s.paket === 'Paket SKD/TKD'       ? 'selected' : '' %>>Paket SKD/TKD</option>
-              <option value="Paket Akademik Polri" <%= s.paket === 'Paket Akademik Polri' ? 'selected' : '' %>>Paket Akademik Polri</option>
-              <option value="Paket PPPK"           <%= s.paket === 'Paket PPPK'           ? 'selected' : '' %>>Paket PPPK</option>
+            <select name="paket" id="editPaketSelect"
+              class="w-full border border-slate-300 p-2.5 rounded-lg bg-slate-50 text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+              <option value="Paket SKD/TKD"        <%= s.paket==="Paket SKD/TKD"        ? "selected" : "" %>>Paket SKD/TKD</option>
+              <option value="Paket Akademik Polri"  <%= s.paket==="Paket Akademik Polri"  ? "selected" : "" %>>Paket Akademik Polri</option>
+              <option value="Paket PPPK"            <%= s.paket==="Paket PPPK"            ? "selected" : "" %>>Paket PPPK</option>
             </select>
           </div>
           <div>
             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Bidang Materi</label>
-            <input type="text" name="materi" value="<%= s.materi %>" placeholder="Contoh: TWK atau TIU"
+            <select name="materi_id" id="editMateriSelect"
+              class="w-full border border-slate-300 p-2.5 rounded-lg bg-slate-50 text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+            </select>
+          </div>
+        </div>
+
+        <!-- Nomor TO & Nomor Urut -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nomor TO</label>
+            <input type="number" name="nomor_to" value="<%= s.nomor_to %>" min="1" max="10"
+              class="w-full border border-slate-300 p-2.5 rounded-lg bg-slate-50 text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nomor Urut Soal</label>
+            <input type="number" name="nomor_urut" value="<%= s.nomor_urut %>" min="1"
               class="w-full border border-slate-300 p-2.5 rounded-lg bg-slate-50 text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none transition" required>
           </div>
         </div>
@@ -79,7 +96,8 @@
         <div>
           <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Isi Pertanyaan</label>
           <textarea name="soal"
-            class="w-full border border-slate-300 p-3 rounded-lg bg-slate-50 text-sm font-medium leading-relaxed focus:ring-2 focus:ring-blue-500 outline-none transition resize-none h-36" required><%= s.soal %></textarea>
+            class="w-full border border-slate-300 p-3 rounded-lg bg-slate-50 text-sm font-medium leading-relaxed focus:ring-2 focus:ring-blue-500 outline-none transition resize-none h-36"
+            required><%= s.soal %></textarea>
         </div>
 
         <!-- Opsi Jawaban -->
@@ -87,52 +105,60 @@
           <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Pilihan Jawaban</label>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <% ['a','b','c','d'].forEach(letra => { %>
-              <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 flex-none flex items-center justify-center rounded-lg bg-slate-100 text-slate-500 font-black text-sm uppercase">
-                  <%= letra %>
-                </div>
-                <input type="text"
-                  name="opsi_<%= letra %>"
-                  value="<%= s['opsi_' + letra] %>"
-                  placeholder="Jawaban opsi <%= letra.toUpperCase() %>"
-                  class="flex-1 border border-slate-300 p-2.5 rounded-lg bg-white text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition"
-                  required>
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 flex-none flex items-center justify-center rounded-lg bg-slate-100 text-slate-500 font-black text-sm uppercase">
+                <%= letra %>
               </div>
+              <input type="text" name="opsi_<%= letra %>" value="<%= s['opsi_' + letra] %>"
+                placeholder="Jawaban opsi <%= letra.toUpperCase() %>"
+                class="flex-1 border border-slate-300 p-2.5 rounded-lg bg-white text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+            </div>
             <% }) %>
             <!-- Opsi E full width -->
             <div class="flex items-center gap-2.5 md:col-span-2">
               <div class="w-9 h-9 flex-none flex items-center justify-center rounded-lg bg-slate-100 text-slate-500 font-black text-sm uppercase">e</div>
-              <input type="text"
-                name="opsi_e"
-                value="<%= s['opsi_e'] %>"
-                placeholder="Jawaban opsi E"
-                class="flex-1 border border-slate-300 p-2.5 rounded-lg bg-white text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition"
-                required>
+              <input type="text" name="opsi_e" value="<%= s['opsi_e'] %>" placeholder="Jawaban opsi E"
+                class="flex-1 border border-slate-300 p-2.5 rounded-lg bg-white text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition" required>
             </div>
           </div>
         </div>
 
-        <!-- Kunci & Submit -->
-        <div class="pt-5 border-t border-slate-100 flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div class="w-full md:w-48">
-            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Kunci Jawaban</label>
-            <select name="kunci"
-              class="w-full border-2 border-yellow-400 p-2.5 rounded-lg bg-yellow-50 font-black text-slate-800 uppercase text-sm focus:ring-2 focus:ring-yellow-400 outline-none transition cursor-pointer" required>
-              <% ['a','b','c','d','e'].forEach(opt => { %>
-                <option value="<%= opt %>" <%= s.kunci === opt ? 'selected' : '' %>>Opsi <%= opt.toUpperCase() %></option>
-              <% }) %>
-            </select>
-          </div>
-          <div class="flex gap-3 justify-end">
-            <a href="/admin/kelola-soal/<%= encodeURIComponent(s.paket) %>"
-              class="px-5 py-2.5 border border-slate-300 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
-              Batal
-            </a>
-            <button type="submit"
-              class="px-8 py-2.5 bg-[#0f172a] hover:bg-slate-800 text-white rounded-lg text-xs font-bold uppercase tracking-widest transition shadow cursor-pointer">
-              Simpan Perubahan
-            </button>
-          </div>
+        <!-- Kunci Jawaban -->
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Kunci Jawaban</label>
+          <select name="kunci"
+            class="w-full md:w-48 border-2 border-yellow-400 p-2.5 rounded-lg bg-yellow-50 font-black text-slate-800 uppercase text-sm focus:ring-2 focus:ring-yellow-400 outline-none transition cursor-pointer"
+            required>
+            <% ['a','b','c','d','e'].forEach(opt => { %>
+            <option value="<%= opt %>" <%= s.kunci && s.kunci.toLowerCase()===opt ? 'selected' : '' %>>Opsi <%= opt.toUpperCase() %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <!-- ══ KETERANGAN / PEMBAHASAN ══ -->
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">
+            Pembahasan / Keterangan Jawaban
+          </label>
+          <textarea
+            name="pembahasan"
+            placeholder="Tulis pembahasan jawaban di sini. Bisa multi-baris..."
+            class="w-full border border-slate-300 p-3 rounded-lg bg-slate-50 text-sm font-medium leading-relaxed focus:ring-2 focus:ring-blue-500 outline-none transition resize-none"
+            style="height:7rem"
+          ><%= s.pembahasan || '' %></textarea>
+          <p class="text-[10px] text-slate-400 mt-1">Keterangan ini akan ditampilkan di halaman review jawaban setelah ujian selesai.</p>
+        </div>
+
+        <!-- Submit -->
+        <div class="pt-5 border-t border-slate-100 flex gap-3 justify-end">
+          <a href="/admin/kelola-soal/<%= encodeURIComponent(s.paket) %>"
+            class="px-5 py-2.5 border border-slate-300 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
+            Batal
+          </a>
+          <button type="submit"
+            class="px-8 py-2.5 bg-[#0f172a] hover:bg-slate-800 text-white rounded-lg text-xs font-bold uppercase tracking-widest transition shadow cursor-pointer">
+            Simpan Perubahan
+          </button>
         </div>
 
       </form>
@@ -142,6 +168,33 @@
       Tabeahan Cendekia Admin Panel
     </p>
   </div>
+
+  <script>
+    const materiPerPaket = {
+      "Paket SKD/TKD":        [{ id:1, nama:"TWK — Tes Wawasan Kebangsaan" }, { id:2, nama:"TIU — Tes Intelegensia Umum" }, { id:3, nama:"TKP — Tes Karakteristik Pribadi" }],
+      "Paket Akademik Polri": [{ id:4, nama:"Pengetahuan Umum" }, { id:5, nama:"Wawasan Kebangsaan" }, { id:6, nama:"Penalaran Numerik" }, { id:7, nama:"Bahasa Indonesia" }, { id:8, nama:"Bahasa Inggris" }],
+      "Paket PPPK":           [{ id:9, nama:"Kompetensi Teknis" }, { id:10, nama:"Kompetensi Manajerial" }, { id:11, nama:"Kompetensi Sosial-Kultural" }, { id:12, nama:"Kompetensi Wawancara" }]
+    };
+
+    const editPaketSelect  = document.getElementById('editPaketSelect');
+    const editMateriSelect = document.getElementById('editMateriSelect');
+    const currentMateriId  = <%= s.materi_id %>;
+
+    function updateEditMateri() {
+      const list = materiPerPaket[editPaketSelect.value] || [];
+      editMateriSelect.innerHTML = '';
+      list.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = m.nama;
+        if (m.id === currentMateriId) opt.selected = true;
+        editMateriSelect.appendChild(opt);
+      });
+    }
+
+    editPaketSelect.addEventListener('change', updateEditMateri);
+    updateEditMateri();
+  </script>
 
 </body>
 </html>

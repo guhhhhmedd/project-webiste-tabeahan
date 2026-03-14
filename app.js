@@ -4,13 +4,10 @@ const session = require("express-session");
 const helmet = require("helmet");
 const compression = require("compression");
 const path = require("path");
-
 const app = express();
 const port = process.env.PORT || 3000;
 
-// ========================
 // SECURITY MIDDLEWARE
-// ========================
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -30,17 +27,14 @@ app.use(
 );
 app.use(compression());
 
-// ========================
+
 // GENERAL MIDDLEWARE
-// ========================
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
-// ========================
 // SESSION
-// ========================
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -52,27 +46,21 @@ app.use(
     },
   })
 );
-// Aktifkan hanya di production
 if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
 }
 
-// No cache — biar reload tidak bisa balik ke halaman sebelumnya
 app.use((req, res, next) => {
   res.set("Cache-Control", "no-cache, private, no-store, must-revalidate");
   next();
 });
 
-// ========================
 // VIEW ENGINE
-// ========================
 app.set("view engine", "ejs");
 app.set("views", "views");
 
 
-// ========================
 // ROUTES
-// ========================
 const authRouter = require("./routes/auth");
 const usersRouter = require("./routes/users");
 const adminRouter = require("./routes/admin");
@@ -83,7 +71,6 @@ app.use("/", usersRouter);
 app.use("/", adminRouter);
 app.use("/ujian", ujianRouter);
 
-// Landing page & static pages
 app.get("/", (req, res) => {
   res.render("landing");
 });

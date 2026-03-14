@@ -8,240 +8,106 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --primary: #1e293b;
-      --accent:  #f59e0b;
-      --accent2: #d97706;
-      --bg:      #f1f5f9;
-      --surface: #ffffff;
-      --border:  #e2e8f0;
-      --muted:   #94a3b8;
-      --text:    #1e293b;
-      --danger:  #ef4444;
-      --success: #22c55e;
+      --primary: #1e293b; --accent: #f59e0b; --accent2: #d97706;
+      --bg: #f1f5f9; --surface: #ffffff; --border: #e2e8f0;
+      --muted: #94a3b8; --text: #1e293b; --danger: #ef4444; --success: #22c55e;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
 
-    /* ── Layout ── */
-    .exam-layout {
-      display: grid;
-      grid-template-columns: 1fr 300px;
-      grid-template-rows: auto 1fr;
-      height: 100vh;
-      overflow: hidden;
-    }
+    .exam-layout { display: grid; grid-template-columns: 1fr 300px; grid-template-rows: auto 1fr; height: 100vh; overflow: hidden; }
 
-    /* ── Topbar ── */
-    .topbar {
-      grid-column: 1 / -1;
-      background: #5a0a0a;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 1.5rem; height: 56px;
-      border-bottom: 3px solid var(--accent);
-      position: relative; z-index: 10;
-    }
+    .topbar { grid-column: 1 / -1; background: #5a0a0a; display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; height: 56px; border-bottom: 3px solid var(--accent); position: relative; z-index: 10; }
     .topbar-title { font-size: 13px; font-weight: 700; color: white; letter-spacing: 0.03em; }
     .topbar-paket { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.5); margin-top: 1px; }
 
-    .timer-box {
-      display: flex; align-items: center; gap: 8px;
-      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18);
-      border-radius: 8px; padding: 6px 20px;
-      position: absolute; left: 50%; transform: translateX(-50%);
-    }
+    .timer-box { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18); border-radius: 8px; padding: 6px 20px; position: absolute; left: 50%; transform: translateX(-50%); }
     .timer-icon { font-size: 16px; }
-    #timer {
-      font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums;
-      color: white; letter-spacing: 0.05em;
-    }
+    #timer { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; color: white; letter-spacing: 0.05em; }
     #timer.warning { color: var(--danger); animation: pulse 1s ease-in-out infinite; }
     @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
 
-    .topbar-user {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.8);
-    }
-    .user-avatar {
-      width: 30px; height: 30px; border-radius: 50%;
-      background: var(--accent); color: var(--primary);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 800;
-    }
+    .topbar-user { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.8); }
+    .user-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; }
 
-    /* ── Soal Panel ── */
-    .soal-panel {
-      overflow-y: auto; background: var(--bg);
-      display: flex; flex-direction: column;
-    }
+    .soal-panel { overflow-y: auto; background: var(--bg); display: flex; flex-direction: column; }
     .soal-panel::-webkit-scrollbar { width: 5px; }
     .soal-panel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
-
     .soal-content { flex: 1; padding: 1.75rem 2rem; max-width: 780px; }
 
-    /* Breadcrumb soal */
-    .soal-breadcrumb {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 11px; font-weight: 700; color: var(--muted);
-      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem;
-    }
+    .soal-breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; }
     .soal-breadcrumb .sep { color: #cbd5e1; }
-    .materi-chip {
-      background: rgba(245,158,11,0.1); color: var(--accent2);
-      border: 1px solid rgba(245,158,11,0.25); border-radius: 99px;
-      padding: 2px 10px; font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
-    }
+    .materi-chip { background: rgba(245,158,11,0.1); color: var(--accent2); border: 1px solid rgba(245,158,11,0.25); border-radius: 99px; padding: 2px 10px; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; }
 
-    /* Progress bar */
     .progress-bar-wrap { background: #e2e8f0; height: 4px; border-radius: 99px; margin-bottom: 1.5rem; overflow: hidden; }
     .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 99px; transition: width 0.4s ease; }
 
-    /* Soal text */
-    .soal-number-badge {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 32px; height: 32px; border-radius: 8px;
-      background: var(--primary); color: white;
-      font-size: 13px; font-weight: 800; flex-shrink: 0;
-    }
-    .soal-text {
-      font-size: 15px; line-height: 1.75; font-weight: 500; color: var(--text);
-      flex: 1;
-    }
+    .soal-number-badge { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; background: var(--primary); color: white; font-size: 13px; font-weight: 800; flex-shrink: 0; }
+    .soal-text { font-size: 15px; line-height: 1.75; font-weight: 500; color: var(--text); flex: 1; }
 
-    /* Opsi jawaban */
-    .opsi-label {
-      display: flex; align-items: flex-start; gap: 14px;
-      padding: 14px 18px; border-radius: 12px;
-      border: 2px solid var(--border); background: white;
-      cursor: pointer; transition: all 0.15s ease;
-      margin-bottom: 10px; user-select: none;
-      position: relative;
-    }
+    .opsi-label { display: flex; align-items: flex-start; gap: 14px; padding: 14px 18px; border-radius: 12px; border: 2px solid var(--border); background: white; cursor: pointer; transition: all 0.15s ease; margin-bottom: 10px; user-select: none; position: relative; }
     .opsi-label:hover { border-color: var(--accent); background: rgba(245,158,11,0.03); transform: translateX(2px); }
-    .opsi-label.selected {
-      border-color: var(--accent); background: rgba(245,158,11,0.06);
-      box-shadow: 0 0 0 3px rgba(245,158,11,0.12);
-    }
+    .opsi-label.selected { border-color: var(--accent); background: rgba(245,158,11,0.06); box-shadow: 0 0 0 3px rgba(245,158,11,0.12); }
     .opsi-label input[type="radio"] { display: none; }
-
-    .opsi-bullet {
-      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-      border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 800; transition: all 0.15s;
-      color: var(--muted); background: white;
-    }
-    .opsi-label.selected .opsi-bullet {
-      background: var(--accent); border-color: var(--accent); color: white;
-    }
+    .opsi-bullet { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; transition: all 0.15s; color: var(--muted); background: white; }
+    .opsi-label.selected .opsi-bullet { background: var(--accent); border-color: var(--accent); color: white; }
     .opsi-text { font-size: 14px; font-weight: 500; color: #475569; line-height: 1.5; padding-top: 3px; }
     .opsi-label.selected .opsi-text { color: var(--primary); font-weight: 600; }
 
-    /* Nav bawah soal */
-    .soal-nav {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1rem 2rem; background: white;
-      border-top: 1px solid var(--border);
-      position: sticky; bottom: 0;
-    }
-    .btn-nav {
-      display: flex; align-items: center; gap: 8px;
-      padding: 10px 22px; border-radius: 8px;
-      font-size: 13px; font-weight: 700; cursor: pointer; border: none;
-      transition: all 0.15s;
-    }
+    .soal-nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; background: white; border-top: 1px solid var(--border); position: sticky; bottom: 0; }
+    .btn-nav { display: flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; transition: all 0.15s; }
     .btn-nav.prev { background: white; border: 2px solid var(--border); color: var(--muted); }
     .btn-nav.prev:hover:not(:disabled) { border-color: #94a3b8; color: var(--text); }
     .btn-nav.next { background: var(--primary); color: white; }
     .btn-nav.next:hover:not(:disabled) { background: #0f172a; }
     .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
-
     .soal-counter { font-size: 12px; font-weight: 600; color: var(--muted); }
     .soal-counter strong { color: var(--text); }
 
-    /* ── Sidebar ── */
-    .sidebar {
-      background: white; border-left: 1px solid var(--border);
-      display: flex; flex-direction: column; overflow: hidden;
-    }
-
-    .sidebar-header {
-      padding: 16px; border-bottom: 1px solid var(--border);
-      background: #f8fafc;
-    }
+    .sidebar { background: white; border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+    .sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); background: #f8fafc; }
     .sidebar-header h3 { font-size: 12px; font-weight: 800; color: var(--text); text-transform: uppercase; letter-spacing: 0.08em; }
 
-    /* Stats strip */
-    .stats-strip {
-      display: grid; grid-template-columns: 1fr 1fr 1fr;
-      padding: 10px 16px; gap: 8px; border-bottom: 1px solid var(--border);
-    }
+    .stats-strip { display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 10px 16px; gap: 8px; border-bottom: 1px solid var(--border); }
     .stat-item { text-align: center; }
     .stat-num { font-size: 18px; font-weight: 800; }
     .stat-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.05em; }
 
-    /* Nav grid */
     .nav-scroll { flex: 1; overflow-y: auto; padding: 12px 16px; }
     .nav-scroll::-webkit-scrollbar { width: 4px; }
     .nav-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 99px; }
-
     #nav-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
 
-    .nav-item {
-      aspect-ratio: 1; border-radius: 8px; font-size: 11px; font-weight: 700;
-      border: 2px solid var(--border); background: white; color: var(--muted);
-      cursor: pointer; transition: all 0.15s;
-      display: flex; align-items: center; justify-content: center;
-    }
+    .nav-item { aspect-ratio: 1; border-radius: 8px; font-size: 11px; font-weight: 700; border: 2px solid var(--border); background: white; color: var(--muted); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
     .nav-item:hover { border-color: var(--accent); color: var(--accent2); background: rgba(245,158,11,0.05); }
     .nav-item.answered { background: var(--accent); border-color: var(--accent2); color: white; }
     .nav-item.active { border-color: var(--primary); border-width: 2.5px; color: var(--primary); box-shadow: 0 0 0 3px rgba(30,41,59,0.12); }
     .nav-item.answered.active { background: var(--accent2); border-color: var(--primary); color: white; box-shadow: 0 0 0 3px rgba(30,41,59,0.15); }
 
-    /* Legend */
     .legend { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; gap: 14px; flex-wrap: wrap; }
     .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; color: var(--muted); }
     .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
 
-    /* Tombol akhiri */
     .sidebar-footer { padding: 14px 16px; border-top: 1px solid var(--border); }
-    #btnSelesai {
-      width: 100%; padding: 12px; border-radius: 10px;
-      background: linear-gradient(135deg, #dc2626, #b91c1c);
-      color: white; font-size: 13px; font-weight: 800; letter-spacing: 0.03em;
-      border: none; cursor: pointer;
-      box-shadow: 0 4px 12px rgba(220,38,38,0.3), 0 3px 0 #991b1b;
-      transition: all 0.15s; position: relative; top: 0;
-    }
+    #btnSelesai { width: 100%; padding: 12px; border-radius: 10px; background: linear-gradient(135deg, #dc2626, #b91c1c); color: white; font-size: 13px; font-weight: 800; letter-spacing: 0.03em; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(220,38,38,0.3), 0 3px 0 #991b1b; transition: all 0.15s; position: relative; top: 0; }
     #btnSelesai:hover { filter: brightness(1.08); }
     #btnSelesai:active { top: 3px; box-shadow: 0 1px 6px rgba(220,38,38,0.3), 0 0px 0 #991b1b; }
 
-    /* Modal konfirmasi selesai */
-    .modal-bg {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.55);
-      backdrop-filter: blur(4px); z-index: 200;
-      display: none; align-items: center; justify-content: center; padding: 1rem;
-    }
+    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.55); backdrop-filter: blur(4px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 1rem; }
     .modal-bg.open { display: flex; }
-    .modal-box {
-      background: white; border-radius: 20px; max-width: 400px; width: 100%;
-      overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.2);
-      animation: popIn 0.25s ease;
-    }
+    .modal-box { background: white; border-radius: 20px; max-width: 400px; width: 100%; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.2); animation: popIn 0.25s ease; }
     @keyframes popIn { from { transform: scale(0.9); opacity:0; } to { transform: scale(1); opacity:1; } }
     .modal-header { background: linear-gradient(135deg,#1e293b,#334155); padding: 24px; text-align: center; }
     .modal-body { padding: 24px; }
     .modal-emoji { font-size: 40px; margin-bottom: 8px; }
 
-    /* Mobile responsive */
     @media (max-width: 768px) {
       .exam-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; height: auto; min-height: 100vh; overflow: auto; }
       .soal-panel { overflow: visible; }
       .sidebar { border-left: none; border-top: 1px solid var(--border); }
-      .sidebar-header, .stats-strip, .nav-scroll, .legend, .sidebar-footer { display: block; }
       .topbar { padding: 0 1rem; }
       .soal-content { padding: 1.25rem; }
     }
-
     .soal-box.hidden { display: none; }
   </style>
 </head>
@@ -258,65 +124,48 @@
 
   <div class="exam-layout">
 
-    <!-- ===== TOPBAR ===== -->
     <header class="topbar">
-      <!-- Kiri: judul -->
       <div>
         <div class="topbar-title">Tabeahan Cendekia</div>
         <div class="topbar-paket"><%= paket %></div>
       </div>
-
-      <!-- Tengah: Timer -->
       <div class="timer-box">
         <span class="timer-icon">⏱</span>
         <span id="timer">00:00</span>
       </div>
-
-      <!-- Kanan: user -->
       <div class="topbar-user">
         <div class="user-avatar"><%= user.username.charAt(0).toUpperCase() %></div>
         <%= user.username %>
       </div>
     </header>
 
-    <!-- ===== AREA SOAL ===== -->
     <div class="soal-panel">
       <div class="soal-content">
 
-        <!-- Progress bar -->
         <div class="progress-bar-wrap">
           <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
         </div>
 
-        <!-- Semua soal (toggle via JS) -->
         <div id="soal-container">
           <% soal.forEach((s, index) => { %>
           <div id="box-<%= index %>" class="soal-box hidden">
 
-            <!-- Breadcrumb -->
             <div class="soal-breadcrumb">
               <span>Soal <strong style="color:var(--text)"><%= index + 1 %></strong> / <%= soal.length %></span>
               <span class="sep">•</span>
               <span class="materi-chip"><%= s.materi %></span>
             </div>
 
-            <!-- Pertanyaan -->
             <div style="display:flex; gap:12px; align-items:flex-start; margin-bottom:1.5rem;">
               <div class="soal-number-badge"><%= index + 1 %></div>
               <p class="soal-text"><%= s.soal %></p>
             </div>
 
-            <!-- Opsi jawaban -->
             <div>
               <% ['a','b','c','d','e'].forEach(opt => { %>
                 <% if (s['opsi_' + opt]) { %>
                 <label class="opsi-label" id="label-<%= s.id %>-<%= opt %>">
-                  <input type="radio"
-                    name="q_<%= s.id %>"
-                    value="<%= opt %>"
-                    class="jawaban-radio"
-                    data-qid="<%= s.id %>"
-                    data-idx="<%= index %>">
+                  <input type="radio" name="q_<%= s.id %>" value="<%= opt %>" class="jawaban-radio" data-qid="<%= s.id %>" data-idx="<%= index %>">
                   <div class="opsi-bullet"><%= opt.toUpperCase() %></div>
                   <span class="opsi-text"><%= s['opsi_' + opt] %></span>
                 </label>
@@ -328,29 +177,19 @@
           <% }) %>
         </div>
 
-      </div><!-- /soal-content -->
-
-      <!-- Nav bawah -->
-      <div class="soal-nav">
-        <button id="btnKembali" class="btn-nav prev">
-          ← Sebelumnya
-        </button>
-        <span class="soal-counter">
-          Soal <strong id="counterCurrent">1</strong> dari <strong><%= soal.length %></strong>
-        </span>
-        <button id="btnLanjut" class="btn-nav next">
-          Selanjutnya →
-        </button>
       </div>
-    </div><!-- /soal-panel -->
 
-    <!-- ===== SIDEBAR ===== -->
+      <div class="soal-nav">
+        <button id="btnKembali" class="btn-nav prev">← Sebelumnya</button>
+        <span class="soal-counter">Soal <strong id="counterCurrent">1</strong> dari <strong><%= soal.length %></strong></span>
+        <button id="btnLanjut" class="btn-nav next">Selanjutnya →</button>
+      </div>
+    </div>
+
     <aside class="sidebar">
       <div class="sidebar-header">
         <h3>📋 Navigasi Soal</h3>
       </div>
-
-      <!-- Stats strip -->
       <div class="stats-strip">
         <div class="stat-item">
           <div class="stat-num" id="statDijawab" style="color:var(--accent2)">0</div>
@@ -365,8 +204,6 @@
           <div class="stat-lbl">Total</div>
         </div>
       </div>
-
-      <!-- Grid nomor -->
       <div class="nav-scroll">
         <div id="nav-grid">
           <% soal.forEach((s, index) => { %>
@@ -374,32 +211,18 @@
           <% }) %>
         </div>
       </div>
-
-      <!-- Legend -->
       <div class="legend">
-        <div class="legend-item">
-          <div class="legend-dot" style="background:var(--accent)"></div>
-          Dijawab
-        </div>
-        <div class="legend-item">
-          <div class="legend-dot" style="background:var(--primary); border:2px solid var(--primary)"></div>
-          Aktif
-        </div>
-        <div class="legend-item">
-          <div class="legend-dot" style="background:white; border:2px solid var(--border)"></div>
-          Belum
-        </div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Dijawab</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--primary);border:2px solid var(--primary)"></div>Aktif</div>
+        <div class="legend-item"><div class="legend-dot" style="background:white;border:2px solid var(--border)"></div>Belum</div>
       </div>
-
-      <!-- Tombol akhiri -->
       <div class="sidebar-footer">
         <button id="btnSelesai">🚩 AKHIRI UJIAN</button>
       </div>
-    </aside><!-- /sidebar -->
+    </aside>
 
-  </div><!-- /exam-layout -->
+  </div>
 
-  <!-- ===== MODAL KONFIRMASI SELESAI ===== -->
   <div class="modal-bg" id="modalSelesai">
     <div class="modal-box">
       <div class="modal-header">
@@ -422,12 +245,10 @@
           <p id="modalPesan" style="font-size:13px; color:#64748b; line-height:1.5;"></p>
         </div>
         <div style="display:flex; gap:10px;">
-          <button id="btnBatalSelesai"
-            style="flex:1; padding:12px; border-radius:10px; border:2px solid #e2e8f0; background:white; font-size:13px; font-weight:700; color:#64748b; cursor:pointer;">
+          <button id="btnBatalSelesai" style="flex:1; padding:12px; border-radius:10px; border:2px solid #e2e8f0; background:white; font-size:13px; font-weight:700; color:#64748b; cursor:pointer;">
             Periksa Lagi
           </button>
-          <button id="btnKonfirmasiSelesai"
-            style="flex:1; padding:12px; border-radius:10px; background:linear-gradient(135deg,#dc2626,#b91c1c); color:white; font-size:13px; font-weight:800; border:none; cursor:pointer;">
+          <button id="btnKonfirmasiSelesai" style="flex:1; padding:12px; border-radius:10px; background:linear-gradient(135deg,#dc2626,#b91c1c); color:white; font-size:13px; font-weight:800; border:none; cursor:pointer;">
             Ya, Kumpulkan!
           </button>
         </div>
@@ -436,7 +257,6 @@
   </div>
 
   <script>
-    // ── Data dari server ──
     const examData  = document.getElementById('exam-data').dataset;
     const totalSoal = parseInt(examData.total);
     const startTime = Number(examData.start);
@@ -447,19 +267,14 @@
     try { jawabanMap = JSON.parse(document.getElementById('existing-jawaban').textContent); } catch(e) {}
 
     let currentIdx = 0;
-    let answeredCount = 0;
 
-    // ── Update counter stats ──
     function updateStats() {
-      answeredCount = Object.keys(jawabanMap).length;
-      const belum   = totalSoal - answeredCount;
-      document.getElementById('statDijawab').textContent = answeredCount;
-      document.getElementById('statBelum').textContent   = belum;
-      // Progress bar
-      document.getElementById('progressFill').style.width = Math.round((answeredCount / totalSoal) * 100) + '%';
+      const answered = Object.keys(jawabanMap).length;
+      document.getElementById('statDijawab').textContent = answered;
+      document.getElementById('statBelum').textContent   = totalSoal - answered;
+      document.getElementById('progressFill').style.width = Math.round((answered / totalSoal) * 100) + '%';
     }
 
-    // ── Mark opsi label selected ──
     function applySelectedStyle(qid, val) {
       document.querySelectorAll(`label[id^="label-${qid}-"]`).forEach(lbl => lbl.classList.remove('selected'));
       if (val) {
@@ -468,49 +283,37 @@
       }
     }
 
-    // ── Restore jawaban ──
+    function markAnswered(idx) {
+      const navBtn = document.querySelector(`.nav-item[data-index="${idx}"]`);
+      if (navBtn) navBtn.classList.add('answered');
+    }
+
     function restoreJawaban() {
       Object.entries(jawabanMap).forEach(([qid, jawaban]) => {
         const radio = document.querySelector(`input[name="q_${qid}"][value="${jawaban}"]`);
         if (radio) {
           radio.checked = true;
           applySelectedStyle(qid, jawaban);
-          const idx = parseInt(radio.dataset.idx);
-          markAnswered(idx);
+          markAnswered(parseInt(radio.dataset.idx));
         }
       });
       updateStats();
     }
 
-    function markAnswered(idx) {
-      const navBtn = document.querySelector(`.nav-item[data-index="${idx}"]`);
-      if (navBtn) navBtn.classList.add('answered');
-    }
-
-    // ── Navigasi soal ──
     function updateView() {
       document.querySelectorAll('.soal-box').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-
       const box = document.getElementById(`box-${currentIdx}`);
       const nav = document.querySelector(`.nav-item[data-index="${currentIdx}"]`);
       if (box) box.classList.remove('hidden');
-      if (nav) {
-        nav.classList.add('active');
-        nav.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-
+      if (nav) { nav.classList.add('active'); nav.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
       document.getElementById('btnKembali').disabled = currentIdx === 0;
       document.getElementById('btnLanjut').disabled  = currentIdx === totalSoal - 1;
       document.getElementById('counterCurrent').textContent = currentIdx + 1;
     }
 
-    document.getElementById('btnKembali').addEventListener('click', () => {
-      if (currentIdx > 0) { currentIdx--; updateView(); }
-    });
-    document.getElementById('btnLanjut').addEventListener('click', () => {
-      if (currentIdx < totalSoal - 1) { currentIdx++; updateView(); }
-    });
+    document.getElementById('btnKembali').addEventListener('click', () => { if (currentIdx > 0) { currentIdx--; updateView(); } });
+    document.getElementById('btnLanjut').addEventListener('click', () => { if (currentIdx < totalSoal - 1) { currentIdx++; updateView(); } });
     document.getElementById('nav-grid').addEventListener('click', e => {
       const btn = e.target.closest('.nav-item');
       if (!btn) return;
@@ -518,18 +321,14 @@
       updateView();
     });
 
-    // ── Simpan jawaban ──
     document.querySelectorAll('.jawaban-radio').forEach(radio => {
       radio.addEventListener('change', function() {
         const qId = this.dataset.qid;
         const jaw = this.value;
-        const idx = parseInt(this.dataset.idx);
-
         applySelectedStyle(qId, jaw);
         jawabanMap[qId] = jaw;
-        markAnswered(idx);
+        markAnswered(parseInt(this.dataset.idx));
         updateStats();
-
         fetch('/ujian/simpan-jawaban', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -537,16 +336,12 @@
         })
         .then(r => r.json())
         .then(data => {
-          if (data.expired) {
-            alert('Waktu ujian sudah habis!');
-            window.location.href = '/ujian/selesai-paksa';
-          }
+          if (data.expired) { alert('Waktu ujian sudah habis!'); window.location.href = '/ujian/selesai-paksa'; }
         })
         .catch(err => console.error("Gagal simpan jawaban:", err));
       });
     });
 
-    // ── Timer ──
     const timerEl = document.getElementById('timer');
     const timerInterval = setInterval(() => {
       const diff = endTime - Date.now();
@@ -563,20 +358,18 @@
       timerEl.textContent = h > 0
         ? `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
         : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-
       if (diff < 300000) timerEl.classList.add('warning');
     }, 1000);
 
-    // ── Submit selesai ──
+    // ── Submit selesai — FIXED: redirect ke /ujian/hasil bukan /users/dashboardPembayaranUjian ──
     function submitSelesai() {
       clearInterval(timerInterval);
       fetch('/ujian/selesai', { method: 'POST' })
         .then(r => r.json())
-        .then(data => { window.location.href = data.redirect || '/users/dashboardPembayaranUjian'; })
-        .catch(() => { window.location.href = '/users/dashboardPembayaranUjian'; });
+        .then(data => { window.location.href = data.redirect || '/ujian/hasil'; })
+        .catch(() => { window.location.href = '/ujian/hasil'; });
     }
 
-    // ── Modal selesai ──
     const modalSelesai = document.getElementById('modalSelesai');
 
     document.getElementById('btnSelesai').addEventListener('click', () => {
@@ -590,12 +383,8 @@
       modalSelesai.classList.add('open');
     });
 
-    document.getElementById('btnBatalSelesai').addEventListener('click', () => {
-      modalSelesai.classList.remove('open');
-    });
-    modalSelesai.addEventListener('click', e => {
-      if (e.target === modalSelesai) modalSelesai.classList.remove('open');
-    });
+    document.getElementById('btnBatalSelesai').addEventListener('click', () => { modalSelesai.classList.remove('open'); });
+    modalSelesai.addEventListener('click', e => { if (e.target === modalSelesai) modalSelesai.classList.remove('open'); });
     document.getElementById('btnKonfirmasiSelesai').addEventListener('click', () => {
       document.getElementById('btnKonfirmasiSelesai').textContent = 'Mengirim...';
       document.getElementById('btnKonfirmasiSelesai').disabled = true;
@@ -623,7 +412,6 @@
       }
     });
 
-    // ── Init ──
     restoreJawaban();
     updateView();
   </script>
