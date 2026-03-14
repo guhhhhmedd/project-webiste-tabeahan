@@ -1,282 +1,302 @@
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth">
+<html lang="id">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Review Jawaban - Tabeahan Cendekia</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Review Jawaban | Tabeahan Cendekia</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --gold: #c8a020; --gold-light: #e0b830;
-      --dark: #7a1010; --cream: #fff8f8; --muted: #9b6b6b;
-      --red-deep: #5a0a0a;
+    :root { --cream:#fff8f8; --gold:#c8a020; --dark:#7a1010; --red-deep:#5a0a0a; --muted:#9b6b6b; }
+    *, *::before, *::after { box-sizing:border-box; }
+    body { font-family:"DM Sans",sans-serif; background:var(--cream); color:var(--dark); min-height:100vh; }
+    h1,h2,h3,h4 { font-family:"Playfair Display",serif; }
+
+    /* ── Navbar ── */
+    .nav { background:var(--red-deep); border-bottom:1px solid rgba(200,160,32,0.25); position:sticky; top:0; z-index:50; box-shadow:0 2px 12px rgba(90,10,10,0.18); }
+
+    /* ── Stat bar ── */
+    .stat-pill {
+      display:inline-flex; align-items:center; gap:0.4rem;
+      padding:0.45rem 0.9rem; border-radius:99px;
+      font-size:0.72rem; font-weight:800;
     }
-    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--dark); }
-    .font-display { font-family: 'Playfair Display', serif; }
+    .stat-benar  { background:rgba(21,128,61,0.1);  color:#15803d; border:1px solid rgba(21,128,61,0.2); }
+    .stat-salah  { background:rgba(220,38,38,0.08); color:#b91c1c; border:1px solid rgba(220,38,38,0.15); }
+    .stat-skor   { background:rgba(200,160,32,0.1); color:#92400e; border:1px solid rgba(200,160,32,0.25); }
 
-    .nav-glass { background: var(--red-deep); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(200,160,32,0.25); box-shadow: 0 2px 12px rgba(90,10,10,0.18); }
+    /* ── Filter tabs ── */
+    .ftab { padding:0.35rem 0.9rem; border-radius:8px; font-size:0.65rem; font-weight:700; cursor:pointer; border:1px solid rgba(200,160,32,0.2); background:white; color:var(--muted); transition:all 0.2s; }
+    .ftab.active, .ftab:hover { background:var(--red-deep); color:var(--gold); border-color:transparent; }
 
-    /* Stat cards */
-    .stat-card { background: white; border-radius: 16px; border: 1.5px solid #f0e8d8; box-shadow: 0 2px 12px rgba(90,10,10,0.05); padding: 1rem 1.5rem; text-align: center; }
-
-    /* Progress bar */
-    .progress-track { height: 8px; background: #f0e8d8; border-radius: 99px; overflow: hidden; }
-    .progress-fill  { height: 100%; border-radius: 99px; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
-
-    /* Soal card */
+    /* ── Soal card ── */
     .soal-card {
-      background: white; border-radius: 16px;
-      border: 1.5px solid #f0e8d8;
-      box-shadow: 0 2px 10px rgba(90,10,10,0.04);
-      overflow: hidden; margin-bottom: 0.75rem;
+      background:white; border-radius:14px;
+      border:1px solid rgba(200,160,32,0.12);
+      box-shadow:0 2px 12px rgba(90,10,10,0.05);
+      overflow:hidden; transition:box-shadow 0.2s;
     }
-    .soal-card.benar { border-color: rgba(22,163,74,0.3); }
-    .soal-card.salah { border-color: rgba(220,38,38,0.2); }
+    .soal-card:hover { box-shadow:0 6px 24px rgba(90,10,10,0.09); }
+    .soal-card.benar { border-left:4px solid #16a34a; }
+    .soal-card.salah { border-left:4px solid #dc2626; }
 
-    .soal-header { padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.75rem; }
-    .soal-header.benar { background: rgba(22,163,74,0.06); }
-    .soal-header.salah { background: rgba(220,38,38,0.04); }
-
-    .badge-no {
-      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 800;
+    .soal-header {
+      padding:0.75rem 1.25rem;
+      display:flex; align-items:center; justify-content:space-between; gap:0.5rem;
+      border-bottom:1px solid rgba(200,160,32,0.08);
     }
-    .badge-no.benar { background: #16a34a; color: white; }
-    .badge-no.salah { background: #dc2626; color: white; }
+    .soal-header.benar { background:rgba(21,128,61,0.04); }
+    .soal-header.salah { background:rgba(220,38,38,0.03); }
 
-    /* Opsi styling */
+    .nomor-badge {
+      width:2rem; height:2rem; border-radius:8px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-family:"Playfair Display",serif; font-weight:900; font-size:0.8rem; color:white;
+    }
+    .nomor-badge.benar { background:#16a34a; }
+    .nomor-badge.salah { background:#dc2626; }
+
+    /* ── Opsi jawaban ── */
     .opsi-row {
-      display: flex; align-items: flex-start; gap: 0.5rem;
-      padding: 0.5rem 0.75rem; border-radius: 10px; margin-bottom: 0.25rem;
-      font-size: 0.8rem; line-height: 1.4;
+      display:flex; align-items:flex-start; gap:0.75rem;
+      padding:0.55rem 0.75rem; border-radius:8px;
+      font-size:0.82rem; transition:background 0.15s;
     }
-    .opsi-label {
-      width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 10px; font-weight: 800; border: 1.5px solid #e0d4c0;
-      color: var(--muted); background: white;
+    .opsi-row.kunci  { background:rgba(21,128,61,0.08); border:1px solid rgba(21,128,61,0.2); }
+    .opsi-row.salah-user { background:rgba(220,38,38,0.06); border:1px solid rgba(220,38,38,0.18); }
+    .opsi-row.normal { background:rgba(200,160,32,0.03); border:1px solid rgba(200,160,32,0.1); }
+
+    .opsi-huruf {
+      width:1.5rem; height:1.5rem; border-radius:6px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.65rem; font-weight:800; text-transform:uppercase;
     }
-    .opsi-row.kunci   { background: rgba(22,163,74,0.08);  }
-    .opsi-row.salah-user { background: rgba(220,38,38,0.06); }
-    .opsi-row.kunci   .opsi-label { background: #16a34a; color: white; border-color: #16a34a; }
-    .opsi-row.salah-user .opsi-label { background: #dc2626; color: white; border-color: #dc2626; }
+    .opsi-huruf.kunci     { background:#16a34a; color:white; }
+    .opsi-huruf.salah-user { background:#dc2626; color:white; }
+    .opsi-huruf.normal    { background:rgba(200,160,32,0.15); color:var(--muted); }
 
-    /* Materi badge */
-    .materi-badge { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; padding: 0.2rem 0.6rem; border-radius: 99px; background: rgba(200,160,32,0.1); color: var(--gold); border: 1px solid rgba(200,160,32,0.2); }
+    /* ── Keterangan box ── */
+    .keterangan-box {
+      background:linear-gradient(135deg, rgba(200,160,32,0.06), rgba(200,160,32,0.03));
+      border:1px solid rgba(200,160,32,0.25);
+      border-radius:10px; padding:1rem 1.25rem;
+      position:relative;
+    }
+    .keterangan-box::before {
+      content:'💡';
+      position:absolute; top:-0.6rem; left:1rem;
+      background:var(--cream); padding:0 0.25rem;
+      font-size:0.85rem;
+    }
+    .keterangan-label {
+      font-size:0.55rem; font-weight:800; text-transform:uppercase;
+      letter-spacing:0.12em; color:var(--gold); margin-bottom:0.5rem;
+      display:block;
+    }
+    .keterangan-text {
+      font-size:0.82rem; line-height:1.75; color:var(--dark);
+      white-space:pre-wrap;   /* jaga enter/baris baru */
+    }
 
-    /* Accordion */
-    .acc-content { display: none; }
-    .acc-content.open { display: block; }
-    .acc-chevron { transition: transform 0.2s; }
-    .acc-header.open .acc-chevron { transform: rotate(180deg); }
-
-    /* Filter tabs */
-    .filter-tab { padding: 0.4rem 0.9rem; border-radius: 99px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1.5px solid #e0d4c0; background: white; color: var(--muted); transition: all 0.15s; }
-    .filter-tab.active { background: var(--red-deep); color: var(--gold); border-color: var(--red-deep); }
-
-    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-    .fade-up { animation: fadeUp 0.4s ease forwards; }
+    /* ── Scroll to top ── */
+    #scrollTop {
+      position:fixed; bottom:1.5rem; right:1.5rem; z-index:40;
+      width:2.5rem; height:2.5rem; border-radius:50%;
+      background:var(--red-deep); color:var(--gold);
+      border:none; cursor:pointer; font-size:1rem;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 4px 12px rgba(90,10,10,0.25);
+      transition:all 0.2s; opacity:0; pointer-events:none;
+    }
+    #scrollTop.show { opacity:1; pointer-events:auto; }
+    #scrollTop:hover { background:var(--gold); color:white; }
   </style>
 </head>
 <body>
 
-  <!-- ===== NAVBAR ===== -->
-  <nav class="nav-glass fixed w-full z-50">
-    <div class="max-w-5xl mx-auto px-6 py-3 flex justify-between items-center">
-      <a href="/dashboard" class="flex items-center gap-3">
-        <img src="/asset/logo.png" alt="Logo" class="h-9 w-9 object-cover rounded-full"/>
-        <span class="font-display font-bold text-sm text-white">Tabeahan <span style="color:var(--gold)">Cendekia</span></span>
-      </a>
-      <div class="flex items-center gap-3">
-        <a href="/users/dashboardPembayaranUjian" class="text-xs font-semibold text-white/60 hover:text-white transition">← Dashboard Ujian</a>
-      </div>
+<!-- NAVBAR -->
+<nav class="nav">
+  <div class="max-w-4xl mx-auto px-4 py-3.5 flex justify-between items-center">
+    <div class="flex items-center gap-2.5">
+      <img src="/asset/logo.png" alt="Logo" class="h-8 w-auto">
+      <span style="font-family:'Playfair Display',serif;color:white;font-size:0.95rem;font-weight:700">
+        Tabeahan <span style="color:var(--gold)">Cendekia</span>
+      </span>
     </div>
-  </nav>
+    <a href="/dashboardPembayaranUjian"
+      style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:0.35rem 1rem;font-size:0.72rem;font-weight:700;text-decoration:none;transition:all 0.2s"
+      onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='rgba(255,255,255,0.75)'">
+      ← Kembali
+    </a>
+  </div>
+</nav>
 
-  <!-- ===== MAIN ===== -->
-  <main class="pt-24 pb-16 min-h-screen">
-    <div class="max-w-5xl mx-auto px-4 md:px-8">
+<!-- MAIN -->
+<div class="max-w-4xl mx-auto px-4 py-8">
 
-      <!-- Header -->
-      <div class="mb-6 fade-up">
-        <p class="text-sm font-medium" style="color:var(--muted)">Evaluasi Hasil Belajar</p>
-        <h1 class="text-3xl font-display font-black">Review <span style="color:var(--gold)">Jawaban</span></h1>
-        <p class="text-sm mt-1" style="color:var(--muted)">Tinjau setiap soal, jawaban kamu, dan kunci jawaban yang benar.</p>
+  <!-- Header -->
+  <div class="mb-6">
+    <p style="font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--muted);margin-bottom:0.35rem">
+      <%= paket %> · Try Out #<%= nomor_to %>
+    </p>
+    <h1 style="font-size:1.75rem;font-weight:900;color:var(--dark);margin:0 0 0.35rem">
+      Review Jawaban
+    </h1>
+    <% if (tglSelesai) { %>
+    <p style="font-size:0.75rem;color:var(--muted)">
+      Diselesaikan pada <%= new Date(tglSelesai).toLocaleDateString('id-ID', {weekday:'long', day:'2-digit', month:'long', year:'numeric'}) %>
+    </p>
+    <% } %>
+  </div>
+
+  <!-- Stat bar -->
+  <div class="flex flex-wrap gap-2.5 mb-5">
+    <span class="stat-pill stat-benar">✅ <%= totalBenar %> Benar</span>
+    <span class="stat-pill stat-salah">❌ <%= totalSalah %> Salah</span>
+    <span class="stat-pill stat-skor">🎯 Skor <%= skor %></span>
+    <span class="stat-pill" style="background:rgba(90,10,10,0.06);color:var(--dark);border:1px solid rgba(90,10,10,0.1)">
+      📄 <%= totalSoal %> Soal
+    </span>
+  </div>
+
+  <!-- Skor bar visual -->
+  <div class="mb-6">
+    <div style="height:6px;background:rgba(200,160,32,0.12);border-radius:99px;overflow:hidden">
+      <div style="height:100%;width:<%= skor %>%;background:linear-gradient(90deg,#16a34a,var(--gold));border-radius:99px;transition:width 1s"></div>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <div class="flex items-center gap-2 mb-5 flex-wrap">
+    <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted)">Tampilkan:</span>
+    <button class="ftab active" data-filter="all">Semua (<%= totalSoal %>)</button>
+    <button class="ftab" data-filter="benar">✅ Benar (<%= totalBenar %>)</button>
+    <button class="ftab" data-filter="salah">❌ Salah (<%= totalSalah %>)</button>
+  </div>
+
+  <!-- List Soal -->
+  <div class="space-y-5" id="soalList">
+  <% soalRows.forEach((item, idx) => {
+       const statusClass = item.is_benar ? 'benar' : 'salah';
+       const opsiMap = {
+         a: item.opsi_a, b: item.opsi_b, c: item.opsi_c,
+         d: item.opsi_d, e: item.opsi_e
+       };
+       const kunciLower     = (item.kunci     || '').toLowerCase();
+       const jawabanLower   = (item.jawaban_user || '').toLowerCase();
+  %>
+  <div class="soal-card <%= statusClass %>" data-status="<%= statusClass %>">
+
+    <!-- Card header -->
+    <div class="soal-header <%= statusClass %>">
+      <div style="display:flex;align-items:center;gap:0.75rem">
+        <div class="nomor-badge <%= statusClass %>"><%= idx + 1 %></div>
+        <div>
+          <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted)">Soal #<%= item.nomor_urut %></span>
+          <% if (!item.is_benar) { %>
+          <p style="font-size:0.65rem;color:#b91c1c;font-weight:700;margin:0">
+            Jawabanmu: <strong><%= jawabanLower.toUpperCase() %></strong> · Kunci: <strong><%= kunciLower.toUpperCase() %></strong>
+          </p>
+          <% } %>
+        </div>
       </div>
+      <% if (item.is_benar) { %>
+        <span style="font-size:0.75rem;color:#15803d;font-weight:800">✅ Benar</span>
+      <% } else { %>
+        <span style="font-size:0.75rem;color:#b91c1c;font-weight:800">❌ Salah</span>
+      <% } %>
+    </div>
 
-      <!-- Stats bar -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 fade-up">
-        <div class="stat-card">
-          <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Skor</p>
-          <p class="text-3xl font-display font-black" style="color:<%= skor >= 70 ? '#16a34a' : skor >= 50 ? 'var(--gold)' : '#dc2626' %>"><%= skor %></p>
-          <p class="text-[10px]" style="color:var(--muted)">dari 100</p>
-        </div>
-        <div class="stat-card">
-          <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Benar</p>
-          <p class="text-3xl font-display font-black text-green-600"><%= totalBenar %></p>
-          <p class="text-[10px]" style="color:var(--muted)">soal</p>
-        </div>
-        <div class="stat-card">
-          <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Salah</p>
-          <p class="text-3xl font-display font-black text-red-600"><%= totalSalah %></p>
-          <p class="text-[10px]" style="color:var(--muted)">soal</p>
-        </div>
-        <div class="stat-card">
-          <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Total</p>
-          <p class="text-3xl font-display font-black" style="color:var(--dark)"><%= totalSoal %></p>
-          <p class="text-[10px]" style="color:var(--muted)">soal dijawab</p>
-        </div>
-      </div>
+    <!-- Body soal -->
+    <div class="p-5 space-y-4">
 
-      <!-- Progress Bar -->
-      <div class="bg-white rounded-2xl border p-4 mb-6 fade-up" style="border-color:#f0e8d8">
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-xs font-bold" style="color:var(--muted)">Akurasi Jawaban</span>
-          <span class="text-xs font-black" style="color:var(--gold)"><%= totalBenar %>/<%= totalSoal %> Benar</span>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill" id="progressBar"
-            style="width: 0%; background: linear-gradient(90deg, #16a34a, #22c55e);"
-            data-width="<%= Math.round((totalBenar/totalSoal)*100) %>%">
-          </div>
-        </div>
-        <div class="flex justify-between mt-2">
-          <span class="text-[10px] font-bold text-green-600">✅ <%= totalBenar %> Benar</span>
-          <span class="text-[10px] font-bold text-red-500">❌ <%= totalSalah %> Salah</span>
-        </div>
-      </div>
+      <!-- Teks soal -->
+      <p style="font-size:0.9rem;line-height:1.7;color:var(--dark);font-weight:500"><%= item.soal %></p>
 
-      <!-- Filter Tabs -->
-      <div class="flex flex-wrap gap-2 mb-5 fade-up" id="filterTabs">
-        <button class="filter-tab active" data-filter="all">Semua (<%= totalSoal %>)</button>
-        <button class="filter-tab" data-filter="benar">✅ Benar (<%= totalBenar %>)</button>
-        <button class="filter-tab" data-filter="salah">❌ Salah (<%= totalSalah %>)</button>
-      </div>
-
-      <!-- Soal List grouped by Paket > Materi -->
-      <div id="soalContainer" class="fade-up">
+      <!-- Opsi jawaban -->
+      <div class="space-y-2">
+      <% ['a','b','c','d','e'].forEach(huruf => { %>
         <%
-          let noSoal = 0;
-          Object.keys(grouped).forEach(paket => {
-            const materis = grouped[paket];
+          let rowClass   = 'normal';
+          let hurufClass = 'normal';
+          let icon       = '';
+
+          if (huruf === kunciLower) {
+            rowClass   = 'kunci';
+            hurufClass = 'kunci';
+            icon       = '✅ ';
+          } else if (huruf === jawabanLower && !item.is_benar) {
+            rowClass   = 'salah-user';
+            hurufClass = 'salah-user';
+            icon       = '❌ ';
+          }
         %>
-        <!-- Paket Header -->
-        <div class="mb-6">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="h-px flex-1" style="background:linear-gradient(90deg,var(--gold),transparent)"></div>
-            <span class="font-display font-bold text-sm px-3 py-1 rounded-full text-white" style="background:var(--red-deep)"><%= paket %></span>
-            <div class="h-px flex-1" style="background:linear-gradient(270deg,var(--gold),transparent)"></div>
-          </div>
-
-          <%
-            Object.keys(materis).forEach(materi => {
-              const soalList = materis[materi];
-              const benarCount = soalList.filter(s => s.is_benar).length;
-          %>
-          <!-- Materi Accordion -->
-          <div class="mb-3">
-            <button class="acc-header w-full flex items-center justify-between p-3 rounded-xl mb-2 text-left transition"
-              style="background:rgba(200,160,32,0.06); border:1px solid rgba(200,160,32,0.15)"
-              data-acc="<%= paket %>-<%= materi %>">
-              <div class="flex items-center gap-2">
-                <span class="materi-badge"><%= materi %></span>
-                <span class="text-xs font-semibold" style="color:var(--dark)"><%= soalList.length %> soal</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="text-[10px] font-bold text-green-600"><%= benarCount %> benar</span>
-                <svg class="acc-chevron w-4 h-4" style="color:var(--muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                </svg>
-              </div>
-            </button>
-
-            <div class="acc-content open" id="acc-<%= (paket + '-' + materi).replace(/[^a-zA-Z0-9]/g, '_') %>">
-            <% soalList.forEach((s, idx) => {
-                noSoal++;
-                const opsiMap = { a: s.opsi_a, b: s.opsi_b, c: s.opsi_c, d: s.opsi_d, e: s.opsi_e };
-                const statusClass = s.is_benar ? 'benar' : 'salah';
-            %>
-              <div class="soal-card <%= statusClass %>" data-status="<%= statusClass %>">
-                <div class="soal-header <%= statusClass %>">
-                  <div class="badge-no <%= statusClass %>"><%= noSoal %></div>
-                  <p class="text-xs font-semibold flex-1 leading-relaxed" style="color:var(--dark)"><%= s.soal %></p>
-                  <span class="text-lg flex-shrink-0"><%= s.is_benar ? '✅' : '❌' %></span>
-                </div>
-                <div class="px-4 py-3 space-y-1">
-                  <% ['a','b','c','d','e'].forEach(k => { %>
-                  <%
-                    let rowClass = '';
-                    if (k === s.kunci) rowClass = 'kunci';
-                    else if (k === s.jawaban_user && !s.is_benar) rowClass = 'salah-user';
-                  %>
-                  <div class="opsi-row <%= rowClass %>">
-                    <div class="opsi-label"><%= k.toUpperCase() %></div>
-                    <span class="flex-1" style="color:<%= k===s.kunci ? '#15803d' : k===s.jawaban_user&&!s.is_benar ? '#b91c1c' : 'var(--muted)' %>">
-                      <%= opsiMap[k] %>
-                    </span>
-                    <% if (k === s.kunci) { %><span class="text-[10px] font-bold text-green-600">✓ Kunci</span><% } %>
-                    <% if (k === s.jawaban_user && !s.is_benar) { %><span class="text-[10px] font-bold text-red-500">← Kamu</span><% } %>
-                    <% if (k === s.jawaban_user && s.is_benar) { %><span class="text-[10px] font-bold text-green-600">← Kamu ✓</span><% } %>
-                  </div>
-                  <% }) %>
-                </div>
-              </div>
-            <% }) %>
-            </div>
-          </div>
-          <% }) %>
+        <div class="opsi-row <%= rowClass %>">
+          <div class="opsi-huruf <%= hurufClass %>"><%= huruf %></div>
+          <span style="font-size:0.82rem;line-height:1.5;flex:1"><%= icon %><%= opsiMap[huruf] || '-' %></span>
         </div>
-        <% }) %>
+      <% }) %>
       </div>
 
-      <!-- Bottom CTA -->
-      <div class="text-center mt-8 fade-up">
-        <a href="/users/dashboardPembayaranUjian"
-          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm text-white"
-          style="background:var(--red-deep)">
-          ← Kembali ke Dashboard
-        </a>
+      <!-- Keterangan Jawaban -->
+      <% if (item.pembahasan && item.pembahasan.trim() !== '') { %>
+      <div class="keterangan-box">
+        <span class="keterangan-label">Pembahasan</span>
+        <p class="keterangan-text"><%= item.pembahasan %></p>
       </div>
+      <% } %>
 
     </div>
-  </main>
+  </div>
+  <% }) %>
+  </div>
 
-  <script>
-    // ── Animate Progress Bar ──
-    window.addEventListener('load', () => {
-      const bar = document.getElementById('progressBar');
-      if (bar) setTimeout(() => { bar.style.width = bar.dataset.width; }, 200);
-    });
+  <!-- Empty state kalau filter kosong -->
+  <div id="emptyFilter" style="display:none;text-align:center;padding:3rem">
+    <div style="font-size:2.5rem;opacity:0.2;margin-bottom:0.75rem">🔍</div>
+    <p style="color:var(--muted);font-weight:600">Tidak ada soal dengan filter ini.</p>
+  </div>
 
-    // ── Accordion toggle ──
-    document.querySelectorAll('.acc-header').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const key = btn.dataset.acc.replace(/[^a-zA-Z0-9]/g, '_');
-        const content = document.getElementById('acc-' + key);
-        const isOpen  = content.classList.contains('open');
-        content.classList.toggle('open', !isOpen);
-        btn.classList.toggle('open', !isOpen);
+  <div class="mt-8 flex justify-center">
+    <a href="/dashboardPembayaranUjian"
+      style="background:linear-gradient(135deg,var(--red-deep),#6b1a1a);color:white;padding:0.75rem 2rem;border-radius:10px;font-size:0.8rem;font-weight:700;text-decoration:none;letter-spacing:0.05em">
+      ← Kembali ke Dashboard
+    </a>
+  </div>
+
+  <p style="margin-top:2rem;text-align:center;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:rgba(155,107,107,0.35)">
+    Tabeahan Cendekia
+  </p>
+
+</div>
+
+<!-- Scroll to top -->
+<button id="scrollTop" title="Ke atas">↑</button>
+
+<script>
+  // Filter tabs
+  document.querySelectorAll('.ftab').forEach(tab => {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      const filter = this.dataset.filter;
+      let shown = 0;
+      document.querySelectorAll('.soal-card').forEach(card => {
+        const match = filter === 'all' || card.dataset.status === filter;
+        card.style.display = match ? '' : 'none';
+        if (match) shown++;
       });
+      document.getElementById('emptyFilter').style.display = shown === 0 ? '' : 'none';
     });
+  });
 
-    // ── Filter tabs ──
-    document.querySelectorAll('.filter-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
+  // Scroll to top button
+  const scrollBtn = document.getElementById('scrollTop');
+  window.addEventListener('scroll', () => {
+    scrollBtn.classList.toggle('show', window.scrollY > 400);
+  });
+  scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+</script>
 
-        const filter = tab.dataset.filter;
-        document.querySelectorAll('.soal-card').forEach(card => {
-          if (filter === 'all') {
-            card.style.display = '';
-          } else {
-            card.style.display = card.dataset.status === filter ? '' : 'none';
-          }
-        });
-      });
-    });
-  </script>
 </body>
 </html>

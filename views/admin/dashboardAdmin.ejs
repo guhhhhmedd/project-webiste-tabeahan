@@ -240,19 +240,23 @@
               </div>
             </div>
 
-            <div class="flex items-end gap-3">
-              <div class="flex-1">
-                <label class="adm-lbl">Kunci Jawaban</label>
-                <select name="kunci" class="adm-input font-bold" style="border-color:var(--gold);background:rgba(200,160,32,0.04)" required>
-                  <option value="a">Opsi A</option>
-                  <option value="b">Opsi B</option>
-                  <option value="c">Opsi C</option>
-                  <option value="d">Opsi D</option>
-                  <option value="e">Opsi E</option>
-                </select>
-              </div>
-              <button type="submit" class="adm-btn">SIMPAN SOAL</button>
+            <div>
+              <label class="adm-lbl">Kunci Jawaban</label>
+              <select name="kunci" class="adm-input font-bold" style="border-color:var(--gold);background:rgba(200,160,32,0.04)" required>
+                <option value="a">Opsi A</option>
+                <option value="b">Opsi B</option>
+                <option value="c">Opsi C</option>
+                <option value="d">Opsi D</option>
+                <option value="e">Opsi E</option>
+              </select>
             </div>
+
+            <div>
+              <label class="adm-lbl">Pembahasan / Keterangan Jawaban</label>
+              <textarea name="pembahasan" placeholder="Tulis pembahasan jawaban di sini. Bisa multi-baris..." class="adm-input" style="height:5rem" required></textarea>
+            </div>
+
+            <button type="submit" class="adm-btn w-full">SIMPAN SOAL</button>
 
           </form>
         </div>
@@ -278,7 +282,7 @@
 
             <div class="rounded-lg p-3" style="background:rgba(200,160,32,0.04);border:1px solid rgba(200,160,32,0.15)">
               <p class="text-[10px] font-bold uppercase mb-1" style="color:var(--muted)">Format Kolom Excel:</p>
-              <p class="text-[11px] font-mono" style="color:var(--dark)">paket | nomor_to | materi_id | nomor_urut | soal | a | b | c | d | e | kunci</p>
+              <p class="text-[11px] font-mono" style="color:var(--dark)">paket | nomor_to | materi_id | nomor_urut | soal | a | b | c | d | e | kunci | pembahasan</p>
             </div>
 
             <div class="rounded-lg p-3" style="background:rgba(200,160,32,0.06);border:1px solid rgba(200,160,32,0.2)">

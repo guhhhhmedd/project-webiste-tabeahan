@@ -2,12 +2,14 @@ const express = require("express");
 const router  = express.Router();
 const db      = require("../config/db");
 
+
 // MIDDLEWARE
 function isSedangUjian(req, res, next) {
   if (req.session.ujian) return next();
   res.redirect("/dashboardPembayaranUjian");
 }
 
+// Cek role admin
 function isAdmin(req, res, next) {
   if (req.session.user && req.session.user.role === "admin") return next();
   res.status(403).send("Akses Ditolak: Hanya Admin yang bisa mereset ujian!");
@@ -30,6 +32,7 @@ async function isLogin(req, res, next) {
     next();
   }
 }
+
 
 // POST /ujian/mulai
 router.post("/mulai", isLogin, async (req, res) => {
@@ -72,7 +75,7 @@ router.post("/mulai", isLogin, async (req, res) => {
     );
     const durasiMs = (config[0]?.durasi_menit || 100) * 60 * 1000;
 
-      req.session.ujian = {
+    req.session.ujian = {
       paymentId: paymentId,
       paket:     paket_pilihan,
       nomorTO:   parseInt(nomor_to),
@@ -93,11 +96,12 @@ router.post("/mulai", isLogin, async (req, res) => {
   }
 });
 
+
 // GET /ujian/soal/:index
+
 router.get("/soal/:index", isLogin, isSedangUjian, async (req, res) => {
   const sesi = req.session.ujian;
 
-  // Cek waktu habis
   if (Date.now() - sesi.startTime >= sesi.durasiMs) {
     return res.redirect("/ujian/selesai-paksa");
   }
@@ -132,7 +136,9 @@ router.get("/soal/:index", isLogin, isSedangUjian, async (req, res) => {
   }
 });
 
+
 // POST /ujian/simpan-jawaban
+
 router.post("/simpan-jawaban", isLogin, isSedangUjian, async (req, res) => {
   const sesi = req.session.ujian;
   const { questionId, jawaban } = req.body;
@@ -150,19 +156,24 @@ router.post("/simpan-jawaban", isLogin, isSedangUjian, async (req, res) => {
   }
 });
 
+
 // POST /ujian/selesai
+
 router.post("/selesai", isLogin, async (req, res) => {
   if (!req.session.ujian)
     return res.json({ ok: false, redirect: "/dashboardPembayaranUjian" });
   await hitungDanSimpanSkor(req, res, true);
 });
 
+
 // GET /ujian/selesai-paksa
+
 router.get("/selesai-paksa", isLogin, async (req, res) => {
   if (!req.session.ujian)
     return res.redirect("/dashboardPembayaranUjian");
   await hitungDanSimpanSkor(req, res, false);
 });
+
 
 // HITUNG & SIMPAN SKOR
 async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
@@ -176,14 +187,10 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
       [sesi.paket, sesi.nomorTO]
     );
 
-    let benar = 0;
     const jawabanUserSesi = sesi.jawaban;
 
-    // Simpan semua jawaban + hitung skor
     const simpanPromises = soalRows.map((s) => {
       const jawabanUser = jawabanUserSesi[s.id] || null;
-      if (jawabanUser && jawabanUser === s.kunci) benar++;
-
       return db.query(
         `INSERT INTO jawaban_peserta (user_id, question_id, jawaban_user)
          VALUES (?, ?, ?)
@@ -194,7 +201,18 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
 
     await Promise.all(simpanPromises);
 
-    const totalSoal = soalRows.length;
+    const [hasilDB] = await db.query(
+      `SELECT
+         COUNT(*) AS total_soal,
+         SUM(CASE WHEN jp.jawaban_user = q.kunci THEN 1 ELSE 0 END) AS total_benar
+       FROM jawaban_peserta jp
+       JOIN questions q ON jp.question_id = q.id
+       WHERE jp.user_id = ? AND q.nomor_to = ? AND TRIM(q.paket) = TRIM(?) AND q.is_active = 1`,
+      [userId, sesi.nomorTO, sesi.paket]
+    );
+
+    const totalSoal = parseInt(hasilDB[0].total_soal) || soalRows.length;
+    const benar     = parseInt(hasilDB[0].total_benar) || 0;
     const skor      = totalSoal > 0 ? Math.round((benar / totalSoal) * 100) : 0;
 
     await Promise.all([
@@ -203,6 +221,7 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
          VALUES (?, ?, ?, ?, ?, ?, NOW())`,
         [userId, sesi.paket, sesi.nomorTO, skor, benar, totalSoal]
       ),
+      // Status payment → SELESAI (hanya kalau ada payment row — anggota tidak punya)
       sesi.paymentId
         ? db.query(
             `UPDATE payments SET status = 'SELESAI'
@@ -229,7 +248,9 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
   }
 }
 
+
 // POST /ujian/reset-ujian (admin only)
+
 router.post("/reset-ujian", isLogin, isAdmin, async (req, res) => {
   const { userIdTarget, paket_pilihan, nomor_to } = req.body;
 
@@ -260,7 +281,9 @@ router.post("/reset-ujian", isLogin, isAdmin, async (req, res) => {
   }
 });
 
+
 // GET /ujian/hasil
+
 router.get("/hasil", isLogin, async (req, res) => {
   try {
     const userId = req.session.user.id;
@@ -286,7 +309,9 @@ router.get("/hasil", isLogin, async (req, res) => {
   }
 });
 
+
 // GET /ujian/review?nomor_to=X
+
 router.get("/review", isLogin, async (req, res) => {
   const { nomor_to, paket } = req.query;
   const userId = req.session.user.id;
@@ -303,15 +328,15 @@ router.get("/review", isLogin, async (req, res) => {
       `SELECT
          jp.question_id,
          jp.jawaban_user,
-         q.soal, q.paket, q.nomor_to,
+         q.soal, q.paket, q.nomor_to, q.nomor_urut,
          q.opsi_a, q.opsi_b, q.opsi_c, q.opsi_d, q.opsi_e,
-         q.kunci,
+         q.kunci, q.pembahasan,
          CASE WHEN jp.jawaban_user = q.kunci THEN 1 ELSE 0 END AS is_benar
        FROM jawaban_peserta jp
        JOIN questions q ON jp.question_id = q.id
-       WHERE jp.user_id = ? AND q.nomor_to = ?
+       WHERE jp.user_id = ? AND q.nomor_to = ? AND TRIM(q.paket) = TRIM(?)
        ORDER BY q.nomor_urut ASC`,
-      [userId, nomor_to]
+      [userId, nomor_to, paket]
     );
 
     if (jawabanRows.length === 0) {

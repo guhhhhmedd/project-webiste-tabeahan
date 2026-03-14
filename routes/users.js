@@ -40,11 +40,6 @@ const PAKET_LIST = [
   { key: "Paket PPPK",           label: "Paket PPPK",           durasi: 120 },
 ];
 
-// ─────────────────────────────────────────────
-// HELPER: Bangun paymentMap dari array payments
-// Key: "NamaPaket_nomor_to" → ambil yang terbaru (ORDER BY created_at DESC)
-// Status di-UPPER agar konsisten dengan pengecekan di EJS
-// ─────────────────────────────────────────────
 function buildPaymentMap(payments, user = null) {
   const map = {};
   for (const p of payments) {
