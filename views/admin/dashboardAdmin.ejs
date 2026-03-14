@@ -231,18 +231,18 @@
 
             <div>
               <label class="adm-lbl">Pilihan Jawaban</label>
-              <div class="grid grid-cols-2 gap-2">
-                <input type="text" name="a" placeholder="A. ..." class="adm-input" required>
-                <input type="text" name="b" placeholder="B. ..." class="adm-input" required>
-                <input type="text" name="c" placeholder="C. ..." class="adm-input" required>
-                <input type="text" name="d" placeholder="D. ..." class="adm-input" required>
-                <input type="text" name="e" placeholder="E. ..." class="col-span-2 adm-input" required>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div class="flex gap-2"><input type="text" name="a" placeholder="A. ..." class="adm-input flex-1" required><input type="number" name="bobot_a" placeholder="Poin" min="0" max="100" class="adm-input w-20 text-center font-bold text-blue-700 bobot-input-add" style="display:none;" title="Poin A"></div>
+                <div class="flex gap-2"><input type="text" name="b" placeholder="B. ..." class="adm-input flex-1" required><input type="number" name="bobot_b" placeholder="Poin" min="0" max="100" class="adm-input w-20 text-center font-bold text-blue-700 bobot-input-add" style="display:none;" title="Poin B"></div>
+                <div class="flex gap-2"><input type="text" name="c" placeholder="C. ..." class="adm-input flex-1" required><input type="number" name="bobot_c" placeholder="Poin" min="0" max="100" class="adm-input w-20 text-center font-bold text-blue-700 bobot-input-add" style="display:none;" title="Poin C"></div>
+                <div class="flex gap-2"><input type="text" name="d" placeholder="D. ..." class="adm-input flex-1" required><input type="number" name="bobot_d" placeholder="Poin" min="0" max="100" class="adm-input w-20 text-center font-bold text-blue-700 bobot-input-add" style="display:none;" title="Poin D"></div>
+                <div class="col-span-1 md:col-span-2 flex gap-2"><input type="text" name="e" placeholder="E. ..." class="adm-input flex-1" required><input type="number" name="bobot_e" placeholder="Poin" min="0" max="100" class="adm-input w-20 text-center font-bold text-blue-700 bobot-input-add" style="display:none;" title="Poin E"></div>
               </div>
             </div>
 
-            <div>
+            <div id="kunciContainerAdd">
               <label class="adm-lbl">Kunci Jawaban</label>
-              <select name="kunci" class="adm-input font-bold" style="border-color:var(--gold);background:rgba(200,160,32,0.04)" required>
+              <select name="kunci" id="kunciSelectAdd" class="adm-input font-bold" style="border-color:var(--gold);background:rgba(200,160,32,0.04)" required>
                 <option value="a">Opsi A</option>
                 <option value="b">Opsi B</option>
                 <option value="c">Opsi C</option>
@@ -427,11 +427,36 @@
         opt.textContent = m.nama;
         materiSelect.appendChild(opt);
       });
+      toggleBobotAdd();
     }
 
     if (paketSelect) {
       paketSelect.addEventListener('change', updateMateri);
       updateMateri();
+    }
+
+    const bobotIdsAdd = [3, 10, 11, 12];
+    function toggleBobotAdd() {
+      if (!materiSelect) return;
+      const id = parseInt(materiSelect.value);
+      const isBobot = bobotIdsAdd.includes(id);
+      
+      document.querySelectorAll('.bobot-input-add').forEach(el => {
+        el.style.display = isBobot ? 'block' : 'none';
+      });
+      
+      const kc = document.getElementById('kunciContainerAdd');
+      const ks = document.getElementById('kunciSelectAdd');
+      if (kc) kc.style.display = isBobot ? 'none' : 'block';
+      if (ks) {
+        if (isBobot) ks.removeAttribute('required');
+        else ks.setAttribute('required', 'required');
+      }
+    }
+
+    if (materiSelect) {
+      materiSelect.addEventListener('change', toggleBobotAdd);
+      setTimeout(toggleBobotAdd, 50);
     }
 
     function showToast(msg) {

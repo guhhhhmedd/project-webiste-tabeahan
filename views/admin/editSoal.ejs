@@ -112,6 +112,9 @@
               <input type="text" name="opsi_<%= letra %>" value="<%= s['opsi_' + letra] %>"
                 placeholder="Jawaban opsi <%= letra.toUpperCase() %>"
                 class="flex-1 border border-slate-300 p-2.5 rounded-lg bg-white text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+              <input type="number" name="bobot_<%= letra %>" value="<%= s['bobot_' + letra] || 0 %>"
+                placeholder="Poin" min="0" max="100"
+                class="w-16 border border-slate-300 p-2.5 rounded-lg bg-white text-sm font-bold text-center text-blue-700 bg-blue-50 focus:ring-2 focus:ring-blue-500 outline-none transition bobot-input" style="display:none;" title="Poin untuk opsi ini">
             </div>
             <% }) %>
             <!-- Opsi E full width -->
@@ -119,16 +122,18 @@
               <div class="w-9 h-9 flex-none flex items-center justify-center rounded-lg bg-slate-100 text-slate-500 font-black text-sm uppercase">e</div>
               <input type="text" name="opsi_e" value="<%= s['opsi_e'] %>" placeholder="Jawaban opsi E"
                 class="flex-1 border border-slate-300 p-2.5 rounded-lg bg-white text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+              <input type="number" name="bobot_e" value="<%= s['bobot_e'] || 0 %>"
+                placeholder="Poin" min="0" max="100"
+                class="w-16 border border-slate-300 p-2.5 rounded-lg bg-white text-sm font-bold text-center text-blue-700 bg-blue-50 focus:ring-2 focus:ring-blue-500 outline-none transition bobot-input" style="display:none;" title="Poin untuk opsi ini">
             </div>
           </div>
         </div>
 
         <!-- Kunci Jawaban -->
-        <div>
+        <div id="kunciContainer">
           <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Kunci Jawaban</label>
-          <select name="kunci"
-            class="w-full md:w-48 border-2 border-yellow-400 p-2.5 rounded-lg bg-yellow-50 font-black text-slate-800 uppercase text-sm focus:ring-2 focus:ring-yellow-400 outline-none transition cursor-pointer"
-            required>
+          <select name="kunci" id="kunciSelect"
+            class="w-full md:w-48 border-2 border-yellow-400 p-2.5 rounded-lg bg-yellow-50 font-black text-slate-800 uppercase text-sm focus:ring-2 focus:ring-yellow-400 outline-none transition cursor-pointer">
             <% ['a','b','c','d','e'].forEach(opt => { %>
             <option value="<%= opt %>" <%= s.kunci && s.kunci.toLowerCase()===opt ? 'selected' : '' %>>Opsi <%= opt.toUpperCase() %></option>
             <% }) %>
@@ -194,6 +199,28 @@
 
     editPaketSelect.addEventListener('change', updateEditMateri);
     updateEditMateri();
+
+    const bobotMateriIds = [3, 10, 11, 12];
+    function toggleBobotInputs() {
+      const selectedId = parseInt(editMateriSelect.value);
+      const isBobot = bobotMateriIds.includes(selectedId);
+      
+      document.querySelectorAll('.bobot-input').forEach(el => {
+        el.style.display = isBobot ? 'block' : 'none';
+      });
+      
+      document.getElementById('kunciContainer').style.display = isBobot ? 'none' : 'block';
+      const kunciSelect = document.getElementById('kunciSelect');
+      if (isBobot) {
+        kunciSelect.removeAttribute('required');
+      } else {
+        kunciSelect.setAttribute('required', 'required');
+      }
+    }
+
+    editMateriSelect.addEventListener('change', toggleBobotInputs);
+    // Initialize state
+    setTimeout(toggleBobotInputs, 50);
   </script>
 
 </body>

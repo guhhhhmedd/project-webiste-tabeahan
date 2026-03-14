@@ -264,12 +264,17 @@ router.get("/admin/kelola-soal/:paket", isAdmin, async (req, res) => {
  
 // TAMBAH SOAL MANUAL
 router.post("/admin/tambah-soal", isAdmin, async (req, res) => {
-  const { paket, nomor_to, materi_id, nomor_urut, soal, a, b, c, d, e, kunci, pembahasan } = req.body;
+  const { paket, nomor_to, materi_id, nomor_urut, soal, a, b, c, d, e, kunci, pembahasan,
+          bobot_a, bobot_b, bobot_c, bobot_d, bobot_e } = req.body;
   try {
+    const bobotMateriIds = [3, 10, 11, 12];
+    const tipe_penilaian = bobotMateriIds.includes(parseInt(materi_id)) ? 'BOBOT_OPSI' : 'BENAR_SALAH';
+
     await db.query(
-      `INSERT INTO questions (paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [paket, nomor_to, materi_id, nomor_urut, soal, a, b, c, d, e, kunci, pembahasan || '']
+      `INSERT INTO questions (paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan, tipe_penilaian, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [paket, nomor_to, materi_id, nomor_urut, soal, a, b, c, d, e, kunci || '', pembahasan || '',
+       tipe_penilaian, bobot_a || 0, bobot_b || 0, bobot_c || 0, bobot_d || 0, bobot_e || 0]
     );
     res.redirect("/dashboardAdmin?message=Soal+berhasil+ditambah");
   } catch (err) {
@@ -286,14 +291,20 @@ router.post("/admin/tambah-soal", isAdmin, async (req, res) => {
  
 // UPDATE SOAL
 router.post("/admin/updateSoal", isAdmin, async (req, res) => {
-  const { id, paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan } = req.body;
+  const { id, paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan,
+          bobot_a, bobot_b, bobot_c, bobot_d, bobot_e } = req.body;
   try {
+    const bobotMateriIds = [3, 10, 11, 12];
+    const tipe_penilaian = bobotMateriIds.includes(parseInt(materi_id)) ? 'BOBOT_OPSI' : 'BENAR_SALAH';
+
     await db.query(
       `UPDATE questions 
        SET paket=?, nomor_to=?, materi_id=?, nomor_urut=?, soal=?,
-           opsi_a=?, opsi_b=?, opsi_c=?, opsi_d=?, opsi_e=?, kunci=?, pembahasan=?
+           opsi_a=?, opsi_b=?, opsi_c=?, opsi_d=?, opsi_e=?, kunci=?, pembahasan=?,
+           tipe_penilaian=?, bobot_a=?, bobot_b=?, bobot_c=?, bobot_d=?, bobot_e=?
        WHERE id=?`,
-      [paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan || '', id]
+      [paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci || '', pembahasan || '',
+       tipe_penilaian, bobot_a || 0, bobot_b || 0, bobot_c || 0, bobot_d || 0, bobot_e || 0, id]
     );
     res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}`);
   } catch (err) {
