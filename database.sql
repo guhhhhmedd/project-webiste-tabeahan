@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.44, for Win64 (x86_64)
 --
--- Host: localhost    Database: db_pencatatan
+-- Host: localhost    Database: webcat
 -- ------------------------------------------------------
 -- Server version	8.0.44
 
@@ -47,6 +47,89 @@ INSERT INTO `anggota_offline` VALUES (1,'jono@gmail.com','jono','anggota regu ul
 UNLOCK TABLES;
 
 --
+-- Table structure for table `bank_soal`
+--
+
+DROP TABLE IF EXISTS `bank_soal`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `bank_soal` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `materi_id` int DEFAULT NULL,
+  `tipe_penilaian` varchar(50) DEFAULT 'BENAR_SALAH',
+  `teks_soal` text NOT NULL,
+  `pembahasan` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bank_soal`
+--
+
+LOCK TABLES `bank_soal` WRITE;
+/*!40000 ALTER TABLE `bank_soal` DISABLE KEYS */;
+INSERT INTO `bank_soal` VALUES (4,4,'BENAR_SALAH','Contoh soal PU: Ibu kota Indonesia adalah...','tes'),(5,5,'BENAR_SALAH','Contoh soal WK: Pancasila lahir tanggal...',NULL),(6,6,'BENAR_SALAH','Contoh soal Numerik: 10 + 10 x 0 = ...',NULL),(7,7,'BENAR_SALAH','Contoh soal B.Indo: Antonim besar adalah...',NULL),(8,8,'BENAR_SALAH','Contoh soal B.Inggris: I ... a student.',NULL),(9,9,'BENAR_SALAH','Contoh soal Teknis: Jelaskan tupoksi...',''),(10,10,'BOBOT_OPSI','Contoh soal Manajerial: Cara memimpin...',NULL),(11,11,'BOBOT_OPSI','Contoh soal Sosio: Toleransi adalah...',NULL),(12,12,'BOBOT_OPSI','Contoh soal Wawancara: Alasan mendaftar...',NULL),(40,4,'BENAR_SALAH','Contoh soal PU: Ibu kota Indonesia adalah...',NULL),(41,5,'BENAR_SALAH','Contoh soal WK: Pancasila lahir tanggal...',NULL),(42,6,'BENAR_SALAH','Contoh soal Numerik: 10 + 10 x 0 = ...',NULL),(43,7,'BENAR_SALAH','Contoh soal B.Indo: Antonim besar adalah...',NULL),(44,8,'BENAR_SALAH','Contoh soal B.Inggris: I ... a student.',NULL),(45,9,'BENAR_SALAH','Contoh soal Teknis: Jelaskan tupoksi...',NULL),(46,10,'BOBOT_OPSI','Contoh soal Manajerial: Cara memimpin...',NULL),(47,11,'BOBOT_OPSI','Contoh soal Sosio: Toleransi adalah...',NULL),(48,12,'BOBOT_OPSI','Contoh soal Wawancara: Alasan mendaftar...',NULL),(51,1,'BENAR_SALAH','apa itu pancasila','karena ya begitu'),(52,3,'BOBOT_OPSI','kawanmu sakit','biarin');
+/*!40000 ALTER TABLE `bank_soal` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `categories`
+--
+
+DROP TABLE IF EXISTS `categories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `categories` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `category_name` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `categories`
+--
+
+LOCK TABLES `categories` WRITE;
+/*!40000 ALTER TABLE `categories` DISABLE KEYS */;
+INSERT INTO `categories` VALUES (1,'elektronik'),(2,'buku'),(3,'peralatan dari bahan kayu');
+/*!40000 ALTER TABLE `categories` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `items`
+--
+
+DROP TABLE IF EXISTS `items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `items` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `item_code` varchar(50) NOT NULL,
+  `item_name` varchar(100) NOT NULL,
+  `category_id` int NOT NULL,
+  `stock` int NOT NULL DEFAULT '0',
+  `unit` varchar(20) NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `item_code` (`item_code`),
+  KEY `category_id` (`category_id`),
+  CONSTRAINT `items_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `items`
+--
+
+LOCK TABLES `items` WRITE;
+/*!40000 ALTER TABLE `items` DISABLE KEYS */;
+INSERT INTO `items` VALUES (1,'EL-001','Laptop Asus',1,10,'unit','2026-01-26 14:33:16'),(2,'EL-002','Printer Epson',1,5,'unit','2026-01-26 14:33:16'),(3,'EL-003','Kabel LAN',1,50,'pcs','2026-01-26 14:33:16'),(4,'BK-001','Buku Pemrograman JavaScript',2,20,'pcs','2026-01-26 14:33:58'),(5,'BK-002','Buku Manajemen Gudang',2,15,'pcs','2026-01-26 14:33:58'),(6,'KY-001','Meja Kayu',3,8,'unit','2026-01-26 14:34:08'),(7,'KY-002','Kursi Kayu',3,20,'unit','2026-01-26 14:34:08'),(8,'KY-003','Rak Kayu',3,6,'unit','2026-01-26 14:34:08');
+/*!40000 ALTER TABLE `items` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `jawaban_peserta`
 --
 
@@ -60,8 +143,9 @@ CREATE TABLE `jawaban_peserta` (
   `jawaban_user` varchar(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`,`question_id`),
-  KEY `user_id_2` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=248 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `user_id_2` (`user_id`),
+  KEY `idx_jawaban_peserta_user_question` (`user_id`,`question_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=262 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -70,7 +154,7 @@ CREATE TABLE `jawaban_peserta` (
 
 LOCK TABLES `jawaban_peserta` WRITE;
 /*!40000 ALTER TABLE `jawaban_peserta` DISABLE KEYS */;
-INSERT INTO `jawaban_peserta` VALUES (73,28,13,'c'),(136,48,4,NULL),(137,48,5,NULL),(138,48,6,NULL),(139,48,7,NULL),(140,48,8,NULL),(141,48,40,NULL),(142,48,41,NULL),(143,48,43,NULL),(144,48,42,NULL),(145,48,44,NULL),(156,49,2,'a'),(157,49,1,'a'),(158,49,3,'b'),(159,49,37,'a'),(160,49,39,'b'),(161,49,38,'a'),(162,28,2,'c'),(163,28,1,'a'),(164,28,3,'b'),(165,28,37,'b'),(166,28,38,'b'),(167,28,39,'c'),(168,49,5,'a'),(169,49,4,'e'),(170,49,6,'c'),(171,49,7,'b'),(172,49,40,'e'),(173,49,41,'a'),(174,49,8,'c'),(175,49,42,'c'),(176,49,43,'b'),(177,49,44,'c');
+INSERT INTO `jawaban_peserta` VALUES (73,28,13,'c'),(136,48,4,NULL),(137,48,5,NULL),(138,48,6,NULL),(139,48,7,NULL),(140,48,8,NULL),(141,48,40,NULL),(142,48,41,NULL),(143,48,43,NULL),(144,48,42,NULL),(145,48,44,NULL),(156,49,2,'a'),(157,49,1,'a'),(158,49,3,'b'),(159,49,37,'a'),(160,49,39,'b'),(161,49,38,'a'),(162,28,2,'c'),(163,28,1,'a'),(164,28,3,'b'),(165,28,37,'b'),(166,28,38,'b'),(167,28,39,'c'),(168,49,5,'a'),(169,49,4,'e'),(170,49,6,'c'),(171,49,7,'b'),(172,49,40,'e'),(173,49,41,'a'),(174,49,8,'c'),(175,49,42,'c'),(176,49,43,'b'),(177,49,44,'c'),(248,49,52,'c'),(249,49,51,'b');
 /*!40000 ALTER TABLE `jawaban_peserta` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -86,6 +170,7 @@ CREATE TABLE `materi_list` (
   `nama_paket` enum('Paket SKD/TKD','Paket Akademik Polri','Paket PPPK') NOT NULL,
   `nama_materi` varchar(100) NOT NULL,
   `urutan_materi` int NOT NULL,
+  `bobot_benar` int DEFAULT '500',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -96,8 +181,68 @@ CREATE TABLE `materi_list` (
 
 LOCK TABLES `materi_list` WRITE;
 /*!40000 ALTER TABLE `materi_list` DISABLE KEYS */;
-INSERT INTO `materi_list` VALUES (1,'Paket SKD/TKD','TWK',1),(2,'Paket SKD/TKD','TIU',2),(3,'Paket SKD/TKD','TKP',3),(4,'Paket Akademik Polri','Pengetahuan Umum',1),(5,'Paket Akademik Polri','Wawasan Kebangsaan',2),(6,'Paket Akademik Polri','Penalaran Numerik',3),(7,'Paket Akademik Polri','Bahasa Indonesia',4),(8,'Paket Akademik Polri','Bahasa Inggris',5),(9,'Paket PPPK','Kompetensi Teknis',1),(10,'Paket PPPK','Kompetensi Manajerial',2),(11,'Paket PPPK','Kompetensi Sosial-Kultural',3),(12,'Paket PPPK','Kompetensi Wawancara',4);
+INSERT INTO `materi_list` VALUES (1,'Paket SKD/TKD','TWK',1,500),(2,'Paket SKD/TKD','TIU',2,500),(3,'Paket SKD/TKD','TKP',3,0),(4,'Paket Akademik Polri','Pengetahuan Umum',1,100),(5,'Paket Akademik Polri','Wawasan Kebangsaan',2,100),(6,'Paket Akademik Polri','Penalaran Numerik',3,100),(7,'Paket Akademik Polri','Bahasa Indonesia',4,100),(8,'Paket Akademik Polri','Bahasa Inggris',5,100),(9,'Paket PPPK','Kompetensi Teknis',1,500),(10,'Paket PPPK','Kompetensi Manajerial',2,0),(11,'Paket PPPK','Kompetensi Sosial-Kultural',3,0),(12,'Paket PPPK','Kompetensi Wawancara',4,0);
 /*!40000 ALTER TABLE `materi_list` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `opsi_jawaban`
+--
+
+DROP TABLE IF EXISTS `opsi_jawaban`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `opsi_jawaban` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `bank_soal_id` int NOT NULL,
+  `abjad` char(1) NOT NULL,
+  `teks_opsi` text NOT NULL,
+  `is_kunci` tinyint(1) DEFAULT '0',
+  `poin_bobot` int DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `bank_soal_id` (`bank_soal_id`),
+  CONSTRAINT `opsi_jawaban_ibfk_1` FOREIGN KEY (`bank_soal_id`) REFERENCES `bank_soal` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=145 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `opsi_jawaban`
+--
+
+LOCK TABLES `opsi_jawaban` WRITE;
+/*!40000 ALTER TABLE `opsi_jawaban` DISABLE KEYS */;
+INSERT INTO `opsi_jawaban` VALUES (1,4,'a','Jakarta',0,0),(2,5,'a','46174',1,0),(3,6,'a','20',0,0),(4,7,'a','Luas',0,0),(5,8,'a','Is',0,0),(6,9,'a','A',1,0),(7,10,'a','A',0,0),(8,11,'a','A',0,0),(9,12,'a','A',0,0),(10,40,'a','Jakarta',0,0),(11,41,'a','46174',1,0),(12,42,'a','20',0,0),(13,43,'a','Luas',0,0),(14,44,'a','Is',0,0),(15,45,'a','A',1,0),(16,46,'a','A',0,0),(17,47,'a','A',0,0),(18,48,'a','A',0,0),(19,51,'a','lambang negara',0,0),(20,52,'a','biarin',0,1),(32,4,'b','Bandung',0,0),(33,5,'b','17 Ags',0,0),(34,6,'b','0',0,0),(35,7,'b','Kecil',1,0),(36,8,'b','Are',0,0),(37,9,'b','B',0,0),(38,10,'b','B',1,0),(39,11,'b','B',0,0),(40,12,'b','B',0,0),(41,40,'b','Bandung',0,0),(42,41,'b','17 Ags',0,0),(43,42,'b','0',0,0),(44,43,'b','Kecil',1,0),(45,44,'b','Are',0,0),(46,45,'b','B',0,0),(47,46,'b','B',1,0),(48,47,'b','B',0,0),(49,48,'b','B',0,0),(50,51,'b','ideologi negara',1,0),(51,52,'b','marah',0,3),(63,4,'c','Medan',0,0),(64,5,'c','46296',0,0),(65,6,'c','10',1,0),(66,7,'c','Lebar',0,0),(67,8,'c','Am',1,0),(68,9,'c','C',0,0),(69,10,'c','C',0,0),(70,11,'c','C',1,0),(71,12,'c','C',0,0),(72,40,'c','Medan',0,0),(73,41,'c','46296',0,0),(74,42,'c','10',1,0),(75,43,'c','Lebar',0,0),(76,44,'c','Am',1,0),(77,45,'c','C',0,0),(78,46,'c','C',0,0),(79,47,'c','C',1,0),(80,48,'c','C',0,0),(81,51,'c','sila yang 5',0,0),(82,52,'c','ejek',0,2),(94,4,'d','Surabaya',0,0),(95,5,'d','46144',0,0),(96,6,'d','100',0,0),(97,7,'d','Tinggi',0,0),(98,8,'d','Was',0,0),(99,9,'d','D',0,0),(100,10,'d','D',0,0),(101,11,'d','D',0,0),(102,12,'d','D',1,0),(103,40,'d','Surabaya',0,0),(104,41,'d','46144',0,0),(105,42,'d','100',0,0),(106,43,'d','Tinggi',0,0),(107,44,'d','Was',0,0),(108,45,'d','D',0,0),(109,46,'d','D',0,0),(110,47,'d','D',0,0),(111,48,'d','D',1,0),(112,51,'d','burung garuda',0,0),(113,52,'d','tolong',1,5),(125,4,'e','IKN',1,0),(126,5,'e','46336',0,0),(127,6,'e','5',0,0),(128,7,'e','Jauh',0,0),(129,8,'e','Were',0,0),(130,9,'e','E',0,0),(131,10,'e','E',0,0),(132,11,'e','E',0,0),(133,12,'e','E',0,0),(134,40,'e','IKN',1,0),(135,41,'e','46336',0,0),(136,42,'e','5',0,0),(137,43,'e','Jauh',0,0),(138,44,'e','Were',0,0),(139,45,'e','E',0,0),(140,46,'e','E',0,0),(141,47,'e','E',0,0),(142,48,'e','E',0,0),(143,51,'e','garuda ',0,0),(144,52,'e','pukul',0,3);
+/*!40000 ALTER TABLE `opsi_jawaban` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `paket_soal_mapping`
+--
+
+DROP TABLE IF EXISTS `paket_soal_mapping`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `paket_soal_mapping` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `bank_soal_id` int NOT NULL,
+  `paket` varchar(100) NOT NULL,
+  `nomor_to` int NOT NULL,
+  `nomor_urut` int NOT NULL,
+  `is_active` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `bank_soal_id` (`bank_soal_id`),
+  CONSTRAINT `paket_soal_mapping_ibfk_1` FOREIGN KEY (`bank_soal_id`) REFERENCES `bank_soal` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `paket_soal_mapping`
+--
+
+LOCK TABLES `paket_soal_mapping` WRITE;
+/*!40000 ALTER TABLE `paket_soal_mapping` DISABLE KEYS */;
+INSERT INTO `paket_soal_mapping` VALUES (1,4,'Paket Akademik Polri',1,1,1),(2,5,'Paket Akademik Polri',1,26,1),(3,6,'Paket Akademik Polri',1,51,1),(4,7,'Paket Akademik Polri',1,76,1),(5,8,'Paket Akademik Polri',1,101,1),(6,9,'Paket PPPK',1,1,1),(7,10,'Paket PPPK',1,91,1),(8,11,'Paket PPPK',1,116,1),(9,12,'Paket PPPK',1,136,1),(10,40,'Paket Akademik Polri',1,2,1),(11,41,'Paket Akademik Polri',1,27,1),(12,42,'Paket Akademik Polri',1,52,1),(13,43,'Paket Akademik Polri',1,77,1),(14,44,'Paket Akademik Polri',1,102,1),(15,45,'Paket PPPK',1,2,1),(16,46,'Paket PPPK',1,92,1),(17,47,'Paket PPPK',1,117,1),(18,48,'Paket PPPK',1,137,1),(19,51,'Paket SKD/TKD',1,1,1),(20,52,'Paket SKD/TKD',1,1,1);
+/*!40000 ALTER TABLE `paket_soal_mapping` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -152,7 +297,8 @@ CREATE TABLE `payments` (
   `expired_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_user_paket` (`user_id`,`paket`),
-  KEY `idx_status` (`status`)
+  KEY `idx_status` (`status`),
+  KEY `idx_payments_lookup` (`user_id`,`paket`,`nomor_to`,`status`)
 ) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -189,10 +335,18 @@ CREATE TABLE `questions` (
   `pembahasan` text,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `bobot_nilai` int DEFAULT '5',
+  `tipe_penilaian` enum('BENAR_SALAH','BOBOT_OPSI') NOT NULL DEFAULT 'BENAR_SALAH',
+  `bobot_a` int DEFAULT '0',
+  `bobot_b` int DEFAULT '0',
+  `bobot_c` int DEFAULT '0',
+  `bobot_d` int DEFAULT '0',
+  `bobot_e` int DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_soal` (`paket`,`nomor_to`,`materi_id`,`nomor_urut`),
-  KEY `idx_paket_active` (`paket`,`is_active`)
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `idx_paket_active` (`paket`,`is_active`),
+  KEY `idx_questions_paket_to` (`paket`,`nomor_to`,`is_active`),
+  KEY `idx_questions_materi` (`materi_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -201,7 +355,7 @@ CREATE TABLE `questions` (
 
 LOCK TABLES `questions` WRITE;
 /*!40000 ALTER TABLE `questions` DISABLE KEYS */;
-INSERT INTO `questions` VALUES (1,'Paket SKD/TKD',1,1,1,'Contoh soal TWK: Lambang sila ke-1 adalah ','Bintang','Rantai','Pohon','Banteng','Padi','b','tes',1,5),(2,'Paket SKD/TKD',1,2,31,'Contoh soal TIU: 2, 4, 8, ...','10','12','14','16','18','D',NULL,1,5),(3,'Paket SKD/TKD',1,3,66,'Contoh soal TKP: Jika rekan kerja curang...','Diam','Lapor','Ikut','Kesal','Acuh','B',NULL,1,5),(4,'Paket Akademik Polri',1,4,1,'Contoh soal PU: Ibu kota Indonesia adalah...','Jakarta','Bandung','Medan','Surabaya','IKN','e','tes',1,5),(5,'Paket Akademik Polri',1,5,26,'Contoh soal WK: Pancasila lahir tanggal...','46174','17 Ags','46296','46144','46336','A',NULL,1,5),(6,'Paket Akademik Polri',1,6,51,'Contoh soal Numerik: 10 + 10 x 0 = ...','20','0','10','100','5','C',NULL,1,5),(7,'Paket Akademik Polri',1,7,76,'Contoh soal B.Indo: Antonim besar adalah...','Luas','Kecil','Lebar','Tinggi','Jauh','B',NULL,1,5),(8,'Paket Akademik Polri',1,8,101,'Contoh soal B.Inggris: I ... a student.','Is','Are','Am','Was','Were','C',NULL,1,5),(9,'Paket PPPK',1,9,1,'Contoh soal Teknis: Jelaskan tupoksi...','A','B','C','D','E','a','',1,5),(10,'Paket PPPK',1,10,91,'Contoh soal Manajerial: Cara memimpin...','A','B','C','D','E','B',NULL,1,5),(11,'Paket PPPK',1,11,116,'Contoh soal Sosio: Toleransi adalah...','A','B','C','D','E','C',NULL,1,5),(12,'Paket PPPK',1,12,136,'Contoh soal Wawancara: Alasan mendaftar...','A','B','C','D','E','D',NULL,1,5),(37,'Paket SKD/TKD',1,1,2,'Contoh soal TWK: Lambang sila ke-1 adalah...','Bintang','Rantai','Pohon','Banteng','Padi','a','',1,5),(38,'Paket SKD/TKD',1,2,32,'Contoh soal TIU: 2, 4, 8, ...','10','12','14','16','18','D',NULL,1,5),(39,'Paket SKD/TKD',1,3,67,'Contoh soal TKP: Jika rekan kerja curang...','Diam','Lapor','Ikut','Kesal','Acuh','B',NULL,1,5),(40,'Paket Akademik Polri',1,4,2,'Contoh soal PU: Ibu kota Indonesia adalah...','Jakarta','Bandung','Medan','Surabaya','IKN','E',NULL,1,5),(41,'Paket Akademik Polri',1,5,27,'Contoh soal WK: Pancasila lahir tanggal...','46174','17 Ags','46296','46144','46336','A',NULL,1,5),(42,'Paket Akademik Polri',1,6,52,'Contoh soal Numerik: 10 + 10 x 0 = ...','20','0','10','100','5','C',NULL,1,5),(43,'Paket Akademik Polri',1,7,77,'Contoh soal B.Indo: Antonim besar adalah...','Luas','Kecil','Lebar','Tinggi','Jauh','B',NULL,1,5),(44,'Paket Akademik Polri',1,8,102,'Contoh soal B.Inggris: I ... a student.','Is','Are','Am','Was','Were','C',NULL,1,5),(45,'Paket PPPK',1,9,2,'Contoh soal Teknis: Jelaskan tupoksi...','A','B','C','D','E','A',NULL,1,5),(46,'Paket PPPK',1,10,92,'Contoh soal Manajerial: Cara memimpin...','A','B','C','D','E','B',NULL,1,5),(47,'Paket PPPK',1,11,117,'Contoh soal Sosio: Toleransi adalah...','A','B','C','D','E','C',NULL,1,5),(48,'Paket PPPK',1,12,137,'Contoh soal Wawancara: Alasan mendaftar...','A','B','C','D','E','D',NULL,1,5);
+INSERT INTO `questions` VALUES (4,'Paket Akademik Polri',1,4,1,'Contoh soal PU: Ibu kota Indonesia adalah...','Jakarta','Bandung','Medan','Surabaya','IKN','e','tes',1,5,'BENAR_SALAH',0,0,0,0,0),(5,'Paket Akademik Polri',1,5,26,'Contoh soal WK: Pancasila lahir tanggal...','46174','17 Ags','46296','46144','46336','A',NULL,1,5,'BENAR_SALAH',0,0,0,0,0),(6,'Paket Akademik Polri',1,6,51,'Contoh soal Numerik: 10 + 10 x 0 = ...','20','0','10','100','5','C',NULL,1,5,'BENAR_SALAH',0,0,0,0,0),(7,'Paket Akademik Polri',1,7,76,'Contoh soal B.Indo: Antonim besar adalah...','Luas','Kecil','Lebar','Tinggi','Jauh','B',NULL,1,5,'BENAR_SALAH',0,0,0,0,0),(8,'Paket Akademik Polri',1,8,101,'Contoh soal B.Inggris: I ... a student.','Is','Are','Am','Was','Were','C',NULL,1,5,'BENAR_SALAH',0,0,0,0,0),(9,'Paket PPPK',1,9,1,'Contoh soal Teknis: Jelaskan tupoksi...','A','B','C','D','E','a','',1,5,'BENAR_SALAH',0,0,0,0,0),(10,'Paket PPPK',1,10,91,'Contoh soal Manajerial: Cara memimpin...','A','B','C','D','E','B',NULL,1,5,'BOBOT_OPSI',0,0,0,0,0),(11,'Paket PPPK',1,11,116,'Contoh soal Sosio: Toleransi adalah...','A','B','C','D','E','C',NULL,1,5,'BOBOT_OPSI',0,0,0,0,0),(12,'Paket PPPK',1,12,136,'Contoh soal Wawancara: Alasan mendaftar...','A','B','C','D','E','D',NULL,1,5,'BOBOT_OPSI',0,0,0,0,0),(40,'Paket Akademik Polri',1,4,2,'Contoh soal PU: Ibu kota Indonesia adalah...','Jakarta','Bandung','Medan','Surabaya','IKN','E',NULL,1,5,'BENAR_SALAH',0,0,0,0,0),(41,'Paket Akademik Polri',1,5,27,'Contoh soal WK: Pancasila lahir tanggal...','46174','17 Ags','46296','46144','46336','A',NULL,1,5,'BENAR_SALAH',0,0,0,0,0),(42,'Paket Akademik Polri',1,6,52,'Contoh soal Numerik: 10 + 10 x 0 = ...','20','0','10','100','5','C',NULL,1,5,'BENAR_SALAH',0,0,0,0,0),(43,'Paket Akademik Polri',1,7,77,'Contoh soal B.Indo: Antonim besar adalah...','Luas','Kecil','Lebar','Tinggi','Jauh','B',NULL,1,5,'BENAR_SALAH',0,0,0,0,0),(44,'Paket Akademik Polri',1,8,102,'Contoh soal B.Inggris: I ... a student.','Is','Are','Am','Was','Were','C',NULL,1,5,'BENAR_SALAH',0,0,0,0,0),(45,'Paket PPPK',1,9,2,'Contoh soal Teknis: Jelaskan tupoksi...','A','B','C','D','E','A',NULL,1,5,'BENAR_SALAH',0,0,0,0,0),(46,'Paket PPPK',1,10,92,'Contoh soal Manajerial: Cara memimpin...','A','B','C','D','E','B',NULL,1,5,'BOBOT_OPSI',0,0,0,0,0),(47,'Paket PPPK',1,11,117,'Contoh soal Sosio: Toleransi adalah...','A','B','C','D','E','C',NULL,1,5,'BOBOT_OPSI',0,0,0,0,0),(48,'Paket PPPK',1,12,137,'Contoh soal Wawancara: Alasan mendaftar...','A','B','C','D','E','D',NULL,1,5,'BOBOT_OPSI',0,0,0,0,0),(51,'Paket SKD/TKD',1,1,1,'apa itu pancasila','lambang negara','ideologi negara','sila yang 5','burung garuda','garuda ','b','karena ya begitu',1,5,'BENAR_SALAH',0,0,0,0,0),(52,'Paket SKD/TKD',1,3,1,'kawanmu sakit','biarin','marah','ejek','tolong','pukul','d','biarin',1,5,'BOBOT_OPSI',1,3,2,5,3);
 /*!40000 ALTER TABLE `questions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -223,8 +377,9 @@ CREATE TABLE `riwayat_ujian` (
   `tgl_selesai` datetime DEFAULT NULL,
   `percobaan_ke` int DEFAULT '1',
   PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `user_id` (`user_id`),
+  KEY `idx_riwayat_user_to` (`user_id`,`nomor_to`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -233,7 +388,7 @@ CREATE TABLE `riwayat_ujian` (
 
 LOCK TABLES `riwayat_ujian` WRITE;
 /*!40000 ALTER TABLE `riwayat_ujian` DISABLE KEYS */;
-INSERT INTO `riwayat_ujian` VALUES (1,49,'Paket SKD/TKD',1,17,1,6,'2026-03-14 12:54:14',1),(2,49,'Paket Akademik Polri',1,0,0,10,'2026-03-14 12:59:27',1),(3,49,'Paket Akademik Polri',1,10,1,10,'2026-03-14 13:01:50',1),(4,49,'Paket Akademik Polri',1,10,1,10,'2026-03-14 13:12:40',1),(5,49,'Paket Akademik Polri',1,100,10,10,'2026-03-14 13:20:18',1);
+INSERT INTO `riwayat_ujian` VALUES (1,49,'Paket SKD/TKD',1,17,1,6,'2026-03-14 12:54:14',1),(2,49,'Paket Akademik Polri',1,0,0,10,'2026-03-14 12:59:27',1),(3,49,'Paket Akademik Polri',1,10,1,10,'2026-03-14 13:01:50',1),(4,49,'Paket Akademik Polri',1,10,1,10,'2026-03-14 13:12:40',1),(5,49,'Paket Akademik Polri',1,100,10,10,'2026-03-14 13:20:18',1),(6,49,'Paket SKD/TKD',1,5,1,2,'2026-03-14 23:41:22',1),(7,49,'Paket SKD/TKD',1,5,0,2,'2026-03-14 23:49:43',1),(8,49,'Paket SKD/TKD',1,10,1,2,'2026-03-14 23:50:20',1),(9,49,'Paket SKD/TKD',1,10,2,2,'2026-03-15 00:02:31',1),(10,49,'Paket SKD/TKD',1,8,2,2,'2026-03-15 00:04:30',1),(11,49,'Paket SKD/TKD',1,5,1,2,'2026-03-15 00:07:29',1),(12,49,'Paket SKD/TKD',1,7,2,2,'2026-03-15 00:07:47',1);
 /*!40000 ALTER TABLE `riwayat_ujian` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -286,4 +441,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-14 13:28:59
+-- Dump completed on 2026-03-15  6:59:35
