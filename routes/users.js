@@ -5,16 +5,21 @@ const multer  = require("multer");
 const path    = require("path");
 const fs      = require("fs");
 
+// ─────────────────────────────────────────────
 // MIDDLEWARE
+// ─────────────────────────────────────────────
 function isLogin(req, res, next) {
   if (req.session.user) return next();
   res.redirect("/login");
 }
 
+// ─────────────────────────────────────────────
 // MULTER — upload bukti transfer
+// ─────────────────────────────────────────────
 const storageBukti = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadPath = path.join(process.cwd(), "public", "uploads", "bukti");
+    // Buat folder kalau belum ada
     if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
     cb(null, uploadPath);
   },
@@ -34,12 +39,31 @@ const uploadBukti = multer({
   },
 });
 
-const PAKET_LIST = [
-  { key: "Paket SKD/TKD",       label: "Paket SKD/TKD",       durasi: 90  },
-  { key: "Paket Akademik Polri", label: "Paket Akademik Polri", durasi: 90  },
-  { key: "Paket PPPK",           label: "Paket PPPK",           durasi: 120 },
+// ─────────────────────────────────────────────
+// PAKET_LIST — diambil dari DB agar admin bisa ubah deskripsi & harga
+// Fungsi helper untuk ambil dari DB (dipanggil di setiap route yang butuh)
+async function getPaketList() {
+  const [rows] = await db.query(
+    "SELECT nama_paket AS `key`, nama_paket AS label, durasi_menit AS durasi, deskripsi, harga, harga_asli FROM paket_ujian ORDER BY id ASC"
+  );
+  return rows;
+}
+
+// Fallback kalau kolom baru belum ada (sebelum migration)
+const PAKET_LIST_FALLBACK = [
+  { key: "Paket SKD/TKD",       label: "Paket SKD/TKD",       durasi: 90,  deskripsi: null, harga: 50000, harga_asli: 100000 },
+  { key: "Paket Akademik Polri", label: "Paket Akademik Polri", durasi: 90,  deskripsi: null, harga: 50000, harga_asli: 100000 },
+  { key: "Paket PPPK",           label: "Paket PPPK",           durasi: 120, deskripsi: null, harga: 50000, harga_asli: 100000 },
 ];
 
+// PAKET_LIST tetap ada untuk backward compat (ujian.js, buildPaymentMap)
+const PAKET_LIST = PAKET_LIST_FALLBACK;
+
+// ─────────────────────────────────────────────
+// HELPER: Bangun paymentMap dari array payments
+// Key: "NamaPaket_nomor_to" → ambil yang terbaru (ORDER BY created_at DESC)
+// Status di-UPPER agar konsisten dengan pengecekan di EJS
+// ─────────────────────────────────────────────
 function buildPaymentMap(payments, user = null) {
   const map = {};
   for (const p of payments) {
@@ -52,6 +76,7 @@ function buildPaymentMap(payments, user = null) {
     }
   }
 
+  // Anggota kelas offline → semua TO gratis (inject LUNAS untuk yang belum ada)
   if (user && user.is_anggota) {
     for (const paket of PAKET_LIST) {
       for (let to = 1; to <= 10; to++) {
@@ -65,7 +90,7 @@ function buildPaymentMap(payments, user = null) {
             status:        "LUNAS",
             token_ujian:   null,
             bukti_transfer: null,
-            is_gratis:     true,   
+            is_gratis:     true,   // flag: gratis karena anggota offline
           };
         }
       }
@@ -75,13 +100,17 @@ function buildPaymentMap(payments, user = null) {
   return map;
 }
 
+// ─────────────────────────────────────────────
 // GET /dashboard
+// Landing page setelah login — redirect ke ujian kalau sedang ujian
+// ─────────────────────────────────────────────
 router.get("/dashboard", isLogin, async (req, res) => {
   try {
     const userId = req.session.user.id;
     const [rows] = await db.query("SELECT * FROM users WHERE id = ?", [userId]);
     const user = rows[0];
 
+    // Kalau sedang ujian, langsung ke halaman soal
     if (user.status_ujian === "SEDANG_UJIAN") {
       return res.redirect("/ujian/soal/1");
     }
@@ -113,7 +142,10 @@ router.get("/dashboard", isLogin, async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────────
 // GET /dashboardPembayaranUjian
+// Halaman utama pilih TO + upload bukti bayar
+// ─────────────────────────────────────────────
 router.get("/dashboardPembayaranUjian", isLogin, async (req, res) => {
   try {
     const userId = req.session.user.id;
@@ -146,9 +178,17 @@ router.get("/dashboardPembayaranUjian", isLogin, async (req, res) => {
       [userId]
     );
 
+    // Ambil paket dari DB (termasuk deskripsi & harga terbaru)
+    let paketList;
+    try {
+      paketList = await getPaketList();
+    } catch (e) {
+      paketList = PAKET_LIST_FALLBACK;
+    }
+
     res.render("users/dashboardPembayaranUjian", {
       user,
-      paketList:    PAKET_LIST,
+      paketList,
       paymentMap,
       rankings:     rankingRows,
       myRank:       myRank > 0 ? myRank : "-",
@@ -162,7 +202,31 @@ router.get("/dashboardPembayaranUjian", isLogin, async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────────
+// GET /profil — halaman info akun & riwayat ujian
+// ─────────────────────────────────────────────
+router.get("/profil", isLogin, async (req, res) => {
+  const userId = req.session.user.id;
+  try {
+    const [userRows] = await db.query("SELECT * FROM users WHERE id = ?", [userId]);
+    const user = userRows[0];
+
+    const [riwayatUjian] = await db.query(
+      "SELECT * FROM riwayat_ujian WHERE user_id = ? ORDER BY tgl_selesai DESC",
+      [userId]
+    );
+
+    res.render("users/profil", { user, riwayatUjian });
+  } catch (err) {
+    console.error("Profil Error:", err);
+    res.status(500).send("Gagal memuat profil.");
+  }
+});
+
+// ─────────────────────────────────────────────
 // POST /upload-bukti
+// Upload bukti transfer untuk TO tertentu
+// ─────────────────────────────────────────────
 router.post("/upload-bukti", isLogin, uploadBukti.single("bukti"), async (req, res) => {
   const { paket_pilihan, nomor_to } = req.body;
   const userId        = req.session.user.id;
@@ -192,6 +256,7 @@ router.post("/upload-bukti", isLogin, uploadBukti.single("bukti"), async (req, r
   }
 
   try {
+    // Cek apakah sudah ada payment aktif (PENDING/LUNAS) untuk TO ini
     const [existing] = await db.query(
       `SELECT id FROM payments
        WHERE user_id = ? AND TRIM(paket) = TRIM(?) AND nomor_to = ?
@@ -200,6 +265,7 @@ router.post("/upload-bukti", isLogin, uploadBukti.single("bukti"), async (req, r
     );
 
     if (existing.length > 0) {
+      // Hapus file yang baru diupload karena tidak jadi dipakai
       if (req.file) {
         const fp = path.join(process.cwd(), "public", "uploads", "bukti", buktiFilename);
         if (fs.existsSync(fp)) fs.unlinkSync(fp);
@@ -227,11 +293,15 @@ router.post("/upload-bukti", isLogin, uploadBukti.single("bukti"), async (req, r
   }
 });
 
+// ─────────────────────────────────────────────
 // POST /deleteAccount
+// Hapus akun sendiri beserta semua data
+// ─────────────────────────────────────────────
 router.post("/deleteAccount", isLogin, async (req, res) => {
   const userId = req.session.user.id;
 
   try {
+    // Hapus file bukti transfer dari storage
     const [payments] = await db.query(
       "SELECT bukti_transfer FROM payments WHERE user_id = ?",
       [userId]

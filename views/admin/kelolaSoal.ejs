@@ -32,7 +32,7 @@
         </div>
         <div class="hidden md:flex gap-5 text-[11px] font-bold uppercase tracking-widest">
           <a href="/dashboardAdmin"      class="text-slate-400 hover:text-white transition">Dashboard</a>
-          <a href="/admin/daftarPeserta" class="text-slate-400 hover:text-white transition">Peserta</a>
+          <a href="/admin/daftarPeserta" class="text-slate-400 hover:text-white transition">Peserta Ujian</a>
           <a href="/admin/anggota"       class="text-slate-400 hover:text-white transition">Anggota Offline</a>
         </div>
       </div>
@@ -93,10 +93,40 @@
 
       <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
         <h3 class="font-black text-slate-800 text-sm mb-1">⚙️ Konfigurasi Paket</h3>
-        <p class="text-xs text-slate-400 mb-4">Atur durasi waktu dan jumlah soal yang akan muncul di ujian.</p>
+        <p class="text-xs text-slate-400 mb-4">Atur tampilan kartu, durasi, jumlah soal, dan harga.</p>
         <form action="/admin/update-config-paket" method="POST" class="space-y-4">
           <input type="hidden" name="paket" value="<%= paket %>">
-          <div class="flex flex-col md:flex-row gap-4">
+
+          <!-- Deskripsi -->
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Deskripsi Paket <span class="text-slate-300">(tampil di halaman user)</span></label>
+            <textarea name="deskripsi" rows="3" placeholder="Tulis deskripsi singkat paket ini..."
+              class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-yellow-400 resize-none leading-relaxed"><%= config.deskripsi || '' %></textarea>
+          </div>
+
+          <!-- Harga -->
+          <div class="flex gap-3">
+            <div class="flex-1">
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Harga (Rp)</label>
+              <div class="relative">
+                <span class="absolute left-3 top-2 text-[10px] font-bold text-slate-400">Rp</span>
+                <input type="number" name="harga" value="<%= config.harga || 50000 %>" min="0" step="1000"
+                  class="w-full pl-8 pr-3 py-2 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:border-yellow-400" required>
+              </div>
+            </div>
+            <div class="flex-1">
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Harga Coret <span class="text-slate-300">(opsional)</span></label>
+              <div class="relative">
+                <span class="absolute left-3 top-2 text-[10px] font-bold text-slate-400">Rp</span>
+                <input type="number" name="harga_asli" value="<%= config.harga_asli || '' %>" min="0" step="1000"
+                  placeholder="0 = tidak ditampilkan"
+                  class="w-full pl-8 pr-3 py-2 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:border-yellow-400">
+              </div>
+            </div>
+          </div>
+
+          <!-- Jumlah soal & Durasi -->
+          <div class="flex gap-3">
             <div class="flex-1">
               <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Jumlah Soal</label>
               <input type="number" name="jumlah_soal" value="<%= config.jumlah_soal %>" min="1" max="<%= totalAktif || soalList.length %>"
@@ -111,8 +141,9 @@
               </div>
             </div>
           </div>
+
           <button type="submit" class="w-full py-2.5 bg-[#0f172a] text-white text-xs font-bold rounded-lg hover:bg-slate-800 transition shadow-sm">
-            Simpan Konfigurasi Paket
+            💾 Simpan Semua Perubahan
           </button>
         </form>
         <p class="text-[10px] text-slate-400 mt-2">

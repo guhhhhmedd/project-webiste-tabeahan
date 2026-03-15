@@ -8,23 +8,18 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // SECURITY MIDDLEWARE
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
-        styleSrc: ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "blob:", "https://img.youtube.com"],
-        fontSrc: [
-          "'self'",
-          "https://fonts.googleapis.com",
-          "https://fonts.gstatic.com",
-        ],
-      },
-    },
-  })
-);
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
+      styleSrc:  ["'self'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com", "'unsafe-inline'"],
+      fontSrc:   ["'self'", "https://fonts.gstatic.com"],
+      connectSrc:["'self'", "https://cdn.jsdelivr.net"],
+    }
+  }
+}));
+// app.use(helmet({ contentSecurityPolicy: false }));
 app.use(compression());
 
 

@@ -1,152 +1,111 @@
-# 📘 Project Ujian CAT Web
+# 📘 Project Ujian CAT Web - Tabeahan Cendekia
 
-Aplikasi ujian berbasis web menggunakan:
+Aplikasi simulasi ujian CAT (Computer Assisted Test) yang mendukung berbagai jenis paket ujian seperti SKD/TKD, Akademik POLRI, dan PPPK dengan sistem penilaian dinamis.
 
-* Node.js
-* Express
-* EJS
-* MySQL
-* mysql2
-* express-session
-* multer
-
----
-
-# 🚀 Cara Menjalankan Project (Local Setup)
-
-Ikuti langkah berikut untuk menjalankan project di komputer kamu.
+## 🚀 Fitur Utama (Update Terbaru)
+- **Sistem Scoring Dinamis:** Mendukung poin 1-5 (khusus soal TKP/PPPK).
+- **Passing Grade:** Kalkulasi kelulusan otomatis berdasarkan ambang batas subtes.
+- **Fitur Pembahasan:** Peserta dapat melihat kunci dan penjelasan jawaban setelah ujian.
+- **Manajemen Admin:** Verifikasi pembayaran, reset ujian, dan pengelolaan soal.
+- **Timer Real-time:** Batasan waktu sesuai dengan paket ujian yang dipilih.
 
 ---
 
-## 1️⃣ Clone Repository
+## 🛠️ Stack Teknologi
+- **Backend:** Node.js, Express.js
+- **Frontend:** EJS (Embedded JavaScript Templates), Tailwind CSS
+- **Database:** MySQL (menggunakan `mysql2/promise`)
+- **Session:** express-session
+- **File Upload:** Multer
 
+---
+
+## 💻 Cara Menjalankan Project (Local Setup)
+
+### 1️⃣ Clone Repository
 ```bash
-git clone https://github.com/username/nama-repo.git
+git clone [https://github.com/username/nama-repo.git](https://github.com/username/nama-repo.git)
 cd nama-repo
-```
-
----
-
-## 2️⃣ Install Dependencies
-
-```bash
+2️⃣ Install Dependencies
+Bash
 npm install
-```
+3️⃣ Setup Database MySQL
+Pastikan MySQL sudah berjalan, lalu buat database baru:
 
----
+SQL
+CREATE DATABASE db_pencatatan;
+4️⃣ Import Database (Versi Terbaru)
+Import file database.sql yang ada di root folder ke database yang baru dibuat. File ini sudah mencakup tabel:
 
-## 3️⃣ Setup Database MySQL
+users (dengan sistem role & status ujian)
 
-Pastikan MySQL sudah terinstall dan berjalan.
+questions (dengan field skor_a-e & pembahasan)
 
-Masuk ke MySQL:
+materi_list (kategori subtes)
 
-```bash
-mysql -u root -p
-```
+payments (log pembayaran & token)
 
-Buat database:
+jawaban_peserta & riwayat_ujian
 
-```sql
-CREATE DATABASE namadb;
-EXIT;
-```
+Jalankan via terminal:
 
----
+Bash
+mysql -u root -p db_pencatatan < database.sql
+5️⃣ Konfigurasi Environment (.env)
+Buat file .env di root project dan isi sesuai konfigurasi database kamu:
 
-## 4️⃣ Import File Database
-
-Pastikan file `database.sql` ada di folder project.
-
-Jalankan:
-
-```bash
-mysql -u root -p namadb < database.sql
-```
-
-Jika berhasil, semua tabel akan otomatis dibuat.
-
----
-
-## 5️⃣ Buat File `.env`
-
-Di root project, buat file bernama:
-
-```
-.env
-```
-
-Isi dengan konfigurasi berikut:
-
-```env
+Cuplikan kode
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=
-DB_NAME=namadb
+DB_NAME=db_pencatatan
 DB_PORT=3306
-SESSION_SECRET=secret123
-```
+SESSION_SECRET=tabeahan_secret_key_123
+PORT=3000
+6️⃣ Jalankan Aplikasi
+Mode Produksi:
 
-Sesuaikan jika menggunakan user/password berbeda.
-
----
-
-## 6️⃣ Jalankan Project
-
-Untuk menjalankan aplikasi:
-
-```bash
+Bash
 npm start
-```
+Mode Development (Auto-restart):
 
-Atau untuk mode development:
-
-```bash
+Bash
 npm run dev
-```
+📂 Struktur Penting
+app.js → Titik masuk utama aplikasi.
+
+routes/ → Logika routing (auth, admin, ujian, dashboard).
+
+views/ → Template tampilan (EJS).
+
+public/uploads/bukti/ → Lokasi penyimpanan bukti transfer peserta.
+
+config/db.js → Koneksi pool database.
+
+📝 Aturan Penilaian (Revisi Terbaru)
+SKD/TKD: - TWK & TIU: Benar 5, Salah 0.
+
+TKP: Skala 1 - 5 poin per opsi.
+
+Perangkingan: Total Skor > TKP > TIU > TWK.
+
+POLRI: Benar 1, Salah 0. (Lulus minimal 75%).
+
+PPPK: Teknis (5 poin), Manajerial/Soskul/Wawancara (1-4 poin).
+
+⚠ Troubleshooting
+Error: Unknown column 'pembahasan' → Pastikan kamu sudah menjalankan query ALTER TABLE questions ADD COLUMN pembahasan TEXT; atau import database terbaru.
+
+Gambar Tidak Muncul → Cek folder public/uploads/, pastikan permission folder tersebut bisa dibaca dan ditulis.
+
+Session Hilang → Pastikan SESSION_SECRET di .env sudah terisi.
+
+👨‍💻 Developer
+Project ini dikembangkan untuk sistem simulasi ujian Tabeahan Cendekia.
+
 
 ---
 
-## 🌐 Akses Aplikasi
-
-Buka browser dan akses:
-
-```
-http://localhost:3000
-```
-
----
-
-# ⚠ Troubleshooting
-
-### ❌ Error: Unknown database
-
-Pastikan database sudah dibuat:
-
-```sql
-CREATE DATABASE namadb;
-```
-
-### ❌ Access denied for user
-
-Pastikan username & password MySQL benar.
-
----
-
-# 📂 Struktur Penting
-
-* `app.js` → file utama aplikasi
-* `config/` → konfigurasi database
-* `routes/` → routing aplikasi
-* `views/` → template EJS
-* `public/` → file static (css, image, upload)
-
----
-
-# 👨‍💻 Developer
-
-Project ini dibuat untuk pembelajaran dan pengembangan aplikasi ujian berbasis web.
-
----
-
-🔥 Jika ada kendala saat setup, pastikan semua langkah sudah diikuti dengan benar.
+### Tips buat kamu, Le:
+1. **File database.sql:** Sebelum kamu `git push`, pastiin file `database.sql` di folder project kamu itu hasil **Export terbaru** dari MySQL kamu (yang sudah ada kolom `pembahasan` dan kolom `skor_a` sampe `skor_e`).
+2. **Folder Upload:** Kadang folder `public/uploads/bukti` nggak ke-upload ke Git kalau kosong. Biar ke-upload, masukin file kosong namanya `.gitkeep` di dalam folder itu.

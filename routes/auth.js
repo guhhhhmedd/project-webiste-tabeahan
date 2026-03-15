@@ -1,9 +1,14 @@
-const express  = require("express");
-const router   = express.Router();
-const db       = require("../config/db");
+const express   = require("express");
+const router    = express.Router();
+const db        = require("../config/db");
 const rateLimit = require("express-rate-limit");
+const bcrypt    = require("bcrypt");
 
+const SALT_ROUNDS = 10;
+
+// ─────────────────────────────────────────────
 // RATE LIMITER — Login
+// ─────────────────────────────────────────────
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
@@ -21,7 +26,9 @@ const loginLimiter = rateLimit({
   },
 });
 
+// ─────────────────────────────────────────────
 // RATE LIMITER — Register
+// ─────────────────────────────────────────────
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 10,
@@ -34,7 +41,10 @@ const registerLimiter = rateLimit({
   },
 });
 
+// ─────────────────────────────────────────────
 // HELPER — Cek & sync status anggota offline
+// Dipanggil saat register dan login
+// ─────────────────────────────────────────────
 async function syncStatusAnggota(userId, email) {
   const [anggota] = await db.query(
     "SELECT id FROM anggota_offline WHERE LOWER(email) = LOWER(?)",
@@ -56,13 +66,17 @@ async function syncStatusAnggota(userId, email) {
   return false;
 }
 
+// ─────────────────────────────────────────────
 // GET /login
+// ─────────────────────────────────────────────
 router.get("/login", (req, res) => {
   if (req.session.user) return res.redirect("/dashboard");
   res.render("login", { error: null, rateLimited: false, resetTime: null });
 });
 
+// ─────────────────────────────────────────────
 // POST /login
+// ─────────────────────────────────────────────
 router.post("/login", loginLimiter, async (req, res) => {
   const { username, password } = req.body;
 
@@ -72,7 +86,16 @@ router.post("/login", loginLimiter, async (req, res) => {
       [username]
     );
 
-    if (rows.length === 0 || password !== rows[0].password) {
+    if (rows.length === 0) {
+      return res.status(401).render("login", {
+        error: "Username atau Password salah",
+        rateLimited: false,
+        resetTime: null,
+      });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, rows[0].password);
+    if (!passwordMatch) {
       return res.status(401).render("login", {
         error: "Username atau Password salah",
         rateLimited: false,
@@ -83,8 +106,11 @@ router.post("/login", loginLimiter, async (req, res) => {
     const user     = rows[0];
     const userRole = user.role.toLowerCase();
 
-     await syncStatusAnggota(user.id, user.email);
+    // Sync status anggota setiap login
+    // (handle kasus: email didaftarkan admin SETELAH user sudah register)
+    await syncStatusAnggota(user.id, user.email);
 
+    // Ambil ulang supaya is_anggota selalu fresh
     const [fresh] = await db.query(
       "SELECT is_anggota, status_ujian FROM users WHERE id = ?",
       [user.id]
@@ -97,7 +123,7 @@ router.post("/login", loginLimiter, async (req, res) => {
       role:         userRole,
       expired_at:   user.expired_at,
       is_active:    user.is_active,
-      is_anggota:   fresh[0].is_anggota,   
+      is_anggota:   fresh[0].is_anggota,   // ← kunci fitur gratis
       status_ujian: fresh[0].status_ujian,
     };
 
@@ -118,13 +144,17 @@ router.post("/login", loginLimiter, async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────────
 // GET /register
+// ─────────────────────────────────────────────
 router.get("/register", (req, res) => {
   if (req.session.user) return res.redirect("/dashboard");
   res.render("register", { err: null });
 });
 
+// ─────────────────────────────────────────────
 // POST /register
+// ─────────────────────────────────────────────
 router.post("/register", registerLimiter, async (req, res) => {
   const { username, password, email } = req.body;
 
@@ -141,12 +171,16 @@ router.post("/register", registerLimiter, async (req, res) => {
     return res.render("register", { err: "Format email tidak valid!" });
 
   try {
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+
     const [result] = await db.query(
       "INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, 'users')",
-      [username, password, email]
+      [username, hashedPassword, email]
     );
 
-   await syncStatusAnggota(result.insertId, email);
+    // Cek apakah email ada di whitelist anggota offline
+    // Kalau ada → langsung set is_anggota = 1 tanpa perlu login ulang
+    await syncStatusAnggota(result.insertId, email);
 
     res.redirect("/login?success=" + encodeURIComponent(
       "Registrasi berhasil! Silakan login."
@@ -160,7 +194,9 @@ router.post("/register", registerLimiter, async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────────
 // GET /logout
+// ─────────────────────────────────────────────
 router.get("/logout", (req, res) => {
   req.session.destroy(() => {
     res.clearCookie("connect.sid");
