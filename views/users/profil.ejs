@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profil - Tabeahan Cendekia</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root { --gold:#c8a020; --dark:#7a1010; --cream:#fff8f8; --muted:#9b6b6b; --red-deep:#5a0a0a; }
+    body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--dark); }
+    .font-display { font-family:'Playfair Display',serif; }
+
+    .nav-glass { background:var(--red-deep); border-bottom:1px solid rgba(200,160,32,0.25); box-shadow:0 2px 12px rgba(90,10,10,0.18); }
+
+    .card {
+      background:white; border:1.5px solid #f0e8d8;
+      box-shadow:0 2px 12px rgba(90,10,10,0.05);
+      border-radius:4px; overflow:hidden;
+    }
+    .card-hd {
+      padding:0.875rem 1.25rem;
+      background:linear-gradient(135deg,var(--red-deep),#6b1a1a);
+      border-bottom:1px solid rgba(200,160,32,0.15);
+    }
+    .card-hd h3 { color:white; font-family:'Playfair Display',serif; font-size:0.875rem; margin:0; }
+
+    .info-row { display:flex; justify-content:space-between; align-items:center; padding:0.625rem 0; border-bottom:1px solid #f0e8d8; font-size:0.75rem; }
+    .info-row:last-child { border-bottom:none; }
+
+    .riwayat-item { display:flex; align-items:center; justify-content:space-between; padding:0.75rem 1.25rem; border-bottom:1px solid #f0e8d8; transition:background 0.15s; }
+    .riwayat-item:last-child { border-bottom:none; }
+    .riwayat-item:hover { background:rgba(200,160,32,0.03); }
+
+    .skor-badge { font-size:0.875rem; font-weight:900; font-family:monospace; }
+
+    .btn-danger { background:none; border:1px solid rgba(220,38,38,0.2); color:#b91c1c; padding:0.5rem 1.25rem; border-radius:4px; font-size:0.72rem; font-weight:700; cursor:pointer; transition:all 0.2s; }
+    .btn-danger:hover { display:flex; justify-content:space-between; align-items:center; background:rgba(220,38,38,0.07); }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="nav-glass sticky top-0 z-50">
+  <div class="max-w-3xl mx-auto px-4 py-3.5 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <img src="/asset/logo.png" alt="Logo" class="h-8 w-8 object-cover rounded-full"/>
+      <span class="font-display font-bold text-base text-white">
+        Tabeahan <span style="color:var(--gold)">Cendekia</span>
+      </span>
+    </div>
+    <a href="/dashboardPembayaranUjian"
+      style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.15);border-radius:4px;padding:0.35rem 1rem;font-size:0.72rem;font-weight:700;text-decoration:none;transition:all 0.2s"
+      onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='rgba(255,255,255,0.75)'">
+      ← Dashboard
+    </a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="max-w-3xl mx-auto px-4 py-8 space-y-5">
+
+  <!-- Header -->
+  <div class="flex items-center gap-4 mb-2">
+    <div class="w-14 h-14 rounded-full flex items-center justify-center font-display font-black text-2xl text-white flex-shrink-0"
+      style="background:linear-gradient(135deg,var(--red-deep),#6b1a1a)">
+      <%= user.username.charAt(0).toUpperCase() %>
+    </div>
+    <div>
+      <h1 class="font-display font-black text-2xl leading-tight" style="color:var(--dark)"><%= user.username %></h1>
+      <p class="text-sm" style="color:var(--muted)"><%= user.email %></p>
+    </div>
+  </div>
+
+  <!-- Info Akun -->
+  <div class="card">
+    <div class="card-hd">
+      <h3>👤 Info Akun</h3>
+    </div>
+    <div class="px-5 py-1">
+      <div class="info-row">
+        <span style="color:var(--muted)">Username</span>
+        <span class="font-bold text-sm"><%= user.username %></span>
+      </div>
+      <div class="info-row">
+        <span style="color:var(--muted)">Email</span>
+        <span class="font-semibold text-sm truncate max-w-[200px]"><%= user.email %></span>
+      </div>
+      <div class="info-row">
+        <span style="color:var(--muted)">ID Akun</span>
+        <span class="font-mono font-bold text-sm"><%= user.id %></span>
+      </div>
+      <div class="info-row">
+        <span style="color:var(--muted)">Status Ujian</span>
+        <span class="font-bold text-xs uppercase px-2 py-0.5"
+          style="border-radius:4px;background:<%= user.status_ujian==='SEDANG_UJIAN'?'rgba(234,179,8,0.12)':user.status_ujian==='SELESAI'?'rgba(21,128,61,0.1)':'rgba(155,107,107,0.08)' %>;color:<%= user.status_ujian==='SEDANG_UJIAN'?'#a16207':user.status_ujian==='SELESAI'?'#15803d':'var(--muted)' %>">
+          <%= user.status_ujian || 'IDLE' %>
+        </span>
+      </div>
+      <% if (user.is_anggota) { %>
+      <div class="info-row">
+        <span style="color:var(--muted)">Tipe Akun</span>
+        <span class="font-bold text-xs px-2 py-0.5"
+          style="border-radius:4px;background:rgba(21,128,61,0.1);color:#15803d">
+          🎓 Anggota Kelas Offline
+        </span>
+      </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Statistik -->
+  <% if (typeof riwayatUjian !== 'undefined' && riwayatUjian.length > 0) { %>
+  <%
+    const totalSesi  = riwayatUjian.length;
+    const skorMax    = Math.max(...riwayatUjian.map(r => r.skor || 0));
+    const skorRataRata = Math.round(riwayatUjian.reduce((a, r) => a + (r.skor || 0), 0) / totalSesi);
+  %>
+  <div class="grid grid-cols-3 gap-3">
+    <div class="card p-4 text-center">
+      <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Total Sesi</p>
+      <p class="font-display font-black text-2xl" style="color:var(--dark)"><%= totalSesi %></p>
+    </div>
+    <div class="card p-4 text-center">
+      <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Skor Terbaik</p>
+      <p class="font-display font-black text-2xl" style="color:<%= skorMax>=70?'#16a34a':skorMax>=50?'var(--gold)':'#b91c1c' %>"><%= skorMax %></p>
+    </div>
+    <div class="card p-4 text-center">
+      <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Rata-rata</p>
+      <p class="font-display font-black text-2xl" style="color:<%= skorRataRata>=70?'#16a34a':skorRataRata>=50?'var(--gold)':'#b91c1c' %>"><%= skorRataRata %></p>
+    </div>
+  </div>
+  <% } %>
+
+  <!-- Riwayat Ujian -->
+  <div class="card">
+    <div class="card-hd flex items-center justify-between">
+      <h3>📜 Riwayat Ujian</h3>
+      <% if (typeof riwayatUjian !== 'undefined' && riwayatUjian.length > 0) { %>
+      <span style="font-size:0.6rem;color:rgba(255,255,255,0.4)"><%= riwayatUjian.length %> sesi</span>
+      <% } %>
+    </div>
+
+    <% if (typeof riwayatUjian !== 'undefined' && riwayatUjian.length > 0) { %>
+    <div>
+      <% riwayatUjian.forEach((r) => { %>
+      <div class="riwayat-item">
+        <!-- Kiri: info -->
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-sm leading-tight" style="color:var(--dark)">
+            <%= r.paket %>
+          </p>
+          <p class="text-xs mt-0.5" style="color:var(--muted)">
+            TO #<%= r.nomor_to %> &middot;
+            <%= r.jml_benar %>/<%= r.jml_soal %> benar &middot;
+            <%= r.tgl_selesai ? new Date(r.tgl_selesai).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '-' %>
+          </p>
+        </div>
+        <!-- Kanan: skor + tombol review -->
+        <div class="flex items-center gap-3 flex-shrink-0 ml-3">
+          <div class="text-center">
+            <p class="skor-badge" style="color:<%= r.skor>=70?'#16a34a':r.skor>=50?'var(--gold)':'#b91c1c' %>">
+              <%= r.skor %>
+            </p>
+            <p class="text-[9px]" style="color:var(--muted)">skor</p>
+          </div>
+          <a href="/ujian/review?nomor_to=<%= r.nomor_to %>&paket=<%= encodeURIComponent(r.paket) %>"
+            style="padding:0.3rem 0.75rem;border-radius:4px;font-size:0.65rem;font-weight:800;text-decoration:none;background:rgba(90,10,10,0.07);color:var(--dark);border:1px solid rgba(90,10,10,0.15);white-space:nowrap;transition:all 0.2s"
+            onmouseover="this.style.background='var(--red-deep)';this.style.color='var(--gold)'"
+            onmouseout="this.style.background='rgba(90,10,10,0.07)';this.style.color='var(--dark)'">
+            📝 Review
+          </a>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+    <% } else { %>
+    <div class="px-5 py-10 text-center">
+      <p class="text-3xl opacity-20 mb-3">📋</p>
+      <p class="text-sm font-semibold" style="color:var(--muted)">Belum ada riwayat ujian.</p>
+      <a href="/dashboardPembayaranUjian" class="inline-block mt-3 text-xs font-bold" style="color:var(--gold)">
+        Mulai ujian pertamamu →
+      </a>
+    </div>
+    <% } %>
+  </div>
+
+  <!-- Zona Bahaya -->
+  <div class="card p-5">
+    <p class="text-xs mb-4" style="color:var(--muted)">Tindakan di bawah ini tidak dapat dibatalkan.</p>
+    <form action="/deleteAccount" method="POST" class="confirm-hapus inline">
+      <input type="hidden" name="id" value="<%= user.id %>">
+      <button type="submit" class="btn-danger">🗑️ Hapus Akun Permanen</button>
+    </form>
+  </div>
+
+  <p style="text-align:center;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:rgba(155,107,107,0.35);margin-top:1rem">
+    Tabeahan Cendekia
+  </p>
+
+</main>
+
+<script>
+  document.querySelectorAll('.confirm-hapus').forEach(form => {
+    form.addEventListener('submit', e => {
+      if (!confirm('Akun akan dihapus permanen beserta semua data ujian! Yakin?')) e.preventDefault();
+    });
+  });
+</script>
+
+</body>
+</html>

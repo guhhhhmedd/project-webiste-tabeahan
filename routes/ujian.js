@@ -108,9 +108,11 @@ router.get("/soal/:index", isLogin, isSedangUjian, async (req, res) => {
 
   try {
     const [soalRows] = await db.query(
-      `SELECT * FROM questions
-       WHERE TRIM(paket) = TRIM(?) AND nomor_to = ? AND is_active = 1
-       ORDER BY nomor_urut ASC`,
+      `SELECT q.*, COALESCE(m.nama_materi, q.materi_id) AS materi
+       FROM questions q
+       LEFT JOIN materi_list m ON q.materi_id = m.id
+       WHERE TRIM(q.paket) = TRIM(?) AND q.nomor_to = ? AND q.is_active = 1
+       ORDER BY q.nomor_urut ASC`,
       [sesi.paket, sesi.nomorTO]
     );
 
@@ -175,45 +177,92 @@ router.get("/selesai-paksa", isLogin, async (req, res) => {
 });
 
 
+// KONSTANTA DEFAULT PENILAIAN
+const DEFAULT_BOBOT_BENAR = 500; // 5 poin × 100
+
 // HITUNG & SIMPAN SKOR
 async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
   const sesi   = req.session.ujian;
   const userId = req.session.user.id;
 
   try {
-    const [soalRows] = await db.query(
-      `SELECT id, kunci FROM questions
-       WHERE TRIM(paket) = TRIM(?) AND nomor_to = ? AND is_active = 1`,
-      [sesi.paket, sesi.nomorTO]
-    );
+    // 1. Ambil soal + scoring rule
+    let soalRows;
+    try {
+      const [rows] = await db.query(
+        `SELECT id, kunci, tipe_penilaian,
+                bobot_a, bobot_b, bobot_c, bobot_d, bobot_e,
+                materi_id
+         FROM questions
+         WHERE TRIM(paket) = TRIM(?) AND nomor_to = ? AND is_active = 1`,
+        [sesi.paket, sesi.nomorTO]
+      );
+      soalRows = rows;
+    } catch(err) {
+      console.warn('Fallback scoring: kolom tipe_penilaian belum ada', err.message);
+      const [rows] = await db.query(
+        `SELECT id, kunci, 'BENAR_SALAH' AS tipe_penilaian,
+                0 AS bobot_a, 0 AS bobot_b, 0 AS bobot_c, 0 AS bobot_d, 0 AS bobot_e,
+                materi_id
+         FROM questions
+         WHERE TRIM(paket) = TRIM(?) AND nomor_to = ? AND is_active = 1`,
+        [sesi.paket, sesi.nomorTO]
+      );
+      soalRows = rows;
+    }
 
-    const jawabanUserSesi = sesi.jawaban;
+    // 2. Ambil bobot_benar per subtest dari materi_list
+    const materiIds = [...new Set(soalRows.map(s => s.materi_id).filter(Boolean))];
+    let scoringMap = {};
+    if (materiIds.length > 0) {
+      const placeholders = materiIds.map(() => '?').join(',');
+      const [materiRows] = await db.query(
+        `SELECT id, bobot_benar FROM materi_list WHERE id IN (${placeholders})`,
+        materiIds
+      );
+      materiRows.forEach(m => { scoringMap[m.id] = m; });
+    }
+
+    // 3. Hitung Skor
+    let totalPoin = 0;
+    let benar     = 0;
+    const jawabanUserSesi = sesi.jawaban || {};
 
     const simpanPromises = soalRows.map((s) => {
-      const jawabanUser = jawabanUserSesi[s.id] || null;
+      const jawabanUser = (jawabanUserSesi[s.id] || '').toLowerCase();
+      const kunci       = (s.kunci || '').toLowerCase();
+
+      // Hitung per soal
+      if (s.tipe_penilaian === 'BOBOT_OPSI') {
+        if (jawabanUser) {
+          const bobotOpsi = Number(s['bobot_' + jawabanUser]) || 0;
+          totalPoin += bobotOpsi; // Tidak dibagi 100 karena dinput langsung sebagai satuan 1-5
+          benar++; // hitung sebagai 'benar' / 'terjawab valid' untuk statistik
+        }
+      } else {
+        if (jawabanUser && jawabanUser === kunci) {
+          const aturan = scoringMap[s.materi_id];
+          const bb = (aturan && aturan.bobot_benar != null && aturan.bobot_benar > 0)
+            ? aturan.bobot_benar
+            : DEFAULT_BOBOT_BENAR;
+          totalPoin += bb / 100;
+          benar++;
+        }
+      }
+
+      // Simpan riwayat_jawaban per soal untuk review
       return db.query(
         `INSERT INTO jawaban_peserta (user_id, question_id, jawaban_user)
          VALUES (?, ?, ?)
          ON DUPLICATE KEY UPDATE jawaban_user = ?`,
-        [userId, s.id, jawabanUser, jawabanUser]
+        [userId, s.id, jawabanUser || null, jawabanUser || null]
       );
     });
 
     await Promise.all(simpanPromises);
 
-    const [hasilDB] = await db.query(
-      `SELECT
-         COUNT(*) AS total_soal,
-         SUM(CASE WHEN jp.jawaban_user = q.kunci THEN 1 ELSE 0 END) AS total_benar
-       FROM jawaban_peserta jp
-       JOIN questions q ON jp.question_id = q.id
-       WHERE jp.user_id = ? AND q.nomor_to = ? AND TRIM(q.paket) = TRIM(?) AND q.is_active = 1`,
-      [userId, sesi.nomorTO, sesi.paket]
-    );
-
-    const totalSoal = parseInt(hasilDB[0].total_soal) || soalRows.length;
-    const benar     = parseInt(hasilDB[0].total_benar) || 0;
-    const skor      = totalSoal > 0 ? Math.round((benar / totalSoal) * 100) : 0;
+    const totalSoal = soalRows.length;
+    const skor      = Math.round(totalPoin);
 
     await Promise.all([
       db.query(
@@ -330,8 +379,12 @@ router.get("/review", isLogin, async (req, res) => {
          jp.jawaban_user,
          q.soal, q.paket, q.nomor_to, q.nomor_urut,
          q.opsi_a, q.opsi_b, q.opsi_c, q.opsi_d, q.opsi_e,
-         q.kunci, q.pembahasan,
-         CASE WHEN jp.jawaban_user = q.kunci THEN 1 ELSE 0 END AS is_benar
+         q.kunci, q.pembahasan, q.tipe_penilaian, q.bobot_a, q.bobot_b, q.bobot_c, q.bobot_d, q.bobot_e,
+         CASE 
+           WHEN q.tipe_penilaian = 'BOBOT_OPSI' AND jp.jawaban_user IS NOT NULL AND jp.jawaban_user != '' THEN 1
+           WHEN jp.jawaban_user = q.kunci THEN 1 
+           ELSE 0 
+         END AS is_benar
        FROM jawaban_peserta jp
        JOIN questions q ON jp.question_id = q.id
        WHERE jp.user_id = ? AND q.nomor_to = ? AND TRIM(q.paket) = TRIM(?)
@@ -346,15 +399,16 @@ router.get("/review", isLogin, async (req, res) => {
       );
     }
 
-    const totalSoal  = jawabanRows.length;
-    const totalBenar = jawabanRows.filter((j) => j.is_benar).length;
-    const totalSalah = totalSoal - totalBenar;
-    const skor       = Math.round((totalBenar / totalSoal) * 100);
-
     const [riwayat] = await db.query(
       "SELECT * FROM riwayat_ujian WHERE user_id = ? AND nomor_to = ? ORDER BY tgl_selesai DESC LIMIT 1",
       [userId, nomor_to]
     );
+
+    const totalSoal  = jawabanRows.length;
+    // Gunakan total_benar dan total_salah & skor dari riwayat agar persis sama dengan dashboard
+    const totalBenar = riwayat[0]?.jml_benar || jawabanRows.filter((j) => j.is_benar).length;
+    const totalSalah = totalSoal - totalBenar;
+    const skor       = riwayat[0]?.skor || Math.round((totalBenar / totalSoal) * 100);
 
     const [userRows] = await db.query(
       "SELECT * FROM users WHERE id = ?",

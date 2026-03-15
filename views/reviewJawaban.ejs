@@ -18,7 +18,7 @@
     /* ── Stat bar ── */
     .stat-pill {
       display:inline-flex; align-items:center; gap:0.4rem;
-      padding:0.45rem 0.9rem; border-radius:99px;
+      padding:0.45rem 0.9rem; border-radius:4px;
       font-size:0.72rem; font-weight:800;
     }
     .stat-benar  { background:rgba(21,128,61,0.1);  color:#15803d; border:1px solid rgba(21,128,61,0.2); }
@@ -26,12 +26,12 @@
     .stat-skor   { background:rgba(200,160,32,0.1); color:#92400e; border:1px solid rgba(200,160,32,0.25); }
 
     /* ── Filter tabs ── */
-    .ftab { padding:0.35rem 0.9rem; border-radius:8px; font-size:0.65rem; font-weight:700; cursor:pointer; border:1px solid rgba(200,160,32,0.2); background:white; color:var(--muted); transition:all 0.2s; }
+    .ftab { padding:0.35rem 0.9rem; border-radius:4px; font-size:0.65rem; font-weight:700; cursor:pointer; border:1px solid rgba(200,160,32,0.2); background:white; color:var(--muted); transition:all 0.2s; }
     .ftab.active, .ftab:hover { background:var(--red-deep); color:var(--gold); border-color:transparent; }
 
     /* ── Soal card ── */
     .soal-card {
-      background:white; border-radius:14px;
+      background:white; border-radius:4px;
       border:1px solid rgba(200,160,32,0.12);
       box-shadow:0 2px 12px rgba(90,10,10,0.05);
       overflow:hidden; transition:box-shadow 0.2s;
@@ -49,7 +49,7 @@
     .soal-header.salah { background:rgba(220,38,38,0.03); }
 
     .nomor-badge {
-      width:2rem; height:2rem; border-radius:8px; flex-shrink:0;
+      width:2rem; height:2rem; border-radius:4px; flex-shrink:0;
       display:flex; align-items:center; justify-content:center;
       font-family:"Playfair Display",serif; font-weight:900; font-size:0.8rem; color:white;
     }
@@ -59,7 +59,7 @@
     /* ── Opsi jawaban ── */
     .opsi-row {
       display:flex; align-items:flex-start; gap:0.75rem;
-      padding:0.55rem 0.75rem; border-radius:8px;
+      padding:0.55rem 0.75rem; border-radius:4px;
       font-size:0.82rem; transition:background 0.15s;
     }
     .opsi-row.kunci  { background:rgba(21,128,61,0.08); border:1px solid rgba(21,128,61,0.2); }
@@ -67,7 +67,7 @@
     .opsi-row.normal { background:rgba(200,160,32,0.03); border:1px solid rgba(200,160,32,0.1); }
 
     .opsi-huruf {
-      width:1.5rem; height:1.5rem; border-radius:6px; flex-shrink:0;
+      width:1.5rem; height:1.5rem; border-radius:3px; flex-shrink:0;
       display:flex; align-items:center; justify-content:center;
       font-size:0.65rem; font-weight:800; text-transform:uppercase;
     }
@@ -76,24 +76,24 @@
     .opsi-huruf.normal    { background:rgba(200,160,32,0.15); color:var(--muted); }
 
     /* ── Keterangan box ── */
-    .keterangan-box {
+    .pembahasan-box {
       background:linear-gradient(135deg, rgba(200,160,32,0.06), rgba(200,160,32,0.03));
       border:1px solid rgba(200,160,32,0.25);
-      border-radius:10px; padding:1rem 1.25rem;
+      border-radius:4px; padding:1rem 1.25rem;
       position:relative;
     }
-    .keterangan-box::before {
+    .pembahasan-box::before {
       content:'💡';
       position:absolute; top:-0.6rem; left:1rem;
       background:var(--cream); padding:0 0.25rem;
       font-size:0.85rem;
     }
-    .keterangan-label {
+    .pembahasan-label {
       font-size:0.55rem; font-weight:800; text-transform:uppercase;
       letter-spacing:0.12em; color:var(--gold); margin-bottom:0.5rem;
       display:block;
     }
-    .keterangan-text {
+    .pembahasan-text {
       font-size:0.82rem; line-height:1.75; color:var(--dark);
       white-space:pre-wrap;   /* jaga enter/baris baru */
     }
@@ -101,7 +101,7 @@
     /* ── Scroll to top ── */
     #scrollTop {
       position:fixed; bottom:1.5rem; right:1.5rem; z-index:40;
-      width:2.5rem; height:2.5rem; border-radius:50%;
+      width:2.5rem; height:2.5rem; border-radius:4px;
       background:var(--red-deep); color:var(--gold);
       border:none; cursor:pointer; font-size:1rem;
       display:flex; align-items:center; justify-content:center;
@@ -124,7 +124,7 @@
       </span>
     </div>
     <a href="/dashboardPembayaranUjian"
-      style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:0.35rem 1rem;font-size:0.72rem;font-weight:700;text-decoration:none;transition:all 0.2s"
+      style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.15);border-radius:4px;padding:0.35rem 1rem;font-size:0.72rem;font-weight:700;text-decoration:none;transition:all 0.2s"
       onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='rgba(255,255,255,0.75)'">
       ← Kembali
     </a>
@@ -154,6 +154,9 @@
     <span class="stat-pill stat-benar">✅ <%= totalBenar %> Benar</span>
     <span class="stat-pill stat-salah">❌ <%= totalSalah %> Salah</span>
     <span class="stat-pill stat-skor">🎯 Skor <%= skor %></span>
+    <span class="stat-pill" style="background:rgba(200,160,32,0.1);color:#92400e;border:1px solid rgba(200,160,32,0.25)">
+      ⭐ <%= typeof totalPoin !== 'undefined' ? totalPoin : 0 %> Poin
+    </span>
     <span class="stat-pill" style="background:rgba(90,10,10,0.06);color:var(--dark);border:1px solid rgba(90,10,10,0.1)">
       📄 <%= totalSoal %> Soal
     </span>
@@ -161,8 +164,8 @@
 
   <!-- Skor bar visual -->
   <div class="mb-6">
-    <div style="height:6px;background:rgba(200,160,32,0.12);border-radius:99px;overflow:hidden">
-      <div style="height:100%;width:<%= skor %>%;background:linear-gradient(90deg,#16a34a,var(--gold));border-radius:99px;transition:width 1s"></div>
+    <div style="height:6px;background:rgba(200,160,32,0.12);border-radius:3px;overflow:hidden">
+      <div style="height:100%;width:<%= skor %>%;background:linear-gradient(90deg,#16a34a,var(--gold));border-radius:3px;transition:width 1s"></div>
     </div>
   </div>
 
@@ -196,6 +199,12 @@
           <% if (!item.is_benar) { %>
           <p style="font-size:0.65rem;color:#b91c1c;font-weight:700;margin:0">
             Jawabanmu: <strong><%= jawabanLower.toUpperCase() %></strong> · Kunci: <strong><%= kunciLower.toUpperCase() %></strong>
+          </p>
+          <% } %>
+          <% if (item.poin_didapat !== undefined) { %>
+          <p style="font-size:0.6rem;color:var(--muted);font-weight:600;margin:2px 0 0">
+            Poin: <strong style="color:<%= item.poin_didapat > 0 ? '#15803d' : '#b91c1c' %>"><%= item.poin_didapat %></strong>
+            / <%= item.poin_max %>
           </p>
           <% } %>
         </div>
@@ -233,16 +242,16 @@
         %>
         <div class="opsi-row <%= rowClass %>">
           <div class="opsi-huruf <%= hurufClass %>"><%= huruf %></div>
-          <span style="font-size:0.82rem;line-height:1.5;flex:1"><%= icon %><%= opsiMap[huruf] || '-' %></span>
+          <span style="font-size:0.82rem;line-height:1.5;flex:1;min-width:0;word-break:break-word"><%= icon %><%= opsiMap[huruf] || '-' %></span>
         </div>
       <% }) %>
       </div>
 
       <!-- Keterangan Jawaban -->
       <% if (item.pembahasan && item.pembahasan.trim() !== '') { %>
-      <div class="keterangan-box">
-        <span class="keterangan-label">Pembahasan</span>
-        <p class="keterangan-text"><%= item.pembahasan %></p>
+      <div class="pembahasan-box">
+        <span class="pembahasan-label">Pembahasan</span>
+        <p class="pembahasan-text"><%= item.pembahasan %></p>
       </div>
       <% } %>
 
@@ -259,7 +268,7 @@
 
   <div class="mt-8 flex justify-center">
     <a href="/dashboardPembayaranUjian"
-      style="background:linear-gradient(135deg,var(--red-deep),#6b1a1a);color:white;padding:0.75rem 2rem;border-radius:10px;font-size:0.8rem;font-weight:700;text-decoration:none;letter-spacing:0.05em">
+      style="background:linear-gradient(135deg,var(--red-deep),#6b1a1a);color:white;padding:0.75rem 2rem;border-radius:4px;font-size:0.8rem;font-weight:700;text-decoration:none;letter-spacing:0.05em">
       ← Kembali ke Dashboard
     </a>
   </div>
