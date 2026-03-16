@@ -20,7 +20,7 @@
 <body class="bg-slate-100 font-sans text-slate-900 min-h-screen">
 
   <!-- NAVBAR -->
-  <nav class="bg-[#0f172a] text-white shadow-lg sticky top-0 z-50">
+  <nav class="bg-[#5a0a0a] text-white shadow-lg sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 md:px-8 py-3 flex justify-between items-center">
       <div class="flex items-center gap-6">
         <div class="flex items-center gap-2.5">
@@ -31,9 +31,9 @@
           </div>
         </div>
         <div class="hidden md:flex gap-5 text-[11px] font-bold uppercase tracking-widest">
-          <a href="/dashboardAdmin"      class="text-slate-400 hover:text-white transition">Dashboard</a>
-          <a href="/admin/daftarPeserta" class="text-slate-400 hover:text-white transition">Peserta Ujian</a>
-          <a href="/admin/anggota"       class="text-slate-400 hover:text-white transition">Anggota Offline</a>
+          <a href="/dashboardAdmin"      class="text-white hover:text-[#c8a020] transition">Dashboard</a>
+          <a href="/admin/daftarPeserta" class="text-white hover:text-[#c8a020] transition">Peserta Ujian</a>
+          <a href="/admin/anggota"       class="text-white hover:text-[#c8a020] transition">Anggota Offline</a>
         </div>
       </div>
       <a href="/logout" class="bg-red-600 hover:bg-red-700 px-5 py-1.5 rounded text-xs font-bold transition">Logout</a>
@@ -69,14 +69,25 @@
 
     <!-- Tab TO -->
     <div class="mb-6 flex items-center gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
-      <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Pilih Try Out:</span>
-      <div class="flex gap-2">
-        <% [1,2,3,4,5,6,7,8,9,10].forEach(num => { %>
-        <a href="?to=<%= num %>"
-          class="px-4 py-2 rounded-lg text-xs font-bold transition <%= currentTo == num ? 'bg-yellow-400 text-slate-900 shadow-md' : 'bg-slate-100 text-slate-500 hover:bg-slate-200' %>">
-          TO <%= num %>
-        </a>
-        <% }) %>
+      <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2 whitespace-nowrap">Pilih Try Out:</span>
+      <div class="flex gap-2 items-center">
+        <% if (availTo && availTo.length > 0) { %>
+          <% availTo.forEach(to => { %>
+          <a href="?to=<%= to.nomor_to %>"
+            class="px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap <%= currentTo == to.nomor_to ? 'bg-yellow-400 text-slate-900 shadow-md' : 'bg-slate-100 text-slate-500 hover:bg-slate-200' %>">
+            TO <%= to.nomor_to %>
+          </a>
+          <% }) %>
+        <% } else { %>
+          <span class="text-xs font-bold text-slate-400 px-2">Belum ada paket TO</span>
+        <% } %>
+        
+        <form action="/admin/tryout/tambah" method="POST" class="inline-flex m-0">
+          <input type="hidden" name="paket" value="<%= paket %>">
+          <button type="submit" class="px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-[11px] font-bold hover:bg-blue-100 border border-blue-200 transition whitespace-nowrap">
+            + Tambah Paket TO
+          </button>
+        </form>
       </div>
     </div>
 
@@ -175,16 +186,53 @@
           </form>
         </div>
       </div>
+
+      <!-- PENGATURAN TO SAAT INI -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 md:col-span-2 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+          <h3 class="font-black text-slate-800 text-sm mb-1">📢 Pengaturan Paket TO <%= currentTo %> Saat Ini</h3>
+          <p class="text-xs text-slate-400">Tampilkan TO ini di halaman penjualan atau hapus secara permanen beserta soalnya.</p>
+        </div>
+        <div class="flex items-center gap-4">
+          <form action="/admin/tryout/publish" method="POST" class="flex items-center gap-2">
+            <input type="hidden" name="paket" value="<%= paket %>">
+            <input type="hidden" name="nomor_to" value="<%= currentTo %>">
+            <% const isPublished = (currentTOData && currentTOData.is_published == 1); %>
+            <input type="hidden" name="is_published" value="<%= isPublished ? '0' : '1' %>">
+            <span class="text-[11px] font-bold <%= isPublished ? 'text-green-600' : 'text-slate-400' %> uppercase tracking-wide">
+              <%= isPublished ? '🌐 AKTIF DI PENJUALAN' : '🔒 DRAFT (SEMBUNYI)' %>
+            </span>
+            <button type="submit" class="px-4 py-2 text-xs font-bold rounded-lg transition border <%= isPublished ? 'bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100' : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100' %>">
+              <%= isPublished ? 'Sembunyikan' : 'Publish ke User' %>
+            </button>
+          </form>
+          
+          <div class="w-px h-8 bg-slate-200"></div>
+
+          <form action="/admin/tryout/delete" method="POST">
+            <input type="hidden" name="paket" value="<%= paket %>">
+            <input type="hidden" name="nomor_to" value="<%= currentTo %>">
+            <button type="submit" onclick="return confirm('PERINGATAN: Anda akan menghapus TO <%= currentTo %> beserta SEMUA SOAL di dalamnya secara permanen. Lanjutkan?')" class="px-4 py-2 bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 text-xs font-bold rounded-lg transition">
+              🗑️ Hapus TO <%= currentTo %>
+            </button>
+          </form>
+        </div>
+      </div>
+
     </div>
 
     <!-- Tabel Soal -->
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
       <div class="bg-slate-50 border-b border-slate-200 px-5 py-3 flex items-center justify-between">
         <h3 class="text-xs font-bold text-slate-600 uppercase tracking-widest">📋 Daftar Soal</h3>
-        <div class="flex gap-2">
+        <div class="flex gap-2 items-center">
           <button id="filterAll"      class="filter-btn active px-3 py-1 rounded text-[10px] font-bold bg-slate-800 text-white">Semua</button>
           <button id="filterAktif"    class="filter-btn px-3 py-1 rounded text-[10px] font-bold bg-slate-100 text-slate-500 hover:bg-slate-200">Aktif</button>
           <button id="filterNonaktif" class="filter-btn px-3 py-1 rounded text-[10px] font-bold bg-slate-100 text-slate-500 hover:bg-slate-200">Non-aktif</button>
+          <div class="w-px h-4 bg-slate-300 mx-1"></div>
+          <button onclick="document.getElementById('modalTambahSoal').classList.remove('hidden')" class="px-3 py-1 bg-green-600 text-white rounded text-[10px] font-bold shadow-sm hover:bg-green-700">
+            + Tambah Soal Manual
+          </button>
         </div>
       </div>
 
@@ -192,7 +240,7 @@
       <div class="p-16 text-center">
         <div class="text-4xl opacity-20 mb-3">📝</div>
         <p class="text-slate-400 text-sm">Belum ada soal untuk paket ini.</p>
-        <a href="/dashboardAdmin" class="mt-3 inline-block text-xs font-bold text-blue-500 underline">+ Tambah Soal</a>
+        <button onclick="document.getElementById('modalTambahSoal').classList.remove('hidden')" class="mt-3 inline-block text-xs font-bold text-blue-500 underline cursor-pointer">+ Tambah Soal Manual</button>
       </div>
       <% } else { %>
       <div class="overflow-x-auto">
@@ -263,6 +311,84 @@
     </div>
 
     <p class="mt-6 text-center text-slate-400 text-[10px] font-bold uppercase tracking-widest">Tabeahan Cendekia Admin Panel</p>
+  </div>
+
+  <!-- MODAL TAMBAH SOAL MANUAL -->
+  <div id="modalTambahSoal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl relative">
+      <div class="p-5 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
+        <div>
+          <h3 class="font-black text-slate-800 text-sm">➕ Tambah Soal Manual</h3>
+          <p class="text-[10px] font-bold text-slate-400 mt-0.5"><%= paket %> - TO <%= currentTo %></p>
+        </div>
+        <button onclick="document.getElementById('modalTambahSoal').classList.add('hidden')" class="text-slate-400 hover:text-red-500 font-bold text-xl leading-none">&times;</button>
+      </div>
+      <form action="/admin/tambah-soal-manual" method="POST" class="p-5 space-y-5">
+        <input type="hidden" name="paket" value="<%= paket %>">
+        <input type="hidden" name="nomor_to" value="<%= currentTo %>">
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Materi Ujian</label>
+            <select name="materi_id" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-yellow-400" required>
+              <option value="" disabled selected>Pilih Materi...</option>
+              <% materiList.forEach(m => { %>
+                <option value="<%= m.id %>"><%= m.nama_materi %></option>
+              <% }) %>
+            </select>
+            <p class="text-[9px] text-slate-400 mt-1">Pilih sesuai kategori soal</p>
+          </div>
+          <div>
+            <% 
+              let nextNomorUrut = 1;
+              if (soalList && soalList.length > 0) {
+                const maxUrut = Math.max(...soalList.map(s => Number(s.nomor_urut) || 0));
+                nextNomorUrut = maxUrut + 1;
+              }
+            %>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nomor Urut</label>
+            <input type="number" name="nomor_urut" value="<%= nextNomorUrut %>" placeholder="Misal: 1" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-black text-slate-800 bg-slate-50 focus:outline-none focus:border-yellow-400 focus:bg-white transition" required>
+            <p class="text-[9px] text-slate-400 mt-1">Otomatis dilanjutkan dari soal terakhir</p>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Pertanyaan Soal</label>
+          <textarea name="soal" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm h-28 focus:outline-none focus:border-yellow-400" placeholder="Tulis soal di sini..." required></textarea>
+        </div>
+
+        <div class="space-y-3 bg-slate-50 p-4 border border-slate-100 rounded-lg">
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-[10px] font-bold text-slate-400 uppercase">Pilihan Ganda & Bobot</label>
+            <span class="text-[9px] font-bold bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">Isi bobot (1-5) jika soal TKP/Manajerial</span>
+          </div>
+          <% ['A','B','C','D','E'].forEach(o => { %>
+          <div class="flex items-center gap-2">
+            <span class="font-black text-slate-400 w-5 text-center"><%= o %></span>
+            <input type="text" name="opsi_<%= o.toLowerCase() %>" placeholder="Teks opsi <%= o %>" class="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-yellow-400" required>
+            <input type="number" name="bobot_<%= o.toLowerCase() %>" placeholder="Bobot" class="w-20 px-3 py-2 border border-slate-200 rounded-lg text-sm text-center focus:outline-none focus:border-yellow-400">
+          </div>
+          <% }) %>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="md:col-span-1">
+            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Kunci (A-E)</label>
+            <select name="kunci" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-bold focus:outline-none focus:border-yellow-400" required>
+              <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
+            </select>
+          </div>
+          <div class="md:col-span-3">
+            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Pembahasan (Opsional)</label>
+            <textarea name="pembahasan" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm h-20 focus:outline-none focus:border-yellow-400" placeholder="Penjelasan jawaban..."></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-[#0f172a] text-white font-bold rounded-lg shadow hover:bg-slate-800 transition">
+          💾 Simpan Soal Manual
+        </button>
+      </form>
+    </div>
   </div>
 
   <script>

@@ -526,147 +526,80 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="paket-card rounded-xl overflow-hidden">
-            <div
-              class="p-6"
-              style="
-                background-image:
-                  linear-gradient(
-                    135deg,
-                    rgba(58, 15, 15, 0.82),
-                    rgba(107, 26, 26, 0.82)
-                  ),
-                  url(&quot;./asset/catbanner.jpg&quot;);
-                background-size: cover;
-                background-position: center;
-                min-height: 180px;
-              "
-            >
-              <div class="text-4xl mb-4">🏛️</div>
-              <h3
-                class="font-bold text-white text-lg"
-                style="font-family: &quot;Playfair Display&quot;, serif"
-              >
-                SKD / TKD
-              </h3>
-              <p class="text-xs mt-1" style="color: rgba(255, 255, 255, 0.5)">
-                CPNS · Kedinasan · 90 Menit
-              </p>
-            </div>
-            <div class="p-6">
-              <p
-                class="text-sm leading-relaxed mb-6"
-                style="color: var(--muted)"
-              >
-                Latihan soal SKD/TKD lengkap untuk seleksi CPNS dan sekolah
-                kedinasan. Mencakup TWK, TIU, dan TKP.
-              </p>
-              <div class="flex items-end justify-between">
-                <div>
-                  <p class="text-xs line-through" style="color: #ccc">
-                    Rp 100.000
-                  </p>
-                  <p
-                    class="text-2xl font-black"
-                    style="
-                      font-family: &quot;Playfair Display&quot;, serif;
-                      color: var(--gold);
-                    "
-                  >
-                    Rp 50.000
-                  </p>
-                </div>
-                <span
-                  class="text-xs font-bold px-2 py-1 rounded"
-                  style="
-                    background: rgba(184, 146, 74, 0.1);
-                    color: var(--gold);
-                  "
-                  >50% OFF</span
-                >
-              </div>
-              <a
-                href="/register"
-                class="btn-primary block text-center mt-4 py-3 text-sm font-semibold rounded-lg"
-                >Pilih Paket</a
-              >
-            </div>
-          </div>
-
-          <div
-            class="paket-card rounded-xl overflow-hidden"
-            style="
-              border-color: var(--gold);
-              box-shadow: 0 12px 40px -12px rgba(184, 146, 74, 0.25);
-            "
-          >
+          <% 
+            const styles = [
+              { bg: "linear-gradient(135deg, rgba(58,15,15,0.82), rgba(107,26,26,0.82)), url('./asset/catbanner.jpg')", icon: "🏛️" },
+              { bg: "linear-gradient(135deg, rgba(15,26,58,0.82), rgba(26,46,107,0.82)), url('./asset/polribanner.png')", icon: "👮" },
+              { bg: "linear-gradient(135deg, rgba(15,58,26,0.82), rgba(26,107,46,0.82)), url('./asset/pppkbanner.png')", icon: "👨‍🏫" }
+            ];
+            
+            if (typeof paketList !== 'undefined') { 
+              paketList.forEach((paket, idx) => {
+                const s = styles[idx % styles.length];
+                let tos = [];
+                if (typeof tryoutList !== 'undefined') {
+                  tos = tryoutList.filter(t => t.paket === paket.key);
+                }
+          %>
+          <div class="paket-card rounded-xl overflow-hidden" 
+               style="<%= idx === 1 ? 'border-color: var(--gold); box-shadow: 0 12px 40px -12px rgba(184, 146, 74, 0.25);' : '' %>">
             <div
               class="p-6 relative"
-              style="
-                background-image:
-                  linear-gradient(
-                    135deg,
-                    rgba(15, 26, 58, 0.82),
-                    rgba(26, 46, 107, 0.82)
-                  ),
-                  url(&quot;./asset/polribanner.png&quot;);
-                background-size: cover;
-                background-position: center;
-                min-height: 180px;
-              "
+              style="background-image: <%= s.bg %>; background-size: cover; background-position: center; min-height: 180px;"
             >
+              <% if (idx === 1) { %>
               <div
                 class="absolute top-4 right-4 text-[9px] font-bold px-3 py-1"
-                style="
-                  background: var(--gold);
-                  color: white;
-                  font-family: &quot;DM Sans&quot;, sans-serif;
-                "
+                style="background: var(--gold); color: white; font-family: 'DM Sans', sans-serif;"
               >
                 POPULER
               </div>
-              <div class="text-4xl mb-4">👮</div>
+              <% } %>
+              
+              <div class="text-4xl mb-4"><%= s.icon %></div>
               <h3
                 class="font-bold text-white text-lg"
-                style="font-family: &quot;Playfair Display&quot;, serif"
+                style="font-family: 'Playfair Display', serif"
               >
-                Akademik Polri
+                <%= paket.label %>
               </h3>
               <p class="text-xs mt-1" style="color: rgba(255, 255, 255, 0.5)">
-                Bintara · Akpol · 90 Menit
+                <%= paket.durasi %> Menit
+                <% if (tos && tos.length > 0) { %>
+                  · <%= tos.length %> TO Master
+                <% } %>
               </p>
             </div>
-            <div class="p-6">
-              <p
-                class="text-sm leading-relaxed mb-6"
-                style="color: var(--muted)"
-              >
-                Persiapan ujian akademik Polri untuk jalur Bintara dan Akpol.
-                Materi lengkap dan terstruktur.
-              </p>
-              <div class="flex items-end justify-between">
-                <div>
-                  <p class="text-xs line-through" style="color: #ccc">
-                    Rp 100.000
-                  </p>
-                  <p
-                    class="text-2xl font-black"
-                    style="
-                      font-family: &quot;Playfair Display&quot;, serif;
-                      color: var(--gold);
-                    "
+            <div class="p-6 flex flex-col justify-between" style="min-height: 220px;">
+              <div>
+                <p class="text-sm leading-relaxed mb-6" style="color: var(--muted)">
+                  <%= paket.deskripsi || 'Latihan soal lengkap dan terstruktur. Tersedia akses penuh ke bank soal terbaik.' %>
+                </p>
+                <div class="flex items-end justify-between">
+                  <div>
+                    <% if (paket.harga_asli && paket.harga_asli > paket.harga) { %>
+                    <p class="text-xs line-through flex items-center gap-2" style="color: #ccc">
+                      Rp <%= paket.harga_asli.toLocaleString('id-ID') %>
+                    </p>
+                    <% } %>
+                    <p
+                      class="text-2xl font-black mt-1"
+                      style="font-family: 'Playfair Display', serif; color: var(--gold);"
+                    >
+                      Rp <%= (paket.harga || 50000).toLocaleString('id-ID') %>
+                    </p>
+                    <p class="text-[10px]" style="color:var(--muted)">per Try Out</p>
+                  </div>
+                  <% if (paket.harga_asli && paket.harga_asli > paket.harga) { 
+                       const disc = Math.round((paket.harga_asli - paket.harga) / paket.harga_asli * 100);
+                  %>
+                  <span
+                    class="text-xs font-bold px-2 py-1 rounded"
+                    style="background: rgba(184, 146, 74, 0.1); color: var(--gold);"
+                    ><%= disc %>% OFF</span
                   >
-                    Rp 50.000
-                  </p>
+                  <% } %>
                 </div>
-                <span
-                  class="text-xs font-bold px-2 py-1 rounded"
-                  style="
-                    background: rgba(184, 146, 74, 0.1);
-                    color: var(--gold);
-                  "
-                  >50% OFF</span
-                >
               </div>
               <a
                 href="/register"
@@ -675,73 +608,9 @@
               >
             </div>
           </div>
-
-          <div class="paket-card rounded-xl overflow-hidden">
-            <div
-              class="p-6"
-              style="
-                background-image:
-                  linear-gradient(
-                    135deg,
-                    rgba(15, 58, 26, 0.82),
-                    rgba(26, 107, 46, 0.82)
-                  ),
-                  url(&quot;./asset/pppkbanner.png&quot;);
-                background-size: cover;
-                background-position: center;
-                min-height: 180px;
-              "
-            >
-              <div class="text-4xl mb-4">👨‍🏫</div>
-              <h3
-                class="font-bold text-white text-lg"
-                style="font-family: &quot;Playfair Display&quot;, serif"
-              >
-                Paket PPPK
-              </h3>
-              <p class="text-xs mt-1" style="color: rgba(255, 255, 255, 0.5)">
-                Guru · Teknis · 120 Menit
-              </p>
-            </div>
-            <div class="p-6">
-              <p
-                class="text-sm leading-relaxed mb-6"
-                style="color: var(--muted)"
-              >
-                Latihan soal PPPK untuk tenaga guru, teknis, dan fungsional.
-                Komprehensif dan sesuai standar.
-              </p>
-              <div class="flex items-end justify-between">
-                <div>
-                  <p class="text-xs line-through" style="color: #ccc">
-                    Rp 100.000
-                  </p>
-                  <p
-                    class="text-2xl font-black"
-                    style="
-                      font-family: &quot;Playfair Display&quot;, serif;
-                      color: var(--gold);
-                    "
-                  >
-                    Rp 50.000
-                  </p>
-                </div>
-                <span
-                  class="text-xs font-bold px-2 py-1 rounded"
-                  style="
-                    background: rgba(184, 146, 74, 0.1);
-                    color: var(--gold);
-                  "
-                  >50% OFF</span
-                >
-              </div>
-              <a
-                href="/register"
-                class="btn-primary block text-center mt-4 py-3 text-sm font-semibold rounded-lg"
-                >Pilih Paket</a
-              >
-            </div>
-          </div>
+          <%  }); 
+            } 
+          %>
         </div>
       </div>
     </section>
@@ -832,6 +701,7 @@
                 src="https://img.youtube.com/vi/hkGmsVlO8lM/maxresdefault.jpg"
                 alt="Pembahasan Soal SKD CPNS Terbaru"
                 class="absolute inset-0 w-full h-full object-cover"
+                onerror="this.onerror=null;this.src='https://img.youtube.com/vi/hkGmsVlO8lM/hqdefault.jpg'"
               />
             </div>
             <!-- Card Body -->
@@ -940,6 +810,7 @@
                 src="https://img.youtube.com/vi/0W0O1ZvKCNk/hqdefault.jpg"
                 alt="Tips Lolos Seleksi Akademik Polri"
                 class="absolute inset-0 w-full h-full object-cover"
+                onerror="this.onerror=null;this.src='https://img.youtube.com/vi/0W0O1ZvKCNk/mqdefault.jpg'"
               />
             </div>
             <div class="p-5">
@@ -1047,6 +918,7 @@
                 src="https://img.youtube.com/vi/KdeQUZPYc6A/hqdefault.jpg"
                 alt="Kisi-Kisi Soal PPPK Guru & Teknis"
                 class="absolute inset-0 w-full h-full object-cover"
+                onerror="this.onerror=null;this.src='https://img.youtube.com/vi/KdeQUZPYc6A/mqdefault.jpg'"
               />
             </div>
             <div class="p-5">

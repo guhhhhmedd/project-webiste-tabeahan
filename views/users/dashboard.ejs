@@ -17,12 +17,11 @@
       /* User dropdown */
       .user-menu { position:relative; }
       .user-menu-dropdown {
-        display:none; position:absolute; right:0; top:calc(100% + 8px);
+        position:absolute; right:0; top:calc(100% + 8px);
         width:220px; background:white; border-radius:14px;
         box-shadow:0 8px 32px rgba(0,0,0,0.12); border:1px solid rgba(0,0,0,0.07);
         overflow:hidden; z-index:100;
       }
-      .user-menu:hover .user-menu-dropdown { display:block; }
     </style>
   </head>
 
@@ -57,8 +56,8 @@
             </span>
 
             <!-- User dropdown -->
-            <div class="user-menu">
-              <button class="flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer"
+            <div class="user-menu relative" id="userMenuContainer">
+              <button id="userMenuBtn" class="flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer"
                 style="background:rgb(255, 255, 255); border-color:rgba(184,146,74,0.25); color:var(--dark)">
                 <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white"
                   style="background:var(--gold)">
@@ -70,7 +69,7 @@
                 </svg>
               </button>
 
-              <div class="user-menu-dropdown">
+              <div id="userMenuDropdown" class="user-menu-dropdown hidden">
                 <div class="px-4 py-3 border-b" style="background:#fafafa">
                   <p class="text-[10px] text-slate-400 font-bold uppercase mb-0.5">Akun</p>
                   <p class="text-xs font-semibold text-slate-700 truncate"><%= user.email %></p>
@@ -274,7 +273,7 @@
                   <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                 </div>
               </div>
-              <img src="https://img.youtube.com/vi/hkGmsVlO8lM/maxresdefault.jpg" alt="Pembahasan Soal SKD CPNS Terbaru" class="absolute inset-0 w-full h-full object-cover"/>
+              <img src="https://img.youtube.com/vi/hkGmsVlO8lM/maxresdefault.jpg" alt="Pembahasan Soal SKD CPNS Terbaru" class="absolute inset-0 w-full h-full object-cover" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/hkGmsVlO8lM/hqdefault.jpg'"/>
             </div>
             <div class="p-5">
               <div class="flex items-center gap-2 mb-2"><span class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded" style="background:rgba(184,146,74,0.12);color:var(--gold)">TWK · TIU · TKP</span></div>
@@ -298,7 +297,7 @@
                   <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                 </div>
               </div>
-              <img src="https://img.youtube.com/vi/0W0O1ZvKCNk/hqdefault.jpg" alt="Tips Lolos Seleksi Akademik Polri" class="absolute inset-0 w-full h-full object-cover"/>
+              <img src="https://img.youtube.com/vi/0W0O1ZvKCNk/hqdefault.jpg" alt="Tips Lolos Seleksi Akademik Polri" class="absolute inset-0 w-full h-full object-cover" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/0W0O1ZvKCNk/mqdefault.jpg'"/>
             </div>
             <div class="p-5">
               <div class="flex items-center gap-2 mb-2"><span class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded" style="background:rgba(184,146,74,0.12);color:var(--gold)">Akademik Polri</span></div>
@@ -322,7 +321,7 @@
                   <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                 </div>
               </div>
-              <img src="https://img.youtube.com/vi/KdeQUZPYc6A/hqdefault.jpg" alt="Kisi-Kisi Soal PPPK Guru & Teknis" class="absolute inset-0 w-full h-full object-cover"/>
+              <img src="https://img.youtube.com/vi/KdeQUZPYc6A/hqdefault.jpg" alt="Kisi-Kisi Soal PPPK Guru & Teknis" class="absolute inset-0 w-full h-full object-cover" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/KdeQUZPYc6A/mqdefault.jpg'"/>
             </div>
             <div class="p-5">
               <div class="flex items-center gap-2 mb-2"><span class="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded" style="background:rgba(184,146,74,0.12);color:var(--gold)">PPPK</span></div>
@@ -547,6 +546,23 @@
           }
         });
       });
+      // Dropdown Desktop Click Behaviors
+      const userMenuBtn = document.getElementById('userMenuBtn');
+      const userMenuDropdown = document.getElementById('userMenuDropdown');
+      
+      if (userMenuBtn && userMenuDropdown) {
+        userMenuBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          userMenuDropdown.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!userMenuBtn.contains(e.target) && !userMenuDropdown.contains(e.target)) {
+            userMenuDropdown.classList.add('hidden');
+          }
+        });
+      }
+
     </script>
   </body>
 </html>

@@ -13,8 +13,10 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
+      scriptSrcAttr: ["'unsafe-inline'"],
       styleSrc:  ["'self'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com", "'unsafe-inline'"],
       fontSrc:   ["'self'", "https://fonts.gstatic.com"],
+      imgSrc:    ["'self'", "data:", "https://img.youtube.com", "https://i.ytimg.com"],
       connectSrc:["'self'", "https://cdn.jsdelivr.net"],
     }
   }
@@ -66,8 +68,27 @@ app.use("/", usersRouter);
 app.use("/", adminRouter);
 app.use("/ujian", ujianRouter);
 
-app.get("/", (req, res) => {
-  res.render("landing");
+// Fungsi helper fallback seperti di users.js
+const PAKET_LIST_FALLBACK = [
+  { key: "Paket SKD/TKD",       label: "Paket SKD/TKD",       durasi: 90,  deskripsi: null, harga: 50000, harga_asli: 100000 },
+  { key: "Paket Akademik Polri", label: "Paket Akademik Polri", durasi: 90,  deskripsi: null, harga: 50000, harga_asli: 100000 },
+  { key: "Paket PPPK",           label: "Paket PPPK",           durasi: 120, deskripsi: null, harga: 50000, harga_asli: 100000 },
+];
+
+app.get("/", async (req, res) => {
+  const db = require("./config/db");
+  try {
+    const [paketRows] = await db.query("SELECT nama_paket AS `key`, nama_paket AS label, durasi_menit AS durasi, deskripsi, harga, harga_asli FROM paket_ujian ORDER BY id ASC");
+    const [tryoutRows] = await db.query("SELECT * FROM paket_to WHERE is_published = 1 ORDER BY paket ASC, nomor_to ASC");
+    
+    res.render("landing", { 
+      paketList: paketRows.length > 0 ? paketRows : PAKET_LIST_FALLBACK,
+      tryoutList: tryoutRows 
+    });
+  } catch (err) {
+    console.error("Landing Page Error:", err);
+    res.render("landing", { paketList: PAKET_LIST_FALLBACK, tryoutList: [] });
+  }
 });
 
 app.get("/terms", (req, res) => {

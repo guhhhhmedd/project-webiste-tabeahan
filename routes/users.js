@@ -64,7 +64,7 @@ const PAKET_LIST = PAKET_LIST_FALLBACK;
 // Key: "NamaPaket_nomor_to" → ambil yang terbaru (ORDER BY created_at DESC)
 // Status di-UPPER agar konsisten dengan pengecekan di EJS
 // ─────────────────────────────────────────────
-function buildPaymentMap(payments, user = null) {
+function buildPaymentMap(payments, user = null, tryoutList = []) {
   const map = {};
   for (const p of payments) {
     const key = `${p.paket}_${p.nomor_to}`;
@@ -76,21 +76,32 @@ function buildPaymentMap(payments, user = null) {
     }
   }
 
-  // Anggota kelas offline → semua TO gratis (inject LUNAS untuk yang belum ada)
-  if (user && user.is_anggota) {
+  // Anggota kelas offline → semua TO publik gratis (inject LUNAS untuk yang belum ada)
+  if (user && user.is_anggota && tryoutList.length > 0) {
+    for (const toObj of tryoutList) {
+      const key = `${toObj.paket}_${toObj.nomor_to}`;
+      if (!map[key]) {
+        map[key] = {
+          id:            null,
+          user_id:       user.id,
+          paket:         toObj.paket,
+          nomor_to:      toObj.nomor_to,
+          status:        "LUNAS",
+          token_ujian:   null,
+          bukti_transfer: null,
+          is_gratis:     true,   // flag: gratis karena anggota offline
+        };
+      }
+    }
+  } else if (user && user.is_anggota) {
+    // Fallback jika DB kosong
     for (const paket of PAKET_LIST) {
       for (let to = 1; to <= 10; to++) {
         const key = `${paket.key}_${to}`;
         if (!map[key]) {
           map[key] = {
-            id:            null,
-            user_id:       user.id,
-            paket:         paket.key,
-            nomor_to:      to,
-            status:        "LUNAS",
-            token_ujian:   null,
-            bukti_transfer: null,
-            is_gratis:     true,   // flag: gratis karena anggota offline
+            id: null, user_id: user.id, paket: paket.key, nomor_to: to,
+            status: "LUNAS", is_gratis: true
           };
         }
       }
@@ -129,12 +140,16 @@ router.get("/dashboard", isLogin, async (req, res) => {
 
     const myRank = rankingRows.findIndex(r => r.username === user.username) + 1;
 
+    // Ambil semua TO yg published
+    const [tryoutList] = await db.query("SELECT * FROM paket_to WHERE is_published = 1 ORDER BY paket ASC, nomor_to ASC");
+
     res.render("users/dashboard", {
       user,
       payments,
-      paymentMap: buildPaymentMap(payments, user),
+      paymentMap: buildPaymentMap(payments, user, tryoutList),
       rankings:   rankingRows.slice(0, 5),
       myRank:     myRank > 0 ? myRank : "-",
+      tryoutList, // optional if needed
     });
   } catch (err) {
     console.error("Dashboard Error:", err);
@@ -162,7 +177,6 @@ router.get("/dashboardPembayaranUjian", isLogin, async (req, res) => {
       "SELECT * FROM payments WHERE user_id = ? ORDER BY created_at DESC",
       [userId]
     );
-    const paymentMap = buildPaymentMap(paymentRows, user);
 
     const [rankingRows] = await db.query(`
       SELECT username, skor FROM users
@@ -186,9 +200,13 @@ router.get("/dashboardPembayaranUjian", isLogin, async (req, res) => {
       paketList = PAKET_LIST_FALLBACK;
     }
 
+    const [tryoutList] = await db.query("SELECT * FROM paket_to WHERE is_published = 1 ORDER BY paket ASC, nomor_to ASC");
+    const paymentMap = buildPaymentMap(paymentRows, user, tryoutList);
+
     res.render("users/dashboardPembayaranUjian", {
       user,
       paketList,
+      tryoutList,
       paymentMap,
       rankings:     rankingRows,
       myRank:       myRank > 0 ? myRank : "-",

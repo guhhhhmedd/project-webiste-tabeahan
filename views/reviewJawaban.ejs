@@ -198,7 +198,11 @@
           <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted)">Soal #<%= item.nomor_urut %></span>
           <% if (!item.is_benar) { %>
           <p style="font-size:0.65rem;color:#b91c1c;font-weight:700;margin:0">
-            Jawabanmu: <strong><%= jawabanLower.toUpperCase() %></strong> · Kunci: <strong><%= kunciLower.toUpperCase() %></strong>
+            Jawabanmu: <strong><%= jawabanLower.toUpperCase() || '-' %></strong> · Kunci: <strong><%= kunciLower.toUpperCase() %></strong>
+          </p>
+          <% } else if (item.tipe_penilaian === 'BOBOT_OPSI' && jawabanLower) { %>
+          <p style="font-size:0.65rem;color:#15803d;font-weight:700;margin:0">
+            Jawabanmu: <strong><%= jawabanLower.toUpperCase() %></strong>
           </p>
           <% } %>
           <% if (item.poin_didapat !== undefined) { %>
@@ -230,19 +234,38 @@
           let hurufClass = 'normal';
           let icon       = '';
 
-          if (huruf === kunciLower) {
-            rowClass   = 'kunci';
-            hurufClass = 'kunci';
-            icon       = '✅ ';
-          } else if (huruf === jawabanLower && !item.is_benar) {
-            rowClass   = 'salah-user';
-            hurufClass = 'salah-user';
-            icon       = '❌ ';
+          if (item.tipe_penilaian === 'BOBOT_OPSI') {
+            if (huruf === jawabanLower) {
+              rowClass   = 'kunci'; // Highlight opsi yang dipilih user
+              hurufClass = 'kunci';
+              icon       = '✅ ';
+            }
+          } else {
+            if (huruf === kunciLower) {
+              rowClass   = 'kunci';
+              hurufClass = 'kunci';
+              icon       = '✅ ';
+            } else if (huruf === jawabanLower && !item.is_benar) {
+              rowClass   = 'salah-user';
+              hurufClass = 'salah-user';
+              icon       = '❌ ';
+            }
+          }
+
+          let bobotText = '';
+          if (item.tipe_penilaian === 'BOBOT_OPSI') {
+            const bobot = item['bobot_' + huruf] || 0;
+            if (bobot > 0) {
+              bobotText = `<span style="font-size:0.65rem; font-weight:800; color:var(--muted); background:rgba(200,160,32,0.15); padding:0.15rem 0.4rem; border-radius:3px; margin-left:auto; white-space:nowrap;">Bobot: ${bobot}</span>`;
+            } else {
+              bobotText = `<span style="font-size:0.65rem; font-weight:800; color:var(--muted); opacity:0.5; margin-left:auto; white-space:nowrap;">Bobot: 0</span>`;
+            }
           }
         %>
         <div class="opsi-row <%= rowClass %>">
           <div class="opsi-huruf <%= hurufClass %>"><%= huruf %></div>
           <span style="font-size:0.82rem;line-height:1.5;flex:1;min-width:0;word-break:break-word"><%= icon %><%= opsiMap[huruf] || '-' %></span>
+          <%- bobotText %>
         </div>
       <% }) %>
       </div>

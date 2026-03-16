@@ -271,9 +271,14 @@ router.get("/admin/kelola-soal/:paket", isAdmin, async (req, res) => {
     const config = configRows[0] || { jumlah_soal: 0, durasi_menit: 0, deskripsi: '', harga: 50000, harga_asli: null };
 
     const [availTo] = await db.query(
-      "SELECT DISTINCT nomor_to FROM questions WHERE TRIM(paket) = ? ORDER BY nomor_to ASC",
+      "SELECT * FROM paket_to WHERE TRIM(paket) = ? ORDER BY nomor_to ASC",
       [namaPaket]
     );
+
+    // Dapatkan data spesifik TryOut yang aktif saat ini
+    const currentTOData = availTo.find(t => t.nomor_to === filterTo) || {};
+
+    const [materiList] = await db.query("SELECT * FROM materi_list ORDER BY id ASC");
 
     res.render("admin/kelolaSoal", {
       paket: namaPaket,
@@ -281,9 +286,11 @@ router.get("/admin/kelola-soal/:paket", isAdmin, async (req, res) => {
       totalAktif,
       config,
       currentTo: filterTo,
-      availTo: availTo.map((r) => r.nomor_to),
-      message: req.query.msg || null,
-      error:   req.query.err || null,
+      availTo: availTo, // mengirim seluruh object agar frontend bisa baca is_published dsb.
+      currentTOData,
+      materiList,
+      message: req.query.msg || req.query.message || null,
+      error:   req.query.err || req.query.error || null,
     });
   } catch (err) {
     console.error(err);
@@ -400,6 +407,34 @@ router.post("/admin/upload-soal", isAdmin, uploadExcel.single("fileExcel"), asyn
     console.error("ERROR IMPORT EXCEL:", err);
     if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
     res.redirect("/dashboardAdmin?error=Gagal+proses+Excel.+Cek+format+kolom+dan+materi_id.");
+  }
+});
+
+// ─────────────────────────────────────────────
+// TAMBAH SOAL MANUAL
+// ─────────────────────────────────────────────
+router.post("/admin/tambah-soal-manual", isAdmin, async (req, res) => {
+  const { paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e } = req.body;
+  try {
+    const m_id = parseInt(materi_id) || 1;
+    const isBobot = [3, 10, 11, 12].includes(m_id);
+    await db.query(
+      `INSERT INTO questions 
+       (paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan,
+        tipe_penilaian, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [paket, nomor_to, m_id, nomor_urut, soal,
+       opsi_a, opsi_b, opsi_c, opsi_d, opsi_e,
+       (kunci || "A").toString().trim().toUpperCase(),
+       (pembahasan || "").toString().trim(),
+       isBobot ? 'BOBOT_OPSI' : 'BENAR_SALAH',
+       Number(bobot_a)||0, Number(bobot_b)||0, Number(bobot_c)||0,
+       Number(bobot_d)||0, Number(bobot_e)||0]
+    );
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}&message=Soal+berhasil+ditambahkan`);
+  } catch (err) {
+    console.error(err);
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}&error=Gagal+menambahkan+soal`);
   }
 });
 
@@ -665,6 +700,7 @@ router.post("/admin/reset-password", isAdmin, async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────────
 // POST /admin/anggota/hapus — hapus email dari whitelist
 // ─────────────────────────────────────────────
 router.post("/admin/anggota/hapus", isAdmin, async (req, res) => {
@@ -683,6 +719,45 @@ router.post("/admin/anggota/hapus", isAdmin, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.redirect("/admin/anggota?error=" + encodeURIComponent("Gagal menghapus email."));
+  }
+});
+
+// ─────────────────────────────────────────────
+// TAMBAH, HAPUS, DAN PUBLISH TRYOUT BARU 
+// ─────────────────────────────────────────────
+router.post("/admin/tryout/tambah", isAdmin, async (req, res) => {
+  const { paket } = req.body;
+  try {
+    const [rows] = await db.query("SELECT MAX(nomor_to) AS maxTo FROM paket_to WHERE TRIM(paket) = ?", [paket]);
+    const nextTo = (rows[0].maxTo || 0) + 1;
+    await db.query("INSERT INTO paket_to (paket, nomor_to) VALUES (?, ?)", [paket, nextTo]);
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nextTo}&message=${encodeURIComponent("TryOut baru berhasil dibuat")}`);
+  } catch (err) {
+    console.error(err);
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?error=${encodeURIComponent("Gagal tambah TryOut")}`);
+  }
+});
+
+router.post("/admin/tryout/delete", isAdmin, async (req, res) => {
+  const { paket, nomor_to } = req.body;
+  try {
+    await db.query("DELETE FROM questions WHERE TRIM(paket) = ? AND nomor_to = ?", [paket, nomor_to]);
+    await db.query("DELETE FROM paket_to WHERE TRIM(paket) = ? AND nomor_to = ?", [paket, nomor_to]);
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?message=${encodeURIComponent("TryOut dan seluruh soalnya berhasil dihapus")}`);
+  } catch (err) {
+    console.error(err);
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?error=${encodeURIComponent("Gagal hapus TryOut")}`);
+  }
+});
+
+router.post("/admin/tryout/publish", isAdmin, async (req, res) => {
+  const { paket, nomor_to, is_published } = req.body;
+  try {
+    await db.query("UPDATE paket_to SET is_published = ? WHERE TRIM(paket) = ? AND nomor_to = ?", [is_published, paket, nomor_to]);
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}&message=${encodeURIComponent("Status penjualan TO berhasil diupdate")}`);
+  } catch (err) {
+    console.error(err);
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}&error=${encodeURIComponent("Gagal update penjualan")}`);
   }
 });
 
