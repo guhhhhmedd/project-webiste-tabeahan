@@ -75,10 +75,38 @@ router.post("/mulai", isLogin, async (req, res) => {
     );
     const durasiMs = (config[0]?.durasi_menit || 100) * 60 * 1000;
 
+    // --- RANDOMISASI SOAL ---
+    const [questions] = await db.query(
+      "SELECT id, materi_id FROM questions WHERE TRIM(paket) = TRIM(?) AND nomor_to = ? AND is_active = 1",
+      [paket_pilihan, parseInt(nomor_to)]
+    );
+
+    const groups = {};
+    questions.forEach(q => {
+      const mid = q.materi_id || 0;
+      if (!groups[mid]) groups[mid] = [];
+      groups[mid].push(q.id);
+    });
+
+    const sortedMateriIds = Object.keys(groups).sort((a, b) => Number(a) - Number(b));
+
+    let flatSoalIds = [];
+    sortedMateriIds.forEach(mid => {
+      const ids = groups[mid];
+      // Fisher-Yates Shuffle
+      for (let i = ids.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [ids[i], ids[j]] = [ids[j], ids[i]];
+      }
+      flatSoalIds = flatSoalIds.concat(ids);
+    });
+    // ------------------------
+
     req.session.ujian = {
       paymentId: paymentId,
       paket:     paket_pilihan,
       nomorTO:   parseInt(nomor_to),
+      soalIds:   flatSoalIds,
       jawaban:   {},
       startTime: Date.now(),
       durasiMs:  durasiMs,
@@ -107,16 +135,22 @@ router.get("/soal/:index", isLogin, isSedangUjian, async (req, res) => {
   }
 
   try {
+    if (!sesi.soalIds || sesi.soalIds.length === 0) {
+      return res.redirect("/dashboardPembayaranUjian");
+    }
+
     const [soalRows] = await db.query(
       `SELECT q.*, COALESCE(m.nama_materi, q.materi_id) AS materi
        FROM questions q
        LEFT JOIN materi_list m ON q.materi_id = m.id
-       WHERE TRIM(q.paket) = TRIM(?) AND q.nomor_to = ? AND q.is_active = 1
-       ORDER BY q.nomor_urut ASC`,
-      [sesi.paket, sesi.nomorTO]
+       WHERE q.id IN (?)`,
+      [sesi.soalIds]
     );
 
-    if (!soalRows || soalRows.length === 0) {
+    // Urutkan di memori sesuai urutan acak di sesi
+    const orderedSoal = sesi.soalIds.map(id => soalRows.find(s => s.id === id)).filter(Boolean);
+
+    if (!orderedSoal || orderedSoal.length === 0) {
       return res.send(`<script>
         alert('Soal tidak ditemukan! Hubungi admin.');
         window.location.href='/dashboardPembayaranUjian';
@@ -124,7 +158,7 @@ router.get("/soal/:index", isLogin, isSedangUjian, async (req, res) => {
     }
 
     res.render("ujian-soal", {
-      soal:       soalRows,       
+      soal:       orderedSoal,       
       jawaban:    sesi.jawaban,   
       waktuMulai: sesi.startTime,
       durasiMs:   sesi.durasiMs,
@@ -270,6 +304,7 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
          VALUES (?, ?, ?, ?, ?, ?, NOW())`,
         [userId, sesi.paket, sesi.nomorTO, skor, benar, totalSoal]
       ),
+      /*
       // Status payment → SELESAI (hanya kalau ada payment row — anggota tidak punya)
       sesi.paymentId
         ? db.query(
@@ -278,6 +313,8 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
             [userId, sesi.paket, sesi.nomorTO]
           )
         : Promise.resolve(),
+      */
+      Promise.resolve(),
       db.query(
         "UPDATE users SET status_ujian = 'IDLE' WHERE id = ?",
         [userId]
