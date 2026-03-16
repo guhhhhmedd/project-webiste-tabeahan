@@ -42,7 +42,8 @@ router.post("/mulai", isLogin, async (req, res) => {
   try {
     const [payment] = await db.query(
       `SELECT id FROM payments
-       WHERE user_id = ? AND TRIM(paket) = TRIM(?) AND nomor_to = ? AND UPPER(status) = 'LUNAS'`,
+       WHERE user_id = ? AND TRIM(paket) = TRIM(?) AND nomor_to = ? AND UPPER(status) = 'LUNAS'
+         AND created_at >= NOW() - INTERVAL 7 DAY`,
       [userId, paket_pilihan, nomor_to]
     );
 
@@ -441,6 +442,31 @@ router.get("/review", isLogin, async (req, res) => {
       [userId, nomor_to]
     );
 
+    // --- HITUNG SISA WAKTU AKSES (1 MINGGU) ---
+    const [paymentRows] = await db.query(
+      `SELECT created_at FROM payments 
+       WHERE user_id = ? AND TRIM(paket) = TRIM(?) AND nomor_to = ? AND UPPER(status) = 'LUNAS'
+       ORDER BY created_at DESC LIMIT 1`,
+      [userId, paket || riwayat[0]?.paket || "", nomor_to]
+    );
+
+    let sisaWaktuText = "";
+    if (paymentRows.length > 0) {
+      const p = paymentRows[0];
+      const createdAt = p.created_at ? new Date(p.created_at) : null;
+      if (createdAt) {
+        const diff = (createdAt.getTime() + 7 * 24 * 60 * 60 * 1000) - Date.now();
+        if (diff > 0) {
+          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          sisaWaktuText = days > 0 ? `${days} hari ${hours} jam` : `${hours} jam`;
+        } else {
+          sisaWaktuText = "Kadaluarsa";
+        }
+      }
+    }
+    // ------------------------------------------
+
     const totalSoal  = jawabanRows.length;
     // Gunakan total_benar dan total_salah & skor dari riwayat agar persis sama dengan dashboard
     const totalBenar = riwayat[0]?.jml_benar || jawabanRows.filter((j) => j.is_benar).length;
@@ -462,6 +488,7 @@ router.get("/review", isLogin, async (req, res) => {
       nomor_to,
       paket:      riwayat[0]?.paket || paket || "",
       tglSelesai: riwayat[0]?.tgl_selesai || null,
+      sisaWaktuText,
     });
   } catch (err) {
     console.error("ERROR /review:", err);

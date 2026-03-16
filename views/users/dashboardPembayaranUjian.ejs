@@ -297,6 +297,9 @@
                     <div>
                       <p class="text-sm font-bold leading-tight" style="color:var(--dark)">Try Out #<%= i %></p>
                       <p class="text-[10px]" style="color:var(--muted)"><%= paket.durasi %> menit</p>
+                      <% if (status === 'LUNAS' && pay && pay.sisaWaktuText) { %>
+                        <p class="text-[9px] text-amber-600 font-bold mt-0.5 flex items-center gap-0.5"><span>⏳</span> sisa <%= pay.sisaWaktuText %></p>
+                      <% } %>
                     </div>
                   </div>
                   <span class="text-[9px] font-black uppercase px-2 py-0.5" 

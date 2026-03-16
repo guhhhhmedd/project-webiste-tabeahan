@@ -150,10 +150,24 @@
           <p class="font-bold text-sm leading-tight" style="color:var(--dark)">
             <%= r.paket %>
           </p>
-          <p class="text-xs mt-0.5" style="color:var(--muted)">
-            TO #<%= r.nomor_to %> &middot;
-            <%= r.jml_benar %>/<%= r.jml_soal %> benar &middot;
-            <%= r.tgl_selesai ? new Date(r.tgl_selesai).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '-' %>
+          <p class="text-xs mt-0.5 flex items-center gap-1.5 flex-wrap" style="color:var(--muted)">
+            <span>TO #<%= r.nomor_to %></span> &middot;
+            <span><%= r.jml_benar %>/<%= r.jml_soal %> benar</span> &middot;
+            <span><%= r.tgl_selesai ? new Date(r.tgl_selesai).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '-' %></span>
+            
+            <% 
+              if (r.payment_created_at) {
+                const pCreated = new Date(r.payment_created_at);
+                const diff = (pCreated.getTime() + 7 * 24 * 60 * 60 * 1000) - Date.now();
+                if (diff > 0) {
+                  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                  const sisaText = days > 0 ? `${days}h ${hours}j` : `${hours}j`;
+            %>
+              &middot; <span class="inline-flex items-center gap-0.5 text-[9px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200/40" style="border-radius:3px">⏳ sisa <%= sisaText %></span>
+            <% } else { %>
+              &middot; <span class="inline-flex items-center gap-0.5 text-[9px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-200/40" style="border-radius:3px">🔒 Kadaluarsa</span>
+            <% } } %>
           </p>
         </div>
         <!-- Kanan: skor + tombol review -->

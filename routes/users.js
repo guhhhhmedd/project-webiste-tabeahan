@@ -69,9 +69,26 @@ function buildPaymentMap(payments, user = null, tryoutList = []) {
   for (const p of payments) {
     const key = `${p.paket}_${p.nomor_to}`;
     if (!map[key]) {
+      const createdAt = p.created_at ? new Date(p.created_at) : null;
+      const isExpired = createdAt && (Date.now() - createdAt.getTime() > 7 * 24 * 60 * 60 * 1000);
+      
+      let status = p.status ? p.status.toUpperCase() : "KOSONG";
+      if (isExpired && status === "LUNAS") {
+        status = "EXPIRED";
+      }
+
+      let sisaWaktuText = "";
+      if (createdAt && !isExpired && status === "LUNAS") {
+        const diff = (createdAt.getTime() + 7 * 24 * 60 * 60 * 1000) - Date.now();
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        sisaWaktuText = days > 0 ? `${days} hari ${hours} jam` : `${hours} jam`;
+      }
+
       map[key] = {
         ...p,
-        status: p.status ? p.status.toUpperCase() : "KOSONG",
+        status: status,
+        sisaWaktuText: sisaWaktuText
       };
     }
   }
@@ -232,7 +249,18 @@ router.get("/profil", isLogin, async (req, res) => {
     const user = userRows[0];
 
     const [riwayatUjian] = await db.query(
-      "SELECT * FROM riwayat_ujian WHERE user_id = ? ORDER BY tgl_selesai DESC",
+      `SELECT r.*, p.created_at AS payment_created_at
+       FROM riwayat_ujian r
+       LEFT JOIN (
+         SELECT user_id, paket, nomor_to, MAX(created_at) AS created_at
+         FROM payments
+         WHERE UPPER(status) = 'LUNAS'
+         GROUP BY user_id, paket, nomor_to
+       ) p ON r.user_id = p.user_id 
+           AND TRIM(r.paket) = TRIM(p.paket) 
+           AND r.nomor_to = p.nomor_to
+       WHERE r.user_id = ?
+       ORDER BY r.tgl_selesai DESC`,
       [userId]
     );
 

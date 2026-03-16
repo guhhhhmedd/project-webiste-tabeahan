@@ -139,6 +139,13 @@
     <p style="font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--muted);margin-bottom:0.35rem">
       <%= paket %> · Try Out #<%= nomor_to %>
     </p>
+    <% if (typeof sisaWaktuText !== 'undefined' && sisaWaktuText) { %>
+      <div class="mt-1">
+        <span class="inline-flex items-center gap-1 text-[9px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50">
+          ⏳ Sisa Masa Aktif Review: <%= sisaWaktuText %>
+        </span>
+      </div>
+    <% } %>
     <h1 style="font-size:1.75rem;font-weight:900;color:var(--dark);margin:0 0 0.35rem">
       Review Jawaban
     </h1>
