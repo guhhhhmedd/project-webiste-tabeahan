@@ -142,6 +142,7 @@ router.get("/dashboard", isLogin, async (req, res) => {
 
     // Ambil semua TO yg published
     const [tryoutList] = await db.query("SELECT * FROM paket_to WHERE is_published = 1 ORDER BY paket ASC, nomor_to ASC");
+    const [paketList] = await db.query("SELECT nama_paket AS `key`, nama_paket AS label, durasi_menit AS durasi, deskripsi, harga, harga_asli FROM paket_ujian ORDER BY id ASC");
 
     res.render("users/dashboard", {
       user,
@@ -149,7 +150,8 @@ router.get("/dashboard", isLogin, async (req, res) => {
       paymentMap: buildPaymentMap(payments, user, tryoutList),
       rankings:   rankingRows.slice(0, 5),
       myRank:     myRank > 0 ? myRank : "-",
-      tryoutList, // optional if needed
+      tryoutList,
+      paketList,
     });
   } catch (err) {
     console.error("Dashboard Error:", err);

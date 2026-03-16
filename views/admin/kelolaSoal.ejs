@@ -162,10 +162,12 @@
         </p>
       </div>
 
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col justify-center">
-        <h3 class="font-black text-slate-800 text-sm mb-1">⚡ Aksi Massal Soal</h3>
-        <p class="text-xs text-slate-400 mb-4">Status semua soal di TO ini.</p>
-        <div class="flex gap-3">
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col justify-between">
+        <div>
+          <h3 class="font-black text-slate-800 text-sm mb-1">⚡ Aksi Massal Soal</h3>
+          <p class="text-xs text-slate-400 mb-4">Status semua soal di TO ini.</p>
+        </div>
+        <div class="flex gap-3 mb-4">
           <form action="/admin/toggle-all-soal" method="POST" class="flex-1">
             <input type="hidden" name="paket" value="<%= paket %>">
             <input type="hidden" name="is_active" value="1">
@@ -184,6 +186,13 @@
               MATIKAN SEMUA TO <%= currentTo %>
             </button>
           </form>
+        </div>
+        <div class="mt-auto pt-3 border-t border-slate-100">
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Waktu Server (WIB)</p>
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+            <p id="liveTime" class="text-lg font-black text-slate-800 font-mono tracking-tight">--:--:--</p>
+          </div>
         </div>
       </div>
 
@@ -453,6 +462,16 @@
         if (!confirm('Hapus soal ini permanen?')) e.preventDefault();
       });
     });
+
+    // Live Time for Aksi Massal Panel
+    const liveTimeEl = document.getElementById('liveTime');
+    if (liveTimeEl) {
+      setInterval(() => {
+        const now = new Date();
+        const options = { timeZone: 'Asia/Jakarta', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        liveTimeEl.textContent = now.toLocaleTimeString('id-ID', options);
+      }, 1000);
+    }
   </script>
 </body>
 </html>

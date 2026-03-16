@@ -528,9 +528,9 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <% 
             const styles = [
-              { bg: "linear-gradient(135deg, rgba(58,15,15,0.82), rgba(107,26,26,0.82)), url('./asset/catbanner.jpg')", icon: "🏛️" },
-              { bg: "linear-gradient(135deg, rgba(15,26,58,0.82), rgba(26,46,107,0.82)), url('./asset/polribanner.png')", icon: "👮" },
-              { bg: "linear-gradient(135deg, rgba(15,58,26,0.82), rgba(26,107,46,0.82)), url('./asset/pppkbanner.png')", icon: "👨‍🏫" }
+              { bg: "url('./asset/catbanner.jpg')", icon: "" },
+              { bg: "url('./asset/polribanner.png')", icon: "" },
+              { bg: "url('./asset/pppkbanner.png')", icon: "" }
             ];
             
             if (typeof paketList !== 'undefined') { 
@@ -557,18 +557,6 @@
               <% } %>
               
               <div class="text-4xl mb-4"><%= s.icon %></div>
-              <h3
-                class="font-bold text-white text-lg"
-                style="font-family: 'Playfair Display', serif"
-              >
-                <%= paket.label %>
-              </h3>
-              <p class="text-xs mt-1" style="color: rgba(255, 255, 255, 0.5)">
-                <%= paket.durasi %> Menit
-                <% if (tos && tos.length > 0) { %>
-                  · <%= tos.length %> TO Master
-                <% } %>
-              </p>
             </div>
             <div class="p-6 flex flex-col justify-between" style="min-height: 220px;">
               <div>

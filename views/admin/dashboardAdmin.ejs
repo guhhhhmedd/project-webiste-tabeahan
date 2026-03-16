@@ -588,15 +588,17 @@
                       <span class="sub">Klik tombol untuk edit / hapus soal</span>
                     </div>
                     <div class="p-5">
-                      <% if (statsSoal.length> 0) { %>
+                      <% if (daftarPaket && daftarPaket.length > 0) { %>
                         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                          <% statsSoal.forEach((s, i)=> {
+                          <% daftarPaket.forEach((p, i)=> {
+                            const statMatch = statsSoal.find(s => s.paket.trim() === p.nama_paket.trim());
+                            const totalSoal = statMatch ? statMatch.total : 0;
                             const borderColors = ['var(--red-deep)', 'var(--gold)', '#15803d'];
                             const textColors = ['var(--dark)', 'var(--gold)', '#15803d'];
                             const btnColors = ['var(--red-deep)', 'var(--gold)', '#15803d'];
-                            const bc = borderColors[i] || borderColors[0];
-                            const tc = textColors[i] || textColors[0];
-                            const btn = btnColors[i] || btnColors[0];
+                            const bc = borderColors[i % 3];
+                            const tc = textColors[i % 3];
+                            const btn = btnColors[i % 3];
                             %>
                             <div class="kelola-card" style="border-left-color:<%= bc %>">
                               <div>
@@ -605,17 +607,17 @@
                                   Paket Ujian</p>
                                 <h4
                                   style="font-size:0.875rem;font-weight:900;color:var(--dark);font-family:'Playfair Display',serif;line-height:1.2;margin-top:0.25rem">
-                                  <%= s.paket %>
+                                  <%= p.nama_paket %>
                                 </h4>
                               </div>
                               <div class="flex items-center justify-between pt-3 mt-3"
                                 style="border-top:1px solid rgba(200,160,32,0.1)">
                                 <p
                                   style="font-size:1.5rem;font-weight:900;color:<%= tc %>;font-family:'Playfair Display',serif;line-height:1">
-                                  <%= s.total %><span
+                                  <%= totalSoal %><span
                                       style="font-size:0.7rem;font-weight:400;color:var(--muted);margin-left:0.25rem">soal</span>
                                 </p>
-                                <a href="/admin/kelola-soal/<%= encodeURIComponent(s.paket) %>"
+                                <a href="/admin/kelola-soal/<%= encodeURIComponent(p.nama_paket) %>"
                                   style="background:<%= btn %>;color:white;padding:0.375rem 0.75rem;border-radius:6px;font-size:0.65rem;font-weight:700;text-decoration:none;letter-spacing:0.05em;transition:opacity 0.2s"
                                   onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
                                   KELOLA →
@@ -627,7 +629,7 @@
                         <% } else { %>
                           <div class="text-center py-10">
                             <div class="text-4xl mb-2 opacity-30">📭</div>
-                            <p class="text-xs font-semibold" style="color:var(--muted)">Belum ada soal yang diinput.</p>
+                            <p class="text-xs font-semibold" style="color:var(--muted)">Belum ada daftar paket ujian yang tersedia.</p>
                           </div>
                           <% } %>
                     </div>

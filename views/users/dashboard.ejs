@@ -50,10 +50,7 @@
               const ujianStatus = user.status_ujian || 'IDLE';
               const badgeColor = ujianStatus === 'SELESAI' ? '#15803d' : ujianStatus === 'SEDANG_UJIAN' ? '#c8a020' : '#9b6b6b';
             %>
-            <span class="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest"
-              style="background:#ffffff;color:<%= badgeColor %>;border:1px solid <%= badgeColor %>40">
-              <%= ujianStatus.replace('_', ' ') %>
-            </span>
+
 
             <!-- User dropdown -->
             <div class="user-menu relative" id="userMenuContainer">
@@ -148,7 +145,7 @@
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
               </svg>
-              <%= user.status === 'LUNAS' ? 'Mulai Ujian' : 'Daftar Ujian' %>
+              <%= user.status === 'LUNAS' ? 'Mulai Ujian' : 'Try Out' %>
             </a>
             <a href="https://wa.me/6282324090580?text=Halo%20min%20saya%20mau%20daftar%20les"
               target="_blank" rel="noopener noreferrer"
@@ -218,37 +215,78 @@
           <p class="text-base mt-4 max-w-lg mx-auto" style="color:var(--muted);font-weight:300">Pilih paket try out sesuai jalur seleksi yang kamu tuju.</p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <%
-            const pakets = [
-              { emoji:'🏛️', title:'SKD / TKD', sub:'CPNS · Kedinasan · 90 Menit', desc:'Latihan soal SKD/TKD lengkap untuk seleksi CPNS dan sekolah kedinasan. Mencakup TWK, TIU, dan TKP.', overlay:'linear-gradient(135deg,rgba(58,15,15,0.82),rgba(107,26,26,0.82))', banner:'./asset/catbanner.jpg', popular:false },
-              { emoji:'👮', title:'Akademik Polri', sub:'Bintara · Akpol · 90 Menit', desc:'Persiapan ujian akademik Polri untuk jalur Bintara dan Akpol. Materi lengkap dan terstruktur.', overlay:'linear-gradient(135deg,rgba(15,26,58,0.82),rgba(26,46,107,0.82))', banner:'./asset/polribanner.png', popular:true },
-              { emoji:'👨‍🏫', title:'Paket PPPK', sub:'Guru · Teknis · 120 Menit', desc:'Latihan soal PPPK untuk tenaga guru, teknis, dan fungsional. Komprehensif dan sesuai standar.', overlay:'linear-gradient(135deg,rgba(15,58,26,0.82),rgba(26,107,46,0.82))', banner:'./asset/pppkbanner.png', popular:false }
+          <% 
+            const styles = [
+              { bg: "url('./asset/catbanner.jpg')", icon: "" },
+              { bg: "url('./asset/polribanner.png')", icon: "" },
+              { bg: "url('./asset/pppkbanner.png')", icon: "" }
             ];
+            
+            if (typeof paketList !== 'undefined') { 
+              paketList.forEach((paket, idx) => {
+                const s = styles[idx % styles.length];
+                let tos = [];
+                if (typeof tryoutList !== 'undefined') {
+                  tos = tryoutList.filter(t => t.paket === paket.key);
+                }
           %>
-          <% pakets.forEach(p => { %>
-          <div class="paket-card rounded-xl overflow-hidden" style="<%= p.popular ? 'border-color:var(--gold);box-shadow:0 12px 40px -12px rgba(184,146,74,0.25)' : '' %>">
-            <div class="p-6 relative" style="background-image:<%= p.overlay %>,url('<%= p.banner %>');background-size:cover;background-position:center;min-height:180px;">
-              <% if(p.popular) { %><div class="absolute top-4 right-4 text-[9px] font-bold px-3 py-1" style="background:var(--gold);color:white">POPULER</div><% } %>
-              <div class="text-4xl mb-4"><%= p.emoji %></div>
-              <h3 class="font-bold text-white text-lg" style="font-family:'Playfair Display',serif"><%= p.title %></h3>
-              <p class="text-xs mt-1" style="color:rgba(255,255,255,0.5)"><%= p.sub %></p>
+          <div class="paket-card rounded-xl overflow-hidden" 
+               style="<%= idx === 1 ? 'border-color: var(--gold); box-shadow: 0 12px 40px -12px rgba(184, 146, 74, 0.25);' : '' %>">
+            <div
+              class="p-6 relative"
+              style="background-image: <%= s.bg %>; background-size: cover; background-position: center; min-height: 180px;"
+            >
+              <% if (idx === 1) { %>
+              <div
+                class="absolute top-4 right-4 text-[9px] font-bold px-3 py-1"
+                style="background: var(--gold); color: white; font-family: 'DM Sans', sans-serif;"
+              >
+                POPULER
+              </div>
+              <% } %>
+              
+              <div class="text-4xl mb-4"><%= s.icon %></div>
             </div>
-            <div class="p-6">
-              <p class="text-sm leading-relaxed mb-6" style="color:var(--muted)"><%= p.desc %></p>
-              <div class="flex items-end justify-between mb-4">
-                <div>
-                  <p class="text-xs line-through" style="color:#ccc">Rp 100.000</p>
-                  <p class="text-2xl font-black" style="font-family:'Playfair Display',serif;color:var(--gold)">Rp 50.000</p>
+            <div class="p-6 flex flex-col justify-between" style="min-height: 220px;">
+              <div>
+                <p class="text-sm leading-relaxed mb-6" style="color: var(--muted)">
+                  <%= paket.deskripsi || 'Latihan soal lengkap dan terstruktur. Tersedia akses penuh ke bank soal terbaik.' %>
+                </p>
+                <div class="flex items-end justify-between">
+                  <div>
+                    <% if (paket.harga_asli && paket.harga_asli > paket.harga) { %>
+                    <p class="text-xs line-through flex items-center gap-2" style="color: #ccc">
+                      Rp <%= paket.harga_asli.toLocaleString('id-ID') %>
+                    </p>
+                    <% } %>
+                    <p
+                      class="text-2xl font-black mt-1"
+                      style="font-family: 'Playfair Display', serif; color: var(--gold);"
+                    >
+                      Rp <%= (paket.harga || 50000).toLocaleString('id-ID') %>
+                    </p>
+                    <p class="text-[10px]" style="color:var(--muted)">per Try Out</p>
+                  </div>
+                  <% if (paket.harga_asli && paket.harga_asli > paket.harga) { 
+                       const disc = Math.round((paket.harga_asli - paket.harga) / paket.harga_asli * 100);
+                  %>
+                  <span
+                    class="text-xs font-bold px-2 py-1 rounded"
+                    style="background: rgba(184, 146, 74, 0.1); color: var(--gold);"
+                    ><%= disc %>% OFF</span
+                  >
+                  <% } %>
                 </div>
-                <span class="text-xs font-bold px-2 py-1 rounded" style="background:rgba(184,146,74,0.1);color:var(--gold)">50% OFF</span>
               </div>
               <a href="/dashboardPembayaranUjian"
-                class="btn-primary block text-center py-3 text-sm font-semibold rounded-lg">
+                class="btn-primary block text-center mt-4 py-3 text-sm font-semibold rounded-lg">
                 <%= user.status === 'LUNAS' ? 'Mulai Ujian →' : 'Pilih Paket' %>
               </a>
             </div>
           </div>
-          <% }) %>
+          <%  }); 
+            } 
+          %>
         </div>
       </div>
     </section>

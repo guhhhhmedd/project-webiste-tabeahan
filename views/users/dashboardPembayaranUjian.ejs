@@ -82,7 +82,7 @@
     .rank-row.me { background: rgba(200,160,32,0.1); border: 1px solid rgba(200,160,32,0.2); }
 
     .user-menu { position: relative; }
-    .user-menu-dropdown { position: absolute; right: 0; top: calc(100% + 8px); width: 220px; background: white; border-radius: 4px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.07); overflow: hidden; z-index: 100; }
+    .user-menu-dropdown { position: absolute; right: 0; top: calc(100% + 8px); width: 220px; background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.07); overflow: hidden; z-index: 100; }
 
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 1rem; }
 
@@ -140,14 +140,19 @@
         <img src="/asset/logo.png" alt="Logo" class="h-10 w-10 object-cover rounded-full"/>
         <span class="font-display font-bold text-base text-white">Tabeahan <span style="color:var(--gold)">Cendekia</span></span>
       </a>
-      <div class="hidden md:flex items-center gap-4">
-        <a href="/dashboard" class="text-sm font-medium text-white/60 hover:text-white transition">Beranda</a>
+      <div class="flex items-center gap-4">
+        <a href="/dashboard"
+          class="hidden md:inline-block"
+          style="background:#ffffff;color:var(--dark);border:1px solid rgba(184,146,74,0.3);border-radius:4px;padding:0.35rem 1rem;font-size:0.72rem;font-weight:700;text-decoration:none;transition:all 0.2s"
+          onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--dark)'">
+          ← Kembali
+        </a>
         <div class="user-menu relative" id="userMenuContainerUjian">
           <button id="userMenuBtnUjian" class="flex items-center gap-2 px-3 py-2 cursor-pointer" style="border-radius:4px;background:rgba(184,146,74,0.15);border:1px solid rgba(184,146,74,0.3)">
             <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style="background:var(--gold)">
               <%= user.username.charAt(0).toUpperCase() %>
             </div>
-            <span class="text-sm font-semibold text-white truncate max-w-[90px]"><%= user.username %></span>
+            <span class="hidden md:inline-block text-sm font-semibold text-white truncate max-w-[90px]"><%= user.username %></span>
             <svg class="w-3 h-3 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </button>
           <div id="userMenuDropdownUjian" class="user-menu-dropdown hidden">
@@ -168,7 +173,7 @@
           </div>
         </div>
       </div>
-      <a href="/dashboard" class="md:hidden text-white/60 hover:text-white text-sm font-medium">← Beranda</a>
+      <a href="/dashboard" class="md:hidden text-white/60 hover:text-white text-sm font-medium">← Kembali</a>
     </div>
   </nav>
 
