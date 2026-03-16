@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.44, for Win64 (x86_64)
 --
--- Host: localhost    Database: webcat
+-- Host: localhost    Database: db_pencatatan
 -- ------------------------------------------------------
 -- Server version	8.0.44
 
@@ -145,7 +145,7 @@ CREATE TABLE `jawaban_peserta` (
   UNIQUE KEY `user_id` (`user_id`,`question_id`),
   KEY `user_id_2` (`user_id`),
   KEY `idx_jawaban_peserta_user_question` (`user_id`,`question_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=352 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=359 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -154,7 +154,7 @@ CREATE TABLE `jawaban_peserta` (
 
 LOCK TABLES `jawaban_peserta` WRITE;
 /*!40000 ALTER TABLE `jawaban_peserta` DISABLE KEYS */;
-INSERT INTO `jawaban_peserta` VALUES (73,28,13,'c'),(156,49,2,'a'),(157,49,1,'a'),(158,49,3,'b'),(159,49,37,'a'),(160,49,39,'b'),(161,49,38,'a'),(162,28,2,'c'),(163,28,1,'a'),(164,28,3,'b'),(165,28,37,'b'),(166,28,38,'b'),(167,28,39,'c'),(168,49,5,'a'),(169,49,4,'e'),(170,49,6,'c'),(171,49,7,'b'),(172,49,40,'e'),(173,49,41,'a'),(174,49,8,'c'),(175,49,42,'c'),(176,49,43,'b'),(177,49,44,'c'),(248,49,52,'b'),(249,49,51,'b'),(272,48,9,'a'),(273,48,10,'a'),(274,48,11,'a'),(275,48,46,'a'),(276,48,12,'a'),(277,48,47,'a'),(278,48,45,'a'),(279,48,48,'a'),(296,49,53,'d'),(303,49,55,'a'),(304,49,54,'b'),(305,49,58,'c'),(306,49,57,'b'),(307,49,56,'c'),(308,49,59,'a'),(309,49,60,'b'),(310,28,54,NULL),(311,28,55,NULL),(312,28,58,NULL),(313,28,59,NULL),(314,28,60,NULL),(315,28,56,NULL),(316,28,57,NULL);
+INSERT INTO `jawaban_peserta` VALUES (73,28,13,'c'),(156,49,2,'a'),(157,49,1,'a'),(158,49,3,'b'),(159,49,37,'a'),(160,49,39,'b'),(161,49,38,'a'),(162,28,2,'c'),(163,28,1,'a'),(164,28,3,'b'),(165,28,37,'b'),(166,28,38,'b'),(167,28,39,'c'),(168,49,5,'a'),(169,49,4,'e'),(170,49,6,'c'),(171,49,7,'b'),(172,49,40,'e'),(173,49,41,'a'),(174,49,8,'c'),(175,49,42,'c'),(176,49,43,'b'),(177,49,44,'c'),(248,49,52,'b'),(249,49,51,'b'),(272,48,9,'a'),(273,48,10,'a'),(274,48,11,'a'),(275,48,46,'a'),(276,48,12,'a'),(277,48,47,'a'),(278,48,45,'a'),(279,48,48,'a'),(296,49,53,'d'),(303,49,55,'a'),(304,49,54,'b'),(305,49,58,'c'),(306,49,57,'b'),(307,49,56,'d'),(308,49,59,'b'),(309,49,60,'b'),(310,28,54,NULL),(311,28,55,NULL),(312,28,58,NULL),(313,28,59,NULL),(314,28,60,NULL),(315,28,56,NULL),(316,28,57,NULL);
 /*!40000 ALTER TABLE `jawaban_peserta` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -409,7 +409,7 @@ CREATE TABLE `riwayat_ujian` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `idx_riwayat_user_to` (`user_id`,`nomor_to`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -418,7 +418,7 @@ CREATE TABLE `riwayat_ujian` (
 
 LOCK TABLES `riwayat_ujian` WRITE;
 /*!40000 ALTER TABLE `riwayat_ujian` DISABLE KEYS */;
-INSERT INTO `riwayat_ujian` VALUES (1,49,'Paket SKD/TKD',1,17,1,6,'2026-03-14 12:54:14',1),(2,49,'Paket Akademik Polri',1,0,0,10,'2026-03-14 12:59:27',1),(3,49,'Paket Akademik Polri',1,10,1,10,'2026-03-14 13:01:50',1),(4,49,'Paket Akademik Polri',1,10,1,10,'2026-03-14 13:12:40',1),(5,49,'Paket Akademik Polri',1,100,10,10,'2026-03-14 13:20:18',1),(6,49,'Paket SKD/TKD',1,5,1,2,'2026-03-14 23:41:22',1),(7,49,'Paket SKD/TKD',1,5,0,2,'2026-03-14 23:49:43',1),(8,49,'Paket SKD/TKD',1,10,1,2,'2026-03-14 23:50:20',1),(9,49,'Paket SKD/TKD',1,10,2,2,'2026-03-15 00:02:31',1),(10,49,'Paket SKD/TKD',1,8,2,2,'2026-03-15 00:04:30',1),(11,49,'Paket SKD/TKD',1,5,1,2,'2026-03-15 00:07:29',1),(12,49,'Paket SKD/TKD',1,7,2,2,'2026-03-15 00:07:47',1),(13,49,'Paket Akademik Polri',1,10,10,10,'2026-03-15 07:05:55',1),(14,48,'Paket PPPK',1,10,8,8,'2026-03-15 07:14:29',1),(15,49,'Paket SKD/TKD',1,10,2,2,'2026-03-15 07:22:11',1),(16,49,'Paket SKD/TKD',1,10,2,2,'2026-03-15 07:48:00',1),(17,49,'Paket Akademik Polri',1,10,10,10,'2026-03-15 07:48:48',1),(18,49,'Paket SKD/TKD',1,6,2,3,'2026-03-16 10:22:56',1),(19,49,'Paket SKD/TKD',1,6,2,3,'2026-03-16 10:24:46',1),(20,49,'Paket SKD/TKD',1,9,2,3,'2026-03-16 10:25:57',1),(21,49,'Paket SKD/TKD',1,28,7,7,'2026-03-16 11:55:43',1),(22,28,'Paket SKD/TKD',1,12,4,7,'2026-03-16 13:02:36',1),(23,28,'Paket SKD/TKD',1,29,7,7,'2026-03-16 13:17:06',1),(24,28,'Paket SKD/TKD',1,5,1,7,'2026-03-16 13:17:27',1),(25,28,'Paket SKD/TKD',1,18,4,7,'2026-03-16 13:21:27',1),(26,28,'Paket SKD/TKD',1,0,0,7,'2026-03-16 13:32:45',1),(27,28,'Paket SKD/TKD',1,0,0,7,'2026-03-16 13:33:38',1);
+INSERT INTO `riwayat_ujian` VALUES (1,49,'Paket SKD/TKD',1,17,1,6,'2026-03-14 12:54:14',1),(2,49,'Paket Akademik Polri',1,0,0,10,'2026-03-14 12:59:27',1),(3,49,'Paket Akademik Polri',1,10,1,10,'2026-03-14 13:01:50',1),(4,49,'Paket Akademik Polri',1,10,1,10,'2026-03-14 13:12:40',1),(5,49,'Paket Akademik Polri',1,100,10,10,'2026-03-14 13:20:18',1),(6,49,'Paket SKD/TKD',1,5,1,2,'2026-03-14 23:41:22',1),(7,49,'Paket SKD/TKD',1,5,0,2,'2026-03-14 23:49:43',1),(8,49,'Paket SKD/TKD',1,10,1,2,'2026-03-14 23:50:20',1),(9,49,'Paket SKD/TKD',1,10,2,2,'2026-03-15 00:02:31',1),(10,49,'Paket SKD/TKD',1,8,2,2,'2026-03-15 00:04:30',1),(11,49,'Paket SKD/TKD',1,5,1,2,'2026-03-15 00:07:29',1),(12,49,'Paket SKD/TKD',1,7,2,2,'2026-03-15 00:07:47',1),(13,49,'Paket Akademik Polri',1,10,10,10,'2026-03-15 07:05:55',1),(14,48,'Paket PPPK',1,10,8,8,'2026-03-15 07:14:29',1),(15,49,'Paket SKD/TKD',1,10,2,2,'2026-03-15 07:22:11',1),(16,49,'Paket SKD/TKD',1,10,2,2,'2026-03-15 07:48:00',1),(17,49,'Paket Akademik Polri',1,10,10,10,'2026-03-15 07:48:48',1),(18,49,'Paket SKD/TKD',1,6,2,3,'2026-03-16 10:22:56',1),(19,49,'Paket SKD/TKD',1,6,2,3,'2026-03-16 10:24:46',1),(20,49,'Paket SKD/TKD',1,9,2,3,'2026-03-16 10:25:57',1),(21,49,'Paket SKD/TKD',1,28,7,7,'2026-03-16 11:55:43',1),(22,28,'Paket SKD/TKD',1,12,4,7,'2026-03-16 13:02:36',1),(23,28,'Paket SKD/TKD',1,29,7,7,'2026-03-16 13:17:06',1),(24,28,'Paket SKD/TKD',1,5,1,7,'2026-03-16 13:17:27',1),(25,28,'Paket SKD/TKD',1,18,4,7,'2026-03-16 13:21:27',1),(26,28,'Paket SKD/TKD',1,0,0,7,'2026-03-16 13:32:45',1),(27,28,'Paket SKD/TKD',1,0,0,7,'2026-03-16 13:33:38',1),(28,49,'Paket SKD/TKD',1,24,6,7,'2026-03-16 14:30:50',1);
 /*!40000 ALTER TABLE `riwayat_ujian` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -449,7 +449,7 @@ CREATE TABLE `users` (
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `username_2` (`username`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -458,7 +458,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (2,'admin123','$2b$10$Pzx1yjnpbQ5w7NBRkLOcROeVEOF.9XXr4C6tqKa8Z35dox/TrGjVO','admin@gmail.com','admin','2026-01-27 14:23:38',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(28,'ucup','$2b$10$hE6v7cvn98kWONGKGiD36uhsh9qRJn.jHxrlOs2dX6hoLSfqyLDt2','ucup@gmail.com','users','2026-02-23 00:56:50',5,'IDLE',NULL,'2026-11-08 16:13:59',1,'2026-02-23 13:08:52',0,0,0),(32,'guhu','$2b$10$lCRnMLtrM9fwbpgH94djaegaqyTt9qRIF/4kursBgXmHRgvmciuYy','teguharif5505@gmail.com','users','2026-02-24 16:54:37',0,'IDLE',NULL,'2026-05-06 17:26:06',1,NULL,0,0,0),(42,'user_desember','$2b$10$qmYoctWQiGcBo0tgOGnz6u6h05ai0fN7IgSvLkd1.RlBdnEtcuBNK','des@test.com','users','2025-12-15 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(43,'user_januari','$2b$10$Qujk4Ng74n1KRVO1rDMMhO9fli8RxpQZAQWDwJE2B9./4SkefsObe','jan@test.com','users','2026-01-10 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(44,'user_januari2','$2b$10$TObF.nCDlTHHeWGPWzYKQuMSk13MptLW9yHSpPAlWRwpHaFBNwjHu','jan2@test.com','users','2026-01-20 07:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(46,'user_januar','$2b$10$gGO7LRO/hRk70YnVZ2R1MeKpec7cpnCRwdwvbFfAMIDMgfTd5G35W','jin@test.com','users','2026-01-10 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(48,'wwww','$2b$10$yk05qxkx5/0uIZwAku02A.TG7VTVLoCdl19jfkmTPjFVWJULcsIm6','w@gmail.com','users','2026-03-06 17:58:32',0,'IDLE',NULL,'2026-07-05 01:37:21',1,NULL,0,0,0),(49,'jono','$2b$10$tNkCL5IdpKtWdM/RtR7yc.iHLO5ThiZUiiMQWcP3qpmMaynDjrGoG','jono@gmail.com','users','2026-03-09 07:10:06',0,'IDLE',NULL,NULL,0,NULL,0,0,1),(50,'naruto','$2b$10$bZd2pkZLYVx69gy84FKUaOvZbFGsp.XdBBoXDeEc3xL07wqRgClZy','ijazahnyamana@gmail.com','users','2026-03-15 07:43:16',0,'IDLE',NULL,'2026-05-14 14:45:58',1,NULL,0,0,0);
+INSERT INTO `users` VALUES (2,'admin123','$2b$10$b4EmlshYpx/Dau4xLeCw5OOdoI.mWiletJwljyskt/Vd1klkE/EO6','admin@gmail.com','admin','2026-01-27 14:23:38',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(28,'ucup','$2b$10$hE6v7cvn98kWONGKGiD36uhsh9qRJn.jHxrlOs2dX6hoLSfqyLDt2','ucup@gmail.com','users','2026-02-23 00:56:50',5,'IDLE',NULL,'2026-11-08 16:13:59',1,'2026-02-23 13:08:52',0,0,0),(32,'guhu','$2b$10$lCRnMLtrM9fwbpgH94djaegaqyTt9qRIF/4kursBgXmHRgvmciuYy','teguharif5505@gmail.com','users','2026-02-24 16:54:37',0,'IDLE',NULL,'2026-05-06 17:26:06',1,NULL,0,0,0),(42,'user_desember','$2b$10$qmYoctWQiGcBo0tgOGnz6u6h05ai0fN7IgSvLkd1.RlBdnEtcuBNK','des@test.com','users','2025-12-15 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(43,'user_januari','$2b$10$Qujk4Ng74n1KRVO1rDMMhO9fli8RxpQZAQWDwJE2B9./4SkefsObe','jan@test.com','users','2026-01-10 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(44,'user_januari2','$2b$10$TObF.nCDlTHHeWGPWzYKQuMSk13MptLW9yHSpPAlWRwpHaFBNwjHu','jan2@test.com','users','2026-01-20 07:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(46,'user_januar','$2b$10$gGO7LRO/hRk70YnVZ2R1MeKpec7cpnCRwdwvbFfAMIDMgfTd5G35W','jin@test.com','users','2026-01-10 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(48,'wwww','$2b$10$yk05qxkx5/0uIZwAku02A.TG7VTVLoCdl19jfkmTPjFVWJULcsIm6','w@gmail.com','users','2026-03-06 17:58:32',0,'IDLE',NULL,'2026-07-05 01:37:21',1,NULL,0,0,0),(49,'jono','$2b$10$tNkCL5IdpKtWdM/RtR7yc.iHLO5ThiZUiiMQWcP3qpmMaynDjrGoG','jono@gmail.com','users','2026-03-09 07:10:06',0,'IDLE',NULL,NULL,0,NULL,0,0,1),(50,'naruto','$2b$10$bZd2pkZLYVx69gy84FKUaOvZbFGsp.XdBBoXDeEc3xL07wqRgClZy','ijazahnyamana@gmail.com','users','2026-03-15 07:43:16',0,'IDLE',NULL,'2026-05-14 14:45:58',1,NULL,0,0,0);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -471,4 +471,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-16 13:56:24
+-- Dump completed on 2026-03-16 15:03:09

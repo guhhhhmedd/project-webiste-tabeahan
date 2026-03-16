@@ -221,7 +221,6 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
   const userId = req.session.user.id;
 
   try {
-    // 1. Ambil soal + scoring rule
     let soalRows;
     try {
       const [rows] = await db.query(
@@ -246,7 +245,6 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
       soalRows = rows;
     }
 
-    // 2. Ambil bobot_benar per subtest dari materi_list
     const materiIds = [...new Set(soalRows.map(s => s.materi_id).filter(Boolean))];
     let scoringMap = {};
     if (materiIds.length > 0) {
@@ -258,7 +256,7 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
       materiRows.forEach(m => { scoringMap[m.id] = m; });
     }
 
-    // 3. Hitung Skor
+    
     let totalPoin = 0;
     let benar     = 0;
     const jawabanUserSesi = sesi.jawaban || {};
@@ -267,12 +265,12 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
       const jawabanUser = (jawabanUserSesi[s.id] || '').toLowerCase();
       const kunci       = (s.kunci || '').toLowerCase();
 
-      // Hitung per soal
+     
       if (s.tipe_penilaian === 'BOBOT_OPSI') {
         if (jawabanUser) {
           const bobotOpsi = Number(s['bobot_' + jawabanUser]) || 0;
-          totalPoin += bobotOpsi; // Tidak dibagi 100 karena dinput langsung sebagai satuan 1-5
-          benar++; // hitung sebagai 'benar' / 'terjawab valid' untuk statistik
+          totalPoin += bobotOpsi; 
+          benar++; 
         }
       } else {
         if (jawabanUser && jawabanUser === kunci) {
@@ -285,7 +283,6 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
         }
       }
 
-      // Simpan riwayat_jawaban per soal untuk review
       return db.query(
         `INSERT INTO jawaban_peserta (user_id, question_id, jawaban_user)
          VALUES (?, ?, ?)
@@ -465,10 +462,9 @@ router.get("/review", isLogin, async (req, res) => {
         }
       }
     }
-    // ------------------------------------------
+    
 
     const totalSoal  = jawabanRows.length;
-    // Gunakan total_benar dan total_salah & skor dari riwayat agar persis sama dengan dashboard
     const totalBenar = riwayat[0]?.jml_benar || jawabanRows.filter((j) => j.is_benar).length;
     const totalSalah = totalSoal - totalBenar;
     const skor       = riwayat[0]?.skor || Math.round((totalBenar / totalSoal) * 100);

@@ -10,9 +10,7 @@ const bcrypt = require("bcrypt");
 
 const SALT_ROUNDS = 10;
 
-// ─────────────────────────────────────────────
-// MIDDLEWARE
-// ─────────────────────────────────────────────
+// MIDDLEWARE 
 function isAdmin(req, res, next) {
   if (req.session.user && req.session.user.role === "admin") return next();
   res.render("login", { error: "Hanya admin yang bisa masuk!", rateLimited: false, resetTime: null });
@@ -35,10 +33,8 @@ async function isLogin(req, res, next) {
     next();
   }
 }
-
-// ─────────────────────────────────────────────
-// MULTER — EXCEL
-// ─────────────────────────────────────────────
+ 
+// MULTER — EXCEL 
 const storageExcel = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = "public/uploads/excel_temp/";
@@ -49,10 +45,8 @@ const storageExcel = multer.diskStorage({
     cb(null, `import-${Date.now()}${path.extname(file.originalname)}`),
 });
 const uploadExcel = multer({ storage: storageExcel });
-
-// ─────────────────────────────────────────────
-// DASHBOARD ADMIN
-// ─────────────────────────────────────────────
+ 
+// DASHBOARD ADMIN 
 router.get("/dashboardAdmin", isAdmin, async (req, res) => {
   try {
     const [statsSoal] = await db.query(`
@@ -70,7 +64,6 @@ router.get("/dashboardAdmin", isAdmin, async (req, res) => {
   FROM users WHERE role != 'admin'
 `);
 
-// SESUDAH — total kumulatif per bulan
 const [chartDataRaw] = await db.query(`
   SELECT 
     DATE_FORMAT(create_at, '%b %Y') AS bulan,
@@ -92,7 +85,6 @@ const chartData = {
   }),
 };
 
-// Fallback kalau kosong
 if (!chartData.labels.length) {
   chartData.labels = ['Belum ada data'];
   chartData.values = [0];
@@ -139,10 +131,8 @@ if (!chartData.labels.length) {
     res.status(500).send("Gagal memuat data admin.");
   }
 });
-
-// ─────────────────────────────────────────────
-// DAFTAR PESERTA
-// ─────────────────────────────────────────────
+ 
+// DAFTAR PESERTA 
 router.get("/admin/daftarPeserta", isAdmin, async (req, res) => {
   try {
     const [users] = await db.query(`
@@ -181,10 +171,8 @@ router.get("/admin/daftarPeserta", isAdmin, async (req, res) => {
     res.status(500).send("Gagal memuat data peserta.");
   }
 });
-
-// ─────────────────────────────────────────────
-// VERIFIKASI PEMBAYARAN
-// ─────────────────────────────────────────────
+ 
+// VERIFIKASI PEMBAYARAN 
 router.post("/admin/verify/:paymentId", isAdmin, async (req, res) => {
   const { paymentId } = req.params;
   try {
@@ -198,7 +186,6 @@ router.post("/admin/verify/:paymentId", isAdmin, async (req, res) => {
     const userId = payments[0].user_id;
     const token  = crypto.randomBytes(4).toString("hex").toUpperCase();
 
-    // Expired: tambah 60 hari dari sekarang (atau dari expired lama jika masih aktif)
     const [userRows] = await db.query(
       "SELECT expired_at FROM users WHERE id = ?",
       [userId]
@@ -227,10 +214,8 @@ router.post("/admin/verify/:paymentId", isAdmin, async (req, res) => {
     res.redirect("/admin/daftarPeserta?error=Gagal+verifikasi");
   }
 });
-
-// ─────────────────────────────────────────────
-// TOLAK PEMBAYARAN
-// ─────────────────────────────────────────────
+ 
+// TOLAK PEMBAYARAN 
 router.post("/admin/reject/:paymentId", isAdmin, async (req, res) => {
   const { paymentId } = req.params;
   try {
@@ -244,10 +229,8 @@ router.post("/admin/reject/:paymentId", isAdmin, async (req, res) => {
     res.redirect("/admin/daftarPeserta?error=Gagal+menolak.");
   }
 });
-
-// ─────────────────────────────────────────────
-// KELOLA SOAL PER PAKET
-// ─────────────────────────────────────────────
+ 
+// KELOLA SOAL PER PAKET 
 router.get("/admin/kelola-soal/:paket", isAdmin, async (req, res) => {
   const namaPaket = decodeURIComponent(req.params.paket);
   const filterTo  = parseInt(req.query.to) || 1;
@@ -275,7 +258,6 @@ router.get("/admin/kelola-soal/:paket", isAdmin, async (req, res) => {
       [namaPaket]
     );
 
-    // Dapatkan data spesifik TryOut yang aktif saat ini
     const currentTOData = availTo.find(t => t.nomor_to === filterTo) || {};
 
     const [materiList] = await db.query("SELECT * FROM materi_list ORDER BY id ASC");
@@ -286,7 +268,7 @@ router.get("/admin/kelola-soal/:paket", isAdmin, async (req, res) => {
       totalAktif,
       config,
       currentTo: filterTo,
-      availTo: availTo, // mengirim seluruh object agar frontend bisa baca is_published dsb.
+      availTo: availTo, 
       currentTOData,
       materiList,
       message: req.query.msg || req.query.message || null,
@@ -297,10 +279,8 @@ router.get("/admin/kelola-soal/:paket", isAdmin, async (req, res) => {
     res.status(500).send("Gagal mengambil data soal.");
   }
 });
-
-// ─────────────────────────────────────────────
-// TAMBAH SOAL MANUAL
-// ─────────────────────────────────────────────
+ 
+// TAMBAH SOAL MANUAL 
 router.post("/admin/tambah-soal", isAdmin, async (req, res) => {
   const { paket, nomor_to, materi_id, nomor_urut, soal, a, b, c, d, e, kunci, pembahasan,
           bobot_a, bobot_b, bobot_c, bobot_d, bobot_e } = req.body;
@@ -324,10 +304,8 @@ router.post("/admin/tambah-soal", isAdmin, async (req, res) => {
     res.redirect("/dashboardAdmin?error=Gagal+tambah+soal.");
   }
 });
-
-// ─────────────────────────────────────────────
-// UPDATE SOAL
-// ─────────────────────────────────────────────
+ 
+// UPDATE SOAL 
 router.post("/admin/updateSoal", isAdmin, async (req, res) => {
   const { id, paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan,
           bobot_a, bobot_b, bobot_c, bobot_d, bobot_e } = req.body;
@@ -349,10 +327,8 @@ router.post("/admin/updateSoal", isAdmin, async (req, res) => {
     res.status(500).send("Gagal update soal.");
   }
 });
-
-// ─────────────────────────────────────────────
-// IMPORT SOAL — EXCEL
-// ─────────────────────────────────────────────
+ 
+// IMPORT SOAL — EXCEL 
 router.post("/admin/upload-soal", isAdmin, uploadExcel.single("fileExcel"), async (req, res) => {
   if (!req.file) return res.status(400).send("File tidak ditemukan.");
 
@@ -409,10 +385,8 @@ router.post("/admin/upload-soal", isAdmin, uploadExcel.single("fileExcel"), asyn
     res.redirect("/dashboardAdmin?error=Gagal+proses+Excel.+Cek+format+kolom+dan+materi_id.");
   }
 });
-
-// ─────────────────────────────────────────────
-// TAMBAH SOAL MANUAL
-// ─────────────────────────────────────────────
+ 
+// TAMBAH SOAL MANUAL 
 router.post("/admin/tambah-soal-manual", isAdmin, async (req, res) => {
   const { paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e } = req.body;
   try {
@@ -437,10 +411,7 @@ router.post("/admin/tambah-soal-manual", isAdmin, async (req, res) => {
     res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}&error=Gagal+menambahkan+soal`);
   }
 });
-
-// ─────────────────────────────────────────────
-// TOGGLE AKTIF SOAL (JSON)
-// ─────────────────────────────────────────────
+ 
 router.post("/admin/toggle-soal", isAdmin, async (req, res) => {
   const { id, is_active } = req.body;
   try {
@@ -451,10 +422,8 @@ router.post("/admin/toggle-soal", isAdmin, async (req, res) => {
     res.json({ ok: false });
   }
 });
-
-// ─────────────────────────────────────────────
-// TOGGLE SEMUA SOAL DALAM SATU TO
-// ─────────────────────────────────────────────
+ 
+// TOGGLE SEMUA SOAL DALAM SATU TO 
 router.post("/admin/toggle-all-soal", isAdmin, async (req, res) => {
   const { paket, is_active, current_to } = req.body;
   try {
@@ -471,10 +440,8 @@ router.post("/admin/toggle-all-soal", isAdmin, async (req, res) => {
     );
   }
 });
-
-// ─────────────────────────────────────────────
-// UPDATE CONFIG PAKET (jumlah soal + durasi)
-// ─────────────────────────────────────────────
+ 
+// UPDATE CONFIG PAKET (jumlah soal + durasi) 
 router.post("/admin/update-config-paket", isAdmin, async (req, res) => {
   const { paket, jumlah_soal, durasi_menit, deskripsi, harga, harga_asli } = req.body;
   try {
@@ -494,10 +461,8 @@ router.post("/admin/update-config-paket", isAdmin, async (req, res) => {
     res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?error=Gagal+update`);
   }
 });
-
-// ─────────────────────────────────────────────
-// EDIT SOAL — GET FORM
-// ─────────────────────────────────────────────
+ 
+// EDIT SOAL — GET FORM 
 router.get("/admin/editSoal/:id", isAdmin, async (req, res) => {
   try {
     const [rows] = await db.query("SELECT * FROM questions WHERE id = ?", [req.params.id]);
@@ -508,10 +473,8 @@ router.get("/admin/editSoal/:id", isAdmin, async (req, res) => {
     res.status(500).send("Gagal memuat soal.");
   }
 });
-
-// ─────────────────────────────────────────────
-// HAPUS SOAL
-// ─────────────────────────────────────────────
+ 
+// HAPUS SOAL 
 router.post("/admin/delete-soal", isAdmin, async (req, res) => {
   const { id, paket } = req.body;
   try {
@@ -522,10 +485,8 @@ router.post("/admin/delete-soal", isAdmin, async (req, res) => {
     res.status(500).send("Gagal menghapus soal.");
   }
 });
-
-// ─────────────────────────────────────────────
-// UPDATE DURASI PAKET
-// ─────────────────────────────────────────────
+ 
+// UPDATE DURASI PAKET 
 router.post("/admin/update-durasi", isAdmin, async (req, res) => {
   const { id, durasi } = req.body;
   try {
@@ -535,14 +496,11 @@ router.post("/admin/update-durasi", isAdmin, async (req, res) => {
     res.redirect("/dashboardAdmin?error=Gagal+update+durasi");
   }
 });
-
-// ─────────────────────────────────────────────
-// HAPUS AKUN DARI ADMIN
-// ─────────────────────────────────────────────
+ 
+// HAPUS AKUN DARI ADMIN 
 router.post("/deleteAccountFromAdmin", isAdmin, async (req, res) => {
   const { id } = req.body;
   try {
-    // Hapus file bukti transfer dari storage
     const [payments] = await db.query(
       "SELECT bukti_transfer FROM payments WHERE user_id = ?",
       [id]
@@ -567,11 +525,8 @@ router.post("/deleteAccountFromAdmin", isAdmin, async (req, res) => {
     res.status(500).send("Gagal hapus data.");
   }
 });
-
-// ─────────────────────────────────────────────
+ 
 // RESET UJIAN USER (admin)
-// Kembalikan ke LUNAS + hapus jawaban lama + reset status IDLE
-// ─────────────────────────────────────────────
 router.post("/admin/reset-ujian-user", isAdmin, async (req, res) => {
   const { userIdTarget, paket_pilihan, nomor_to } = req.body;
   try {
@@ -597,10 +552,8 @@ router.post("/admin/reset-ujian-user", isAdmin, async (req, res) => {
     res.redirect("/admin/daftarPeserta?error=Gagal+reset+ujian");
   }
 });
-
-// ─────────────────────────────────────────────
-// HAPUS SATU RIWAYAT PAYMENT (per TO)
-// ─────────────────────────────────────────────
+ 
+// HAPUS SATU RIWAYAT PAYMENT (per TO) 
 router.post("/admin/delete-payment", isAdmin, async (req, res) => {
   const { paymentId } = req.body;
   try {
@@ -619,10 +572,8 @@ router.post("/admin/delete-payment", isAdmin, async (req, res) => {
     res.redirect("/admin/daftarPeserta?error=Gagal+hapus+riwayat");
   }
 });
-
-// ─────────────────────────────────────────────
-// GET /admin/anggota — halaman kelola anggota offline
-// ─────────────────────────────────────────────
+ 
+// GET /admin/anggota — halaman kelola anggota offline 
 router.get("/admin/anggota", isAdmin, async (req, res) => {
   try {
     const [anggota] = await db.query(
@@ -642,10 +593,8 @@ router.get("/admin/anggota", isAdmin, async (req, res) => {
     res.status(500).send("Gagal memuat data anggota.");
   }
 });
-
-// ─────────────────────────────────────────────
-// POST /admin/anggota/tambah — tambah email anggota
-// ─────────────────────────────────────────────
+ 
+// POST /admin/anggota/tambah — tambah email anggota 
 router.post("/admin/anggota/tambah", isAdmin, async (req, res) => {
   const { email, nama, catatan } = req.body;
 
@@ -654,13 +603,11 @@ router.post("/admin/anggota/tambah", isAdmin, async (req, res) => {
   }
 
   try {
-    // Insert ke whitelist
     await db.query(
       "INSERT INTO anggota_offline (email, nama, catatan) VALUES (?, ?, ?)",
       [email.toLowerCase().trim(), nama || null, catatan || null]
     );
 
-    // Kalau user dengan email ini sudah terdaftar, langsung set is_anggota = 1
     await db.query(
       "UPDATE users SET is_anggota = 1 WHERE LOWER(email) = LOWER(?)",
       [email.trim()]
@@ -675,11 +622,8 @@ router.post("/admin/anggota/tambah", isAdmin, async (req, res) => {
     res.redirect("/admin/anggota?error=" + encodeURIComponent("Gagal menambahkan email."));
   }
 });
-
-// ─────────────────────────────────────────────
-// ─────────────────────────────────────────────
-// POST /admin/reset-password — admin set password baru untuk user
-// ─────────────────────────────────────────────
+  
+// POST /admin/reset-password — admin set password baru untuk user 
 router.post("/admin/reset-password", isAdmin, async (req, res) => {
   const { userId, newPassword } = req.body;
 
@@ -699,17 +643,14 @@ router.post("/admin/reset-password", isAdmin, async (req, res) => {
       encodeURIComponent("Gagal reset password."));
   }
 });
-
-// ─────────────────────────────────────────────
-// POST /admin/anggota/hapus — hapus email dari whitelist
-// ─────────────────────────────────────────────
+ 
+// POST /admin/anggota/hapus — hapus email dari whitelist 
 router.post("/admin/anggota/hapus", isAdmin, async (req, res) => {
   const { id, email } = req.body;
 
   try {
     await db.query("DELETE FROM anggota_offline WHERE id = ?", [id]);
 
-    // Cabut status anggota dari user yang bersangkutan
     await db.query(
       "UPDATE users SET is_anggota = 0 WHERE LOWER(email) = LOWER(?)",
       [email]
@@ -721,10 +662,8 @@ router.post("/admin/anggota/hapus", isAdmin, async (req, res) => {
     res.redirect("/admin/anggota?error=" + encodeURIComponent("Gagal menghapus email."));
   }
 });
-
-// ─────────────────────────────────────────────
-// TAMBAH, HAPUS, DAN PUBLISH TRYOUT BARU 
-// ─────────────────────────────────────────────
+ 
+// TAMBAH, HAPUS, DAN PUBLISH TRYOUT BARU  
 router.post("/admin/tryout/tambah", isAdmin, async (req, res) => {
   const { paket } = req.body;
   try {
