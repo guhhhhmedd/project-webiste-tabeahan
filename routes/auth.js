@@ -3,7 +3,6 @@ const router    = express.Router();
 const db        = require("../config/db");
 const rateLimit = require("express-rate-limit");
 const bcrypt    = require("bcrypt");
-
 const SALT_ROUNDS = 10;
 
 // RATE LIMITER — Login
