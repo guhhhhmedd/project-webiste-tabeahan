@@ -164,7 +164,7 @@
   <!-- Tabel -->
   <div class="tbl-card">
     <div class="tbl-hd flex items-center justify-between">
-      <h3>👥 Data Peserta & Pembayaran Per Try Out</h3>
+      <h3> Data Peserta & Pembayaran Per Try Out</h3>
       <span style="font-size:0.65rem;color:rgba(255,255,255,0.5)"><%= users.length %> peserta</span>
     </div>
 
@@ -172,7 +172,7 @@
       <table>
         <thead>
           <tr>
-            <th>#</th>
+            <th>No</th>
             <th>Peserta</th>
             <th>Reset Password</th>
             <th>Status Ujian</th>
@@ -219,7 +219,7 @@
               <div>
                 <p style="font-size:0.875rem;font-weight:700;color:var(--dark);margin:0"><%= u.username %></p>
                 <p style="font-size:0.7rem;color:var(--muted);margin:0;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><%= u.email %></p>
-                <p style="font-size:0.6rem;color:rgba(155,107,107,0.5);margin:0">ID #<%= u.id %></p>
+                <p style="font-size:0.6rem;color:rgba(155,107,107,0.5);margin:0">ID <%= u.id %></p>
               </div>
             </div>
           </td>
@@ -295,7 +295,7 @@
                       <%= pay.nomor_to %>
                     </div>
                     <div>
-                      <p style="font-size:0.7rem;font-weight:700;color:var(--dark);margin:0;line-height:1.2">TO #<%= pay.nomor_to %></p>
+                      <p style="font-size:0.7rem;font-weight:700;color:var(--dark);margin:0;line-height:1.2">TO <%= pay.nomor_to %></p>
                       <span class="badge <%= st==='LUNAS'?'badge-lunas':st==='PENDING'?'badge-pending':st==='DITOLAK'?'badge-ditolak':'badge-idle' %>"
                         style="margin-top:2px;display:inline-block">
                         <%= pay.status %>

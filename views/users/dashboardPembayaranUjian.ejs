@@ -159,7 +159,7 @@
             <div class="px-4 py-3 border-b bg-slate-50">
               <p class="text-[10px] text-slate-400 font-bold uppercase">Akun</p>
               <p class="text-xs font-semibold text-slate-700 truncate"><%= user.email %></p>
-              <p class="text-[10px] text-slate-400">ID #<%= user.id %></p>
+              <p class="text-[10px] text-slate-400">ID <%= user.id %></p>
             </div>
             <div class="p-2">
               <a href="/dashboard" class="flex items-center gap-2 px-3 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 rounded-lg transition">🏠 Beranda</a>
@@ -209,7 +209,7 @@
 
           <!-- Placeholder -->
           <div id="placeholderPilih" class="paket-card p-12 text-center">
-            <p class="text-5xl mb-4">☝️</p>
+            <p class="text-5xl mb-4"></p>
             <p class="font-display font-bold text-xl">Pilih Paket Dulu</p>
             <p class="text-sm mt-2" style="color:var(--muted)">Setelah memilih paket di atas, 10 Try Out akan muncul di sini.</p>
           </div>
@@ -295,7 +295,7 @@
                       <%= i %>
                     </div>
                     <div>
-                      <p class="text-sm font-bold leading-tight" style="color:var(--dark)">Try Out #<%= i %></p>
+                      <p class="text-sm font-bold leading-tight" style="color:var(--dark)">Try Out <%= i %></p>
                       <p class="text-[10px]" style="color:var(--muted)"><%= paket.durasi %> menit</p>
                       <% if (status === 'LUNAS' && pay && pay.sisaWaktuText) { %>
                         <p class="text-[9px] text-amber-600 font-bold mt-0.5 flex items-center gap-0.5"><span>⏳</span> sisa <%= pay.sisaWaktuText %></p>
@@ -337,7 +337,7 @@
                     <form action="/ujian/mulai" method="POST" class="confirm-mulai">
                       <input type="hidden" name="paket_pilihan" value="<%= paket.key %>">
                       <input type="hidden" name="nomor_to"      value="<%= i %>">
-                      <button type="submit" class="btn-green">🚀 Mulai Ujian TO #<%= i %></button>
+                      <button type="submit" class="btn-green"> Mulai Ujian TO <%= i %></button>
                     </form>
                     <a href="/ujian/review?nomor_to=<%= i %>&paket=<%= encodeURIComponent(paket.key) %>"
                       class="block text-center text-[10px] font-semibold mt-2"
@@ -433,7 +433,7 @@
             style="background:var(--gold)" id="mToBadge">—</div>
           <div>
             <p class="text-xs font-bold"  style="color:var(--dark)"  id="mPaketLabel">—</p>
-            <p class="text-[10px]"        style="color:var(--muted)" id="mToLabel">Try Out #—</p>
+            <p class="text-[10px]"        style="color:var(--muted)" id="mToLabel">Try Out —</p>
           </div>
         </div>
 
@@ -520,10 +520,10 @@
 
         document.getElementById('mPaket').value         = paket;
         document.getElementById('mTo').value            = to;
-        document.getElementById('mSubtitle').textContent  = label + ' · TO #' + to;
+        document.getElementById('mSubtitle').textContent  = label + ' · TO ' + to;
         document.getElementById('mToBadge').textContent   = to;
         document.getElementById('mPaketLabel').textContent = label;
-        document.getElementById('mToLabel').textContent   = 'Try Out #' + to;
+        document.getElementById('mToLabel').textContent   = 'Try Out ' + to;
 
         // Harga dinamis
         const harga      = parseInt(btn.dataset.harga)    || 50000;

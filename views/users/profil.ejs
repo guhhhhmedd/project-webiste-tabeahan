@@ -151,7 +151,7 @@
             <%= r.paket %>
           </p>
           <p class="text-xs mt-0.5 flex items-center gap-1.5 flex-wrap" style="color:var(--muted)">
-            <span>TO #<%= r.nomor_to %></span> &middot;
+            <span>TO <%= r.nomor_to %></span> &middot;
             <span><%= r.jml_benar %>/<%= r.jml_soal %> benar</span> &middot;
             <span><%= r.tgl_selesai ? new Date(r.tgl_selesai).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '-' %></span>
             

@@ -202,7 +202,7 @@
       <div style="display:flex;align-items:center;gap:0.75rem">
         <div class="nomor-badge <%= statusClass %>"><%= idx + 1 %></div>
         <div>
-          <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted)">Soal #<%= item.nomor_urut %></span>
+          <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted)">Soal <%= item.nomor_urut %></span>
           <% if (!item.is_benar) { %>
           <p style="font-size:0.65rem;color:#b91c1c;font-weight:700;margin:0">
             Jawabanmu: <strong><%= jawabanLower.toUpperCase() || '-' %></strong> · Kunci: <strong><%= kunciLower.toUpperCase() %></strong>
