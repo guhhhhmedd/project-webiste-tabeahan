@@ -11,7 +11,7 @@ function isLogin(req, res, next) {
   res.redirect("/login");
 }
 
-// MULTER — upload bukti transfer
+// MULTER — upload bukti transfer (SECURE VERSION)
 const storageBukti = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadPath = path.join(process.cwd(), "public", "uploads", "bukti");
@@ -20,21 +20,35 @@ const storageBukti = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const userId = req.session.user?.id || "anon";
-    cb(null, `bukti-${userId}-${Date.now()}${path.extname(file.originalname)}`);
+    const safeExt = file.mimetype === "image/png" ? ".png" : ".jpg";
+    cb(null, `bukti-${userId}-${Date.now()}${safeExt}`);
   },
 });
+
+function validateImageFile(req, file, cb) {
+  const allowedMime = ["image/jpeg", "image/png"];
+  if (!allowedMime.includes(file.mimetype)) {
+    return cb(new Error("Hanya file JPG/PNG yang diizinkan!"));
+  }
+  const originalName = file.originalname.toLowerCase();
+  const parts = originalName.split(".");
+  if (parts.length !== 2) {
+    return cb(new Error("Nama file tidak valid! Jangan gunakan double extension."));
+  }
+  const ext = parts[1];
+  if (!["jpg", "jpeg", "png"].includes(ext)) {
+    return cb(new Error("Ekstensi file tidak diizinkan!"));
+  }
+  cb(null, true);
+}
 
 const uploadBukti = multer({
   storage: storageBukti,
   limits: { fileSize: 2 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    const allowed = ["image/jpeg", "image/png", "image/jpg"];
-    if (allowed.includes(file.mimetype)) cb(null, true);
-    else cb(new Error("Hanya file JPG/PNG yang diizinkan!"));
-  },
+  fileFilter: validateImageFile,
 });
 
-// Fungsi helper untuk ambil dari DB (dipanggil di setiap route yang butuh)
+// HELPER: getPaketList dari DB
 async function getPaketList() {
   const [rows] = await db.query(
     "SELECT nama_paket AS `key`, nama_paket AS label, durasi_menit AS durasi, deskripsi, harga, harga_asli FROM paket_ujian ORDER BY id ASC"
@@ -50,8 +64,6 @@ const PAKET_LIST_FALLBACK = [
 
 const PAKET_LIST = PAKET_LIST_FALLBACK;
 
-// HELPER: Bangun paymentMap dari array payments
-
 function buildPaymentMap(payments, user = null, tryoutList = []) {
   const map = {};
   for (const p of payments) {
@@ -59,42 +71,29 @@ function buildPaymentMap(payments, user = null, tryoutList = []) {
     if (!map[key]) {
       const createdAt = p.created_at ? new Date(p.created_at) : null;
       const isExpired = createdAt && (Date.now() - createdAt.getTime() > 7 * 24 * 60 * 60 * 1000);
-      
+
       let status = p.status ? p.status.toUpperCase() : "KOSONG";
-      if (isExpired && status === "LUNAS") {
-        status = "EXPIRED";
-      }
+      if (isExpired && status === "LUNAS") status = "EXPIRED";
 
       let sisaWaktuText = "";
       if (createdAt && !isExpired && status === "LUNAS") {
         const diff = (createdAt.getTime() + 7 * 24 * 60 * 60 * 1000) - Date.now();
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const days  = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         sisaWaktuText = days > 0 ? `${days} hari ${hours} jam` : `${hours} jam`;
       }
 
-      map[key] = {
-        ...p,
-        status: status,
-        sisaWaktuText: sisaWaktuText
-      };
+      map[key] = { ...p, status, sisaWaktuText };
     }
   }
 
-  // Anggota kelas offline → semua TO publik gratis (inject LUNAS untuk yang belum ada)
   if (user && user.is_anggota && tryoutList.length > 0) {
     for (const toObj of tryoutList) {
       const key = `${toObj.paket}_${toObj.nomor_to}`;
       if (!map[key]) {
         map[key] = {
-          id:            null,
-          user_id:       user.id,
-          paket:         toObj.paket,
-          nomor_to:      toObj.nomor_to,
-          status:        "LUNAS",
-          token_ujian:   null,
-          bukti_transfer: null,
-          is_gratis:     true,   
+          id: null, user_id: user.id, paket: toObj.paket, nomor_to: toObj.nomor_to,
+          status: "LUNAS", token_ujian: null, bukti_transfer: null, is_gratis: true,
         };
       }
     }
@@ -105,7 +104,7 @@ function buildPaymentMap(payments, user = null, tryoutList = []) {
         if (!map[key]) {
           map[key] = {
             id: null, user_id: user.id, paket: paket.key, nomor_to: to,
-            status: "LUNAS", is_gratis: true
+            status: "LUNAS", is_gratis: true,
           };
         }
       }
@@ -115,16 +114,14 @@ function buildPaymentMap(payments, user = null, tryoutList = []) {
   return map;
 }
 
-// GET /dashboard
+// dashboard
 router.get("/dashboard", isLogin, async (req, res) => {
   try {
     const userId = req.session.user.id;
     const [rows] = await db.query("SELECT * FROM users WHERE id = ?", [userId]);
     const user = rows[0];
 
-    if (user.status_ujian === "SEDANG_UJIAN") {
-      return res.redirect("/ujian/soal/1");
-    }
+    if (user.status_ujian === "SEDANG_UJIAN") return res.redirect("/ujian/soal/1");
 
     const [payments] = await db.query(
       "SELECT * FROM payments WHERE user_id = ? ORDER BY created_at DESC",
@@ -134,14 +131,17 @@ router.get("/dashboard", isLogin, async (req, res) => {
     const [rankingRows] = await db.query(`
       SELECT username, skor FROM users
       WHERE skor > 0 AND skor IS NOT NULL
-      ORDER BY skor DESC, id ASC
-      LIMIT 10
+      ORDER BY skor DESC, id ASC LIMIT 10
     `);
 
     const myRank = rankingRows.findIndex(r => r.username === user.username) + 1;
 
-    const [tryoutList] = await db.query("SELECT * FROM paket_to WHERE is_published = 1 ORDER BY paket ASC, nomor_to ASC");
-    const [paketList] = await db.query("SELECT nama_paket AS `key`, nama_paket AS label, durasi_menit AS durasi, deskripsi, harga, harga_asli FROM paket_ujian ORDER BY id ASC");
+    const [tryoutList] = await db.query(
+      "SELECT * FROM paket_to WHERE is_published = 1 ORDER BY paket ASC, nomor_to ASC"
+    );
+    const [paketList] = await db.query(
+      "SELECT nama_paket AS `key`, nama_paket AS label, durasi_menit AS durasi, deskripsi, harga, harga_asli FROM paket_ujian ORDER BY id ASC"
+    );
 
     res.render("users/dashboard", {
       user,
@@ -158,7 +158,7 @@ router.get("/dashboard", isLogin, async (req, res) => {
   }
 });
 
-// GET /dashboardPembayaranUjian
+// dashboardPembayaranUjian
 router.get("/dashboardPembayaranUjian", isLogin, async (req, res) => {
   try {
     const userId = req.session.user.id;
@@ -166,9 +166,7 @@ router.get("/dashboardPembayaranUjian", isLogin, async (req, res) => {
     const [rows] = await db.query("SELECT * FROM users WHERE id = ?", [userId]);
     const user = rows[0];
 
-    if (user.status_ujian === "SEDANG_UJIAN") {
-      return res.redirect("/ujian/soal/1");
-    }
+    if (user.status_ujian === "SEDANG_UJIAN") return res.redirect("/ujian/soal/1");
 
     const [paymentRows] = await db.query(
       "SELECT * FROM payments WHERE user_id = ? ORDER BY created_at DESC",
@@ -178,8 +176,7 @@ router.get("/dashboardPembayaranUjian", isLogin, async (req, res) => {
     const [rankingRows] = await db.query(`
       SELECT username, skor FROM users
       WHERE skor > 0 AND skor IS NOT NULL
-      ORDER BY skor DESC, id ASC
-      LIMIT 5
+      ORDER BY skor DESC, id ASC LIMIT 5
     `);
 
     const myRank = rankingRows.findIndex(r => r.username === user.username) + 1;
@@ -196,7 +193,9 @@ router.get("/dashboardPembayaranUjian", isLogin, async (req, res) => {
       paketList = PAKET_LIST_FALLBACK;
     }
 
-    const [tryoutList] = await db.query("SELECT * FROM paket_to WHERE is_published = 1 ORDER BY paket ASC, nomor_to ASC");
+    const [tryoutList] = await db.query(
+      "SELECT * FROM paket_to WHERE is_published = 1 ORDER BY paket ASC, nomor_to ASC"
+    );
     const paymentMap = buildPaymentMap(paymentRows, user, tryoutList);
 
     res.render("users/dashboardPembayaranUjian", {
@@ -204,11 +203,11 @@ router.get("/dashboardPembayaranUjian", isLogin, async (req, res) => {
       paketList,
       tryoutList,
       paymentMap,
-      rankings:     rankingRows,
-      myRank:       myRank > 0 ? myRank : "-",
+      rankings:    rankingRows,
+      myRank:      myRank > 0 ? myRank : "-",
       riwayatUjian,
-      uploadError:  req.query.uploadError ? decodeURIComponent(req.query.uploadError) : null,
-      successMsg:   req.query.success    ? decodeURIComponent(req.query.success)     : null,
+      uploadError: req.query.uploadError ? decodeURIComponent(req.query.uploadError) : null,
+      successMsg:  req.query.success     ? decodeURIComponent(req.query.success)     : null,
     });
   } catch (err) {
     console.error("Dashboard Pembayaran Error:", err);
@@ -216,8 +215,7 @@ router.get("/dashboardPembayaranUjian", isLogin, async (req, res) => {
   }
 });
 
-
-// GET /profil — halaman info akun & riwayat ujian
+// profil
 router.get("/profil", isLogin, async (req, res) => {
   const userId = req.session.user.id;
   try {
@@ -232,8 +230,8 @@ router.get("/profil", isLogin, async (req, res) => {
          FROM payments
          WHERE UPPER(status) = 'LUNAS'
          GROUP BY user_id, paket, nomor_to
-       ) p ON r.user_id = p.user_id 
-           AND TRIM(r.paket) = TRIM(p.paket) 
+       ) p ON r.user_id = p.user_id
+           AND TRIM(r.paket) = TRIM(p.paket)
            AND r.nomor_to = p.nomor_to
        WHERE r.user_id = ?
        ORDER BY r.tgl_selesai DESC`,
@@ -294,7 +292,6 @@ router.post("/upload-bukti", isLogin, uploadBukti.single("bukti"), async (req, r
       );
     }
 
-    // Simpan ke tabel payments
     await db.query(
       `INSERT INTO payments (user_id, paket, nomor_to, bukti_transfer, status)
        VALUES (?, ?, ?, ?, 'PENDING')`,
@@ -311,21 +308,18 @@ router.post("/upload-bukti", isLogin, uploadBukti.single("bukti"), async (req, r
   }
 });
 
-// POST /deleteAccount
+// deleteAccount
 router.post("/deleteAccount", isLogin, async (req, res) => {
   const userId = req.session.user.id;
 
   try {
     const [payments] = await db.query(
-      "SELECT bukti_transfer FROM payments WHERE user_id = ?",
-      [userId]
+      "SELECT bukti_transfer FROM payments WHERE user_id = ?", [userId]
     );
 
     payments.forEach((p) => {
       if (p.bukti_transfer) {
-        const filePath = path.join(
-          process.cwd(), "public", "uploads", "bukti", p.bukti_transfer
-        );
+        const filePath = path.join(process.cwd(), "public", "uploads", "bukti", p.bukti_transfer);
         if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
       }
     });
