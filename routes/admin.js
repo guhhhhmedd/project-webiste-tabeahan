@@ -50,6 +50,38 @@ const storageExcel = multer.diskStorage({
 });
 const uploadExcel = multer({ storage: storageExcel });
 
+// MULTER — SOAL IMAGES
+const storageSoal = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = "public/uploads/soal/";
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `soal-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`);
+  }
+});
+
+const uploadSoal = multer({
+  storage: storageSoal,
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === "image/png" || file.mimetype === "image/jpeg" || file.mimetype === "image/jpg") {
+      cb(null, true);
+    } else {
+      cb(new Error("Hanya file JPG/PNG yang diperbolehkan!"), false);
+    }
+  }
+});
+const cpUploadSoal = uploadSoal.fields([
+  { name: 'gambar', maxCount: 1 },
+  { name: 'gambar_a', maxCount: 1 },
+  { name: 'gambar_b', maxCount: 1 },
+  { name: 'gambar_c', maxCount: 1 },
+  { name: 'gambar_d', maxCount: 1 },
+  { name: 'gambar_e', maxCount: 1 }
+]);
+
 // DASHBOARD ADMIN
 router.get("/dashboardAdmin", isAdmin, async (req, res) => {
   try {
@@ -199,7 +231,7 @@ router.post("/admin/verify/:paymentId", isAdmin, async (req, res) => {
     if (currentExpired && new Date(currentExpired) > new Date()) {
       newExpiredDate = new Date(currentExpired);
     }
-    newExpiredDate.setDate(newExpiredDate.getDate() + 60);
+    newExpiredDate.setDate(newExpiredDate.getDate() + 7);
 
     await Promise.all([
       db.query(
@@ -294,7 +326,19 @@ router.get("/admin/kelola-soal/:paket", isAdmin, async (req, res) => {
 });
 
 // TAMBAH SOAL MANUAL
-router.post("/admin/tambah-soal", isAdmin, async (req, res) => {
+router.post("/admin/tambah-soal", isAdmin, (req, res, next) => {
+  cpUploadSoal(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res.redirect("/dashboardAdmin?error=Ukuran+gambar+maksimal+2MB.");
+      }
+      return res.redirect("/dashboardAdmin?error=Kesalahan+upload+gambar.");
+    } else if (err) {
+      return res.redirect("/dashboardAdmin?error=" + encodeURIComponent(err.message));
+    }
+    next();
+  });
+}, async (req, res) => {
   const {
     paket,
     nomor_to,
@@ -319,9 +363,17 @@ router.post("/admin/tambah-soal", isAdmin, async (req, res) => {
     const tipe_penilaian = bobotMateriIds.includes(parseInt(materi_id))
       ? "BOBOT_OPSI"
       : "BENAR_SALAH";
+
+    const gambar = req.files && req.files['gambar'] ? req.files['gambar'][0].filename : null;
+    const gambar_a = req.files && req.files['gambar_a'] ? req.files['gambar_a'][0].filename : null;
+    const gambar_b = req.files && req.files['gambar_b'] ? req.files['gambar_b'][0].filename : null;
+    const gambar_c = req.files && req.files['gambar_c'] ? req.files['gambar_c'][0].filename : null;
+    const gambar_d = req.files && req.files['gambar_d'] ? req.files['gambar_d'][0].filename : null;
+    const gambar_e = req.files && req.files['gambar_e'] ? req.files['gambar_e'][0].filename : null;
+
     await db.query(
-      `INSERT INTO questions (paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan, tipe_penilaian, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO questions (paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan, tipe_penilaian, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e, gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         paket,
         nomor_to,
@@ -341,6 +393,7 @@ router.post("/admin/tambah-soal", isAdmin, async (req, res) => {
         bobot_c || 0,
         bobot_d || 0,
         bobot_e || 0,
+        gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e
       ],
     );
     res.redirect("/dashboardAdmin?message=Soal+berhasil+ditambah🤖");
@@ -356,7 +409,21 @@ router.post("/admin/tambah-soal", isAdmin, async (req, res) => {
 });
 
 // UPDATE SOAL
-router.post("/admin/updateSoal", isAdmin, async (req, res) => {
+router.post("/admin/updateSoal", isAdmin, (req, res, next) => {
+  cpUploadSoal(req, res, function (err) {
+    const paramTo = req.body.nomor_to || req.query.to || 1;
+    const paramPaket = req.body.paket || req.query.paket || "";
+    if (err instanceof multer.MulterError) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res.redirect(`/admin/kelola-soal/${encodeURIComponent(paramPaket)}?to=${paramTo}&error=Ukuran+gambar+maksimal+2MB.`);
+      }
+      return res.redirect(`/admin/kelola-soal/${encodeURIComponent(paramPaket)}?to=${paramTo}&error=Kesalahan+upload+gambar.`);
+    } else if (err) {
+      return res.redirect(`/admin/kelola-soal/${encodeURIComponent(paramPaket)}?to=${paramTo}&error=` + encodeURIComponent(err.message));
+    }
+    next();
+  });
+}, async (req, res) => {
   const {
     id,
     paket,
@@ -382,34 +449,50 @@ router.post("/admin/updateSoal", isAdmin, async (req, res) => {
     const tipe_penilaian = bobotMateriIds.includes(parseInt(materi_id))
       ? "BOBOT_OPSI"
       : "BENAR_SALAH";
-    await db.query(
-      `UPDATE questions 
+
+    const gambar = req.files && req.files['gambar'] ? req.files['gambar'][0].filename : null;
+    const gambar_a = req.files && req.files['gambar_a'] ? req.files['gambar_a'][0].filename : null;
+    const gambar_b = req.files && req.files['gambar_b'] ? req.files['gambar_b'][0].filename : null;
+    const gambar_c = req.files && req.files['gambar_c'] ? req.files['gambar_c'][0].filename : null;
+    const gambar_d = req.files && req.files['gambar_d'] ? req.files['gambar_d'][0].filename : null;
+    const gambar_e = req.files && req.files['gambar_e'] ? req.files['gambar_e'][0].filename : null;
+
+    let updateQuery = `UPDATE questions 
        SET paket=?, nomor_to=?, materi_id=?, nomor_urut=?, soal=?,
            opsi_a=?, opsi_b=?, opsi_c=?, opsi_d=?, opsi_e=?, kunci=?, pembahasan=?,
-           tipe_penilaian=?, bobot_a=?, bobot_b=?, bobot_c=?, bobot_d=?, bobot_e=?
-       WHERE id=?`,
-      [
-        paket,
-        nomor_to,
-        materi_id,
-        nomor_urut,
-        soal,
-        opsi_a,
-        opsi_b,
-        opsi_c,
-        opsi_d,
-        opsi_e,
-        kunci || "",
-        pembahasan || "",
-        tipe_penilaian,
-        bobot_a || 0,
-        bobot_b || 0,
-        bobot_c || 0,
-        bobot_d || 0,
-        bobot_e || 0,
-        id,
-      ],
-    );
+           tipe_penilaian=?, bobot_a=?, bobot_b=?, bobot_c=?, bobot_d=?, bobot_e=?`;
+    const queryParams = [
+      paket,
+      nomor_to,
+      materi_id,
+      nomor_urut,
+      soal,
+      opsi_a,
+      opsi_b,
+      opsi_c,
+      opsi_d,
+      opsi_e,
+      kunci || "",
+      pembahasan || "",
+      tipe_penilaian,
+      bobot_a || 0,
+      bobot_b || 0,
+      bobot_c || 0,
+      bobot_d || 0,
+      bobot_e || 0,
+    ];
+
+    if (gambar) { updateQuery += `, gambar=?`; queryParams.push(gambar); }
+    if (gambar_a) { updateQuery += `, gambar_a=?`; queryParams.push(gambar_a); }
+    if (gambar_b) { updateQuery += `, gambar_b=?`; queryParams.push(gambar_b); }
+    if (gambar_c) { updateQuery += `, gambar_c=?`; queryParams.push(gambar_c); }
+    if (gambar_d) { updateQuery += `, gambar_d=?`; queryParams.push(gambar_d); }
+    if (gambar_e) { updateQuery += `, gambar_e=?`; queryParams.push(gambar_e); }
+
+    updateQuery += ` WHERE id=?`;
+    queryParams.push(id);
+
+    await db.query(updateQuery, queryParams);
     res.redirect(
       `/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}`,
     );
@@ -507,8 +590,22 @@ router.post(
   },
 );
 
-// TAMBAH SOAL MANUAL
-router.post("/admin/tambah-soal-manual", isAdmin, async (req, res) => {
+// TAMBAH SOAL MANUAL (di halaman kelola soal)
+router.post("/admin/tambah-soal-manual", isAdmin, (req, res, next) => {
+  cpUploadSoal(req, res, function (err) {
+    const paramTo = req.body.nomor_to || req.query.to || 1;
+    const paramPaket = req.body.paket || req.query.paket || "";
+    if (err instanceof multer.MulterError) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res.redirect(`/admin/kelola-soal/${encodeURIComponent(paramPaket)}?to=${paramTo}&error=Ukuran+gambar+maksimal+2MB.`);
+      }
+      return res.redirect(`/admin/kelola-soal/${encodeURIComponent(paramPaket)}?to=${paramTo}&error=Kesalahan+upload+gambar.`);
+    } else if (err) {
+      return res.redirect(`/admin/kelola-soal/${encodeURIComponent(paramPaket)}?to=${paramTo}&error=` + encodeURIComponent(err.message));
+    }
+    next();
+  });
+}, async (req, res) => {
   const {
     paket,
     nomor_to,
@@ -531,11 +628,19 @@ router.post("/admin/tambah-soal-manual", isAdmin, async (req, res) => {
   try {
     const m_id = parseInt(materi_id) || 1;
     const isBobot = [3, 10, 11, 12].includes(m_id);
+
+    const gambar = req.files && req.files['gambar'] ? req.files['gambar'][0].filename : null;
+    const gambar_a = req.files && req.files['gambar_a'] ? req.files['gambar_a'][0].filename : null;
+    const gambar_b = req.files && req.files['gambar_b'] ? req.files['gambar_b'][0].filename : null;
+    const gambar_c = req.files && req.files['gambar_c'] ? req.files['gambar_c'][0].filename : null;
+    const gambar_d = req.files && req.files['gambar_d'] ? req.files['gambar_d'][0].filename : null;
+    const gambar_e = req.files && req.files['gambar_e'] ? req.files['gambar_e'][0].filename : null;
+
     await db.query(
       `INSERT INTO questions 
        (paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan,
-        tipe_penilaian, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        tipe_penilaian, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e, gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         paket,
         nomor_to,
@@ -555,6 +660,7 @@ router.post("/admin/tambah-soal-manual", isAdmin, async (req, res) => {
         Number(bobot_c) || 0,
         Number(bobot_d) || 0,
         Number(bobot_e) || 0,
+        gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e
       ],
     );
     res.redirect(

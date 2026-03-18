@@ -332,7 +332,7 @@
         </div>
         <button onclick="document.getElementById('modalTambahSoal').classList.add('hidden')" class="text-slate-400 hover:text-red-500 font-bold text-xl leading-none">&times;</button>
       </div>
-      <form action="/admin/tambah-soal-manual" method="POST" class="p-5 space-y-5">
+      <form action="/admin/tambah-soal-manual" method="POST" enctype="multipart/form-data" id="formTambahSoal" class="p-5 space-y-5">
         <input type="hidden" name="paket" value="<%= paket %>">
         <input type="hidden" name="nomor_to" value="<%= currentTo %>">
 
@@ -364,6 +364,10 @@
         <div>
           <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Pertanyaan Soal</label>
           <textarea name="soal" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm h-28 focus:outline-none focus:border-yellow-400" placeholder="Tulis soal di sini..." required></textarea>
+          <div class="mt-2">
+            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Gambar Soal (Opsional, Maks 2MB, Format PNG)</label>
+            <input type="file" name="gambar" accept="image/png, image/jpeg, image/jpg" class="file-check text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+          </div>
         </div>
 
         <div class="space-y-3 bg-slate-50 p-4 border border-slate-100 rounded-lg">
@@ -372,10 +376,15 @@
             <span class="text-[9px] font-bold bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">Isi bobot (1-5) jika soal TKP/Manajerial</span>
           </div>
           <% ['A','B','C','D','E'].forEach(o => { %>
-          <div class="flex items-center gap-2">
-            <span class="font-black text-slate-400 w-5 text-center"><%= o %></span>
-            <input type="text" name="opsi_<%= o.toLowerCase() %>" placeholder="Teks opsi <%= o %>" class="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-yellow-400" required>
-            <input type="number" name="bobot_<%= o.toLowerCase() %>" placeholder="Bobot" class="w-20 px-3 py-2 border border-slate-200 rounded-lg text-sm text-center focus:outline-none focus:border-yellow-400">
+          <div class="flex flex-col gap-1 mb-2">
+            <div class="flex items-center gap-2">
+              <span class="font-black text-slate-400 w-5 text-center"><%= o %></span>
+              <input type="text" name="opsi_<%= o.toLowerCase() %>" placeholder="Teks opsi <%= o %>" class="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-yellow-400">
+              <input type="number" name="bobot_<%= o.toLowerCase() %>" placeholder="Bobot" class="w-20 px-3 py-2 border border-slate-200 rounded-lg text-sm text-center focus:outline-none focus:border-yellow-400">
+            </div>
+            <div class="pl-7">
+              <input type="file" name="gambar_<%= o.toLowerCase() %>" accept="image/png, image/jpeg, image/jpg" class="file-check text-xs text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-[10px] file:font-semibold file:bg-slate-100 file:text-slate-600 hover:file:bg-slate-200">
+            </div>
           </div>
           <% }) %>
         </div>
@@ -471,6 +480,34 @@
         const options = { timeZone: 'Asia/Jakarta', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
         liveTimeEl.textContent = now.toLocaleTimeString('id-ID', options);
       }, 1000);
+    }
+
+    // Validasi Ukuran File & Tipe
+    const formTambah = document.getElementById('formTambahSoal');
+    if(formTambah) {
+      formTambah.addEventListener('submit', function(e) {
+        const fileInputs = this.querySelectorAll('.file-check');
+        const maxBytes = 2 * 1024 * 1024; // 2MB
+        let valid = true;
+        
+        fileInputs.forEach(input => {
+          if(input.files && input.files[0]) {
+            const file = input.files[0];
+            if(file.size > maxBytes) {
+              alert(`File ${file.name} melebihi batas 2MB.`);
+              valid = false;
+            }
+            if(file.type !== "image/png" && file.type !== "image/jpeg" && file.type !== "image/jpg") {
+              alert(`File ${file.name} harus berformat PNG atau JPG.`);
+              valid = false;
+            }
+          }
+        });
+        
+        if(!valid) {
+          e.preventDefault();
+        }
+      });
     }
   </script>
 </body>

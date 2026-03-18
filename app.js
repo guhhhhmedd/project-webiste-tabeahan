@@ -99,18 +99,18 @@ app.get("/privacy", (req, res) => {
   res.render("privacy");
 });
 
-// --- AUTO CLEANUP RIWAYAT UJIAN (> 30 HARI) ---
+// --- AUTO CLEANUP RIWAYAT UJIAN (> 7 HARI) ---
 const dbClean = require("./config/db");
 
 async function cleanOldHistory() {
   try {
     const [result] = await dbClean.query(
-      "DELETE FROM riwayat_ujian WHERE tgl_selesai < DATE_SUB(NOW(), INTERVAL 30 DAY)"
+      "DELETE FROM riwayat_ujian WHERE tgl_selesai < DATE_SUB(NOW(), INTERVAL 7 DAY)"
     );
     if (result && result.affectedRows > 0) {
-      console.log(`[CleanUp] Berhasil menghapus ${result.affectedRows} riwayat ujian lama (> 30 hari).`);
+      console.log(`[CleanUp] Berhasil menghapus ${result.affectedRows} riwayat ujian lama (> 7 hari).`);
     } else {
-      console.log("[CleanUp] Tidak ada riwayat ujian lama (> 30 hari) yang dihapus.");
+      console.log("[CleanUp] Tidak ada riwayat ujian lama (> 7 hari) yang dihapus.");
     }
   } catch (err) {
     console.error("[CleanUp] Gagal menghapus riwayat lama:", err);
