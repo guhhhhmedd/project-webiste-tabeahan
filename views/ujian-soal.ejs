@@ -158,18 +158,30 @@
               <span class="materi-chip"><%= s.materi %></span>
             </div>
 
-            <div style="display:flex; gap:12px; align-items:flex-start; margin-bottom:1.5rem;">
-              <div class="soal-number-badge"><%= index + 1 %></div>
-              <p class="soal-text"><%= s.soal %></p>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:1.5rem;">
+              <div style="display:flex; gap:12px; align-items:flex-start;">
+                <div class="soal-number-badge"><%= index + 1 %></div>
+                <p class="soal-text"><%= s.soal %></p>
+              </div>
+              <% if(s.gambar) { %>
+                <div style="margin-left: 44px; margin-top: 8px;">
+                  <img src="/uploads/soal/<%= s.gambar %>" alt="Gambar Soal <%= index + 1 %>" style="max-width: 400px; max-height: 250px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border);">
+                </div>
+              <% } %>
             </div>
 
             <div>
               <% ['a','b','c','d','e'].forEach(opt => { %>
-                <% if (s['opsi_' + opt]) { %>
+                <% if (s['opsi_' + opt] || s['gambar_' + opt]) { %>
                 <label class="opsi-label" id="label-<%= s.id %>-<%= opt %>">
                   <input type="radio" name="q_<%= s.id %>" value="<%= opt %>" class="jawaban-radio" data-qid="<%= s.id %>" data-idx="<%= index %>">
                   <div class="opsi-bullet"><%= opt.toUpperCase() %></div>
-                  <span class="opsi-text"><%= s['opsi_' + opt] %></span>
+                  <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+                    <span class="opsi-text"><%= s['opsi_' + opt] %></span>
+                    <% if(s['gambar_' + opt]) { %>
+                      <img src="/uploads/soal/<%= s['gambar_' + opt] %>" alt="Gambar Opsi <%= opt.toUpperCase() %>" style="max-width: 150px; max-height: 100px; object-fit: contain; border-radius: 6px; border: 1px solid var(--border); margin-top: 4px;">
+                    <% } %>
+                  </div>
                 </label>
                 <% } %>
               <% }) %>
