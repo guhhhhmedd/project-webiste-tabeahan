@@ -14,9 +14,9 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
       scriptSrcAttr: ["'unsafe-inline'"],
-      styleSrc:  ["'self'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com", "'unsafe-inline'"],
-      fontSrc:   ["'self'", "https://fonts.gstatic.com"],
-      imgSrc:    ["'self'", "data:", "https://img.youtube.com", "https://i.ytimg.com"],
+      styleSrc: ["'self'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com", "'unsafe-inline'"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https://img.youtube.com", "https://i.ytimg.com"],
       connectSrc:["'self'", "https://cdn.jsdelivr.net"],
     }
   }
@@ -58,21 +58,21 @@ app.set("views", "views");
 
 
 // ROUTES
+const adminRouter = require("./routes/admin");
 const authRouter = require("./routes/auth");
 const usersRouter = require("./routes/users");
-const adminRouter = require("./routes/admin");
 const ujianRouter = require("./routes/ujian");
 
+app.use("/", adminRouter);
 app.use("/", authRouter);
 app.use("/", usersRouter);
-app.use("/", adminRouter);
 app.use("/ujian", ujianRouter);
 
 // Fungsi helper fallback seperti di users.js
 const PAKET_LIST_FALLBACK = [
-  { key: "Paket SKD/TKD",       label: "Paket SKD/TKD",       durasi: 90,  deskripsi: null, harga: 50000, harga_asli: 100000 },
+  { key: "Paket SKD/TKD", label: "Paket SKD/TKD", durasi: 90, deskripsi: null, harga: 50000, harga_asli: 100000 },
   { key: "Paket Akademik Polri", label: "Paket Akademik Polri", durasi: 90,  deskripsi: null, harga: 50000, harga_asli: 100000 },
-  { key: "Paket PPPK",           label: "Paket PPPK",           durasi: 120, deskripsi: null, harga: 50000, harga_asli: 100000 },
+  { key: "Paket PPPK", label: "Paket PPPK", durasi: 120, deskripsi: null, harga: 50000, harga_asli: 100000 },
 ];
 
 app.get("/", async (req, res) => {

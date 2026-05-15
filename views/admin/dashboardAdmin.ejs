@@ -316,6 +316,7 @@
               <% } %>
           </a>
           <a href="/admin/anggota" class="adm-nav-link">Anggota Gratis</a>
+          <a href="/admin/rankUjian" class="adm-nav-link">Rangking</a>
         </div>
       </div>
       <a href="/logout"
@@ -637,6 +638,46 @@
 
                   <!-- Stats & Chart -->
                   <div class="adm-card mb-6">
+                    <div class="adm-hd" style="justify-content:space-between">
+                      <h3> Tren Pertumbuhan Peserta</h3>
+                      <span class="sub" style="text-transform:uppercase;letter-spacing:0.1em">6 Bulan Terakhir</span>
+                    </div>
+                    <div class="p-6">
+                      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+                        <!-- 2 stat card kiri -->
+                        <div class="space-y-3">
+                          <div class="adm-stat-red">
+                            <p
+                              style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted)">
+                              Total Pendaftar</p>
+                            <p
+                              style="font-size:1.75rem;font-weight:900;font-family:'Playfair Display',serif;color:var(--dark)">
+                              <%= userStats.total_users || 0 %>
+                            </p>
+                          </div>
+                          <div class="adm-stat-gold">
+                            <p
+                              style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold)">
+                              Pendaftar Hari Ini</p>
+                            <p
+                              style="font-size:1.75rem;font-weight:900;font-family:'Playfair Display',serif;color:var(--gold)">
+                              <%= userStats.today_users || 0 %>
+                            </p>
+                          </div>
+                        </div>
+
+                        <!-- Chart kanan -->
+                        <div class="lg:col-span-3 h-[250px] relative">
+                          <canvas id="userChart"></canvas>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- rangking ujian -->
+                    <div class="adm-card mb-6">
                     <div class="adm-hd" style="justify-content:space-between">
                       <h3> Tren Pertumbuhan Peserta</h3>
                       <span class="sub" style="text-transform:uppercase;letter-spacing:0.1em">6 Bulan Terakhir</span>

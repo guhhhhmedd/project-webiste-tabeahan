@@ -7,6 +7,7 @@ const fs = require("fs");
 const crypto = require("crypto");
 const XLSX = require("xlsx");
 const bcrypt = require("bcrypt");
+const { text } = require("stream/consumers");
 
 const SALT_ROUNDS = 10;
 
@@ -168,6 +169,38 @@ router.get("/dashboardAdmin", isAdmin, async (req, res) => {
   }
 });
 
+// Ranking Ujian
+router.get("/admin/rankUjian", isAdmin, async (req, res) => {
+  try {
+    // Query mengambil data riwayat ujian diurutkan dari skor yang paling tinggi
+    const [rows] = await db.query(`
+      SELECT r.*, u.username, u.email 
+      FROM riwayat_ujian r
+      JOIN users u ON r.user_id = u.id
+      ORDER BY r.skor DESC, r.tgl_selesai ASC
+    `);
+
+    // Kita petakan datanya untuk menambahkan index ranking (peringkat)
+    const dataRanking = rows.map((row, index) => {
+      return {
+        ranking: index + 1,
+        ...row,
+        total_skor: row.skor // Menyesuaikan variabel total_skor di template EJS
+      };
+    });
+
+    // Render halaman views/admin/rank-ujian.ejs
+    res.render("admin/rankUjian", { 
+      rankings: dataRanking,
+      title: "Ranking Ujian Peserta" 
+    });
+
+  } catch (error) {
+    console.error("Error pada rankUjian:", error);
+    res.status(500).send("Terjadi kesalahan pada server saat memuat ranking.");
+  }
+});
+
 // DAFTAR PESERTA
 router.get("/admin/daftarPeserta", isAdmin, async (req, res) => {
   try {
@@ -205,6 +238,99 @@ router.get("/admin/daftarPeserta", isAdmin, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send("Gagal memuat data peserta.");
+  }
+});
+
+// KELOLA SOAL PER PAKET
+router.get("/admin/kelola-soal/:paket", isAdmin, async (req, res) => {
+  const namaPaket = decodeURIComponent(req.params.paket);
+  const filterTo = parseInt(req.query.to) || 1;
+
+  try {
+    const [soalList] = await db.query(
+      `SELECT q.*, m.nama_materi 
+       FROM questions q 
+       LEFT JOIN materi_list m ON q.materi_id = m.id 
+       WHERE TRIM(q.paket) = ? AND q.nomor_to = ? 
+       ORDER BY q.nomor_urut ASC`,
+      [namaPaket, filterTo],
+    );
+
+    const totalAktif = soalList.filter((s) => s.is_active == 1).length;
+
+    const [configRows] = await db.query(
+      "SELECT jumlah_soal, durasi_menit, deskripsi, harga, harga_asli FROM paket_ujian WHERE nama_paket = ?",
+      [namaPaket],
+    );
+    const config = configRows[0] || {
+      jumlah_soal: 0,
+      durasi_menit: 0,
+      deskripsi: "",
+      harga: 50000,
+      harga_asli: null,
+    };
+
+    const [availTo] = await db.query(
+      "SELECT * FROM paket_to WHERE TRIM(paket) = ? ORDER BY nomor_to ASC",
+      [namaPaket],
+    );
+
+    const currentTOData = availTo.find((t) => t.nomor_to === filterTo) || {};
+
+    const [materiList] = await db.query(
+      "SELECT * FROM materi_list ORDER BY id ASC",
+    );
+
+    res.render("admin/kelolaSoal", {
+      paket: namaPaket,
+      soalList,
+      totalAktif,
+      config,
+      currentTo: filterTo,
+      availTo: availTo,
+      currentTOData,
+      materiList,
+      message: req.query.msg || req.query.message || null,
+      error: req.query.err || req.query.error || null,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Gagal mengambil data soal.");
+  }
+});
+
+// EDIT SOAL — GET FORM
+router.get("/admin/editSoal/:id", isAdmin, async (req, res) => {
+  try {
+    const [rows] = await db.query("SELECT * FROM questions WHERE id = ?", [
+      req.params.id,
+    ]);
+    if (!rows.length) return res.redirect("/dashboardAdmin");
+    res.render("admin/editSoal", { s: rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Gagal memuat soal.");
+  }
+});
+
+// GET /admin/anggota — halaman kelola anggota offline
+router.get("/admin/anggota", isAdmin, async (req, res) => {
+  try {
+    const [anggota] = await db.query(
+      "SELECT * FROM anggota_offline ORDER BY created_at DESC",
+    );
+    const [userCount] = await db.query(
+      "SELECT COUNT(*) AS total FROM users WHERE is_anggota = 1",
+    );
+    res.render("admin/anggota", {
+      anggota,
+      totalAktif: userCount[0].total,
+      message: req.query.success ? decodeURIComponent(req.query.success) : null,
+      error: req.query.error ? decodeURIComponent(req.query.error) : null,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Gagal memuat data anggota.");
   }
 });
 
@@ -264,64 +390,6 @@ router.post("/admin/reject/:paymentId", isAdmin, async (req, res) => {
   } catch (err) {
     console.error("ERROR REJECT:", err);
     res.redirect("/admin/daftarPeserta?error=Gagal+menolak.");
-  }
-});
-
-// KELOLA SOAL PER PAKET
-router.get("/admin/kelola-soal/:paket", isAdmin, async (req, res) => {
-  const namaPaket = decodeURIComponent(req.params.paket);
-  const filterTo = parseInt(req.query.to) || 1;
-
-  try {
-    const [soalList] = await db.query(
-      `SELECT q.*, m.nama_materi 
-       FROM questions q 
-       LEFT JOIN materi_list m ON q.materi_id = m.id 
-       WHERE TRIM(q.paket) = ? AND q.nomor_to = ? 
-       ORDER BY q.nomor_urut ASC`,
-      [namaPaket, filterTo],
-    );
-
-    const totalAktif = soalList.filter((s) => s.is_active == 1).length;
-
-    const [configRows] = await db.query(
-      "SELECT jumlah_soal, durasi_menit, deskripsi, harga, harga_asli FROM paket_ujian WHERE nama_paket = ?",
-      [namaPaket],
-    );
-    const config = configRows[0] || {
-      jumlah_soal: 0,
-      durasi_menit: 0,
-      deskripsi: "",
-      harga: 50000,
-      harga_asli: null,
-    };
-
-    const [availTo] = await db.query(
-      "SELECT * FROM paket_to WHERE TRIM(paket) = ? ORDER BY nomor_to ASC",
-      [namaPaket],
-    );
-
-    const currentTOData = availTo.find((t) => t.nomor_to === filterTo) || {};
-
-    const [materiList] = await db.query(
-      "SELECT * FROM materi_list ORDER BY id ASC",
-    );
-
-    res.render("admin/kelolaSoal", {
-      paket: namaPaket,
-      soalList,
-      totalAktif,
-      config,
-      currentTo: filterTo,
-      availTo: availTo,
-      currentTOData,
-      materiList,
-      message: req.query.msg || req.query.message || null,
-      error: req.query.err || req.query.error || null,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Gagal mengambil data soal.");
   }
 });
 
@@ -503,11 +571,7 @@ router.post("/admin/updateSoal", isAdmin, (req, res, next) => {
 });
 
 // IMPORT SOAL — EXCEL
-router.post(
-  "/admin/upload-soal",
-  isAdmin,
-  uploadExcel.single("fileExcel"),
-  async (req, res) => {
+router.post("/admin/upload-soal", isAdmin, uploadExcel.single("fileExcel"), async (req, res) => {
     if (!req.file) return res.status(400).send("File tidak ditemukan.");
 
     try {
@@ -735,20 +799,6 @@ router.post("/admin/update-config-paket", isAdmin, async (req, res) => {
   }
 });
 
-// EDIT SOAL — GET FORM
-router.get("/admin/editSoal/:id", isAdmin, async (req, res) => {
-  try {
-    const [rows] = await db.query("SELECT * FROM questions WHERE id = ?", [
-      req.params.id,
-    ]);
-    if (!rows.length) return res.redirect("/dashboardAdmin");
-    res.render("admin/editSoal", { s: rows[0] });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Gagal memuat soal.");
-  }
-});
-
 // HAPUS SOAL
 router.post("/admin/delete-soal", isAdmin, async (req, res) => {
   const { id, paket } = req.body;
@@ -867,27 +917,6 @@ router.post("/admin/delete-payment", isAdmin, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.redirect("/admin/daftarPeserta?error=Gagal+hapus+riwayat");
-  }
-});
-
-// GET /admin/anggota — halaman kelola anggota offline
-router.get("/admin/anggota", isAdmin, async (req, res) => {
-  try {
-    const [anggota] = await db.query(
-      "SELECT * FROM anggota_offline ORDER BY created_at DESC",
-    );
-    const [userCount] = await db.query(
-      "SELECT COUNT(*) AS total FROM users WHERE is_anggota = 1",
-    );
-    res.render("admin/anggota", {
-      anggota,
-      totalAktif: userCount[0].total,
-      message: req.query.success ? decodeURIComponent(req.query.success) : null,
-      error: req.query.error ? decodeURIComponent(req.query.error) : null,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Gagal memuat data anggota.");
   }
 });
 
