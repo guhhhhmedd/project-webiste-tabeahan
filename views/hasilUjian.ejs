@@ -5,81 +5,389 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hasil Ujian - Tabeahan Cendekia</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    :root { --gold:#b8924a; --dark:#1a1008; --cream:#fdfaf5; }
-    body { font-family:"DM Sans",sans-serif; background:var(--cream); color:var(--dark); }
-    .font-display { font-family:"Playfair Display",serif; }
-    .card-grad { background:linear-gradient(135deg,#fff 0%,#fcf8f0 100%); border:1px solid #e8dec9; }
-    .skor-circle {
-      width:180px; height:180px; border-radius:50%;
-      background:white; border:8px solid var(--gold);
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      box-shadow:0 10px 30px rgba(184,146,74,0.2);
+    :root {
+      --gold:      #c8a020;
+      --gold-light:#e0c040;
+      --dark:      #1a0808;
+      --red-deep:  #5a0a0a;
+      --cream:     #fdfaf5;
     }
+    * { box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--dark); min-height: 100vh; }
+    .font-display { font-family: 'Playfair Display', serif; }
+
+    /* ===== HEADER BANNER ===== */
+    .hasil-header {
+      background: linear-gradient(135deg, var(--red-deep) 0%, #3a0808 100%);
+      padding: 2.5rem 1.5rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hasil-header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 60% 40%, rgba(200,160,32,0.12) 0%, transparent 70%);
+    }
+
+    /* ===== STATUS BADGE ===== */
+    .badge-lulus       { background: linear-gradient(135deg,#15803d,#166534); color: #d1fae5; border: 1.5px solid rgba(74,222,128,0.4); }
+    .badge-tidak-lulus { background: linear-gradient(135deg,#991b1b,#7f1d1d); color: #fee2e2; border: 1.5px solid rgba(248,113,113,0.4); }
+    .badge-peringkat   { background: linear-gradient(135deg,#1d4ed8,#1e3a8a); color: #dbeafe; border: 1.5px solid rgba(96,165,250,0.4); }
+    .badge-info        { background: linear-gradient(135deg,#a16207,#854d0e); color: #fef9c3; border: 1.5px solid rgba(250,204,21,0.4); }
+
+    /* ===== CARD ===== */
+    .card {
+      background: white;
+      border: 1.5px solid #f0e8d8;
+      border-radius: 8px;
+      box-shadow: 0 2px 16px rgba(90,10,10,0.06);
+    }
+
+    /* ===== SUBTEST CARD ===== */
+    .subtest-card {
+      background: white;
+      border: 1.5px solid #f0e8d8;
+      border-radius: 8px;
+      padding: 1.25rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .subtest-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(90,10,10,0.1); }
+    .subtest-card.lulus-card   { border-color: rgba(22,163,74,0.35); background: rgba(22,163,74,0.02); }
+    .subtest-card.gagal-card   { border-color: rgba(220,38,38,0.35); background: rgba(220,38,38,0.02); }
+    .subtest-card.neutral-card { border-color: #f0e8d8; }
+
+    /* ===== PROGRESS BAR ===== */
+    .progress-track {
+      height: 8px; background: #f0e8d8; border-radius: 99px; overflow: hidden; margin: 0.6rem 0 0.3rem;
+    }
+    .progress-fill {
+      height: 100%; border-radius: 99px;
+      transition: width 1s cubic-bezier(0.4,0,0.2,1);
+    }
+    .fill-lulus   { background: linear-gradient(90deg, #16a34a, #4ade80); }
+    .fill-gagal   { background: linear-gradient(90deg, #dc2626, #f87171); }
+    .fill-neutral { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+    .fill-blue    { background: linear-gradient(90deg, #1d4ed8, #60a5fa); }
+
+    /* ===== TOMBOL ===== */
+    .btn-primary {
+      display: block; width: 100%; padding: 0.9rem 1rem;
+      background: linear-gradient(135deg, var(--red-deep), #7a1a1a);
+      color: var(--gold); font-family: 'Playfair Display', serif;
+      font-weight: 700; font-size: 0.875rem; text-align: center;
+      border-radius: 6px; text-decoration: none;
+      box-shadow: 0 4px 0 #3a0808; position: relative; top: 0;
+      transition: all 0.15s;
+    }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-primary:active { top: 3px; box-shadow: 0 1px 0 #3a0808; }
+
+    .btn-secondary {
+      display: block; width: 100%; padding: 0.8rem 1rem;
+      background: white; color: var(--dark);
+      border: 1.5px solid #e8dec9; border-radius: 6px;
+      font-weight: 600; font-size: 0.875rem; text-align: center;
+      text-decoration: none; transition: all 0.15s;
+    }
+    .btn-secondary:hover { border-color: var(--gold); color: var(--red-deep); }
+
+    /* ===== ANIMASI ===== */
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .anim-1 { animation: slideUp 0.45s ease 0.1s both; }
+    .anim-2 { animation: slideUp 0.45s ease 0.2s both; }
+    .anim-3 { animation: slideUp 0.45s ease 0.3s both; }
+    .anim-4 { animation: slideUp 0.45s ease 0.4s both; }
+    .anim-5 { animation: slideUp 0.45s ease 0.5s both; }
+    .anim-6 { animation: slideUp 0.45s ease 0.6s both; }
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
-  <div class="max-w-md w-full card-grad rounded-3xl p-8 text-center shadow-2xl">
+<body>
 
-    <h1 class="font-display text-2xl font-black mb-1">Ujian Selesai!</h1>
-    <p class="text-xs font-semibold mb-1" style="color:var(--gold)">
-      <%= paket %> &middot; Try Out #<%= nomorTO %>
-    </p>
-    <p class="text-sm text-slate-500 mb-8">Hasil evaluasi belajar kamu sudah keluar.</p>
+  <%
+    /* ── Tentukan config visual ── */
+    let badgeClass, badgeIcon, badgeText, headerSub;
+    if (statusKelulusan === 'LULUS') {
+      badgeClass = 'badge-lulus';
+      badgeIcon  = '✅';
+      badgeText  = 'LULUS — Memenuhi Passing Grade';
+      headerSub  = 'Selamat! Semua subtest memenuhi nilai ambang batas.';
+    } else if (statusKelulusan === 'TIDAK_LULUS') {
+      badgeClass = 'badge-tidak-lulus';
+      badgeIcon  = '❌';
+      badgeText  = 'TIDAK LULUS — Ada Subtest di Bawah Passing Grade';
+      headerSub  = 'Pelajari pembahasan dan tingkatkan skormu!';
+    } else if (statusKelulusan === 'PERINGKAT') {
+      badgeClass = 'badge-peringkat';
+      badgeIcon  = '📊';
+      badgeText  = 'Kelulusan Ditentukan Peringkat Akhir';
+      headerSub  = 'Kejar skor setinggi mungkin untuk bersaing.';
+    } else { /* INFO — Polri */
+      badgeClass = 'badge-info';
+      badgeIcon  = '📋';
+      badgeText  = 'Skor Akademik (Indikatif)';
+      headerSub  = 'Passing grade Polri ditentukan secara resmi per TA.';
+    }
+  %>
 
-    <!-- Lingkaran skor -->
-    <div class="skor-circle mx-auto mb-8">
-      <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Skor Anda</span>
-      <span class="text-6xl font-display font-black" style="color:var(--dark)"><%= skor %></span>
-      <span class="text-xs font-bold" style="color:var(--gold)">/ 100</span>
+  <!-- ===== HEADER ===== -->
+  <div class="hasil-header anim-1">
+    <div class="relative z-10 max-w-xl mx-auto">
+      <p class="text-xs font-bold uppercase tracking-widest mb-1" style="color:rgba(200,160,32,0.7)">
+        Hasil Ujian
+      </p>
+      <h1 class="font-display text-2xl md:text-3xl font-black text-white mb-1">
+        <%= paket %>
+      </h1>
+      <p class="text-xs mb-4" style="color:rgba(255,255,255,0.5)">
+        Try Out #<%= nomorTO %> &nbsp;·&nbsp; <%= totalSoal %> Soal
+      </p>
+
+      <!-- Badge Status -->
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold <%= badgeClass %>" style="backdrop-filter:blur(8px)">
+        <span><%= badgeIcon %></span>
+        <span><%= badgeText %></span>
+      </div>
+      <p class="text-xs mt-3" style="color:rgba(255,255,255,0.45)"><%= headerSub %></p>
+    </div>
+  </div>
+
+  <!-- ===== MAIN ===== -->
+  <div class="max-w-2xl mx-auto px-4 py-6 space-y-5">
+
+    <!-- ===== SKOR TOTAL ===== -->
+    <div class="card p-5 anim-2">
+      <p class="text-[10px] font-bold uppercase tracking-widest mb-3" style="color:#9b6b6b">Ringkasan</p>
+
+      <% if (statusKelulusan === 'INFO' && nilaiAkhir !== null) { %>
+        <!-- Polri: tampilkan nilai akhir persentase -->
+        <div class="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <p class="text-4xl font-display font-black" style="color:var(--dark)"><%= nilaiAkhir %></p>
+            <p class="text-xs font-semibold mt-0.5" style="color:#9b6b6b">Nilai Akhir <span class="text-slate-400">/ 100</span></p>
+          </div>
+          <div class="flex gap-4 text-center">
+            <div>
+              <p class="text-xl font-black text-green-600"><%= benar %></p>
+              <p class="text-[10px] font-bold uppercase text-slate-400">Benar</p>
+            </div>
+            <div>
+              <p class="text-xl font-black text-red-500"><%= totalSoal - benar %></p>
+              <p class="text-[10px] font-bold uppercase text-slate-400">Salah</p>
+            </div>
+            <div>
+              <p class="text-xl font-black text-slate-600"><%= totalSoal %></p>
+              <p class="text-[10px] font-bold uppercase text-slate-400">Total</p>
+            </div>
+          </div>
+        </div>
+        <% if (pgConfig && pgConfig.minPersen) { %>
+        <div class="mt-3 p-2.5 rounded-lg text-xs" style="background:rgba(200,160,32,0.07);border:1px solid rgba(200,160,32,0.2)">
+          <span class="font-bold" style="color:var(--gold)">Acuan:</span>
+          <span style="color:#9b6b6b"> Nilai ≥ <%= pgConfig.minPersen %> (Bintara PTU, indikatif)</span>
+          <span class="ml-2 font-bold" style="color:<%= nilaiAkhir >= pgConfig.minPersen ? '#15803d' : '#b91c1c' %>">
+            <%= nilaiAkhir >= pgConfig.minPersen ? '✅ Memenuhi' : '❌ Belum Memenuhi' %>
+          </span>
+        </div>
+        <% } %>
+
+      <% } else if (statusKelulusan === 'PERINGKAT') { %>
+        <!-- PPPK: tampilkan total skor + persentase -->
+        <div class="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <p class="text-4xl font-display font-black" style="color:var(--dark)"><%= skor %></p>
+            <p class="text-xs font-semibold mt-0.5" style="color:#9b6b6b">
+              Total Skor
+              <% if (pgConfig && pgConfig.skorMaksTotal) { %>
+                <span class="text-slate-400">/ <%= pgConfig.skorMaksTotal %></span>
+                &nbsp;<span class="font-bold" style="color:var(--gold)">(<%= Math.round(skor / pgConfig.skorMaksTotal * 1000)/10 %>%)</span>
+              <% } %>
+            </p>
+          </div>
+          <div class="flex gap-4 text-center">
+            <div>
+              <p class="text-xl font-black text-green-600"><%= benar %></p>
+              <p class="text-[10px] font-bold uppercase text-slate-400">Benar</p>
+            </div>
+            <div>
+              <p class="text-xl font-black text-red-500"><%= totalSoal - benar %></p>
+              <p class="text-[10px] font-bold uppercase text-slate-400">Salah</p>
+            </div>
+            <div>
+              <p class="text-xl font-black text-slate-600"><%= totalSoal %></p>
+              <p class="text-[10px] font-bold uppercase text-slate-400">Total Soal</p>
+            </div>
+          </div>
+        </div>
+        <div class="mt-3 p-2.5 rounded-lg text-xs" style="background:rgba(29,78,216,0.06);border:1px solid rgba(29,78,216,0.15)">
+          ⭐ <span style="color:#1d4ed8;font-weight:600">Kelulusan PPPK</span>
+          <span style="color:#9b6b6b"> ditentukan berdasarkan peringkat terbaik sesuai kuota formasi (Kepmenpan 347/2024).</span>
+        </div>
+
+      <% } else { %>
+        <!-- SKD: tampilkan total skor + status kumulatif -->
+        <div class="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <p class="text-4xl font-display font-black" style="color:var(--dark)"><%= skor %></p>
+            <p class="text-xs font-semibold mt-0.5" style="color:#9b6b6b">
+              Total Skor
+              <% if (pgConfig && pgConfig.skorMaksTotal) { %>
+                <span class="text-slate-400">/ <%= pgConfig.skorMaksTotal %></span>
+              <% } %>
+            </p>
+          </div>
+          <div class="flex gap-4 text-center">
+            <div>
+              <p class="text-xl font-black text-green-600"><%= benar %></p>
+              <p class="text-[10px] font-bold uppercase text-slate-400">Benar</p>
+            </div>
+            <div>
+              <p class="text-xl font-black text-red-500"><%= totalSoal - benar %></p>
+              <p class="text-[10px] font-bold uppercase text-slate-400">Salah</p>
+            </div>
+            <div>
+              <p class="text-xl font-black text-slate-600"><%= totalSoal %></p>
+              <p class="text-[10px] font-bold uppercase text-slate-400">Total Soal</p>
+            </div>
+          </div>
+        </div>
+        <% if (pgConfig && pgConfig.kumulatif) { %>
+        <div class="mt-3 p-2.5 rounded-lg text-xs" style="background:<%= skor >= pgConfig.kumulatif ? 'rgba(22,163,74,0.06)' : 'rgba(220,38,38,0.06)' %>;border:1px solid <%= skor >= pgConfig.kumulatif ? 'rgba(22,163,74,0.2)' : 'rgba(220,38,38,0.2)' %>">
+          <span class="font-bold" style="color:<%= skor >= pgConfig.kumulatif ? '#15803d' : '#b91c1c' %>">
+            <%= skor >= pgConfig.kumulatif ? '✅' : '❌' %> Kumulatif:
+          </span>
+          <span style="color:#9b6b6b">
+            Skor <%= skor %> <%= skor >= pgConfig.kumulatif ? '≥' : '<' %> <%= pgConfig.kumulatif %> (min)
+          </span>
+        </div>
+        <% } %>
+      <% } %>
     </div>
 
-    <!-- Stats grid -->
-    <div class="grid grid-cols-3 gap-3 mb-6">
-      <div class="bg-white p-4 rounded-2xl border border-slate-100">
-        <p class="text-[10px] font-bold uppercase text-slate-400">Benar</p>
-        <p class="text-xl font-black text-green-600"><%= benar %></p>
-      </div>
-      <div class="bg-white p-4 rounded-2xl border border-slate-100">
-        <p class="text-[10px] font-bold uppercase text-slate-400">Salah</p>
-        <p class="text-xl font-black text-red-500"><%= totalSoal - benar %></p>
-      </div>
-      <div class="bg-white p-4 rounded-2xl border border-slate-100">
-        <p class="text-[10px] font-bold uppercase text-slate-400">Total</p>
-        <p class="text-xl font-black text-slate-700"><%= totalSoal %></p>
+    <!-- ===== BREAKDOWN PER SUBTEST ===== -->
+    <% if (subtestData && subtestData.length > 0) { %>
+    <div class="anim-3">
+      <p class="text-[10px] font-bold uppercase tracking-widest mb-2.5 px-0.5" style="color:#9b6b6b">Skor Per Subtest</p>
+      <div class="space-y-3">
+        <% subtestData.forEach((sub, idx) => {
+          const persen     = sub.skor_maks > 0 ? Math.min(Math.round(sub.skor_subtest / sub.skor_maks * 100), 100) : 0;
+          const isBobot    = sub.skor_maks > 0;
+          let cardClass, fillClass, badgeSubClass, badgeSubText;
+
+          if (statusKelulusan === 'LULUS' || statusKelulusan === 'TIDAK_LULUS') {
+            // SKD — ada data lulus
+            if (sub.lulus) {
+              cardClass    = 'lulus-card';
+              fillClass    = 'fill-lulus';
+              badgeSubClass = 'bg-green-100 text-green-700';
+              badgeSubText  = '✅ Memenuhi';
+            } else {
+              cardClass    = 'gagal-card';
+              fillClass    = 'fill-gagal';
+              badgeSubClass = 'bg-red-100 text-red-700';
+              badgeSubText  = '❌ Belum Memenuhi';
+            }
+          } else if (statusKelulusan === 'INFO') {
+            cardClass = 'neutral-card';
+            fillClass = persen >= 70 ? 'fill-lulus' : 'fill-neutral';
+            badgeSubClass = '';
+            badgeSubText  = '';
+          } else {
+            // PERINGKAT
+            cardClass = 'neutral-card';
+            fillClass = 'fill-blue';
+            badgeSubClass = '';
+            badgeSubText  = '';
+          }
+        %>
+        <div class="subtest-card <%= cardClass %>" style="animation: slideUp 0.45s ease <%= 0.3 + idx * 0.08 %>s both">
+          <div class="flex items-start justify-between gap-3 flex-wrap">
+            <div class="flex-1 min-w-0">
+              <p class="font-display font-bold text-base leading-tight truncate" style="color:var(--dark)">
+                <%= sub.nama_materi %>
+              </p>
+              <p class="text-xs mt-0.5" style="color:#9b6b6b">
+                <%= sub.jml_benar %> benar dari <%= sub.jml_soal %> soal
+              </p>
+            </div>
+            <div class="text-right flex-shrink-0">
+              <p class="font-display font-black text-xl" style="color:var(--dark)">
+                <%= sub.skor_subtest %>
+              </p>
+              <p class="text-[10px]" style="color:#9b6b6b">
+                / <%= sub.skor_maks %> maks
+              </p>
+            </div>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="progress-track">
+            <div class="progress-fill <%= fillClass %>" style="width:<%= persen %>%"></div>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-semibold" style="color:#9b6b6b"><%= persen %>%</span>
+            <% if (badgeSubText) { %>
+              <span class="text-[10px] font-black px-2 py-0.5 rounded-full <%= badgeSubClass %>"><%= badgeSubText %></span>
+            <% } %>
+            <% if ((statusKelulusan === 'LULUS' || statusKelulusan === 'TIDAK_LULUS') && sub.min_skor) { %>
+              <span class="text-[10px]" style="color:#9b6b6b">Min: <strong><%= sub.min_skor %></strong></span>
+            <% } %>
+            <% if (statusKelulusan === 'INFO' && pgConfig && pgConfig.minPersen) { %>
+              <span class="text-[10px]" style="color:#9b6b6b">Ref: <strong><%= pgConfig.minPersen %>%</strong></span>
+            <% } %>
+          </div>
+        </div>
+        <% }) %>
       </div>
     </div>
+    <% } %>
 
-    <!-- Pesan berdasarkan skor -->
-    <%
-      let pesanSkor, warnaSkor;
-      if (skor >= 80)      { pesanSkor = '🎉 Luar biasa! Pertahankan prestasimu.';        warnaSkor = '#15803d'; }
-      else if (skor >= 60) { pesanSkor = '👍 Bagus! Terus tingkatkan lagi.';              warnaSkor = '#a16207'; }
-      else                 { pesanSkor = '💪 Jangan menyerah, pelajari pembahasannya!';   warnaSkor = '#b91c1c'; }
-    %>
-    <p class="text-sm font-semibold mb-7 px-2" style="color:<%= warnaSkor %>"><%= pesanSkor %></p>
+    <!-- ===== CATATAN PASSING GRADE ===== -->
+    <% if (statusKelulusan === 'LULUS' || statusKelulusan === 'TIDAK_LULUS') { %>
+    <div class="card p-4 anim-4" style="border-color:rgba(200,160,32,0.2);background:rgba(200,160,32,0.04)">
+      <p class="text-[10px] font-bold uppercase tracking-widest mb-2" style="color:var(--gold)">
+        📋 Nilai Ambang Batas (Kepmenpan RB 321/2024)
+      </p>
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <div class="p-2 rounded-lg" style="background:white;border:1px solid #f0e8d8">
+          <p class="text-xs font-black" style="color:var(--dark)">65</p>
+          <p class="text-[9px]" style="color:#9b6b6b">TWK Min</p>
+        </div>
+        <div class="p-2 rounded-lg" style="background:white;border:1px solid #f0e8d8">
+          <p class="text-xs font-black" style="color:var(--dark)">80</p>
+          <p class="text-[9px]" style="color:#9b6b6b">TIU Min</p>
+        </div>
+        <div class="p-2 rounded-lg" style="background:white;border:1px solid #f0e8d8">
+          <p class="text-xs font-black" style="color:var(--dark)">166</p>
+          <p class="text-[9px]" style="color:#9b6b6b">TKP Min</p>
+        </div>
+      </div>
+      <p class="text-[9px] mt-2 text-center" style="color:#9b6b6b">Kumulatif minimal <strong>311</strong> poin (formasi umum)</p>
+    </div>
+    <% } %>
 
-    <!-- Tombol aksi -->
-    <div class="space-y-3">
-
+    <!-- ===== TOMBOL AKSI ===== -->
+    <div class="space-y-2.5 anim-5">
       <a href="/ujian/review?nomor_to=<%= nomorTO %>&paket=<%= encodeURIComponent(paket) %>"
-        class="block w-full py-4 rounded-xl font-bold text-sm text-center transition shadow-lg"
-        style="background:linear-gradient(135deg,#5a0a0a,#7a1a1a);color:#c8a020">
+        class="btn-primary">
         📝 Lihat Pembahasan Jawaban
       </a>
-
-      <a href="/dashboardPembayaranUjian"
-        class="block w-full py-3.5 rounded-xl font-bold text-sm text-center transition"
-        style="background:white;color:var(--dark);border:1.5px solid #e8dec9">
-        ← Kembali ke Dashboard
+      <a href="/dashboardPembayaranUjian" class="btn-secondary">
+        ← Kembali ke Dashboard Ujian
       </a>
-
-      <p class="text-[10px] text-slate-400 italic pt-1">
-        Nilai ini telah disimpan secara permanen di database.
-      </p>
     </div>
 
+    <p class="text-[10px] text-center pb-6 anim-6" style="color:#c4b49a">
+      Nilai ini telah disimpan secara permanen di database.
+    </p>
+
   </div>
+
 </body>
 </html>

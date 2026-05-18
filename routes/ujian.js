@@ -76,31 +76,13 @@ router.post("/mulai", isLogin, async (req, res) => {
     );
     const durasiMs = (config[0]?.durasi_menit || 100) * 60 * 1000;
 
-    // --- RANDOMISASI SOAL ---
+    // --- AMBIL SOAL SESUAI URUTAN ASLI (TIDAK DIACAK) ---
     const [questions] = await db.query(
-      "SELECT id, materi_id FROM questions WHERE TRIM(paket) = TRIM(?) AND nomor_to = ? AND is_active = 1",
+      "SELECT id FROM questions WHERE TRIM(paket) = TRIM(?) AND nomor_to = ? AND is_active = 1 ORDER BY materi_id ASC, nomor_urut ASC",
       [paket_pilihan, parseInt(nomor_to)]
     );
 
-    const groups = {};
-    questions.forEach(q => {
-      const mid = q.materi_id || 0;
-      if (!groups[mid]) groups[mid] = [];
-      groups[mid].push(q.id);
-    });
-
-    const sortedMateriIds = Object.keys(groups).sort((a, b) => Number(a) - Number(b));
-
-    let flatSoalIds = [];
-    sortedMateriIds.forEach(mid => {
-      const ids = groups[mid];
-      // Fisher-Yates Shuffle
-      for (let i = ids.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [ids[i], ids[j]] = [ids[j], ids[i]];
-      }
-      flatSoalIds = flatSoalIds.concat(ids);
-    });
+    const flatSoalIds = questions.map(q => q.id);
     // ------------------------
 
     req.session.ujian = {
@@ -215,79 +197,114 @@ router.get("/selesai-paksa", isLogin, async (req, res) => {
 // KONSTANTA DEFAULT PENILAIAN
 const DEFAULT_BOBOT_BENAR = 500; // 5 poin × 100
 
+// KONSTANTA PASSING GRADE PER PAKET
+const PASSING_GRADE = {
+  'Paket SKD/TKD': {
+    type: 'PER_SUBTEST',
+    // materi_id → skor minimum tampilan
+    perSubtest: { 1: 65, 2: 80, 3: 166 },
+    kumulatif:  311,
+    skorMaksTotal: 550,
+  },
+  'Paket Akademik Polri': {
+    type: 'PERSENTASE',
+    // Nilai akhir = (total benar / total soal) × 100
+    minPersen:    70,   // Bintara PTU (indikatif)
+    skorMaksTotal: 125,
+  },
+  'Paket PPPK': {
+    type: 'PERINGKAT',  // Tidak ada passing grade resmi (Kepmenpan 347/2024)
+    skorMaksTotal: 670,
+  },
+};
+
 // HITUNG & SIMPAN SKOR
 async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
   const sesi   = req.session.ujian;
   const userId = req.session.user.id;
 
   try {
-    let soalRows;
-    try {
-      const [rows] = await db.query(
-        `SELECT id, kunci, tipe_penilaian,
-                bobot_a, bobot_b, bobot_c, bobot_d, bobot_e,
-                materi_id
-         FROM questions
-         WHERE TRIM(paket) = TRIM(?) AND nomor_to = ? AND is_active = 1`,
-        [sesi.paket, sesi.nomorTO]
-      );
-      soalRows = rows;
-    } catch(err) {
-      console.warn('Fallback scoring: kolom tipe_penilaian belum ada', err.message);
-      const [rows] = await db.query(
-        `SELECT id, kunci, 'BENAR_SALAH' AS tipe_penilaian,
-                0 AS bobot_a, 0 AS bobot_b, 0 AS bobot_c, 0 AS bobot_d, 0 AS bobot_e,
-                materi_id
-         FROM questions
-         WHERE TRIM(paket) = TRIM(?) AND nomor_to = ? AND is_active = 1`,
-        [sesi.paket, sesi.nomorTO]
-      );
-      soalRows = rows;
+    // 1. Ambil soal beserta info materi (nama + bobot)
+    const [soalRows] = await db.query(
+      `SELECT q.id, q.kunci, q.tipe_penilaian,
+              q.bobot_a, q.bobot_b, q.bobot_c, q.bobot_d, q.bobot_e,
+              q.materi_id,
+              COALESCE(m.nama_materi, CONCAT('Materi ', q.materi_id)) AS nama_materi,
+              COALESCE(m.bobot_benar, 0) AS bobot_benar_materi
+       FROM questions q
+       LEFT JOIN materi_list m ON q.materi_id = m.id
+       WHERE TRIM(q.paket) = TRIM(?) AND q.nomor_to = ? AND q.is_active = 1`,
+      [sesi.paket, sesi.nomorTO]
+    );
+
+    if (!soalRows || soalRows.length === 0) {
+      delete req.session.ujian;
+      return req.session.save(() => {
+        if (jsonResponse) return res.json({ ok: false, redirect: '/dashboardPembayaranUjian' });
+        res.redirect('/dashboardPembayaranUjian');
+      });
     }
 
-    const materiIds = [...new Set(soalRows.map(s => s.materi_id).filter(Boolean))];
-    let scoringMap = {};
-    if (materiIds.length > 0) {
-      const placeholders = materiIds.map(() => '?').join(',');
-      const [materiRows] = await db.query(
-        `SELECT id, bobot_benar FROM materi_list WHERE id IN (${placeholders})`,
-        materiIds
-      );
-      materiRows.forEach(m => { scoringMap[m.id] = m; });
-    }
-
-    
-    let totalPoin = 0;
-    let benar     = 0;
+    // 2. Hitung skor per soal — akumulasikan per materi
     const jawabanUserSesi = sesi.jawaban || {};
+    const skorPerMateri   = {}; // { materi_id: { skor, maks, benar, total, nama } }
+    let totalPoin = 0;
+    let totalBenar = 0;
 
     const simpanPromises = soalRows.map((s) => {
-      const jawabanUser = (jawabanUserSesi[s.id] || '').toLowerCase();
-      const kunci       = (s.kunci || '').toLowerCase();
+      const mid          = s.materi_id || 0;
+      const jawabanUser  = (jawabanUserSesi[s.id] || '').toLowerCase();
+      const kunci        = (s.kunci || '').toLowerCase();
 
-     
+      if (!skorPerMateri[mid]) {
+        skorPerMateri[mid] = {
+          materi_id: mid || null,
+          nama:  s.nama_materi || `Materi ${mid}`,
+          skor:  0,
+          maks:  0,
+          benar: 0,
+          total: 0,
+        };
+      }
+      skorPerMateri[mid].total++;
+
       if (s.tipe_penilaian === 'BOBOT_OPSI') {
+        // Skor maks = bobot opsi tertinggi di soal ini
+        const maxBobot = Math.max(
+          Number(s.bobot_a || 0), Number(s.bobot_b || 0),
+          Number(s.bobot_c || 0), Number(s.bobot_d || 0),
+          Number(s.bobot_e || 0)
+        );
+        skorPerMateri[mid].maks += maxBobot;
+
         if (jawabanUser) {
           const bobotOpsi = Number(s['bobot_' + jawabanUser]) || 0;
-          totalPoin += bobotOpsi; 
-          benar++; 
+          skorPerMateri[mid].skor += bobotOpsi;
+          skorPerMateri[mid].benar++;
+          totalPoin  += bobotOpsi;
+          totalBenar++;
         }
       } else {
+        // BENAR_SALAH
+        const bb = (s.bobot_benar_materi && s.bobot_benar_materi > 0)
+          ? s.bobot_benar_materi / 100
+          : DEFAULT_BOBOT_BENAR / 100;
+
+        skorPerMateri[mid].maks += bb;
+
         if (jawabanUser && jawabanUser === kunci) {
-          const aturan = scoringMap[s.materi_id];
-          const bb = (aturan && aturan.bobot_benar != null && aturan.bobot_benar > 0)
-            ? aturan.bobot_benar
-            : DEFAULT_BOBOT_BENAR;
-          totalPoin += bb / 100;
-          benar++;
+          skorPerMateri[mid].skor  += bb;
+          skorPerMateri[mid].benar++;
+          totalPoin  += bb;
+          totalBenar++;
         }
       }
 
       return db.query(
-        `INSERT INTO jawaban_peserta (user_id, question_id, jawaban_user)
-         VALUES (?, ?, ?)
-         ON DUPLICATE KEY UPDATE jawaban_user = ?`,
-        [userId, s.id, jawabanUser || null, jawabanUser || null]
+        `INSERT INTO jawaban_peserta (user_id, paket, nomor_to, question_id, jawaban_user)
+         VALUES (?, ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE jawaban_user = VALUES(jawaban_user)`,
+        [userId, sesi.paket, sesi.nomorTO, s.id, jawabanUser || null]
       );
     });
 
@@ -296,27 +313,33 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
     const totalSoal = soalRows.length;
     const skor      = Math.round(totalPoin);
 
+    // 3. Simpan ke riwayat_ujian
+    const [riwayatResult] = await db.query(
+      `INSERT INTO riwayat_ujian (user_id, paket, nomor_to, skor, jml_benar, jml_soal, tgl_selesai)
+       VALUES (?, ?, ?, ?, ?, ?, NOW())`,
+      [userId, sesi.paket, sesi.nomorTO, skor, totalBenar, totalSoal]
+    );
+    const riwayatUjianId = riwayatResult.insertId;
+
+    // 4. Simpan skor per subtest ke riwayat_subtest
+    const subtestInserts = Object.values(skorPerMateri).map((sub) =>
+      db.query(
+        `INSERT INTO riwayat_subtest
+           (riwayat_ujian_id, user_id, paket, nomor_to, materi_id, nama_materi,
+            skor_subtest, skor_maks, jml_benar, jml_soal, tgl_selesai)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+        [
+          riwayatUjianId, userId, sesi.paket, sesi.nomorTO,
+          sub.materi_id || null, sub.nama,
+          Math.round(sub.skor), Math.round(sub.maks),
+          sub.benar, sub.total,
+        ]
+      )
+    );
+
     await Promise.all([
-      db.query(
-        `INSERT INTO riwayat_ujian (user_id, paket, nomor_to, skor, jml_benar, jml_soal, tgl_selesai)
-         VALUES (?, ?, ?, ?, ?, ?, NOW())`,
-        [userId, sesi.paket, sesi.nomorTO, skor, benar, totalSoal]
-      ),
-      /*
-      // Status payment → SELESAI (hanya kalau ada payment row — anggota tidak punya)
-      sesi.paymentId
-        ? db.query(
-            `UPDATE payments SET status = 'SELESAI'
-             WHERE user_id = ? AND TRIM(paket) = TRIM(?) AND nomor_to = ? AND UPPER(status) = 'LUNAS'`,
-            [userId, sesi.paket, sesi.nomorTO]
-          )
-        : Promise.resolve(),
-      */
-      Promise.resolve(),
-      db.query(
-        "UPDATE users SET status_ujian = 'IDLE' WHERE id = ?",
-        [userId]
-      ),
+      ...subtestInserts,
+      db.query("UPDATE users SET status_ujian = 'IDLE' WHERE id = ?", [userId]),
     ]);
 
     delete req.session.ujian;
@@ -372,20 +395,60 @@ router.get("/hasil", isLogin, async (req, res) => {
   try {
     const userId = req.session.user.id;
 
-    const [rows] = await db.query(
+    // Riwayat ujian terbaru
+    const [riwayatRows] = await db.query(
       "SELECT * FROM riwayat_ujian WHERE user_id = ? ORDER BY tgl_selesai DESC LIMIT 1",
       [userId]
     );
+    if (riwayatRows.length === 0) return res.redirect("/dashboardPembayaranUjian");
+    const riwayat = riwayatRows[0];
 
-    if (rows.length === 0) return res.redirect("/dashboardPembayaranUjian");
+    // Data per subtest
+    const [subtestRows] = await db.query(
+      `SELECT * FROM riwayat_subtest
+       WHERE riwayat_ujian_id = ?
+       ORDER BY materi_id ASC`,
+      [riwayat.id]
+    );
+
+    // Logika passing grade sesuai paket
+    const pg = PASSING_GRADE[riwayat.paket] || { type: 'PERINGKAT', skorMaksTotal: 0 };
+    let statusKelulusan = 'PERINGKAT';
+    let nilaiAkhir      = null;
+    let subtestData     = subtestRows;
+
+    if (pg.type === 'PER_SUBTEST') {
+      // SKD/TKD: cek PG per subtest DAN kumulatif
+      let semuaLulus = true;
+      subtestData = subtestRows.map((sub) => {
+        const minSkor = pg.perSubtest[sub.materi_id] || 0;
+        const lulus   = sub.skor_subtest >= minSkor;
+        if (!lulus) semuaLulus = false;
+        return { ...sub, min_skor: minSkor, lulus };
+      });
+      const lulusKumulatif = riwayat.skor >= pg.kumulatif;
+      statusKelulusan = (semuaLulus && lulusKumulatif) ? 'LULUS' : 'TIDAK_LULUS';
+
+    } else if (pg.type === 'PERSENTASE') {
+      // Polri: hitung nilai akhir persentase
+      nilaiAkhir = riwayat.jml_soal > 0
+        ? Math.round((riwayat.jml_benar / riwayat.jml_soal) * 1000) / 10
+        : 0;
+      statusKelulusan = 'INFO';
+    }
+    // PPPK: statusKelulusan tetap 'PERINGKAT'
 
     res.render("hasilUjian", {
-      skor:      rows[0].skor,
-      benar:     rows[0].jml_benar,
-      totalSoal: rows[0].jml_soal,
-      paket:     rows[0].paket,
-      nomorTO:   rows[0].nomor_to,
-      user:      req.session.user,
+      skor:            riwayat.skor,
+      benar:           riwayat.jml_benar,
+      totalSoal:       riwayat.jml_soal,
+      paket:           riwayat.paket,
+      nomorTO:         riwayat.nomor_to,
+      user:            req.session.user,
+      subtestData,
+      statusKelulusan,
+      pgConfig:        pg,
+      nilaiAkhir,
     });
   } catch (err) {
     console.error("Error /hasil:", err);
@@ -414,17 +477,24 @@ router.get("/review", isLogin, async (req, res) => {
          jp.jawaban_user,
          q.soal, q.paket, q.nomor_to, q.nomor_urut,
          q.opsi_a, q.opsi_b, q.opsi_c, q.opsi_d, q.opsi_e,
-         q.kunci, q.pembahasan, q.tipe_penilaian, q.bobot_a, q.bobot_b, q.bobot_c, q.bobot_d, q.bobot_e,
+         q.kunci, q.pembahasan, q.tipe_penilaian,
+         q.bobot_a, q.bobot_b, q.bobot_c, q.bobot_d, q.bobot_e,
+         q.gambar, q.gambar_a, q.gambar_b, q.gambar_c, q.gambar_d, q.gambar_e,
+         q.materi_id,
+         COALESCE(m.nama_materi, CONCAT('Subtest ', q.materi_id)) AS nama_materi,
          CASE 
            WHEN q.tipe_penilaian = 'BOBOT_OPSI' AND jp.jawaban_user IS NOT NULL AND jp.jawaban_user != '' THEN 1
-           WHEN jp.jawaban_user = q.kunci THEN 1 
+           WHEN LOWER(jp.jawaban_user) = LOWER(q.kunci) THEN 1 
            ELSE 0 
          END AS is_benar
        FROM jawaban_peserta jp
        JOIN questions q ON jp.question_id = q.id
-       WHERE jp.user_id = ? AND q.nomor_to = ? AND TRIM(q.paket) = TRIM(?)
-       ORDER BY q.nomor_urut ASC`,
-      [userId, nomor_to, paket]
+       LEFT JOIN materi_list m ON q.materi_id = m.id
+       WHERE jp.user_id = ?
+         AND TRIM(jp.paket) = TRIM(?)
+         AND jp.nomor_to = ?
+       ORDER BY q.materi_id ASC, q.nomor_urut ASC`,
+      [userId, paket || "", nomor_to]
     );
 
     if (jawabanRows.length === 0) {
