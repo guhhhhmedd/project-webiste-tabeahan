@@ -215,6 +215,13 @@ router.get("/dashboardPembayaranUjian", isLogin, async (req, res) => {
   }
 });
 
+// Konstanta passing grade (sama dengan ujian.js)
+const PASSING_GRADE_PROFIL = {
+  'Paket SKD/TKD':      { type: 'PER_SUBTEST', perSubtest: { 1: 65, 2: 80, 3: 166 }, kumulatif: 311, skorMaksTotal: 550 },
+  'Paket Akademik Polri': { type: 'PERSENTASE', minPersen: 70, skorMaksTotal: 125 },
+  'Paket PPPK':           { type: 'PERINGKAT', skorMaksTotal: 670 },
+};
+
 // profil
 router.get("/profil", isLogin, async (req, res) => {
   const userId = req.session.user.id;
@@ -227,8 +234,7 @@ router.get("/profil", isLogin, async (req, res) => {
        FROM riwayat_ujian r
        LEFT JOIN (
          SELECT user_id, paket, nomor_to, MAX(created_at) AS created_at
-         FROM payments
-         WHERE UPPER(status) = 'LUNAS'
+         FROM payments WHERE UPPER(status) = 'LUNAS'
          GROUP BY user_id, paket, nomor_to
        ) p ON r.user_id = p.user_id
            AND TRIM(r.paket) = TRIM(p.paket)
@@ -238,7 +244,50 @@ router.get("/profil", isLogin, async (req, res) => {
       [userId]
     );
 
-    res.render("users/profil", { user, riwayatUjian });
+    // Ambil semua data subtest untuk semua riwayat user sekaligus (efisien)
+    let subtestMap = {};
+    if (riwayatUjian.length > 0) {
+      const riwayatIds = riwayatUjian.map(r => r.id);
+      const placeholders = riwayatIds.map(() => '?').join(',');
+      const [subtestRows] = await db.query(
+        `SELECT * FROM riwayat_subtest WHERE riwayat_ujian_id IN (${placeholders}) ORDER BY materi_id ASC`,
+        riwayatIds
+      );
+      // Kelompokkan per riwayat_ujian_id
+      for (const sub of subtestRows) {
+        if (!subtestMap[sub.riwayat_ujian_id]) subtestMap[sub.riwayat_ujian_id] = [];
+        subtestMap[sub.riwayat_ujian_id].push(sub);
+      }
+    }
+
+    // Hitung status passing grade per riwayat
+    const riwayatDenganPG = riwayatUjian.map(r => {
+      const subtests = subtestMap[r.id] || [];
+      const pg = PASSING_GRADE_PROFIL[r.paket] || { type: 'PERINGKAT', skorMaksTotal: 0 };
+      let statusPG = 'PERINGKAT';
+      let nilaiAkhir = null;
+
+      if (pg.type === 'PER_SUBTEST') {
+        let semuaLulus = true;
+        const subtestsDenganStatus = subtests.map(sub => {
+          const minSkor = pg.perSubtest[sub.materi_id] || 0;
+          const lulus = sub.skor_subtest >= minSkor;
+          if (!lulus) semuaLulus = false;
+          return { ...sub, min_skor: minSkor, lulus };
+        });
+        statusPG = (semuaLulus && r.skor >= pg.kumulatif) ? 'LULUS' : 'TIDAK_LULUS';
+        return { ...r, subtests: subtestsDenganStatus, statusPG, pgConfig: pg, nilaiAkhir };
+
+      } else if (pg.type === 'PERSENTASE') {
+        nilaiAkhir = r.jml_soal > 0 ? Math.round((r.jml_benar / r.jml_soal) * 1000) / 10 : 0;
+        statusPG = 'INFO';
+        return { ...r, subtests, statusPG, pgConfig: pg, nilaiAkhir };
+      }
+
+      return { ...r, subtests, statusPG, pgConfig: pg, nilaiAkhir };
+    });
+
+    res.render("users/profil", { user, riwayatUjian: riwayatDenganPG });
   } catch (err) {
     console.error("Profil Error:", err);
     res.status(500).send("Gagal memuat profil.");

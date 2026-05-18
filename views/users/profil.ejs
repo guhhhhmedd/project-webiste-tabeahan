@@ -10,32 +10,58 @@
     :root { --gold:#c8a020; --dark:#7a1010; --cream:#fff8f8; --muted:#9b6b6b; --red-deep:#5a0a0a; }
     body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--dark); }
     .font-display { font-family:'Playfair Display',serif; }
-
     .nav-glass { background:var(--red-deep); border-bottom:1px solid rgba(200,160,32,0.25); box-shadow:0 2px 12px rgba(90,10,10,0.18); }
 
-    .card {
-      background:white; border:1.5px solid #f0e8d8;
-      box-shadow:0 2px 12px rgba(90,10,10,0.05);
-      border-radius:4px; overflow:hidden;
-    }
-    .card-hd {
-      padding:0.875rem 1.25rem;
-      background:linear-gradient(135deg,var(--red-deep),#6b1a1a);
-      border-bottom:1px solid rgba(200,160,32,0.15);
-    }
+    .card { background:white; border:1.5px solid #f0e8d8; box-shadow:0 2px 12px rgba(90,10,10,0.05); border-radius:6px; overflow:hidden; }
+    .card-hd { padding:0.875rem 1.25rem; background:linear-gradient(135deg,var(--red-deep),#6b1a1a); border-bottom:1px solid rgba(200,160,32,0.15); }
     .card-hd h3 { color:white; font-family:'Playfair Display',serif; font-size:0.875rem; margin:0; }
 
     .info-row { display:flex; justify-content:space-between; align-items:center; padding:0.625rem 0; border-bottom:1px solid #f0e8d8; font-size:0.75rem; }
     .info-row:last-child { border-bottom:none; }
 
-    .riwayat-item { display:flex; align-items:center; justify-content:space-between; padding:0.75rem 1.25rem; border-bottom:1px solid #f0e8d8; transition:background 0.15s; }
-    .riwayat-item:last-child { border-bottom:none; }
-    .riwayat-item:hover { background:rgba(200,160,32,0.03); }
+    /* ===== RIWAYAT CARD ===== */
+    .riwayat-card { border:1.5px solid #f0e8d8; border-radius:6px; background:white; overflow:hidden; transition:box-shadow 0.2s; }
+    .riwayat-card:hover { box-shadow:0 4px 20px rgba(90,10,10,0.08); }
 
-    .skor-badge { font-size:0.875rem; font-weight:900; font-family:monospace; }
+    .riwayat-header { padding:0.875rem 1.25rem; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:0.75rem; }
+    .riwayat-header:hover { background:rgba(200,160,32,0.03); }
+
+    /* ===== BADGE STATUS PG ===== */
+    .pg-lulus       { background:rgba(21,128,61,0.1);  color:#15803d; border:1px solid rgba(21,128,61,0.2); }
+    .pg-tidak       { background:rgba(220,38,38,0.08); color:#b91c1c; border:1px solid rgba(220,38,38,0.15); }
+    .pg-peringkat   { background:rgba(29,78,216,0.08); color:#1d4ed8; border:1px solid rgba(29,78,216,0.15); }
+    .pg-info        { background:rgba(161,98,7,0.08);  color:#a16207; border:1px solid rgba(161,98,7,0.15); }
+
+    .pg-badge { font-size:0.6rem; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; padding:0.2rem 0.5rem; border-radius:3px; white-space:nowrap; }
+
+    /* ===== SUBTEST ROW ===== */
+    .subtest-detail { border-top:1px solid #f0e8d8; padding:0.875rem 1.25rem; background:#fdfaf5; }
+    .subtest-row { display:flex; align-items:center; gap:0.5rem; padding:0.4rem 0; border-bottom:1px dashed #f0e8d8; }
+    .subtest-row:last-child { border-bottom:none; }
+
+    .prog-track { flex:1; height:5px; background:#f0e8d8; border-radius:99px; overflow:hidden; }
+    .prog-fill  { height:100%; border-radius:99px; }
+    .fill-green { background:linear-gradient(90deg,#16a34a,#4ade80); }
+    .fill-red   { background:linear-gradient(90deg,#dc2626,#f87171); }
+    .fill-gold  { background:linear-gradient(90deg,var(--gold),#e0c040); }
+    .fill-blue  { background:linear-gradient(90deg,#1d4ed8,#60a5fa); }
+
+    /* ===== AKSI ===== */
+    .btn-review {
+      padding:0.3rem 0.75rem; border-radius:4px; font-size:0.65rem; font-weight:800;
+      text-decoration:none; background:rgba(90,10,10,0.07); color:var(--dark);
+      border:1px solid rgba(90,10,10,0.15); white-space:nowrap; transition:all 0.2s;
+    }
+    .btn-review:hover { background:var(--red-deep); color:var(--gold); }
 
     .btn-danger { background:none; border:1px solid rgba(220,38,38,0.2); color:#b91c1c; padding:0.5rem 1.25rem; border-radius:4px; font-size:0.72rem; font-weight:700; cursor:pointer; transition:all 0.2s; }
-    .btn-danger:hover { display:flex; justify-content:space-between; align-items:center; background:rgba(220,38,38,0.07); }
+    .btn-danger:hover { background:rgba(220,38,38,0.07); }
+
+    /* ===== ACCORDION ===== */
+    .accordion-body { display:none; }
+    .accordion-body.open { display:block; }
+    .chevron { transition:transform 0.25s; font-size:0.75rem; }
+    .chevron.open { transform:rotate(180deg); }
   </style>
 </head>
 <body>
@@ -74,9 +100,7 @@
 
   <!-- Info Akun -->
   <div class="card">
-    <div class="card-hd">
-      <h3>👤 Info Akun</h3>
-    </div>
+    <div class="card-hd"><h3>👤 Info Akun</h3></div>
     <div class="px-5 py-1">
       <div class="info-row">
         <span style="color:var(--muted)">Username</span>
@@ -93,15 +117,14 @@
       <div class="info-row">
         <span style="color:var(--muted)">Status Ujian</span>
         <span class="font-bold text-xs uppercase px-2 py-0.5"
-          style="border-radius:4px;background:<%= user.status_ujian==='SEDANG_UJIAN'?'rgba(234,179,8,0.12)':user.status_ujian==='SELESAI'?'rgba(21,128,61,0.1)':'rgba(155,107,107,0.08)' %>;color:<%= user.status_ujian==='SEDANG_UJIAN'?'#a16207':user.status_ujian==='SELESAI'?'#15803d':'var(--muted)' %>">
+          style="border-radius:4px;background:<%= user.status_ujian==='SEDANG_UJIAN'?'rgba(234,179,8,0.12)':'rgba(155,107,107,0.08)' %>;color:<%= user.status_ujian==='SEDANG_UJIAN'?'#a16207':'var(--muted)' %>">
           <%= user.status_ujian || 'IDLE' %>
         </span>
       </div>
       <% if (user.is_anggota) { %>
       <div class="info-row">
         <span style="color:var(--muted)">Tipe Akun</span>
-        <span class="font-bold text-xs px-2 py-0.5"
-          style="border-radius:4px;background:rgba(21,128,61,0.1);color:#15803d">
+        <span class="font-bold text-xs px-2 py-0.5" style="border-radius:4px;background:rgba(21,128,61,0.1);color:#15803d">
           🎓 Anggota Kelas Offline
         </span>
       </div>
@@ -112,22 +135,27 @@
   <!-- Statistik -->
   <% if (typeof riwayatUjian !== 'undefined' && riwayatUjian.length > 0) { %>
   <%
-    const totalSesi  = riwayatUjian.length;
-    const skorMax    = Math.max(...riwayatUjian.map(r => r.skor || 0));
+    const totalSesi    = riwayatUjian.length;
+    const skorMax      = Math.max(...riwayatUjian.map(r => r.skor || 0));
     const skorRataRata = Math.round(riwayatUjian.reduce((a, r) => a + (r.skor || 0), 0) / totalSesi);
+    const totalLulus   = riwayatUjian.filter(r => r.statusPG === 'LULUS').length;
   %>
-  <div class="grid grid-cols-3 gap-3">
+  <div class="grid grid-cols-4 gap-3">
     <div class="card p-4 text-center">
       <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Total Sesi</p>
       <p class="font-display font-black text-2xl" style="color:var(--dark)"><%= totalSesi %></p>
     </div>
     <div class="card p-4 text-center">
       <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Skor Terbaik</p>
-      <p class="font-display font-black text-2xl" style="color:<%= skorMax>=70?'#16a34a':skorMax>=50?'var(--gold)':'#b91c1c' %>"><%= skorMax %></p>
+      <p class="font-display font-black text-2xl" style="color:<%= skorMax>=311?'#16a34a':skorMax>=150?'var(--gold)':'#b91c1c' %>"><%= skorMax %></p>
     </div>
     <div class="card p-4 text-center">
       <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Rata-rata</p>
-      <p class="font-display font-black text-2xl" style="color:<%= skorRataRata>=70?'#16a34a':skorRataRata>=50?'var(--gold)':'#b91c1c' %>"><%= skorRataRata %></p>
+      <p class="font-display font-black text-2xl" style="color:<%= skorRataRata>=311?'#16a34a':skorRataRata>=150?'var(--gold)':'#b91c1c' %>"><%= skorRataRata %></p>
+    </div>
+    <div class="card p-4 text-center">
+      <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Lulus PG</p>
+      <p class="font-display font-black text-2xl" style="color:<%= totalLulus>0?'#16a34a':'var(--muted)' %>"><%= totalLulus %></p>
     </div>
   </div>
   <% } %>
@@ -142,49 +170,101 @@
     </div>
 
     <% if (typeof riwayatUjian !== 'undefined' && riwayatUjian.length > 0) { %>
-    <div>
-      <% riwayatUjian.forEach((r) => { %>
-      <div class="riwayat-item">
-        <!-- Kiri: info -->
-        <div class="flex-1 min-w-0">
-          <p class="font-bold text-sm leading-tight" style="color:var(--dark)">
-            <%= r.paket %>
-          </p>
-          <p class="text-xs mt-0.5 flex items-center gap-1.5 flex-wrap" style="color:var(--muted)">
-            <span>TO <%= r.nomor_to %></span> &middot;
-            <span><%= r.jml_benar %>/<%= r.jml_soal %> benar</span> &middot;
-            <span><%= r.tgl_selesai ? new Date(r.tgl_selesai).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '-' %></span>
-            
-            <% 
-              if (r.payment_created_at) {
-                const pCreated = new Date(r.payment_created_at);
-                const diff = (pCreated.getTime() + 7 * 24 * 60 * 60 * 1000) - Date.now();
-                if (diff > 0) {
-                  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                  const sisaText = days > 0 ? `${days}h ${hours}j` : `${hours}j`;
-            %>
-              &middot; <span class="inline-flex items-center gap-0.5 text-[9px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200/40" style="border-radius:3px">⏳ sisa <%= sisaText %></span>
-            <% } else { %>
-              &middot; <span class="inline-flex items-center gap-0.5 text-[9px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-200/40" style="border-radius:3px">🔒 Kadaluarsa</span>
-            <% } } %>
-          </p>
-        </div>
-        <!-- Kanan: skor + tombol review -->
-        <div class="flex items-center gap-3 flex-shrink-0 ml-3">
-          <div class="text-center">
-            <p class="skor-badge" style="color:<%= r.skor>=70?'#16a34a':r.skor>=50?'var(--gold)':'#b91c1c' %>">
-              <%= r.skor %>
+    <div class="divide-y divide-[#f0e8d8]">
+      <% riwayatUjian.forEach((r, idx) => {
+        let pgBadgeClass, pgBadgeText;
+        if (r.statusPG === 'LULUS')        { pgBadgeClass = 'pg-lulus';     pgBadgeText = '✅ LULUS'; }
+        else if (r.statusPG === 'TIDAK_LULUS') { pgBadgeClass = 'pg-tidak'; pgBadgeText = '❌ Belum'; }
+        else if (r.statusPG === 'INFO')    { pgBadgeClass = 'pg-info';      pgBadgeText = '📋 Indikatif'; }
+        else                               { pgBadgeClass = 'pg-peringkat'; pgBadgeText = '📊 Peringkat'; }
+      %>
+      <div class="riwayat-card mx-0 rounded-none border-0 border-b border-[#f0e8d8] last:border-0">
+
+        <!-- Header accordion -->
+        <div class="riwayat-header" onclick="toggleAccordion(<%= idx %>)" id="rh-<%= idx %>">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <p class="font-bold text-sm leading-tight" style="color:var(--dark)"><%= r.paket %></p>
+              <span class="pg-badge <%= pgBadgeClass %>"><%= pgBadgeText %></span>
+            </div>
+            <p class="text-xs mt-0.5 flex items-center gap-1.5 flex-wrap" style="color:var(--muted)">
+              <span>TO <%= r.nomor_to %></span> &middot;
+              <span><%= r.jml_benar %>/<%= r.jml_soal %> benar</span> &middot;
+              <span><%= r.tgl_selesai ? new Date(r.tgl_selesai).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '-' %></span>
+              <% if (r.nilaiAkhir !== null) { %>
+                &middot; <span class="font-bold" style="color:var(--gold)"><%= r.nilaiAkhir %>%</span>
+              <% } %>
+              <%
+                if (r.payment_created_at) {
+                  const pCreated = new Date(r.payment_created_at);
+                  const diff = (pCreated.getTime() + 7 * 24 * 60 * 60 * 1000) - Date.now();
+                  if (diff > 0) {
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const sisaText = days > 0 ? `${days}h ${hours}j` : `${hours}j`;
+              %>
+                &middot; <span class="inline-flex items-center gap-0.5 text-[9px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200/40">⏳ sisa <%= sisaText %></span>
+              <% } else { %>
+                &middot; <span class="inline-flex items-center gap-0.5 text-[9px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-200/40">🔒 Kadaluarsa</span>
+              <% } } %>
             </p>
-            <p class="text-[9px]" style="color:var(--muted)">skor</p>
           </div>
-          <a href="/ujian/review?nomor_to=<%= r.nomor_to %>&paket=<%= encodeURIComponent(r.paket) %>"
-            style="padding:0.3rem 0.75rem;border-radius:4px;font-size:0.65rem;font-weight:800;text-decoration:none;background:rgba(90,10,10,0.07);color:var(--dark);border:1px solid rgba(90,10,10,0.15);white-space:nowrap;transition:all 0.2s"
-            onmouseover="this.style.background='var(--red-deep)';this.style.color='var(--gold)'"
-            onmouseout="this.style.background='rgba(90,10,10,0.07)';this.style.color='var(--dark)'">
-            📝 Review
-          </a>
+          <!-- Kanan: skor + chevron -->
+          <div class="flex items-center gap-3 flex-shrink-0 ml-2">
+            <div class="text-right">
+              <p class="font-display font-black text-lg" style="color:<%= r.skor>=311?'#16a34a':r.skor>=150?'var(--gold)':'#b91c1c' %>"><%= r.skor %></p>
+              <p class="text-[9px]" style="color:var(--muted)">skor</p>
+            </div>
+            <a href="/ujian/review?nomor_to=<%= r.nomor_to %>&paket=<%= encodeURIComponent(r.paket) %>"
+              class="btn-review" onclick="event.stopPropagation()">
+              📝 Review
+            </a>
+            <span class="chevron" id="chevron-<%= idx %>" style="color:var(--muted)">▼</span>
+          </div>
         </div>
+
+        <!-- Accordion body: skor per subtest -->
+        <div class="accordion-body" id="acc-<%= idx %>">
+          <% if (r.subtests && r.subtests.length > 0) { %>
+          <div class="subtest-detail">
+            <p class="text-[9px] font-bold uppercase tracking-widest mb-2" style="color:var(--muted)">Skor Per Subtest</p>
+            <% r.subtests.forEach(sub => {
+              const persen = sub.skor_maks > 0 ? Math.min(Math.round(sub.skor_subtest / sub.skor_maks * 100), 100) : 0;
+              let fillClass;
+              if (r.statusPG === 'LULUS' || r.statusPG === 'TIDAK_LULUS') {
+                fillClass = sub.lulus ? 'fill-green' : 'fill-red';
+              } else if (r.statusPG === 'INFO') {
+                fillClass = persen >= 70 ? 'fill-green' : 'fill-gold';
+              } else {
+                fillClass = 'fill-blue';
+              }
+            %>
+            <div class="subtest-row">
+              <div style="min-width:120px;max-width:140px">
+                <p class="text-[10px] font-bold leading-tight truncate" style="color:var(--dark)"><%= sub.nama_materi %></p>
+                <% if ((r.statusPG === 'LULUS' || r.statusPG === 'TIDAK_LULUS') && sub.min_skor) { %>
+                  <p class="text-[9px]" style="color:var(--muted)">min <%= sub.min_skor %></p>
+                <% } %>
+              </div>
+              <div class="prog-track">
+                <div class="prog-fill <%= fillClass %>" style="width:<%= persen %>%"></div>
+              </div>
+              <span class="text-[10px] font-bold font-mono" style="min-width:64px;text-align:right;color:var(--dark)">
+                <%= sub.skor_subtest %><span style="color:var(--muted);font-weight:400">/<%= sub.skor_maks %></span>
+              </span>
+              <% if (r.statusPG === 'LULUS' || r.statusPG === 'TIDAK_LULUS') { %>
+                <span class="text-[9px] font-black" style="min-width:20px;text-align:center"><%= sub.lulus ? '✅' : '❌' %></span>
+              <% } %>
+            </div>
+            <% }) %>
+          </div>
+          <% } else { %>
+          <div class="subtest-detail text-center">
+            <p class="text-xs" style="color:var(--muted)">Data subtest tidak tersedia (ujian lama).</p>
+          </div>
+          <% } %>
+        </div>
+
       </div>
       <% }) %>
     </div>
@@ -215,6 +295,15 @@
 </main>
 
 <script>
+  // Accordion toggle
+  function toggleAccordion(idx) {
+    const body    = document.getElementById('acc-' + idx);
+    const chevron = document.getElementById('chevron-' + idx);
+    const isOpen  = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    chevron.classList.toggle('open', !isOpen);
+  }
+
   document.querySelectorAll('.confirm-hapus').forEach(form => {
     form.addEventListener('submit', e => {
       if (!confirm('Akun akan dihapus permanen beserta semua data ujian! Yakin?')) e.preventDefault();
