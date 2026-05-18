@@ -3,43 +3,113 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ranking Peserta | Tabeahan Cendekia</title>
+  <title>Ranking Ujian | Tabeahan Cendekia</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --cream:#fff8f8; --gold:#c8a020; --dark:#7a1010; --red-deep:#5a0a0a; --muted:#9b6b6b; }
+    body { font-family:"DM Sans",sans-serif; background:var(--cream); color:var(--dark); min-height:100vh; }
+    h1,h2,h3,h4 { font-family:"Playfair Display",serif; }
+    .adm-nav { background:var(--red-deep); border-bottom:1px solid rgba(200,160,32,0.25); position:sticky; top:0; z-index:50; box-shadow:0 2px 12px rgba(90,10,10,0.18); }
+    .adm-nav-link { color:rgba(255,255,255,0.5); font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; transition:color 0.2s; text-decoration:none; }
+    .adm-nav-link:hover, .adm-nav-link.active { color:var(--gold); }
+  </style>
 </head>
-<body class="bg-gray-50 p-8">
-  <div class="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow">
-    <h1 class="text-2xl font-bold text-gray-800 mb-2">🏆 Papan Peringkat Ujian</h1>
-    <p class="text-sm text-gray-500 mb-6">Diurutkan berdasarkan Total Skor → Nilai TKP → Nilai TIU → Nilai TWK</p>
+<body>
 
-    <table class="w-full text-left border-collapse">
-  <thead>
-    <tr class="bg-gray-100 border-b border-gray-200 text-xs font-bold uppercase text-gray-600">
-      <th class="p-3">Rank</th>
-      <th class="p-3">Peserta</th>
-      <th class="p-3">Paket / TO</th>
-      <th class="p-3 text-center">Jawaban Benar</th>
-      <th class="p-3 text-center">Total Skor</th>
-      <th class="p-3 text-right">Tanggal Selesai</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% rankings.forEach(r => { %>
-    <tr class="border-b border-gray-100 hover:bg-gray-50 text-sm">
-      <td class="p-3 font-bold text-blue-600">#<%= r.ranking %></td>
-      <td class="p-3">
-        <p class="font-semibold text-gray-800"><%= r.username %></p>
-        <p class="text-xs text-gray-400"><%= r.email %></p>
-      </td>
-      <td class="p-3 font-medium text-gray-700"><%= r.paket %> (TO #<%= r.nomor_to %>)</td>
-      <td class="p-3 text-center text-gray-600"><%= r.jml_benar %> / <%= r.jml_soal %></td>
-      <td class="p-3 text-center font-bold text-lg text-emerald-600"><%= r.total_skor %></td>
-      <td class="p-3 text-right text-xs text-gray-500">
-        <%= new Date(r.tgl_selesai).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) %>
-      </td>
-    </tr>
-    <% }) %>
-  </tbody>
-</table>
+<!-- NAVBAR -->
+<nav class="adm-nav">
+  <div class="max-w-7xl mx-auto px-4 md:px-8 py-3.5 flex justify-between items-center">
+    <div class="flex items-center gap-6">
+      <div class="flex items-center gap-2.5">
+        <img src="/asset/logo.png" alt="Logo" class="h-9 w-auto">
+        <div>
+          <span style="font-family:'Playfair Display',serif;color:white;font-size:1rem;font-weight:700;display:block;line-height:1.2">
+            Tabeahan <span style="color:var(--gold)">Cendekia</span>
+          </span>
+          <span style="display:inline-block;background:var(--gold);color:#3a0000;font-size:0.55rem;padding:0.1rem 0.45rem;border-radius:4px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px">
+            Administrator
+          </span>
+        </div>
+      </div>
+      <div class="hidden md:flex gap-5 items-center">
+        <a href="/dashboardAdmin"      class="adm-nav-link">Dashboard</a>
+        <a href="/admin/daftarPeserta" class="adm-nav-link">Peserta Ujian</a>
+        <a href="/admin/anggota"       class="adm-nav-link">Anggota Gratis</a>
+        <a href="/admin/rankUjian"     class="adm-nav-link active">Rangking</a>
+      </div>
+    </div>
+    <a href="/logout"
+      style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:0.35rem 1rem;font-size:0.75rem;font-weight:700;text-decoration:none"
+      onmouseover="this.style.background='rgba(200,160,32,0.2)';this.style.color='#c8a020'"
+      onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.7)'">
+      Logout
+    </a>
   </div>
+</nav>
+
+<!-- MAIN -->
+<div style="font-family:'DM Sans',sans-serif;background:radial-gradient ;padding:12px;position:relative">
+  <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.04) 39px,rgba(255,255,255,0.04) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,0.04) 39px,rgba(255,255,255,0.04) 40px);pointer-events:none"></div>
+
+  <div style="position:relative;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+    <% const paketNames = Object.keys(paketGroups); %>
+    <% paketNames.forEach(paketName => { %>
+    <% const rankings = paketGroups[paketName]; %>
+    <% const safeId = paketName.replace(/[^a-zA-Z0-9]/g,'_'); %>
+
+    <div style="background:white;border-radius:12px;overflow:hidden">
+      <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:#1a1a1a;padding:12px 14px 8px;border-bottom:1px solid #f0f0f0">
+        <%= paketName %>
+      </div>
+
+      <% if (rankings.length === 0) { %>
+        <div style="padding:60px 0;text-align:center;color:#bbb;font-size:13px;font-weight:600">No Entries</div>
+      <% } else { %>
+        <% rankings.forEach((r, i) => { %>
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:0.5px solid #f5f5f5">
+          
+          <!-- Rank -->
+          <div style="width:22px;text-align:center;font-size:<%= i < 3 ? '15px' : '11px' %>;font-weight:800;color:<%= i===0?'#c8a020':i===1?'#888':i===2?'#a0522d':'#aaa' %>;flex-shrink:0">
+            <%= i===0 ? '🥇' : i===1 ? '🥈' : i===2 ? '🥉' : ''+(i+1) %>
+          </div>
+
+          <!-- Avatar -->
+          <div style="width:28px;height:28px;border-radius:50%;background:#1a3d0f;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:white;flex-shrink:0">
+            <%= r.username.charAt(0).toUpperCase() %>
+          </div>
+
+          <!-- Info -->
+          <div style="flex:1;min-width:0">
+            <div style="font-size:11px;font-weight:700;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><%= r.username %></div>
+            <div style="font-size:9px;color:#aaa;font-weight:600"><%= r.jml_benar %>/<%= r.jml_soal %> benar</div>
+          </div>
+
+          <!-- TO Badge -->
+          <div style="font-size:9px;font-weight:700;background:#f0f8e8;color:#3b6d11;border:1px solid #c0dd97;border-radius:4px;padding:1px 5px;flex-shrink:0">
+            TO <%= r.nomor_to %>
+          </div>
+
+          <!-- Skor -->
+          <div style="font-size:13px;font-weight:800;color:#1a3d0f;flex-shrink:0"><%= r.total_skor %></div>
+        </div>
+        <% }) %>
+      <% } %>
+    </div>
+
+    <% }) %>
+
+    <!-- Isi kolom kosong jika paket < 3 -->
+    <% for(let i = paketNames.length; i < 3; i++) { %>
+    <div style="background:white;border-radius:12px;overflow:hidden;opacity:0.4">
+      <div style="font-size:13px;font-weight:700;color:#aaa;padding:12px 14px 8px;border-bottom:1px solid #f0f0f0">—</div>
+      <div style="padding:60px 0;text-align:center;color:#bbb;font-size:13px;font-weight:600">No Entries</div>
+    </div>
+    <% } %>
+  </div>
+
+
+</div>
+
 </body>
 </html>

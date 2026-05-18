@@ -46,33 +46,36 @@
 
 <!-- NAVBAR -->
 <nav class="adm-nav">
-  <div class="max-w-7xl mx-auto px-4 md:px-8 py-3.5 flex justify-between items-center">
-    <div class="flex items-center gap-6">
-      <div class="flex items-center gap-2.5">
-        <img src="../asset/logo.png" alt="Logo" class="h-9 w-auto">
-        <div>
-          <span style="font-family:'Playfair Display',serif;color:white;font-size:1rem;font-weight:700;display:block;line-height:1.2">
-            Tabeahan <span style="color:var(--gold)">Cendekia</span>
-          </span>
-          <span style="display:inline-block;background:var(--gold);color:#3a0000;font-size:0.55rem;padding:0.1rem 0.45rem;border-radius:4px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px">
-            Administrator
-          </span>
+    <div class="max-w-7xl mx-auto px-4 md:px-8 py-3.5 flex justify-between items-center">
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2.5">
+          <img src="./asset/logo.png" alt="Logo" class="h-9 w-auto">
+          <div>
+            <span
+              style="font-family:'Playfair Display',serif;color:white;font-size:1rem;font-weight:700;display:block;line-height:1.2">
+              Tabeahan <span style="color:var(--gold)">Cendekia</span>
+            </span>
+            <span
+              style="display:inline-block;background:var(--gold);color:#3a0000;font-size:0.55rem;padding:0.1rem 0.45rem;border-radius:4px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px">
+              Administrator
+            </span>
+          </div>
+        </div>
+        <div class="hidden md:flex gap-5 items-center">
+          <a href="/dashboardAdmin" class="adm-nav-link">Dashboard</a>
+          <a href="/admin/daftarPeserta" class="adm-nav-link" >Peserta Ujian</a>
+          <a href="/admin/anggota" class="adm-nav-link active">Anggota Gratis</a>
+          <a href="/admin/rankUjian" class="adm-nav-link">Rangking</a>
         </div>
       </div>
-      <div class="hidden md:flex gap-5">
-        <a href="/dashboardAdmin" class="adm-nav-link">Dashboard</a>
-        <a href="/admin/daftarPeserta" class="adm-nav-link">Peserta Ujian</a>
-        <a href="/admin/anggota" class="adm-nav-link active">Anggota Gratis</a>
-      </div>
+      <a href="/logout"
+        style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:0.35rem 1rem;font-size:0.75rem;font-weight:700;transition:all 0.2s;text-decoration:none"
+        onmouseover="this.style.background='rgba(200,160,32,0.2)';this.style.color='#c8a020'"
+        onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.7)'">
+        Logout
+      </a>
     </div>
-    <a href="/logout"
-      style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:0.35rem 1rem;font-size:0.75rem;font-weight:700;transition:all 0.2s;text-decoration:none"
-      onmouseover="this.style.background='rgba(200,160,32,0.2)';this.style.color='#c8a020'"
-      onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.7)'">
-      Logout
-    </a>
-  </div>
-</nav>
+  </nav>
 
 <!-- MAIN -->
 <div class="max-w-5xl mx-auto px-4 py-8">
@@ -111,7 +114,7 @@
   <% if (error) { %>
   <div class="mb-4 px-4 py-3 rounded-lg text-sm font-semibold"
     style="background:rgba(220,38,38,0.07);border:1px solid rgba(220,38,38,0.18);color:#b91c1c">
-    ❌ <%= error %>
+    gagal <%= error %>
   </div>
   <% } %>
 
@@ -121,7 +124,7 @@
     <div class="lg:col-span-1">
       <div class="card">
         <div class="card-hd">
-          <h3>➕ Tambah Anggota</h3>
+          <h3> Tambah Anggota</h3>
         </div>
         <form action="/admin/anggota/tambah" method="POST" class="p-5 space-y-4">
 
@@ -144,7 +147,7 @@
           </div>
 
           <button type="submit" class="btn-primary w-full">
-            ✅ Tambahkan ke Whitelist
+             Tambahkan ke Whitelist
           </button>
         </form>
       </div>
@@ -208,9 +211,9 @@
                 </td>
                 <td>
                   <% if (a.user_id) { %>
-                    <span class="badge-aktif">✅ Terdaftar</span>
+                    <span class="badge-aktif"> Terdaftar</span>
                   <% } else { %>
-                    <span class="badge-belum">⏳ Belum Daftar</span>
+                    <span class="badge-belum"> Belum Daftar</span>
                   <% } %>
                 </td>
                 <td>

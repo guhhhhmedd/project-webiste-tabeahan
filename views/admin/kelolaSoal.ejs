@@ -34,6 +34,7 @@
           <a href="/dashboardAdmin"      class="text-white hover:text-[#c8a020] transition">Dashboard</a>
           <a href="/admin/daftarPeserta" class="text-white hover:text-[#c8a020] transition">Peserta Ujian</a>
           <a href="/admin/anggota"       class="text-white hover:text-[#c8a020] transition">Anggota Offline</a>
+          <a href="/admin/rankUjian" class="text-white hover:text-[#c8a020] transition">Rangking</a>
         </div>
       </div>
       <a href="/logout" class="bg-red-600 hover:bg-red-700 px-5 py-1.5 rounded text-xs font-bold transition">Logout</a>
@@ -85,7 +86,7 @@
         <form action="/admin/tryout/tambah" method="POST" class="inline-flex m-0">
           <input type="hidden" name="paket" value="<%= paket %>">
           <button type="submit" class="px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-[11px] font-bold hover:bg-blue-100 border border-blue-200 transition whitespace-nowrap">
-            + Tambah Paket TO
+             Tambah Paket TO
           </button>
         </form>
       </div>
@@ -93,10 +94,10 @@
 
     <!-- Notifikasi -->
     <% if (typeof message !== 'undefined' && message) { %>
-    <div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm font-semibold">✅ <%= message %></div>
+    <div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm font-semibold"> <%= message %></div>
     <% } %>
     <% if (typeof error !== 'undefined' && error) { %>
-    <div class="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm font-semibold">❌ <%= error %></div>
+    <div class="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm font-semibold"> <%= error %></div>
     <% } %>
 
     <!-- Panel Konfigurasi -->
@@ -154,17 +155,17 @@
           </div>
 
           <button type="submit" class="w-full py-2.5 bg-[#0f172a] text-white text-xs font-bold rounded-lg hover:bg-slate-800 transition shadow-sm">
-            💾 Simpan Semua Perubahan
+            Simpan Semua Perubahan
           </button>
         </form>
         <p class="text-[10px] text-slate-400 mt-2">
-          ⚠️ Pastikan jumlah soal ≤ soal aktif (<span class="font-bold text-green-600" id="aktifHint"><%= totalAktif %></span>)
+           Pastikan jumlah soal ≤ soal aktif (<span class="font-bold text-green-600" id="aktifHint"><%= totalAktif %></span>)
         </p>
       </div>
 
       <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col justify-between">
         <div>
-          <h3 class="font-black text-slate-800 text-sm mb-1">⚡ Aksi Massal Soal</h3>
+          <h3 class="font-black text-slate-800 text-sm mb-1">Aksi Massal Soal</h3>
           <p class="text-xs text-slate-400 mb-4">Status semua soal di TO ini.</p>
         </div>
         <div class="flex gap-3 mb-4">
@@ -199,8 +200,8 @@
       <!-- PENGATURAN TO SAAT INI -->
       <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 md:col-span-2 flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
-          <h3 class="font-black text-slate-800 text-sm mb-1">📢 Pengaturan Paket TO <%= currentTo %> Saat Ini</h3>
-          <p class="text-xs text-slate-400">Tampilkan TO ini di halaman penjualan atau hapus secara permanen beserta soalnya.</p>
+          <h3 class="font-black text-slate-800 text-sm mb-1">Pengaturan Paket TO <%= currentTo %> Saat Ini</h3>
+          <p class="text-xs text-slate-400">Tampilkan TO ini di halaman penjualan atau anda dapat menghapus secara permanen TO ini beserta soalnya.</p>
         </div>
         <div class="flex items-center gap-4">
           <form action="/admin/tryout/publish" method="POST" class="flex items-center gap-2">
@@ -209,7 +210,7 @@
             <% const isPublished = (currentTOData && currentTOData.is_published == 1); %>
             <input type="hidden" name="is_published" value="<%= isPublished ? '0' : '1' %>">
             <span class="text-[11px] font-bold <%= isPublished ? 'text-green-600' : 'text-slate-400' %> uppercase tracking-wide">
-              <%= isPublished ? '🌐 AKTIF DI PENJUALAN' : '🔒 DRAFT (SEMBUNYI)' %>
+              <%= isPublished ? ' TO INI AKTIF DAN DITAMPILKAN KE MENU' : ' TO INI TIDAK DITAMPILKAN KE MENU (SEMBUNYI)' %>
             </span>
             <button type="submit" class="px-4 py-2 text-xs font-bold rounded-lg transition border <%= isPublished ? 'bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100' : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100' %>">
               <%= isPublished ? 'Sembunyikan' : 'Publish ke User' %>
@@ -222,7 +223,7 @@
             <input type="hidden" name="paket" value="<%= paket %>">
             <input type="hidden" name="nomor_to" value="<%= currentTo %>">
             <button type="submit" onclick="return confirm('PERINGATAN: Anda akan menghapus TO <%= currentTo %> beserta SEMUA SOAL di dalamnya secara permanen. Lanjutkan?')" class="px-4 py-2 bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 text-xs font-bold rounded-lg transition">
-              🗑️ Hapus TO <%= currentTo %>
+              Hapus TO <%= currentTo %>
             </button>
           </form>
         </div>
@@ -233,7 +234,7 @@
     <!-- Tabel Soal -->
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
       <div class="bg-slate-50 border-b border-slate-200 px-5 py-3 flex items-center justify-between">
-        <h3 class="text-xs font-bold text-slate-600 uppercase tracking-widest">📋 Daftar Soal</h3>
+        <h3 class="text-xs font-bold text-slate-600 uppercase tracking-widest">Daftar Soal</h3>
         <div class="flex gap-2 items-center">
           <button id="filterAll"      class="filter-btn active px-3 py-1 rounded text-[10px] font-bold bg-slate-800 text-white">Semua</button>
           <button id="filterAktif"    class="filter-btn px-3 py-1 rounded text-[10px] font-bold bg-slate-100 text-slate-500 hover:bg-slate-200">Aktif</button>
@@ -282,7 +283,7 @@
                   id="soal-text-<%= s.id %>"><%= s.soal %></p>
               </td>
               <td class="px-4 py-3">
-                <span class="px-2 py-1 bg-blue-50 text-blue-600 rounded text-[10px] font-bold border border-blue-100">ID: <%= s.materi_id %></span>
+                <span class="px-2 py-1 bg-blue-50 text-blue-600 rounded text-[10px] font-bold border border-blue-100">TO: <%= s.materi_id %></span>
               </td>
               <td class="px-4 py-3 text-center">
                 <span class="w-7 h-7 rounded-full bg-green-100 text-green-700 font-black text-xs inline-flex items-center justify-center uppercase">
@@ -293,10 +294,10 @@
               <td class="px-4 py-3 text-center">
                 <% if (s.pembahasan && s.pembahasan.trim() !== '') { %>
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                  style="background:rgba(21,128,61,0.1);color:#15803d">✅ Ada</span>
+                  style="background:rgba(21,128,61,0.1);color:#15803d"> Ada</span>
                 <% } else { %>
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                  style="background:rgba(220,38,38,0.07);color:#b91c1c">❌ Kosong</span>
+                  style="background:rgba(220,38,38,0.07);color:#b91c1c"> Kosong</span>
                 <% } %>
               </td>
               <td class="px-4 py-3">
@@ -327,7 +328,7 @@
     <div class="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl relative">
       <div class="p-5 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
         <div>
-          <h3 class="font-black text-slate-800 text-sm">➕ Tambah Soal Manual</h3>
+          <h3 class="font-black text-slate-800 text-sm">sTambah Soal Manual</h3>
           <p class="text-[10px] font-bold text-slate-400 mt-0.5"><%= paket %> - TO <%= currentTo %></p>
         </div>
         <button onclick="document.getElementById('modalTambahSoal').classList.add('hidden')" class="text-slate-400 hover:text-red-500 font-bold text-xl leading-none">&times;</button>
@@ -363,7 +364,7 @@
 
         <div>
           <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Pertanyaan Soal</label>
-          <textarea name="soal" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm h-28 focus:outline-none focus:border-yellow-400" placeholder="Tulis soal di sini..." required></textarea>
+          <textarea name="soal" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm h-28 focus:outline-none focus:border-yellow-400" placeholder="Tulis soal di sini..."></textarea>
           <div class="mt-2">
             <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Gambar Soal (Opsional, Maks 2MB, Format PNG)</label>
             <input type="file" name="gambar" accept="image/png, image/jpeg, image/jpg" class="file-check text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
@@ -403,7 +404,7 @@
         </div>
 
         <button type="submit" class="w-full py-3 bg-[#0f172a] text-white font-bold rounded-lg shadow hover:bg-slate-800 transition">
-          💾 Simpan Soal Manual
+           Simpan Soal Manual
         </button>
       </form>
     </div>

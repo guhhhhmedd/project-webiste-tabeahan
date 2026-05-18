@@ -172,29 +172,41 @@ router.get("/dashboardAdmin", isAdmin, async (req, res) => {
 // Ranking Ujian
 router.get("/admin/rankUjian", isAdmin, async (req, res) => {
   try {
-    // Query mengambil data riwayat ujian diurutkan dari skor yang paling tinggi
+    // Ambil hanya ujian PERTAMA per user per paket (ORDER BY tgl_selesai ASC, ambil yang pertama)
     const [rows] = await db.query(`
-      SELECT r.*, u.username, u.email 
+      SELECT r.*, u.username, u.email
       FROM riwayat_ujian r
       JOIN users u ON r.user_id = u.id
-      ORDER BY r.skor DESC, r.tgl_selesai ASC
+      WHERE r.id = (
+        SELECT id FROM riwayat_ujian r2
+        WHERE r2.user_id = r.user_id AND r2.paket = r.paket
+        ORDER BY r2.tgl_selesai ASC
+        LIMIT 1
+      )
+      ORDER BY r.paket ASC, r.skor DESC, r.tgl_selesai ASC
     `);
 
-    // Kita petakan datanya untuk menambahkan index ranking (peringkat)
-    const dataRanking = rows.map((row, index) => {
-      return {
-        ranking: index + 1,
-        ...row,
-        total_skor: row.skor // Menyesuaikan variabel total_skor di template EJS
-      };
-    });
+    // Kelompokkan per paket dan tambahkan ranking
+    const paketGroups = {};
+    for (const row of rows) {
+      const p = row.paket.trim();
+      if (!paketGroups[p]) paketGroups[p] = [];
+      paketGroups[p].push(row);
+    }
 
-    // Render halaman views/admin/rank-ujian.ejs
-    res.render("admin/rankUjian", { 
-      rankings: dataRanking,
-      title: "Ranking Ujian Peserta" 
-    });
+    // Tambahkan nomor ranking per paket
+    for (const paket in paketGroups) {
+      paketGroups[paket] = paketGroups[paket].map((r, i) => ({
+        ...r,
+        ranking: i + 1,
+        total_skor: r.skor
+      }));
+    }
 
+    res.render("admin/rankUjian", {
+      paketGroups,
+      title: "Ranking Ujian Peserta"
+    });
   } catch (error) {
     console.error("Error pada rankUjian:", error);
     res.status(500).send("Terjadi kesalahan pada server saat memuat ranking.");
@@ -464,7 +476,7 @@ router.post("/admin/tambah-soal", isAdmin, (req, res, next) => {
         gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e
       ],
     );
-    res.redirect("/dashboardAdmin?message=Soal+berhasil+ditambah🤖");
+    res.redirect("/dashboardAdmin?message=Soal+berhasil+ditambah");
   } catch (err) {
     console.error(err);
     if (err.code === "ER_DUP_ENTRY") {
@@ -472,7 +484,7 @@ router.post("/admin/tambah-soal", isAdmin, (req, res, next) => {
         `/dashboardAdmin?error=Gagal!+Nomor+urut+${nomor_urut}+sudah+ada+di+paket+dan+TO+ini.`,
       );
     }
-    res.redirect("/dashboardAdmin?error=Gagal+tambah+soal.🤖");
+    res.redirect("/dashboardAdmin?error=Gagal+tambah+soal.");
   }
 });
 
@@ -728,12 +740,12 @@ router.post("/admin/tambah-soal-manual", isAdmin, (req, res, next) => {
       ],
     );
     res.redirect(
-      `/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}&message=Soal+berhasil+ditambahkan👻`,
+      `/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}&message=Soal+berhasil+ditambahkan`,
     );
   } catch (err) {
     console.error(err);
     res.redirect(
-      `/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}&error=Gagal+menambahkan+soal👻`,
+      `/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}&error=Gagal+menambahkan+soal`,
     );
   }
 });
@@ -1040,25 +1052,53 @@ router.post("/admin/tryout/tambah", isAdmin, async (req, res) => {
 // delete tryout
 router.post("/admin/tryout/delete", isAdmin, async (req, res) => {
   const { paket, nomor_to } = req.body;
+  const deletedTo = parseInt(nomor_to);
+  
   try {
     await db.query(
       "DELETE FROM questions WHERE TRIM(paket) = ? AND nomor_to = ?",
-      [paket, nomor_to],
+      [paket, deletedTo]
     );
     await db.query(
       "DELETE FROM paket_to WHERE TRIM(paket) = ? AND nomor_to = ?",
-      [paket, nomor_to],
+      [paket, deletedTo]
     );
+
+    const [toList] = await db.query(
+      "SELECT nomor_to FROM paket_to WHERE TRIM(paket) = ? AND nomor_to > ? ORDER BY nomor_to ASC",
+      [paket, deletedTo]
+    );
+
+    for (const row of toList) {
+      const oldTo = row.nomor_to;
+      const newTo = oldTo - 1;
+
+      await db.query(
+        "UPDATE questions SET nomor_to = ? WHERE TRIM(paket) = ? AND nomor_to = ?",
+        [newTo, paket, oldTo]
+      );
+      await db.query(
+        "UPDATE paket_to SET nomor_to = ? WHERE TRIM(paket) = ? AND nomor_to = ?",
+        [newTo, paket, oldTo]
+      );
+      // update payments agar akses user tidak kacau
+      await db.query(
+        "UPDATE payments SET nomor_to = ? WHERE TRIM(paket) = ? AND nomor_to = ?",
+        [newTo, paket, oldTo]
+      );
+    }
+
     res.redirect(
-      `/admin/kelola-soal/${encodeURIComponent(paket)}?message=${encodeURIComponent("TryOut dan seluruh soalnya berhasil dihapus")}`,
+      `/admin/kelola-soal/${encodeURIComponent(paket)}?message=${encodeURIComponent("TryOut berhasil dihapus")}`
     );
   } catch (err) {
     console.error(err);
     res.redirect(
-      `/admin/kelola-soal/${encodeURIComponent(paket)}?error=${encodeURIComponent("Gagal hapus TryOut")}`,
+      `/admin/kelola-soal/${encodeURIComponent(paket)}?error=${encodeURIComponent("Gagal hapus TryOut")}`
     );
   }
 });
+
 
 // menampilkan tryout
 router.post("/admin/tryout/publish", isAdmin, async (req, res) => {

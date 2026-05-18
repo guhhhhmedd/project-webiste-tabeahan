@@ -8,10 +8,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
-<body class="bg-slate-100 font-sans text-slate-900 min-h-screen">
+<body class="bg-slate-200 font-sans text-slate-900 min-h-screen">
 
   <!-- NAVBAR -->
-  <nav class="bg-[#0f172a] text-white shadow-lg sticky top-0 z-50">
+  <nav class="bg-[#5a0a0a] text-white shadow-lg sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 md:px-8 py-3 flex justify-between items-center">
       <div class="flex items-center gap-6">
         <div class="flex items-center gap-2.5">
@@ -22,178 +22,198 @@
           </div>
         </div>
         <div class="hidden md:flex gap-5 text-[11px] font-bold uppercase tracking-widest">
-          <a href="/dashboardAdmin" class="text-slate-400 hover:text-white transition">Dashboard</a>
-          <a href="/admin/daftarPeserta" class="text-slate-400 hover:text-white transition">Peserta Ujian</a>
-          <a href="/admin/anggota" class="text-slate-400 hover:text-white transition">Anggota Offline</a>
+          <a href="/dashboardAdmin"      class="text-white hover:text-[#c8a020] transition">Dashboard</a>
+          <a href="/admin/daftarPeserta" class="text-white hover:text-[#c8a020] transition">Peserta Ujian</a>
+          <a href="/admin/anggota"       class="text-white hover:text-[#c8a020] transition">Anggota Offline</a>
+          <a href="/admin/rankUjian"     class="text-white hover:text-[#c8a020] transition">Rangking</a>
         </div>
       </div>
       <a href="/logout" class="bg-red-600 hover:bg-red-700 px-5 py-1.5 rounded text-xs font-bold transition">Logout</a>
     </div>
   </nav>
 
-  <div class="max-w-4xl mx-auto px-4 py-8">
+  <div class="max-w-5xl mx-auto px-4 py-8">
 
     <!-- Breadcrumb & Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
       <div>
-        <a href="/admin/kelola-soal/<%= encodeURIComponent(s.paket) %>"
-          class="inline-flex items-center gap-1.5 text-slate-400 hover:text-slate-700 text-xs font-bold uppercase tracking-widest transition mb-2">
+        <a href="/admin/kelola-soal/<%= encodeURIComponent(s.paket) %>?to=<%= s.nomor_to %>"
+          class="inline-flex items-center gap-1.5 text-slate-500 hover:text-slate-800 text-xs font-bold uppercase tracking-widest transition mb-2">
           ← Kembali ke Daftar Soal
         </a>
         <h1 class="text-2xl font-black text-slate-800">Edit Soal</h1>
-        <p class="text-sm text-slate-500 mt-0.5">Memperbarui soal pada paket <span class="font-bold text-slate-700"><%= s.paket %></span></p>
+        <p class="text-sm text-slate-500 mt-0.5 font-semibold">
+          Memperbarui soal pada paket <span class="text-slate-700"><%= s.paket %></span> · TO <%= s.nomor_to %>
+        </p>
       </div>
-      <div class="bg-white px-4 py-2.5 rounded-lg border border-slate-200 shadow-sm">
-        <span class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest">ID Database</span>
-        <span class="text-base font-mono font-bold text-[#0f172a]">#<%= s.id %></span>
+      <div class="bg-white px-4 py-2.5 rounded-xl border border-slate-200 shadow-sm text-center min-w-[100px]">
+        <span class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest">ID Soal</span>
+        <span class="text-xl font-black text-slate-800 font-mono"><%= s.id %></span>
       </div>
     </div>
 
     <!-- Form Card -->
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
 
-      <div class="bg-[#0f172a] px-5 py-3">
-        <p class="text-white/50 text-[10px] font-bold uppercase tracking-[0.2em] text-center">Pastikan semua data terisi dengan benar</p>
+      <!-- Card Header -->
+      <div class="bg-[#5a0a0a] px-5 py-3.5 flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
+        <p class="text-white text-[10px] font-bold uppercase tracking-widest">
+          Form Edit Soal — Pastikan semua data terisi dengan benar sebelum menyimpan
+        </p>
       </div>
 
       <form action="/admin/updateSoal" method="POST" enctype="multipart/form-data" id="formEditSoal" class="p-6 md:p-8 space-y-6">
         <input type="hidden" name="id" value="<%= s.id %>">
 
-        <!-- Paket & Materi -->
+        <!-- ── BARIS 1: Paket & Materi ── -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Kategori Paket</label>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kategori Paket</label>
             <select name="paket" id="editPaketSelect"
-              class="w-full border border-slate-300 p-2.5 rounded-lg bg-slate-50 text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none transition" required>
-              <option value="Paket SKD/TKD"        <%= s.paket==="Paket SKD/TKD"        ? "selected" : "" %>>Paket SKD/TKD</option>
-              <option value="Paket Akademik Polri"  <%= s.paket==="Paket Akademik Polri"  ? "selected" : "" %>>Paket Akademik Polri</option>
-              <option value="Paket PPPK"            <%= s.paket==="Paket PPPK"            ? "selected" : "" %>>Paket PPPK</option>
+              class="w-full border border-slate-200 px-3 py-2 rounded-lg text-sm font-semibold focus:outline-none focus:border-yellow-400 bg-white text-slate-800 transition" required>
+              <option value="Paket SKD/TKD"        <%= s.paket === "Paket SKD/TKD"        ? "selected" : "" %>>Paket SKD/TKD</option>
+              <option value="Paket Akademik Polri"  <%= s.paket === "Paket Akademik Polri"  ? "selected" : "" %>>Paket Akademik Polri</option>
+              <option value="Paket PPPK"            <%= s.paket === "Paket PPPK"            ? "selected" : "" %>>Paket PPPK</option>
             </select>
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Bidang Materi</label>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Bidang Materi</label>
             <select name="materi_id" id="editMateriSelect"
-              class="w-full border border-slate-300 p-2.5 rounded-lg bg-slate-50 text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+              class="w-full border border-slate-200 px-3 py-2 rounded-lg text-sm font-semibold focus:outline-none focus:border-yellow-400 bg-white text-slate-800 transition" required>
             </select>
           </div>
         </div>
 
-        <!-- Nomor TO & Nomor Urut -->
+        <!-- ── BARIS 2: Nomor TO & Nomor Urut ── -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nomor TO</label>
-            <input type="number" name="nomor_to" value="<%= s.nomor_to %>" min="1" max="10"
-              class="w-full border border-slate-300 p-2.5 rounded-lg bg-slate-50 text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Nomor TO</label>
+            <input type="number" name="nomor_to" value="<%= s.nomor_to %>" min="1" max="20"
+              class="w-full border border-slate-200 px-3 py-2 rounded-lg text-sm font-bold text-slate-800 focus:outline-none focus:border-yellow-400 bg-white transition" required>
           </div>
           <div>
-            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nomor Urut Soal</label>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Nomor Urut Soal</label>
             <input type="number" name="nomor_urut" value="<%= s.nomor_urut %>" min="1"
-              class="w-full border border-slate-300 p-2.5 rounded-lg bg-slate-50 text-sm font-semibold focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+              class="w-full border border-slate-200 px-3 py-2 rounded-lg text-sm font-bold text-slate-800 focus:outline-none focus:border-yellow-400 bg-white transition" required>
           </div>
         </div>
 
-        <!-- Soal -->
-        <div>
-          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Isi Pertanyaan</label>
+        <!-- ── BARIS 3: Isi Soal ── -->
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 space-y-3">
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Isi Pertanyaan</label>
           <textarea name="soal"
-            class="w-full border border-slate-300 p-3 rounded-lg bg-slate-50 text-sm font-medium leading-relaxed focus:ring-2 focus:ring-blue-500 outline-none transition resize-none h-36"
-            required><%= s.soal %></textarea>
-          
-          <div class="mt-3">
-            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Gambar Soal (Opsional, Maks 2MB, Format PNG)</label>
-            <% if(s.gambar) { %>
-              <div class="mb-2 w-32 object-contain bg-slate-100 p-1 rounded border border-slate-200">
-                <img src="/uploads/soal/<%= s.gambar %>" alt="Gambar Soal" class="w-full rounded">
+            class="w-full border border-slate-200 p-3 rounded-lg text-sm font-medium leading-relaxed focus:outline-none focus:border-yellow-400 bg-white text-slate-800 transition resize-none h-32" required><%= s.soal %></textarea>
+
+          <!-- Gambar Soal -->
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1.5">Gambar Soal <span class="text-slate-300 normal-case font-normal">(opsional · maks 2MB · PNG/JPG)</span></label>
+            <% if (s.gambar) { %>
+              <div class="mb-2 w-32 bg-white p-1.5 rounded-lg border border-slate-200 shadow-sm">
+                <img src="/uploads/soal/<%= s.gambar %>" alt="Gambar Soal" class="w-full h-auto rounded object-contain">
               </div>
+              <p class="text-[9px] text-slate-400 mb-1.5">Upload baru untuk mengganti gambar lama.</p>
             <% } %>
-            <input type="file" name="gambar" accept="image/png, image/jpeg, image/jpg" class="file-check text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-            <p class="text-[9px] text-slate-400 mt-1"><%= s.gambar ? 'Unggah gambar baru untuk mengganti yang lama.' : 'Pilih gambar untuk dilampirkan.' %></p>
+            <input type="file" name="gambar" accept="image/png, image/jpeg, image/jpg"
+              class="file-check text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
           </div>
         </div>
 
-        <!-- Opsi Jawaban -->
-        <div>
-          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Pilihan Jawaban</label>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- ── BARIS 4: Pilihan Ganda ── -->
+        <div class="space-y-3 bg-slate-50 p-4 border border-slate-100 rounded-xl">
+          <div class="flex items-center justify-between">
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pilihan Ganda & Bobot</label>
+            <span class="text-[9px] font-bold bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full border border-yellow-200">
+              Kolom Poin hanya untuk TKP/Manajerial
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <% ['a','b','c','d'].forEach(letra => { %>
-            <div class="flex flex-col gap-1">
-              <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 flex-none flex items-center justify-center rounded-lg bg-slate-100 text-slate-500 font-black text-sm uppercase">
-                  <%= letra %>
-                </div>
-                <input type="text" name="opsi_<%= letra %>" value="<%= s['opsi_' + letra] %>"
-                  placeholder="Jawaban opsi <%= letra.toUpperCase() %>"
-                  class="flex-1 border border-slate-300 p-2.5 rounded-lg bg-white text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition">
-                <input type="number" name="bobot_<%= letra %>" value="<%= s['bobot_' + letra] || 0 %>"
-                  placeholder="Poin" min="0" max="100"
-                  class="w-16 border border-slate-300 p-2.5 rounded-lg bg-white text-sm font-bold text-center text-blue-700 bg-blue-50 focus:ring-2 focus:ring-blue-500 outline-none transition bobot-input" style="display:none;" title="Poin untuk opsi ini">
+            <div class="flex flex-col gap-2 bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded flex items-center justify-center font-black text-white text-xs uppercase flex-shrink-0"
+                  style="background:#5a0a0a"><%= letra %></span>
+                <input type="text" name="opsi_<%= letra %>" value="<%= s['opsi_' + letra] %>" placeholder="Teks opsi <%= letra.toUpperCase() %>"
+                  class="flex-1 border border-slate-200 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-800 focus:outline-none focus:border-yellow-400 bg-white">
+                <input type="number" name="bobot_<%= letra %>" value="<%= s['bobot_' + letra] || 0 %>" placeholder="Poin" min="0" max="100"
+                  class="w-16 border border-slate-200 px-2 py-1.5 rounded-lg text-sm font-bold text-center text-blue-700 bg-blue-50 focus:outline-none focus:border-yellow-400 bobot-input" style="display:none;">
               </div>
-              <div class="pl-[2.875rem]">
-                <% if(s['gambar_' + letra]) { %>
-                  <div class="mb-1 w-24 object-contain bg-slate-50 p-1 rounded border border-slate-200">
-                    <img src="/uploads/soal/<%= s['gambar_' + letra] %>" alt="Gambar Opsi <%= letra %>" class="w-full rounded">
+              <div class="pl-8 pt-1 border-t border-slate-50">
+                <% if (s['gambar_' + letra]) { %>
+                  <div class="mb-1.5 w-20 bg-white p-1 rounded border border-slate-200 shadow-sm">
+                    <img src="/uploads/soal/<%= s['gambar_' + letra] %>" alt="Gambar Opsi <%= letra %>" class="w-full h-auto rounded">
                   </div>
                 <% } %>
-                <input type="file" name="gambar_<%= letra %>" accept="image/png, image/jpeg, image/jpg" class="file-check text-xs text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-[10px] file:font-semibold file:bg-slate-100 file:text-slate-600 hover:file:bg-slate-200">
+                <input type="file" name="gambar_<%= letra %>" accept="image/png, image/jpeg, image/jpg"
+                  class="file-check text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[9px] file:font-semibold file:bg-slate-100 file:text-slate-600 hover:file:bg-slate-200">
               </div>
             </div>
             <% }) %>
-            
-            <!-- Opsi E full width -->
-            <div class="flex flex-col gap-1 md:col-span-2">
-              <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 flex-none flex items-center justify-center rounded-lg bg-slate-100 text-slate-500 font-black text-sm uppercase">e</div>
-                <input type="text" name="opsi_e" value="<%= s['opsi_e'] %>" placeholder="Jawaban opsi E"
-                  class="flex-1 border border-slate-300 p-2.5 rounded-lg bg-white text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none transition">
-                <input type="number" name="bobot_e" value="<%= s['bobot_e'] || 0 %>"
-                  placeholder="Poin" min="0" max="100"
-                  class="w-16 border border-slate-300 p-2.5 rounded-lg bg-white text-sm font-bold text-center text-blue-700 bg-blue-50 focus:ring-2 focus:ring-blue-500 outline-none transition bobot-input" style="display:none;" title="Poin untuk opsi ini">
+
+            <!-- Opsi E — Full Width -->
+            <div class="flex flex-col gap-2 bg-white p-3 rounded-lg border border-slate-200 shadow-sm md:col-span-2">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded flex items-center justify-center font-black text-white text-xs uppercase flex-shrink-0"
+                  style="background:#5a0a0a">E</span>
+                <input type="text" name="opsi_e" value="<%= s['opsi_e'] %>" placeholder="Teks opsi E"
+                  class="flex-1 border border-slate-200 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-800 focus:outline-none focus:border-yellow-400 bg-white">
+                <input type="number" name="bobot_e" value="<%= s['bobot_e'] || 0 %>" placeholder="Poin" min="0" max="100"
+                  class="w-16 border border-slate-200 px-2 py-1.5 rounded-lg text-sm font-bold text-center text-blue-700 bg-blue-50 focus:outline-none focus:border-yellow-400 bobot-input" style="display:none;">
               </div>
-              <div class="pl-[2.875rem]">
-                <% if(s['gambar_e']) { %>
-                  <div class="mb-1 w-24 object-contain bg-slate-50 p-1 rounded border border-slate-200">
-                    <img src="/uploads/soal/<%= s['gambar_e'] %>" alt="Gambar Opsi E" class="w-full rounded">
+              <div class="pl-8 pt-1 border-t border-slate-50">
+                <% if (s['gambar_e']) { %>
+                  <div class="mb-1.5 w-20 bg-white p-1 rounded border border-slate-200 shadow-sm">
+                    <img src="/uploads/soal/<%= s['gambar_e'] %>" alt="Gambar Opsi E" class="w-full h-auto rounded">
                   </div>
                 <% } %>
-                <input type="file" name="gambar_e" accept="image/png, image/jpeg, image/jpg" class="file-check text-xs text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-[10px] file:font-semibold file:bg-slate-100 file:text-slate-600 hover:file:bg-slate-200">
+                <input type="file" name="gambar_e" accept="image/png, image/jpeg, image/jpg"
+                  class="file-check text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[9px] file:font-semibold file:bg-slate-100 file:text-slate-600 hover:file:bg-slate-200">
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Kunci Jawaban -->
-        <div id="kunciContainer">
-          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Kunci Jawaban</label>
+        <!-- ── BARIS 5: Kunci Jawaban ── -->
+        <div id="kunciContainer" class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 md:w-fit">
+          <label class="block text-[10px] font-bold text-yellow-700 uppercase tracking-widest mb-1.5">Kunci Jawaban Utama</label>
           <select name="kunci" id="kunciSelect"
-            class="w-full md:w-48 border-2 border-yellow-400 p-2.5 rounded-lg bg-yellow-50 font-black text-slate-800 uppercase text-sm focus:ring-2 focus:ring-yellow-400 outline-none transition cursor-pointer">
+            class="w-full md:w-44 border border-yellow-300 px-3 py-2 rounded-lg bg-yellow-400 font-black text-slate-900 uppercase text-xs focus:outline-none transition cursor-pointer shadow-sm">
             <% ['a','b','c','d','e'].forEach(opt => { %>
-            <option value="<%= opt %>" <%= s.kunci && s.kunci.toLowerCase()===opt ? 'selected' : '' %>>Opsi <%= opt.toUpperCase() %></option>
+              <option value="<%= opt %>" <%= s.kunci && s.kunci.toLowerCase() === opt ? 'selected' : '' %>>Opsi <%= opt.toUpperCase() %></option>
             <% }) %>
           </select>
         </div>
 
-        <!-- ══ KETERANGAN / PEMBAHASAN ══ -->
-        <div>
-          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">
-            Pembahasan / Keterangan Jawaban
-          </label>
-          <textarea
-            name="pembahasan"
-            placeholder="Tulis pembahasan jawaban di sini. Bisa multi-baris..."
-            class="w-full border border-slate-300 p-3 rounded-lg bg-slate-50 text-sm font-medium leading-relaxed focus:ring-2 focus:ring-blue-500 outline-none transition resize-none"
-            style="height:7rem"
-          ><%= s.pembahasan || '' %></textarea>
-          <p class="text-[10px] text-slate-400 mt-1">Keterangan ini akan ditampilkan di halaman review jawaban setelah ujian selesai.</p>
+        <!-- ── BARIS 6: Pembahasan ── -->
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 space-y-3">
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pembahasan / Keterangan Jawaban</label>
+          <textarea name="pembahasan" placeholder="Tulis penjelasan/pembahasan di sini..."
+            class="w-full border border-slate-200 p-3 rounded-lg text-sm font-medium leading-relaxed text-slate-800 focus:outline-none focus:border-yellow-400 bg-white transition resize-none h-24"><%= s.pembahasan || '' %></textarea>
+
+          <!-- Gambar Pembahasan -->
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1.5">Gambar Pembahasan <span class="text-slate-300 normal-case font-normal">(opsional · maks 2MB · PNG/JPG)</span></label>
+            <% if (s.gambar_pembahasan) { %>
+              <div class="mb-2 w-48 bg-white p-1.5 rounded-lg border border-slate-200 shadow-sm">
+                <img src="/uploads/soal/<%= s.gambar_pembahasan %>" alt="Gambar Pembahasan" class="w-full h-auto rounded object-contain">
+              </div>
+              <p class="text-[9px] text-slate-400 mb-1.5">Upload baru untuk mengganti gambar pembahasan lama.</p>
+            <% } %>
+            <input type="file" name="gambar_pembahasan" accept="image/png, image/jpeg, image/jpg"
+              class="file-check text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+          </div>
+          <p class="text-[9px] text-slate-400">Pembahasan otomatis dirilis ke peserta setelah sesi ujian selesai.</p>
         </div>
 
-        <!-- Submit -->
-        <div class="pt-5 border-t border-slate-100 flex gap-3 justify-end">
-          <a href="/admin/kelola-soal/<%= encodeURIComponent(s.paket) %>"
-            class="px-5 py-2.5 border border-slate-300 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
+        <!-- ── Submit ── -->
+        <div class="pt-4 border-t border-slate-100 flex gap-3 justify-end">
+          <a href="/admin/kelola-soal/<%= encodeURIComponent(s.paket) %>?to=<%= s.nomor_to %>"
+            class="px-5 py-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition">
             Batal
           </a>
           <button type="submit"
-            class="px-8 py-2.5 bg-[#0f172a] hover:bg-slate-800 text-white rounded-lg text-xs font-bold uppercase tracking-widest transition shadow cursor-pointer">
+            class="px-6 py-2 bg-[#5a0a0a] hover:bg-[#4a0808] text-white rounded-lg text-xs font-bold uppercase tracking-widest transition shadow-sm cursor-pointer">
             Simpan Perubahan
           </button>
         </div>
@@ -201,16 +221,30 @@
       </form>
     </div>
 
-    <p class="mt-6 text-center text-slate-400 text-[10px] font-bold uppercase tracking-widest">
-      Tabeahan Cendekia Admin Panel
-    </p>
+    <p class="mt-6 text-center text-slate-400 text-[10px] font-bold uppercase tracking-widest">Tabeahan Cendekia Admin Panel</p>
   </div>
 
+  <!-- SCRIPT -->
   <script>
     const materiPerPaket = {
-      "Paket SKD/TKD":        [{ id:1, nama:"TWK — Tes Wawasan Kebangsaan" }, { id:2, nama:"TIU — Tes Intelegensia Umum" }, { id:3, nama:"TKP — Tes Karakteristik Pribadi" }],
-      "Paket Akademik Polri": [{ id:4, nama:"Pengetahuan Umum" }, { id:5, nama:"Wawasan Kebangsaan" }, { id:6, nama:"Penalaran Numerik" }, { id:7, nama:"Bahasa Indonesia" }, { id:8, nama:"Bahasa Inggris" }],
-      "Paket PPPK":           [{ id:9, nama:"Kompetensi Teknis" }, { id:10, nama:"Kompetensi Manajerial" }, { id:11, nama:"Kompetensi Sosial-Kultural" }, { id:12, nama:"Kompetensi Wawancara" }]
+      "Paket SKD/TKD": [
+        { id: 1, nama: "TWK — Tes Wawasan Kebangsaan" },
+        { id: 2, nama: "TIU — Tes Intelegensia Umum" },
+        { id: 3, nama: "TKP — Tes Karakteristik Pribadi" }
+      ],
+      "Paket Akademik Polri": [
+        { id: 4, nama: "Pengetahuan Umum" },
+        { id: 5, nama: "Wawasan Kebangsaan" },
+        { id: 6, nama: "Penalaran Numerik" },
+        { id: 7, nama: "Bahasa Indonesia" },
+        { id: 8, nama: "Bahasa Inggris" }
+      ],
+      "Paket PPPK": [
+        { id: 9,  nama: "Kompetensi Teknis" },
+        { id: 10, nama: "Kompetensi Manajerial" },
+        { id: 11, nama: "Kompetensi Sosial-Kultural" },
+        { id: 12, nama: "Kompetensi Wawancara" }
+      ]
     };
 
     const editPaketSelect  = document.getElementById('editPaketSelect');
@@ -222,66 +256,51 @@
       editMateriSelect.innerHTML = '';
       list.forEach(m => {
         const opt = document.createElement('option');
-        opt.value = m.id;
+        opt.value       = m.id;
         opt.textContent = m.nama;
         if (m.id === currentMateriId) opt.selected = true;
         editMateriSelect.appendChild(opt);
       });
+      toggleBobotInputs();
     }
 
-    editPaketSelect.addEventListener('change', updateEditMateri);
-    updateEditMateri();
-
     const bobotMateriIds = [3, 10, 11, 12];
+
     function toggleBobotInputs() {
       const selectedId = parseInt(editMateriSelect.value);
-      const isBobot = bobotMateriIds.includes(selectedId);
-      
+      const isBobot    = bobotMateriIds.includes(selectedId);
       document.querySelectorAll('.bobot-input').forEach(el => {
         el.style.display = isBobot ? 'block' : 'none';
       });
-      
-      document.getElementById('kunciContainer').style.display = isBobot ? 'none' : 'block';
-      const kunciSelect = document.getElementById('kunciSelect');
-      if (isBobot) {
-        kunciSelect.removeAttribute('required');
-      } else {
-        kunciSelect.setAttribute('required', 'required');
-      }
+      const kunciContainer = document.getElementById('kunciContainer');
+      const kunciSelect    = document.getElementById('kunciSelect');
+      kunciContainer.style.display = isBobot ? 'none' : 'block';
+      isBobot ? kunciSelect.removeAttribute('required') : kunciSelect.setAttribute('required', 'required');
     }
 
+    editPaketSelect.addEventListener('change', updateEditMateri);
     editMateriSelect.addEventListener('change', toggleBobotInputs);
-    // Initialize state
-    setTimeout(toggleBobotInputs, 50);
+    updateEditMateri();
 
-    // Validasi Ukuran File & Tipe
-    const formEdit = document.getElementById('formEditSoal');
-    if(formEdit) {
-      formEdit.addEventListener('submit', function(e) {
-        const fileInputs = this.querySelectorAll('.file-check');
-        const maxBytes = 2 * 1024 * 1024; // 2MB
-        let valid = true;
-        
-        fileInputs.forEach(input => {
-          if(input.files && input.files[0]) {
-            const file = input.files[0];
-            if(file.size > maxBytes) {
-              alert(`File ${file.name} melebihi batas 2MB.`);
-              valid = false;
-            }
-            if(file.type !== "image/png" && file.type !== "image/jpeg" && file.type !== "image/jpg") {
-              alert(`File ${file.name} harus berformat PNG atau JPG.`);
-              valid = false;
-            }
+    // Validasi file
+    document.getElementById('formEditSoal').addEventListener('submit', function(e) {
+      const maxBytes = 2 * 1024 * 1024;
+      let valid = true;
+      this.querySelectorAll('.file-check').forEach(input => {
+        if (input.files && input.files[0]) {
+          const file = input.files[0];
+          if (file.size > maxBytes) {
+            alert(`File ${file.name} melebihi batas 2MB.`);
+            valid = false;
           }
-        });
-        
-        if(!valid) {
-          e.preventDefault();
+          if (!['image/png','image/jpeg','image/jpg'].includes(file.type)) {
+            alert(`File ${file.name} harus berformat PNG atau JPG.`);
+            valid = false;
+          }
         }
       });
-    }
+      if (!valid) e.preventDefault();
+    });
   </script>
-
 </body>
 </html>
