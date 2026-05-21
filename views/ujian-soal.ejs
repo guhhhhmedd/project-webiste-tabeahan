@@ -17,19 +17,22 @@
 
     .exam-layout { display: grid; grid-template-columns: 1fr 300px; grid-template-rows: auto 1fr; height: 100vh; overflow: hidden; }
 
+    /* ── Topbar ── */
     .topbar { grid-column: 1 / -1; background: #5a0a0a; display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; height: 56px; border-bottom: 3px solid var(--accent); position: relative; z-index: 10; }
     .topbar-title { font-size: 13px; font-weight: 700; color: white; letter-spacing: 0.03em; }
     .topbar-paket { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.5); margin-top: 1px; }
 
+    /* ── Timer ── */
     .timer-box { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18); border-radius: 8px; padding: 6px 20px; position: absolute; left: 50%; transform: translateX(-50%); }
-    .timer-icon { font-size: 16px; }
     #timer { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; color: white; letter-spacing: 0.05em; }
     #timer.warning { color: var(--danger); animation: pulse 1s ease-in-out infinite; }
     @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
 
+    /* ── User ── */
     .topbar-user { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.8); }
     .user-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; }
 
+    /* ── Soal panel ── */
     .soal-panel { overflow-y: auto; background: var(--bg); display: flex; flex-direction: column; }
     .soal-panel::-webkit-scrollbar { width: 5px; }
     .soal-panel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
@@ -45,7 +48,8 @@
     .soal-number-badge { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; background: var(--primary); color: white; font-size: 13px; font-weight: 800; flex-shrink: 0; }
     .soal-text { font-size: 15px; line-height: 1.75; font-weight: 500; color: var(--text); flex: 1; }
 
-    .opsi-label { display: flex; align-items: flex-start; gap: 14px; padding: 14px 18px; border-radius: 12px; border: 2px solid var(--border); background: white; cursor: pointer; transition: all 0.15s ease; margin-bottom: 10px; user-select: none; position: relative; }
+    /* ── Opsi ── */
+    .opsi-label { display: flex; align-items: flex-start; gap: 14px; padding: 14px 18px; border-radius: 12px; border: 2px solid var(--border); background: white; cursor: pointer; transition: all 0.15s ease; margin-bottom: 10px; user-select: none; }
     .opsi-label:hover { border-color: var(--accent); background: rgba(245,158,11,0.03); transform: translateX(2px); }
     .opsi-label.selected { border-color: var(--accent); background: rgba(245,158,11,0.06); box-shadow: 0 0 0 3px rgba(245,158,11,0.12); }
     .opsi-label input[type="radio"] { display: none; }
@@ -54,6 +58,7 @@
     .opsi-text { font-size: 14px; font-weight: 500; color: #475569; line-height: 1.5; padding-top: 3px; }
     .opsi-label.selected .opsi-text { color: var(--primary); font-weight: 600; }
 
+    /* ── Nav bawah ── */
     .soal-nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; background: white; border-top: 1px solid var(--border); position: sticky; bottom: 0; }
     .btn-nav { display: flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; transition: all 0.15s; }
     .btn-nav.prev { background: white; border: 2px solid var(--border); color: var(--muted); }
@@ -64,6 +69,7 @@
     .soal-counter { font-size: 12px; font-weight: 600; color: var(--muted); }
     .soal-counter strong { color: var(--text); }
 
+    /* ── Sidebar ── */
     .sidebar { background: white; border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
     .sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); background: #f8fafc; }
     .sidebar-header h3 { font-size: 12px; font-weight: 800; color: var(--text); text-transform: uppercase; letter-spacing: 0.08em; }
@@ -88,11 +94,13 @@
     .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; color: var(--muted); }
     .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
 
+    /* ── Tombol selesai ── */
     .sidebar-footer { padding: 14px 16px; border-top: 1px solid var(--border); }
     #btnSelesai { width: 100%; padding: 12px; border-radius: 10px; background: linear-gradient(135deg, #dc2626, #b91c1c); color: white; font-size: 13px; font-weight: 800; letter-spacing: 0.03em; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(220,38,38,0.3), 0 3px 0 #991b1b; transition: all 0.15s; position: relative; top: 0; }
     #btnSelesai:hover { filter: brightness(1.08); }
     #btnSelesai:active { top: 3px; box-shadow: 0 1px 6px rgba(220,38,38,0.3), 0 0px 0 #991b1b; }
 
+    /* ── Modal ── */
     .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.55); backdrop-filter: blur(4px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 1rem; }
     .modal-bg.open { display: flex; }
     .modal-box { background: white; border-radius: 20px; max-width: 400px; width: 100%; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.2); animation: popIn 0.25s ease; }
@@ -101,6 +109,7 @@
     .modal-body { padding: 24px; }
     .modal-emoji { font-size: 40px; margin-bottom: 8px; }
 
+    /* ── Responsive ── */
     @media (max-width: 768px) {
       .exam-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; height: auto; min-height: 100vh; overflow: auto; }
       .soal-panel { overflow: visible; }
@@ -113,17 +122,17 @@
 </head>
 <body>
 
-  <%# Data untuk JS %>
+  <%# Sisa waktu dihitung dari server agar akurat saat refresh %>
   <div id="exam-data"
     data-total="<%= soal.length %>"
-    data-start="<%= waktuMulai %>"
-    data-durasi="<%= durasiMs %>"
+    data-sisa="<%= sisaWaktuMs %>"
     class="hidden">
   </div>
   <script id="existing-jawaban" type="application/json"><%- JSON.stringify(jawaban || {}) %></script>
 
   <div class="exam-layout">
 
+    <!-- Topbar -->
     <header class="topbar">
       <div>
         <div class="topbar-title">Tabeahan Cendekia</div>
@@ -131,9 +140,10 @@
       </div>
       <div class="timer-box">
         <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <span id="timer">00:00</span>
+        <span id="timer">--:--</span>
       </div>
       <div class="topbar-user">
         <div class="user-avatar"><%= user.username.charAt(0).toUpperCase() %></div>
@@ -141,6 +151,7 @@
       </div>
     </header>
 
+    <!-- Soal panel -->
     <div class="soal-panel">
       <div class="soal-content">
 
@@ -158,15 +169,17 @@
               <span class="materi-chip"><%= s.materi %></span>
             </div>
 
-            <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:1.5rem;">
-              <div style="display:flex; gap:12px; align-items:flex-start;">
+            <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem">
+              <div style="display:flex;gap:12px;align-items:flex-start">
                 <div class="soal-number-badge"><%= index + 1 %></div>
                 <p class="soal-text"><%= s.soal %></p>
               </div>
-              <% if(s.gambar) { %>
-                <div style="margin-left: 44px; margin-top: 8px;">
-                  <img src="/uploads/soal/<%= s.gambar %>" alt="Gambar Soal <%= index + 1 %>" style="max-width: 400px; max-height: 250px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border);">
-                </div>
+              <% if (s.gambar) { %>
+              <div style="margin-left:44px;margin-top:8px">
+                <img src="/uploads/soal/<%= s.gambar %>"
+                  alt="Gambar Soal <%= index + 1 %>"
+                  style="max-width:400px;max-height:250px;object-fit:contain;border-radius:8px;border:1px solid var(--border)">
+              </div>
               <% } %>
             </div>
 
@@ -174,12 +187,15 @@
               <% ['a','b','c','d','e'].forEach(opt => { %>
                 <% if (s['opsi_' + opt] || s['gambar_' + opt]) { %>
                 <label class="opsi-label" id="label-<%= s.id %>-<%= opt %>">
-                  <input type="radio" name="q_<%= s.id %>" value="<%= opt %>" class="jawaban-radio" data-qid="<%= s.id %>" data-idx="<%= index %>">
+                  <input type="radio" name="q_<%= s.id %>" value="<%= opt %>"
+                    class="jawaban-radio" data-qid="<%= s.id %>" data-idx="<%= index %>">
                   <div class="opsi-bullet"><%= opt.toUpperCase() %></div>
-                  <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+                  <div style="display:flex;flex-direction:column;gap:8px;width:100%">
                     <span class="opsi-text"><%= s['opsi_' + opt] %></span>
-                    <% if(s['gambar_' + opt]) { %>
-                      <img src="/uploads/soal/<%= s['gambar_' + opt] %>" alt="Gambar Opsi <%= opt.toUpperCase() %>" style="max-width: 150px; max-height: 100px; object-fit: contain; border-radius: 6px; border: 1px solid var(--border); margin-top: 4px;">
+                    <% if (s['gambar_' + opt]) { %>
+                    <img src="/uploads/soal/<%= s['gambar_' + opt] %>"
+                      alt="Gambar Opsi <%= opt.toUpperCase() %>"
+                      style="max-width:150px;max-height:100px;object-fit:contain;border-radius:6px;border:1px solid var(--border);margin-top:4px">
                     <% } %>
                   </div>
                 </label>
@@ -200,6 +216,7 @@
       </div>
     </div>
 
+    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-header">
         <h3>📋 Navigasi Soal</h3>
@@ -227,7 +244,7 @@
       </div>
       <div class="legend">
         <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Dijawab</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--primary);border:2px solid var(--primary)"></div>Aktif</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--primary)"></div>Aktif</div>
         <div class="legend-item"><div class="legend-dot" style="background:white;border:2px solid var(--border)"></div>Belum</div>
       </div>
       <div class="sidebar-footer">
@@ -237,32 +254,35 @@
 
   </div>
 
+  <!-- Modal konfirmasi selesai -->
   <div class="modal-bg" id="modalSelesai">
     <div class="modal-box">
       <div class="modal-header">
         <div class="modal-emoji">🏁</div>
-        <h2 style="color:white; font-size:18px; font-weight:800;">Akhiri Ujian?</h2>
-        <p style="color:rgba(255,255,255,0.6); font-size:12px; margin-top:4px;"><%= paket %></p>
+        <h2 style="color:white;font-size:18px;font-weight:800">Akhiri Ujian?</h2>
+        <p style="color:rgba(255,255,255,0.6);font-size:12px;margin-top:4px"><%= paket %></p>
       </div>
       <div class="modal-body">
-        <div style="text-align:center; margin-bottom:20px;">
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
-            <div style="padding:12px; border-radius:12px; background:#f0fdf4; border:1px solid #bbf7d0;">
-              <div style="font-size:24px; font-weight:800; color:#16a34a;" id="modalDijawab">0</div>
-              <div style="font-size:10px; font-weight:700; color:#15803d; text-transform:uppercase;">Dijawab</div>
+        <div style="text-align:center;margin-bottom:20px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+            <div style="padding:12px;border-radius:12px;background:#f0fdf4;border:1px solid #bbf7d0">
+              <div style="font-size:24px;font-weight:800;color:#16a34a" id="modalDijawab">0</div>
+              <div style="font-size:10px;font-weight:700;color:#15803d;text-transform:uppercase">Dijawab</div>
             </div>
-            <div style="padding:12px; border-radius:12px; background:#fff7ed; border:1px solid #fed7aa;">
-              <div style="font-size:24px; font-weight:800; color:#ea580c;" id="modalBelum">0</div>
-              <div style="font-size:10px; font-weight:700; color:#c2410c; text-transform:uppercase;">Belum Dijawab</div>
+            <div style="padding:12px;border-radius:12px;background:#fff7ed;border:1px solid #fed7aa">
+              <div style="font-size:24px;font-weight:800;color:#ea580c" id="modalBelum">0</div>
+              <div style="font-size:10px;font-weight:700;color:#c2410c;text-transform:uppercase">Belum Dijawab</div>
             </div>
           </div>
-          <p id="modalPesan" style="font-size:13px; color:#64748b; line-height:1.5;"></p>
+          <p id="modalPesan" style="font-size:13px;color:#64748b;line-height:1.5"></p>
         </div>
-        <div style="display:flex; gap:10px;">
-          <button id="btnBatalSelesai" style="flex:1; padding:12px; border-radius:10px; border:2px solid #e2e8f0; background:white; font-size:13px; font-weight:700; color:#64748b; cursor:pointer;">
+        <div style="display:flex;gap:10px">
+          <button id="btnBatalSelesai"
+            style="flex:1;padding:12px;border-radius:10px;border:2px solid #e2e8f0;background:white;font-size:13px;font-weight:700;color:#64748b;cursor:pointer">
             Periksa Lagi
           </button>
-          <button id="btnKonfirmasiSelesai" style="flex:1; padding:12px; border-radius:10px; background:linear-gradient(135deg,#dc2626,#b91c1c); color:white; font-size:13px; font-weight:800; border:none; cursor:pointer;">
+          <button id="btnKonfirmasiSelesai"
+            style="flex:1;padding:12px;border-radius:10px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:white;font-size:13px;font-weight:800;border:none;cursor:pointer">
             Ya, Kumpulkan!
           </button>
         </div>
@@ -271,17 +291,21 @@
   </div>
 
   <script>
+    // ── Data ujian ──
     const examData  = document.getElementById('exam-data').dataset;
     const totalSoal = parseInt(examData.total);
-    const startTime = Number(examData.start);
-    const durasiMs  = Number(examData.durasi);
-    const endTime   = startTime + durasiMs;
 
+    // Sisa waktu dari server — akurat walau refresh berkali-kali
+    const sisaMs  = Number(examData.sisa);
+    const endTime = Date.now() + sisaMs;
+
+    // ── Jawaban ──
     let jawabanMap = {};
     try { jawabanMap = JSON.parse(document.getElementById('existing-jawaban').textContent); } catch(e) {}
 
     let currentIdx = 0;
 
+    // ── Statistik & progress ──
     function updateStats() {
       const answered = Object.keys(jawabanMap).length;
       document.getElementById('statDijawab').textContent = answered;
@@ -289,19 +313,18 @@
       document.getElementById('progressFill').style.width = Math.round((answered / totalSoal) * 100) + '%';
     }
 
+    // ── Gaya opsi terpilih ──
     function applySelectedStyle(qid, val) {
       document.querySelectorAll(`label[id^="label-${qid}-"]`).forEach(lbl => lbl.classList.remove('selected'));
-      if (val) {
-        const target = document.getElementById(`label-${qid}-${val}`);
-        if (target) target.classList.add('selected');
-      }
+      if (val) document.getElementById(`label-${qid}-${val}`)?.classList.add('selected');
     }
 
+    // ── Tandai soal terjawab di navigasi ──
     function markAnswered(idx) {
-      const navBtn = document.querySelector(`.nav-item[data-index="${idx}"]`);
-      if (navBtn) navBtn.classList.add('answered');
+      document.querySelector(`.nav-item[data-index="${idx}"]`)?.classList.add('answered');
     }
 
+    // ── Pulihkan jawaban dari sesi ──
     function restoreJawaban() {
       Object.entries(jawabanMap).forEach(([qid, jawaban]) => {
         const radio = document.querySelector(`input[name="q_${qid}"][value="${jawaban}"]`);
@@ -314,18 +337,22 @@
       updateStats();
     }
 
+    // ── Tampilkan soal aktif ──
     function updateView() {
       document.querySelectorAll('.soal-box').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-      const box = document.getElementById(`box-${currentIdx}`);
+
+      document.getElementById(`box-${currentIdx}`)?.classList.remove('hidden');
+
       const nav = document.querySelector(`.nav-item[data-index="${currentIdx}"]`);
-      if (box) box.classList.remove('hidden');
       if (nav) { nav.classList.add('active'); nav.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+
       document.getElementById('btnKembali').disabled = currentIdx === 0;
       document.getElementById('btnLanjut').disabled  = currentIdx === totalSoal - 1;
       document.getElementById('counterCurrent').textContent = currentIdx + 1;
     }
 
+    // ── Navigasi ──
     document.getElementById('btnKembali').addEventListener('click', () => { if (currentIdx > 0) { currentIdx--; updateView(); } });
     document.getElementById('btnLanjut').addEventListener('click', () => { if (currentIdx < totalSoal - 1) { currentIdx++; updateView(); } });
     document.getElementById('nav-grid').addEventListener('click', e => {
@@ -335,28 +362,44 @@
       updateView();
     });
 
+    // ── Simpan jawaban ──
     document.querySelectorAll('.jawaban-radio').forEach(radio => {
-      radio.addEventListener('change', function() {
+      radio.addEventListener('change', function () {
         const qId = this.dataset.qid;
         const jaw = this.value;
         applySelectedStyle(qId, jaw);
         jawabanMap[qId] = jaw;
         markAnswered(parseInt(this.dataset.idx));
         updateStats();
+
         fetch('/ujian/simpan-jawaban', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ questionId: qId, jawaban: jaw })
+          body: JSON.stringify({ questionId: qId, jawaban: jaw }),
         })
         .then(r => r.json())
         .then(data => {
-          if (data.expired) { alert('Waktu ujian sudah habis!'); window.location.href = '/ujian/selesai-paksa'; }
+          if (data.expired) {
+            alert('Waktu ujian sudah habis!');
+            window.location.href = '/ujian/selesai-paksa';
+          }
         })
         .catch(err => console.error("Gagal simpan jawaban:", err));
       });
     });
 
+    // ── Timer — dihitung dari endTime yang akurat ──
     const timerEl = document.getElementById('timer');
+
+    function formatTimer(diff) {
+      const h = Math.floor(diff / (1000 * 60 * 60));
+      const m = Math.floor((diff / (1000 * 60)) % 60);
+      const s = Math.floor((diff / 1000) % 60);
+      const mm = String(m).padStart(2, '0');
+      const ss = String(s).padStart(2, '0');
+      return h > 0 ? `${String(h).padStart(2,'0')}:${mm}:${ss}` : `${mm}:${ss}`;
+    }
+
     const timerInterval = setInterval(() => {
       const diff = endTime - Date.now();
       if (diff <= 0) {
@@ -366,16 +409,11 @@
         submitSelesai();
         return;
       }
-      const h = Math.floor(diff / (1000 * 60 * 60));
-      const m = Math.floor((diff / (1000 * 60)) % 60);
-      const s = Math.floor((diff / 1000) % 60);
-      timerEl.textContent = h > 0
-        ? `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
-        : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-      if (diff < 300000) timerEl.classList.add('warning');
+      timerEl.textContent = formatTimer(diff);
+      if (diff < 300000) timerEl.classList.add('warning');  // merah di 5 menit terakhir
     }, 1000);
 
-    // ── Submit selesai — FIXED: redirect ke /ujian/hasil bukan /users/dashboardPembayaranUjian ──
+    // ── Submit selesai ──
     function submitSelesai() {
       clearInterval(timerInterval);
       fetch('/ujian/selesai', { method: 'POST' })
@@ -384,6 +422,7 @@
         .catch(() => { window.location.href = '/ujian/hasil'; });
     }
 
+    // ── Modal selesai ──
     const modalSelesai = document.getElementById('modalSelesai');
 
     document.getElementById('btnSelesai').addEventListener('click', () => {
@@ -397,15 +436,17 @@
       modalSelesai.classList.add('open');
     });
 
-    document.getElementById('btnBatalSelesai').addEventListener('click', () => { modalSelesai.classList.remove('open'); });
+    document.getElementById('btnBatalSelesai').addEventListener('click', () => modalSelesai.classList.remove('open'));
     modalSelesai.addEventListener('click', e => { if (e.target === modalSelesai) modalSelesai.classList.remove('open'); });
+
     document.getElementById('btnKonfirmasiSelesai').addEventListener('click', () => {
-      document.getElementById('btnKonfirmasiSelesai').textContent = 'Mengirim...';
-      document.getElementById('btnKonfirmasiSelesai').disabled = true;
+      const btn = document.getElementById('btnKonfirmasiSelesai');
+      btn.textContent = 'Mengirim...';
+      btn.disabled = true;
       submitSelesai();
     });
 
-    // ── Keamanan ──
+    // ── Keamanan: blokir devtools & tab switch ──
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('keydown', e => {
       if (e.key === 'F12') { e.preventDefault(); return false; }
@@ -426,6 +467,7 @@
       }
     });
 
+    // ── Init ──
     restoreJawaban();
     updateView();
   </script>

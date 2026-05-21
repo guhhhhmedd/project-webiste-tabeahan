@@ -268,10 +268,18 @@
         </div>
 
         <!-- Pembahasan -->
-        <% if (item.pembahasan && item.pembahasan.trim() !== '') { %>
+       <!-- Pembahasan -->
+        <% if ((item.pembahasan && item.pembahasan.trim() !== '') || item.gambar_pembahasan) { %>
         <div class="pembahasan-box">
           <span class="pembahasan-label">Pembahasan</span>
-          <p class="pembahasan-text"><%= item.pembahasan %></p>
+          <% if (item.pembahasan && item.pembahasan.trim() !== '') { %>
+            <p class="pembahasan-text"><%= item.pembahasan %></p>
+          <% } %>
+          <% if (item.gambar_pembahasan) { %>
+            <img src="/uploads/soal/<%= item.gambar_pembahasan %>"
+              alt="Gambar Pembahasan"
+              style="max-width:420px;max-height:280px;object-fit:contain;border-radius:6px;border:1px solid rgba(200,160,32,0.2);margin-top:0.75rem">
+          <% } %>
         </div>
         <% } %>
       </div>

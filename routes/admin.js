@@ -80,7 +80,8 @@ const cpUploadSoal = uploadSoal.fields([
   { name: 'gambar_b', maxCount: 1 },
   { name: 'gambar_c', maxCount: 1 },
   { name: 'gambar_d', maxCount: 1 },
-  { name: 'gambar_e', maxCount: 1 }
+  { name: 'gambar_e', maxCount: 1 },
+  { name: 'gambar_pembahasan', maxCount: 1 }
 ]);
 
 // DASHBOARD ADMIN
@@ -437,6 +438,7 @@ router.post("/admin/tambah-soal", isAdmin, (req, res, next) => {
     bobot_c,
     bobot_d,
     bobot_e,
+    
   } = req.body;
   try {
     const bobotMateriIds = [3, 10, 11, 12];
@@ -450,9 +452,10 @@ router.post("/admin/tambah-soal", isAdmin, (req, res, next) => {
     const gambar_c = req.files && req.files['gambar_c'] ? req.files['gambar_c'][0].filename : null;
     const gambar_d = req.files && req.files['gambar_d'] ? req.files['gambar_d'][0].filename : null;
     const gambar_e = req.files && req.files['gambar_e'] ? req.files['gambar_e'][0].filename : null;
+    const gambar_pembahasan = req.files && req.files['gambar_pembahasan'] ? req.files['gambar_pembahasan'][0].filename : null;
 
     await db.query(
-      `INSERT INTO questions (paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan, tipe_penilaian, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e, gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e) 
+      `INSERT INTO questions (paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan, tipe_penilaian, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e, gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e, gambar_pembahasan) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         paket,
@@ -473,7 +476,7 @@ router.post("/admin/tambah-soal", isAdmin, (req, res, next) => {
         bobot_c || 0,
         bobot_d || 0,
         bobot_e || 0,
-        gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e
+        gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e, gambar_pembahasan
       ],
     );
     res.redirect("/dashboardAdmin?message=Soal+berhasil+ditambah");
@@ -523,6 +526,7 @@ router.post("/admin/updateSoal", isAdmin, (req, res, next) => {
     bobot_c,
     bobot_d,
     bobot_e,
+    
   } = req.body;
   try {
     const bobotMateriIds = [3, 10, 11, 12];
@@ -700,6 +704,7 @@ router.post("/admin/tambah-soal-manual", isAdmin, (req, res, next) => {
     bobot_c,
     bobot_d,
     bobot_e,
+    
   } = req.body;
   try {
     const m_id = parseInt(materi_id) || 1;
@@ -711,12 +716,13 @@ router.post("/admin/tambah-soal-manual", isAdmin, (req, res, next) => {
     const gambar_c = req.files && req.files['gambar_c'] ? req.files['gambar_c'][0].filename : null;
     const gambar_d = req.files && req.files['gambar_d'] ? req.files['gambar_d'][0].filename : null;
     const gambar_e = req.files && req.files['gambar_e'] ? req.files['gambar_e'][0].filename : null;
+    const gambar_pembahasan = req.files && req.files['gambar_pembahasan'] ? req.files['gambar_pembahasan'][0].filename : null;
 
     await db.query(
       `INSERT INTO questions 
        (paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan,
-        tipe_penilaian, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e, gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        tipe_penilaian, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e, gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e, gambar_pembahasan) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         paket,
         nomor_to,
@@ -736,7 +742,7 @@ router.post("/admin/tambah-soal-manual", isAdmin, (req, res, next) => {
         Number(bobot_c) || 0,
         Number(bobot_d) || 0,
         Number(bobot_e) || 0,
-        gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e
+        gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e, gambar_pembahasan
       ],
     );
     res.redirect(

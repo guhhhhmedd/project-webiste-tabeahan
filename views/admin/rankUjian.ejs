@@ -1,115 +1,528 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ranking Ujian | Tabeahan Cendekia</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <style>
     :root { --cream:#fff8f8; --gold:#c8a020; --dark:#7a1010; --red-deep:#5a0a0a; --muted:#9b6b6b; }
+    *, *::before, *::after { box-sizing:border-box; }
     body { font-family:"DM Sans",sans-serif; background:var(--cream); color:var(--dark); min-height:100vh; }
     h1,h2,h3,h4 { font-family:"Playfair Display",serif; }
+
     .adm-nav { background:var(--red-deep); border-bottom:1px solid rgba(200,160,32,0.25); position:sticky; top:0; z-index:50; box-shadow:0 2px 12px rgba(90,10,10,0.18); }
     .adm-nav-link { color:rgba(255,255,255,0.5); font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; transition:color 0.2s; text-decoration:none; }
     .adm-nav-link:hover, .adm-nav-link.active { color:var(--gold); }
+
+
+
+    /* ── MAIN ── */
+    .main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 20px 24px;
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(122, 16, 16, 0.1);
+    }
+
+    .page-title {
+      font-family: "Playfair Display", serif;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--red-deep);
+    }
+
+    .page-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+      font-weight: 400;
+    }
+
+    .page-meta {
+      font-size: 11px;
+      color: var(--muted);
+      background: white;
+      border: 0.5px solid rgba(122, 16, 16, 0.12);
+      border-radius: 8px;
+      padding: 7px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .page-meta i {
+      font-size: 14px;
+      color: var(--gold);
+    }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .stat-pill {
+      background: white;
+      border: 0.5px solid rgba(122, 16, 16, 0.12);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stat-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .stat-icon.gold {
+      background: #fef8e4;
+      color: var(--gold);
+    }
+
+    .stat-icon.red {
+      background: #fce8e8;
+      color: var(--dark);
+    }
+
+    .stat-icon.green {
+      background: #eaf3de;
+      color: #3b6d11;
+    }
+
+    .stat-icon i {
+      font-size: 16px;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--red-deep);
+      line-height: 1.1;
+    }
+
+    /* ── PAKET GRID ── */
+    .paket-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .paket-card {
+      background: white;
+      border-radius: 12px;
+      border: 0.5px solid rgba(122, 16, 16, 0.1);
+      overflow: hidden;
+    }
+
+    .paket-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f5eded;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fcf5f5;
+    }
+
+    .paket-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      flex-shrink: 0;
+    }
+
+    .paket-title {
+      font-family: "Playfair Display", serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #3a0808;
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .paket-count {
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 600;
+      background: white;
+      border: 0.5px solid rgba(122, 16, 16, 0.12);
+      border-radius: 12px;
+      padding: 2px 8px;
+      flex-shrink: 0;
+    }
+
+    /* ── RANK ITEMS ── */
+    .rank-list {
+      padding: 4px 0;
+    }
+
+    .rank-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-bottom: 0.5px solid #faf5f5;
+      transition: background 0.15s;
+    }
+
+    .rank-item:last-child {
+      border-bottom: none;
+    }
+
+    .rank-item:hover {
+      background: #fdf8f8;
+    }
+
+    .rank-item.top-rank {
+      background: linear-gradient(90deg, #fefaec 0%, transparent 65%);
+    }
+
+    .rank-item.top-rank:hover {
+      background: linear-gradient(90deg, #fef5d8 0%, #fdf8f8 65%);
+    }
+
+    .rank-num {
+      width: 24px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .rank-medal {
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .rank-num-text {
+      font-size: 11px;
+      font-weight: 700;
+      color: #ccc;
+    }
+
+    .avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .avatar-1 {
+      background: linear-gradient(135deg, #b8860b, #c8a020);
+    }
+
+    .avatar-2 {
+      background: linear-gradient(135deg, #888, #aaa);
+    }
+
+    .avatar-3 {
+      background: linear-gradient(135deg, #a0522d, #cd853f);
+    }
+
+    .avatar-def {
+      background: #1a3d0f;
+    }
+
+    .user-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .user-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1a1a1a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-sub {
+      font-size: 9px;
+      color: #bbb;
+      font-weight: 600;
+      margin-top: 1px;
+    }
+
+    .to-badge {
+      font-size: 9px;
+      font-weight: 700;
+      background: #f0f8e8;
+      color: #3b6d11;
+      border: 1px solid #c0dd97;
+      border-radius: 4px;
+      padding: 2px 6px;
+      flex-shrink: 0;
+    }
+
+    .score {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1a3d0f;
+      flex-shrink: 0;
+      min-width: 34px;
+      text-align: right;
+    }
+
+    .score.score-top {
+      color: var(--gold);
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      padding: 52px 0;
+      text-align: center;
+      color: #ccc;
+    }
+
+    .empty-state i {
+      font-size: 30px;
+      display: block;
+      margin-bottom: 8px;
+      color: #e0d0d0;
+    }
+
+    .empty-state span {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .paket-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .stats-bar {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .paket-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-bar {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .page-meta {
+        display: none;
+      }
+    }
   </style>
 </head>
+
 <body>
 
-<!-- NAVBAR -->
-<nav class="adm-nav">
-  <div class="max-w-7xl mx-auto px-4 md:px-8 py-3.5 flex justify-between items-center">
-    <div class="flex items-center gap-6">
-      <div class="flex items-center gap-2.5">
-        <img src="/asset/logo.png" alt="Logo" class="h-9 w-auto">
-        <div>
-          <span style="font-family:'Playfair Display',serif;color:white;font-size:1rem;font-weight:700;display:block;line-height:1.2">
-            Tabeahan <span style="color:var(--gold)">Cendekia</span>
-          </span>
-          <span style="display:inline-block;background:var(--gold);color:#3a0000;font-size:0.55rem;padding:0.1rem 0.45rem;border-radius:4px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px">
-            Administrator
-          </span>
+  <!--  NAVBAR -->
+  <nav class="adm-nav">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 py-3.5 flex justify-between items-center">
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2.5">
+          <img src="/asset/logo.png" alt="Logo" class="h-9 w-auto">
+          <div>
+            <span
+              style="font-family:'Playfair Display',serif;color:white;font-size:1rem;font-weight:700;display:block;line-height:1.2">
+              Tabeahan <span style="color:var(--gold)">Cendekia</span>
+            </span>
+            <span
+              style="display:inline-block;background:var(--gold);color:#3a0000;font-size:0.55rem;padding:0.1rem 0.45rem;border-radius:4px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px">
+              Administrator
+            </span>
+          </div>
+        </div>
+        <div class="hidden md:flex gap-5 items-center">
+          <a href="/dashboardAdmin" class="adm-nav-link">Dashboard</a>
+          <a href="/admin/daftarPeserta" class="adm-nav-link">Peserta Ujian</a>
+          <a href="/admin/anggota" class="adm-nav-link ">Anggota Gratis</a>
+          <a href="/admin/rankUjian" class="adm-nav-link active">Rangking</a>
         </div>
       </div>
-      <div class="hidden md:flex gap-5 items-center">
-        <a href="/dashboardAdmin"      class="adm-nav-link">Dashboard</a>
-        <a href="/admin/daftarPeserta" class="adm-nav-link">Peserta Ujian</a>
-        <a href="/admin/anggota"       class="adm-nav-link">Anggota Gratis</a>
-        <a href="/admin/rankUjian"     class="adm-nav-link active">Rangking</a>
+      <a href="/logout"
+        style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:0.35rem 1rem;font-size:0.75rem;font-weight:700;transition:all 0.2s;text-decoration:none"
+        onmouseover="this.style.background='rgba(200,160,32,0.2)';this.style.color='#c8a020'"
+        onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.7)'">
+        Logout
+      </a>
+    </div>
+  </nav>
+
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Ranking Ujian</h1>
+        <p class="page-subtitle">Peringkat peserta. berdasarkan skor tertinggi</p>
       </div>
     </div>
-    <a href="/logout"
-      style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:0.35rem 1rem;font-size:0.75rem;font-weight:700;text-decoration:none"
-      onmouseover="this.style.background='rgba(200,160,32,0.2)';this.style.color='#c8a020'"
-      onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.7)'">
-      Logout
-    </a>
-  </div>
-</nav>
 
-<!-- MAIN -->
-<div style="font-family:'DM Sans',sans-serif;background:radial-gradient ;padding:12px;position:relative">
-  <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.04) 39px,rgba(255,255,255,0.04) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,0.04) 39px,rgba(255,255,255,0.04) 40px);pointer-events:none"></div>
+    <!-- Stats Bar -->
+    <% const paketNames=Object.keys(paketGroups); let totalPeserta=0; let skorTertinggi=0; paketNames.forEach(name=> {
+      const r = paketGroups[name];
+      totalPeserta += r.length;
+      if (r.length > 0 && r[0].total_skor > skorTertinggi) skorTertinggi = r[0].total_skor;
+      });
+      %>
 
-  <div style="position:relative;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
-    <% const paketNames = Object.keys(paketGroups); %>
-    <% paketNames.forEach(paketName => { %>
-    <% const rankings = paketGroups[paketName]; %>
-    <% const safeId = paketName.replace(/[^a-zA-Z0-9]/g,'_'); %>
-
-    <div style="background:white;border-radius:12px;overflow:hidden">
-      <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:#1a1a1a;padding:12px 14px 8px;border-bottom:1px solid #f0f0f0">
-        <%= paketName %>
-      </div>
-
-      <% if (rankings.length === 0) { %>
-        <div style="padding:60px 0;text-align:center;color:#bbb;font-size:13px;font-weight:600">No Entries</div>
-      <% } else { %>
-        <% rankings.forEach((r, i) => { %>
-        <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:0.5px solid #f5f5f5">
-          
-          <!-- Rank -->
-          <div style="width:22px;text-align:center;font-size:<%= i < 3 ? '15px' : '11px' %>;font-weight:800;color:<%= i===0?'#c8a020':i===1?'#888':i===2?'#a0522d':'#aaa' %>;flex-shrink:0">
-            <%= i===0 ? '🥇' : i===1 ? '🥈' : i===2 ? '🥉' : ''+(i+1) %>
+      <div class="stats-bar">
+        <div class="stat-pill">
+          <div>
+            <div class="stat-label">Total Peserta</div>
+            <div class="stat-value">
+              <%= totalPeserta %>
+            </div>
           </div>
-
-          <!-- Avatar -->
-          <div style="width:28px;height:28px;border-radius:50%;background:#1a3d0f;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:white;flex-shrink:0">
-            <%= r.username.charAt(0).toUpperCase() %>
-          </div>
-
-          <!-- Info -->
-          <div style="flex:1;min-width:0">
-            <div style="font-size:11px;font-weight:700;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><%= r.username %></div>
-            <div style="font-size:9px;color:#aaa;font-weight:600"><%= r.jml_benar %>/<%= r.jml_soal %> benar</div>
-          </div>
-
-          <!-- TO Badge -->
-          <div style="font-size:9px;font-weight:700;background:#f0f8e8;color:#3b6d11;border:1px solid #c0dd97;border-radius:4px;padding:1px 5px;flex-shrink:0">
-            TO <%= r.nomor_to %>
-          </div>
-
-          <!-- Skor -->
-          <div style="font-size:13px;font-weight:800;color:#1a3d0f;flex-shrink:0"><%= r.total_skor %></div>
         </div>
-        <% }) %>
-      <% } %>
-    </div>
+        <div class="stat-pill">
+          <div>
+            <div class="stat-label">Skor Tertinggi</div>
+            <div class="stat-value">
+              <%= skorTertinggi> 0 ? skorTertinggi : '—' %>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <% }) %>
+      <!-- Paket Grid -->
+      <div class="paket-grid">
+        <% paketNames.forEach(paketName=> { %>
+          <% const rankings=paketGroups[paketName]; %>
 
-    <!-- Isi kolom kosong jika paket < 3 -->
-    <% for(let i = paketNames.length; i < 3; i++) { %>
-    <div style="background:white;border-radius:12px;overflow:hidden;opacity:0.4">
-      <div style="font-size:13px;font-weight:700;color:#aaa;padding:12px 14px 8px;border-bottom:1px solid #f0f0f0">—</div>
-      <div style="padding:60px 0;text-align:center;color:#bbb;font-size:13px;font-weight:600">No Entries</div>
-    </div>
-    <% } %>
-  </div>
+            <div class="paket-card">
 
+              <!-- Card Header -->
+              <div class="paket-header">
+                <div class="paket-title">
+                  <%= paketName %>
+                </div>
+                <div class="paket-count">
+                  <%= rankings.length %> peserta
+                </div>
+              </div>
 
-</div>
+              <!-- Rank List -->
+              <div class="rank-list">
+                <% if (rankings.length===0) { %>
+                  <div class="empty-state">
+                    <span>Belum ada data</span>
+                  </div>
+                  <% } else { %>
+                    <% rankings.forEach((r, i)=> { %>
+
+                      <% let avatarClass='avatar-def' ; if (i===0) avatarClass='avatar-1' ; else if (i===1)
+                        avatarClass='avatar-2' ; else if (i===2) avatarClass='avatar-3' ; %>
+
+                        <div class="rank-item <%= i < 3 ? 'top-rank' : '' %>">
+
+                          <!-- Rank Number / Medal -->
+                          <div class="rank-num">
+                            <% if (i===0) { %><span class="rank-medal">1</span>
+                              <% } else if (i===1) { %><span class="rank-medal">2</span>
+                                <% } else if (i===2) { %><span class="rank-medal">3</span>
+                                  <% } else { %><span class="rank-num-text">
+                                      <%= i + 1 %>
+                                    </span>
+                                    <% } %>
+                          </div>
+
+                          <!-- Avatar -->
+                          <div class="avatar <%= avatarClass %>">
+                            <%= r.username.charAt(0).toUpperCase() %>
+                          </div>
+
+                          <!-- User Info -->
+                          <div class="user-info">
+                            <div class="user-name">
+                              <%= r.username %>
+                            </div>
+                            <div class="user-sub">
+                              <%= r.jml_benar %>/<%= r.jml_soal %> benar
+                            </div>
+                          </div>
+
+                          <!-- TO Badge -->
+                          <div class="to-badge">TO <%= r.nomor_to %>
+                          </div>
+
+                          <!-- Score -->
+                          <div class="score <%= i === 0 ? 'score-top' : '' %>">
+                            <%= r.total_skor %>
+                          </div>
+
+                        </div>
+                        <% }) %>
+                          <% } %>
+              </div>
+
+            </div>
+            <% }) %>
+
+              <!-- Fill empty columns if paket < 3 -->
+              <% for (let i=paketNames.length; i < 3; i++) { %>
+                <div class="paket-card" style="opacity:0.4">
+                  <div class="paket-header">
+                    <div class="paket-dot" style="background:#ccc"></div>
+                    <div class="paket-title" style="color:#bbb">—</div>
+                  </div>
+                  <div class="empty-state">
+                    <i class="ti ti-clipboard-x"></i>
+                    <span>Belum ada data</span>
+                  </div>
+                </div>
+                <% } %>
+
+      </div><!-- /paket-grid -->
+
+  </div><!-- /main -->
 
 </body>
+
 </html>

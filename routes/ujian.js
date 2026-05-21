@@ -3,13 +3,15 @@ const router  = express.Router();
 const db      = require("../config/db");
 
 
+// ─────────────────────────────────────────
 // MIDDLEWARE
+// ─────────────────────────────────────────
+
 function isSedangUjian(req, res, next) {
   if (req.session.ujian) return next();
   res.redirect("/dashboardPembayaranUjian");
 }
 
-// Cek role admin
 function isAdmin(req, res, next) {
   if (req.session.user && req.session.user.role === "admin") return next();
   res.status(403).send("Akses Ditolak: Hanya Admin yang bisa mereset ujian!");
@@ -34,7 +36,35 @@ async function isLogin(req, res, next) {
 }
 
 
+// ─────────────────────────────────────────
+// KONSTANTA
+// ─────────────────────────────────────────
+
+const DEFAULT_BOBOT_BENAR = 500;
+
+const PASSING_GRADE = {
+  'Paket SKD/TKD': {
+    type:          'PER_SUBTEST',
+    perSubtest:    { 1: 65, 2: 80, 3: 166 },
+    kumulatif:     311,
+    skorMaksTotal: 550,
+  },
+  'Paket Akademik Polri': {
+    type:          'PERSENTASE',
+    minPersen:     70,
+    skorMaksTotal: 125,
+  },
+  'Paket PPPK': {
+    type:          'PERINGKAT',
+    skorMaksTotal: 670,
+  },
+};
+
+
+// ─────────────────────────────────────────
 // POST /ujian/mulai
+// ─────────────────────────────────────────
+
 router.post("/mulai", isLogin, async (req, res) => {
   const { paket_pilihan, nomor_to } = req.body;
   const userId = req.session.user.id;
@@ -71,34 +101,31 @@ router.post("/mulai", isLogin, async (req, res) => {
     }
 
     const [config] = await db.query(
-      "SELECT durasi_menit FROM paket_ujian WHERE TRIM(nama_paket) = TRIM(?)",
+      "SELECT durasi_menit FROM paket_ujian WHERE TRIM(nama_paket) = TRIM(?) LIMIT 1",
       [paket_pilihan]
     );
     const durasiMs = (config[0]?.durasi_menit || 100) * 60 * 1000;
 
-    // --- AMBIL SOAL SESUAI URUTAN ASLI (TIDAK DIACAK) ---
     const [questions] = await db.query(
-      "SELECT id FROM questions WHERE TRIM(paket) = TRIM(?) AND nomor_to = ? AND is_active = 1 ORDER BY materi_id ASC, nomor_urut ASC",
+      `SELECT id FROM questions
+       WHERE TRIM(paket) = TRIM(?) AND nomor_to = ? AND is_active = 1
+       ORDER BY materi_id ASC, nomor_urut ASC`,
       [paket_pilihan, parseInt(nomor_to)]
     );
 
     const flatSoalIds = questions.map(q => q.id);
-    // ------------------------
 
     req.session.ujian = {
-      paymentId: paymentId,
+      paymentId,
       paket:     paket_pilihan,
       nomorTO:   parseInt(nomor_to),
       soalIds:   flatSoalIds,
       jawaban:   {},
       startTime: Date.now(),
-      durasiMs:  durasiMs,
+      durasiMs,
     };
 
-    await db.query(
-      "UPDATE users SET status_ujian = 'SEDANG_UJIAN' WHERE id = ?",
-      [userId]
-    );
+    await db.query("UPDATE users SET status_ujian = 'SEDANG_UJIAN' WHERE id = ?", [userId]);
 
     res.redirect("/ujian/soal/1");
   } catch (err) {
@@ -108,46 +135,58 @@ router.post("/mulai", isLogin, async (req, res) => {
 });
 
 
+// ─────────────────────────────────────────
 // GET /ujian/soal/:index
+// ─────────────────────────────────────────
 
 router.get("/soal/:index", isLogin, isSedangUjian, async (req, res) => {
-  const sesi = req.session.ujian;
+  const sesi         = req.session.ujian;
+  const currentIndex = parseInt(req.params.index) - 1;
+  const userId       = req.session.user.id;
 
   if (Date.now() - sesi.startTime >= sesi.durasiMs) {
     return res.redirect("/ujian/selesai-paksa");
   }
 
   try {
-    if (!sesi.soalIds || sesi.soalIds.length === 0) {
-      return res.redirect("/dashboardPembayaranUjian");
+    if (!sesi.soalIds || sesi.soalIds.length === 0 || currentIndex < 0 || currentIndex >= sesi.soalIds.length) {
+      await db.query("UPDATE users SET status_ujian = 'IDLE' WHERE id = ?", [userId]);
+      delete req.session.ujian;
+      return req.session.save(() => res.redirect("/dashboardPembayaranUjian"));
     }
 
-    const [soalRows] = await db.query(
+    const [allSoalRows] = await db.query(
       `SELECT q.*, COALESCE(m.nama_materi, q.materi_id) AS materi
        FROM questions q
        LEFT JOIN materi_list m ON q.materi_id = m.id
-       WHERE q.id IN (?)`,
-      [sesi.soalIds]
+       WHERE q.id IN (?)
+       ORDER BY FIELD(q.id, ?)`,
+      [sesi.soalIds, sesi.soalIds]
     );
 
-    // Urutkan di memori sesuai urutan acak di sesi
-    const orderedSoal = sesi.soalIds.map(id => soalRows.find(s => s.id === id)).filter(Boolean);
-
-    if (!orderedSoal || orderedSoal.length === 0) {
-      return res.send(`<script>
-        alert('Soal tidak ditemukan! Hubungi admin.');
-        window.location.href='/dashboardPembayaranUjian';
-      </script>`);
+    if (allSoalRows.length === 0) {
+      await db.query("UPDATE users SET status_ujian = 'IDLE' WHERE id = ?", [userId]);
+      delete req.session.ujian;
+      return req.session.save(() => {
+        res.send(`<script>
+          alert('Soal tidak ditemukan di database! Status ujian direset.');
+          window.location.href='/dashboardPembayaranUjian';
+        </script>`);
+      });
     }
 
+    // Hitung sisa waktu di server agar timer tidak reset saat refresh
+    const sisaWaktuMs = (sesi.startTime + sesi.durasiMs) - Date.now();
+
     res.render("ujian-soal", {
-      soal:       orderedSoal,       
-      jawaban:    sesi.jawaban,   
-      waktuMulai: sesi.startTime,
-      durasiMs:   sesi.durasiMs,
-      paket:      sesi.paket,
-      nomorTO:    sesi.nomorTO,
-      user:       req.session.user,
+      soal:         allSoalRows,
+      currentIndex: currentIndex + 1,
+      totalSoal:    sesi.soalIds.length,
+      jawaban:      sesi.jawaban,
+      sisaWaktuMs:  Math.max(sisaWaktuMs, 0),
+      paket:        sesi.paket,
+      nomorTO:      sesi.nomorTO,
+      user:         req.session.user,
     });
   } catch (err) {
     console.error("Error /soal:", err);
@@ -156,7 +195,9 @@ router.get("/soal/:index", isLogin, isSedangUjian, async (req, res) => {
 });
 
 
+// ─────────────────────────────────────────
 // POST /ujian/simpan-jawaban
+// ─────────────────────────────────────────
 
 router.post("/simpan-jawaban", isLogin, isSedangUjian, async (req, res) => {
   const sesi = req.session.ujian;
@@ -176,7 +217,9 @@ router.post("/simpan-jawaban", isLogin, isSedangUjian, async (req, res) => {
 });
 
 
+// ─────────────────────────────────────────
 // POST /ujian/selesai
+// ─────────────────────────────────────────
 
 router.post("/selesai", isLogin, async (req, res) => {
   if (!req.session.ujian)
@@ -185,7 +228,9 @@ router.post("/selesai", isLogin, async (req, res) => {
 });
 
 
+// ─────────────────────────────────────────
 // GET /ujian/selesai-paksa
+// ─────────────────────────────────────────
 
 router.get("/selesai-paksa", isLogin, async (req, res) => {
   if (!req.session.ujian)
@@ -194,37 +239,16 @@ router.get("/selesai-paksa", isLogin, async (req, res) => {
 });
 
 
-// KONSTANTA DEFAULT PENILAIAN
-const DEFAULT_BOBOT_BENAR = 500; // 5 poin × 100
-
-// KONSTANTA PASSING GRADE PER PAKET
-const PASSING_GRADE = {
-  'Paket SKD/TKD': {
-    type: 'PER_SUBTEST',
-    // materi_id → skor minimum tampilan
-    perSubtest: { 1: 65, 2: 80, 3: 166 },
-    kumulatif:  311,
-    skorMaksTotal: 550,
-  },
-  'Paket Akademik Polri': {
-    type: 'PERSENTASE',
-    // Nilai akhir = (total benar / total soal) × 100
-    minPersen:    70,   // Bintara PTU (indikatif)
-    skorMaksTotal: 125,
-  },
-  'Paket PPPK': {
-    type: 'PERINGKAT',  // Tidak ada passing grade resmi (Kepmenpan 347/2024)
-    skorMaksTotal: 670,
-  },
-};
-
+// ─────────────────────────────────────────
 // HITUNG & SIMPAN SKOR
+// ─────────────────────────────────────────
+
 async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
   const sesi   = req.session.ujian;
   const userId = req.session.user.id;
 
   try {
-    // 1. Ambil soal beserta info materi (nama + bobot)
+    // 1. Ambil semua soal beserta bobot & materi
     const [soalRows] = await db.query(
       `SELECT q.id, q.kunci, q.tipe_penilaian,
               q.bobot_a, q.bobot_b, q.bobot_c, q.bobot_d, q.bobot_e,
@@ -245,16 +269,17 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
       });
     }
 
-    // 2. Hitung skor per soal — akumulasikan per materi
+    // 2. Hitung skor per soal & akumulasi per materi
     const jawabanUserSesi = sesi.jawaban || {};
-    const skorPerMateri   = {}; // { materi_id: { skor, maks, benar, total, nama } }
-    let totalPoin = 0;
+    const skorPerMateri   = {};
+    let totalPoin  = 0;
     let totalBenar = 0;
+    const valuesJawaban = [];
 
-    const simpanPromises = soalRows.map((s) => {
-      const mid          = s.materi_id || 0;
-      const jawabanUser  = (jawabanUserSesi[s.id] || '').toLowerCase();
-      const kunci        = (s.kunci || '').toLowerCase();
+    soalRows.forEach((s) => {
+      const mid         = s.materi_id || 0;
+      const jawabanUser = (jawabanUserSesi[s.id] || '').toLowerCase();
+      const kunci       = (s.kunci || '').toLowerCase();
 
       if (!skorPerMateri[mid]) {
         skorPerMateri[mid] = {
@@ -269,17 +294,14 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
       skorPerMateri[mid].total++;
 
       if (s.tipe_penilaian === 'BOBOT_OPSI') {
-        // Skor maks = bobot opsi tertinggi di soal ini
         const maxBobot = Math.max(
-          Number(s.bobot_a || 0), Number(s.bobot_b || 0),
-          Number(s.bobot_c || 0), Number(s.bobot_d || 0),
-          Number(s.bobot_e || 0)
+          ...[s.bobot_a, s.bobot_b, s.bobot_c, s.bobot_d, s.bobot_e].map(Number)
         );
         skorPerMateri[mid].maks += maxBobot;
 
         if (jawabanUser) {
           const bobotOpsi = Number(s['bobot_' + jawabanUser]) || 0;
-          skorPerMateri[mid].skor += bobotOpsi;
+          skorPerMateri[mid].skor  += bobotOpsi;
           skorPerMateri[mid].benar++;
           totalPoin  += bobotOpsi;
           totalBenar++;
@@ -300,20 +322,23 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
         }
       }
 
-      return db.query(
-        `INSERT INTO jawaban_peserta (user_id, paket, nomor_to, question_id, jawaban_user)
-         VALUES (?, ?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE jawaban_user = VALUES(jawaban_user)`,
-        [userId, sesi.paket, sesi.nomorTO, s.id, jawabanUser || null]
-      );
+      valuesJawaban.push([userId, sesi.paket, sesi.nomorTO, s.id, jawabanUser || null]);
     });
 
-    await Promise.all(simpanPromises);
+    // 3. Simpan jawaban peserta (bulk)
+    if (valuesJawaban.length > 0) {
+      await db.query(
+        `INSERT INTO jawaban_peserta (user_id, paket, nomor_to, question_id, jawaban_user)
+         VALUES ?
+         ON DUPLICATE KEY UPDATE jawaban_user = VALUES(jawaban_user)`,
+        [valuesJawaban]
+      );
+    }
 
+    // 4. Simpan ke riwayat_ujian
     const totalSoal = soalRows.length;
     const skor      = Math.round(totalPoin);
 
-    // 3. Simpan ke riwayat_ujian
     const [riwayatResult] = await db.query(
       `INSERT INTO riwayat_ujian (user_id, paket, nomor_to, skor, jml_benar, jml_soal, tgl_selesai)
        VALUES (?, ?, ?, ?, ?, ?, NOW())`,
@@ -321,33 +346,42 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
     );
     const riwayatUjianId = riwayatResult.insertId;
 
-    // 4. Simpan skor per subtest ke riwayat_subtest
-    const subtestInserts = Object.values(skorPerMateri).map((sub) =>
-      db.query(
-        `INSERT INTO riwayat_subtest
-           (riwayat_ujian_id, user_id, paket, nomor_to, materi_id, nama_materi,
-            skor_subtest, skor_maks, jml_benar, jml_soal, tgl_selesai)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
-        [
-          riwayatUjianId, userId, sesi.paket, sesi.nomorTO,
-          sub.materi_id || null, sub.nama,
-          Math.round(sub.skor), Math.round(sub.maks),
-          sub.benar, sub.total,
-        ]
-      )
-    );
-
-    await Promise.all([
-      ...subtestInserts,
-      db.query("UPDATE users SET status_ujian = 'IDLE' WHERE id = ?", [userId]),
+    // 5. Simpan skor per subtest (bulk)
+    // Kolom tabel riwayat_subtest:
+    // id, riwayat_ujian_id, materi_id, nama_materi,
+    // jumlah_soal, jumlah_benar, jumlah_salah,
+    // skor_subtest, skor_maks, created_at
+    const valuesSubtest = Object.values(skorPerMateri).map((sub) => [
+      riwayatUjianId,
+      sub.materi_id,
+      sub.nama,
+      sub.total,                          // jumlah_soal
+      sub.benar,                          // jumlah_benar
+      sub.total - sub.benar,              // jumlah_salah
+      Math.round(sub.skor * 100) / 100,   // skor_subtest
+      Math.round(sub.maks * 100) / 100,   // skor_maks
     ]);
 
-    delete req.session.ujian;
+    if (valuesSubtest.length > 0) {
+      await db.query(
+        `INSERT INTO riwayat_subtest
+           (riwayat_ujian_id, materi_id, nama_materi,
+            jumlah_soal, jumlah_benar, jumlah_salah,
+            skor_subtest, skor_maks)
+         VALUES ?`,
+        [valuesSubtest]
+      );
+    }
 
+    // 6. Reset status ujian user
+    await db.query("UPDATE users SET status_ujian = 'IDLE' WHERE id = ?", [userId]);
+
+    delete req.session.ujian;
     req.session.save(() => {
       if (jsonResponse) return res.json({ ok: true, redirect: "/ujian/hasil" });
       res.redirect("/ujian/hasil");
     });
+
   } catch (err) {
     console.error("Error hitungDanSimpanSkor:", err);
     if (jsonResponse) return res.json({ ok: false, redirect: "/dashboardPembayaranUjian" });
@@ -356,7 +390,9 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
 }
 
 
+// ─────────────────────────────────────────
 // POST /ujian/reset-ujian (admin only)
+// ─────────────────────────────────────────
 
 router.post("/reset-ujian", isLogin, isAdmin, async (req, res) => {
   const { userIdTarget, paket_pilihan, nomor_to } = req.body;
@@ -375,10 +411,7 @@ router.post("/reset-ujian", isLogin, isAdmin, async (req, res) => {
            )`,
         [userIdTarget, paket_pilihan, nomor_to]
       ),
-      db.query(
-        "UPDATE users SET status_ujian = 'IDLE' WHERE id = ?",
-        [userIdTarget]
-      ),
+      db.query("UPDATE users SET status_ujian = 'IDLE' WHERE id = ?", [userIdTarget]),
     ]);
 
     res.redirect("/admin/daftarPeserta?success=Ujian+berhasil+direset%2C+user+bisa+ujian+kembali");
@@ -389,7 +422,9 @@ router.post("/reset-ujian", isLogin, isAdmin, async (req, res) => {
 });
 
 
+// ─────────────────────────────────────────
 // GET /ujian/hasil
+// ─────────────────────────────────────────
 
 router.get("/hasil", isLogin, async (req, res) => {
   try {
@@ -403,22 +438,31 @@ router.get("/hasil", isLogin, async (req, res) => {
     if (riwayatRows.length === 0) return res.redirect("/dashboardPembayaranUjian");
     const riwayat = riwayatRows[0];
 
-    // Data per subtest
+    // Data per subtest — alias kolom agar cocok dengan template EJS
     const [subtestRows] = await db.query(
-      `SELECT * FROM riwayat_subtest
+      `SELECT
+         id,
+         riwayat_ujian_id,
+         materi_id,
+         nama_materi,
+         skor_subtest,
+         skor_maks,
+         jumlah_soal  AS jml_soal,
+         jumlah_benar AS jml_benar,
+         jumlah_salah
+       FROM riwayat_subtest
        WHERE riwayat_ujian_id = ?
        ORDER BY materi_id ASC`,
       [riwayat.id]
     );
 
-    // Logika passing grade sesuai paket
+    // Logika passing grade
     const pg = PASSING_GRADE[riwayat.paket] || { type: 'PERINGKAT', skorMaksTotal: 0 };
     let statusKelulusan = 'PERINGKAT';
     let nilaiAkhir      = null;
     let subtestData     = subtestRows;
 
     if (pg.type === 'PER_SUBTEST') {
-      // SKD/TKD: cek PG per subtest DAN kumulatif
       let semuaLulus = true;
       subtestData = subtestRows.map((sub) => {
         const minSkor = pg.perSubtest[sub.materi_id] || 0;
@@ -430,7 +474,6 @@ router.get("/hasil", isLogin, async (req, res) => {
       statusKelulusan = (semuaLulus && lulusKumulatif) ? 'LULUS' : 'TIDAK_LULUS';
 
     } else if (pg.type === 'PERSENTASE') {
-      // Polri: hitung nilai akhir persentase
       nilaiAkhir = riwayat.jml_soal > 0
         ? Math.round((riwayat.jml_benar / riwayat.jml_soal) * 1000) / 10
         : 0;
@@ -457,7 +500,9 @@ router.get("/hasil", isLogin, async (req, res) => {
 });
 
 
-// GET /ujian/review?nomor_to=X
+// ─────────────────────────────────────────
+// GET /ujian/review
+// ─────────────────────────────────────────
 
 router.get("/review", isLogin, async (req, res) => {
   const { nomor_to, paket } = req.query;
@@ -480,12 +525,15 @@ router.get("/review", isLogin, async (req, res) => {
          q.kunci, q.pembahasan, q.tipe_penilaian,
          q.bobot_a, q.bobot_b, q.bobot_c, q.bobot_d, q.bobot_e,
          q.gambar, q.gambar_a, q.gambar_b, q.gambar_c, q.gambar_d, q.gambar_e,
+         q.gambar_pembahasan,
          q.materi_id,
          COALESCE(m.nama_materi, CONCAT('Subtest ', q.materi_id)) AS nama_materi,
-         CASE 
-           WHEN q.tipe_penilaian = 'BOBOT_OPSI' AND jp.jawaban_user IS NOT NULL AND jp.jawaban_user != '' THEN 1
-           WHEN LOWER(jp.jawaban_user) = LOWER(q.kunci) THEN 1 
-           ELSE 0 
+         CASE
+           WHEN q.tipe_penilaian = 'BOBOT_OPSI'
+                AND jp.jawaban_user IS NOT NULL
+                AND jp.jawaban_user != '' THEN 1
+           WHEN LOWER(jp.jawaban_user) = LOWER(q.kunci) THEN 1
+           ELSE 0
          END AS is_benar
        FROM jawaban_peserta jp
        JOIN questions q ON jp.question_id = q.id
@@ -509,51 +557,42 @@ router.get("/review", isLogin, async (req, res) => {
       [userId, nomor_to]
     );
 
-    // --- HITUNG SISA WAKTU AKSES (1 MINGGU) ---
     const [paymentRows] = await db.query(
-      `SELECT created_at FROM payments 
+      `SELECT created_at FROM payments
        WHERE user_id = ? AND TRIM(paket) = TRIM(?) AND nomor_to = ? AND UPPER(status) = 'LUNAS'
        ORDER BY created_at DESC LIMIT 1`,
       [userId, paket || riwayat[0]?.paket || "", nomor_to]
     );
 
     let sisaWaktuText = "";
-    if (paymentRows.length > 0) {
-      const p = paymentRows[0];
-      const createdAt = p.created_at ? new Date(p.created_at) : null;
-      if (createdAt) {
-        const diff = (createdAt.getTime() + 7 * 24 * 60 * 60 * 1000) - Date.now();
-        if (diff > 0) {
-          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-          const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          sisaWaktuText = days > 0 ? `${days} hari ${hours} jam` : `${hours} jam`;
-        } else {
-          sisaWaktuText = "Kadaluarsa";
-        }
+    if (paymentRows.length > 0 && paymentRows[0].created_at) {
+      const diff = (new Date(paymentRows[0].created_at).getTime() + 7 * 24 * 60 * 60 * 1000) - Date.now();
+      if (diff > 0) {
+        const days  = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        sisaWaktuText = days > 0 ? `${days} hari ${hours} jam` : `${hours} jam`;
+      } else {
+        sisaWaktuText = "Kadaluarsa";
       }
     }
-    
 
     const totalSoal  = jawabanRows.length;
-    const totalBenar = riwayat[0]?.jml_benar || jawabanRows.filter((j) => j.is_benar).length;
+    const totalBenar = riwayat[0]?.jml_benar ?? jawabanRows.filter(j => j.is_benar).length;
     const totalSalah = totalSoal - totalBenar;
-    const skor       = riwayat[0]?.skor || Math.round((totalBenar / totalSoal) * 100);
+    const skor       = riwayat[0]?.skor ?? Math.round((totalBenar / totalSoal) * 100);
 
-    const [userRows] = await db.query(
-      "SELECT * FROM users WHERE id = ?",
-      [userId]
-    );
+    const [userRows] = await db.query("SELECT * FROM users WHERE id = ?", [userId]);
 
     res.render("reviewJawaban", {
-      user:       userRows[0],
-      soalRows:   jawabanRows,
+      user:         userRows[0],
+      soalRows:     jawabanRows,
       totalSoal,
       totalBenar,
       totalSalah,
       skor,
       nomor_to,
-      paket:      riwayat[0]?.paket || paket || "",
-      tglSelesai: riwayat[0]?.tgl_selesai || null,
+      paket:        riwayat[0]?.paket || paket || "",
+      tglSelesai:   riwayat[0]?.tgl_selesai || null,
       sisaWaktuText,
     });
   } catch (err) {
@@ -561,5 +600,6 @@ router.get("/review", isLogin, async (req, res) => {
     res.redirect("/dashboardPembayaranUjian?error=Gagal+memuat+review");
   }
 });
+
 
 module.exports = router;

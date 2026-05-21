@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.44, for Win64 (x86_64)
 --
--- Host: localhost    Database: webcat
+-- Host: localhost    Database: db_pencatatan
 -- ------------------------------------------------------
 -- Server version	8.0.44
 
@@ -42,7 +42,7 @@ CREATE TABLE `anggota_offline` (
 
 LOCK TABLES `anggota_offline` WRITE;
 /*!40000 ALTER TABLE `anggota_offline` DISABLE KEYS */;
-INSERT INTO `anggota_offline` VALUES (1,'jono@gmail.com','jono','anggota regu ular',49,'2026-03-09 07:18:47'),(2,'adilijokowi@gmail.com','panjul','anggota regu cobra',NULL,'2026-03-15 00:13:01');
+INSERT INTO `anggota_offline` VALUES (1,'jono@gmail.com','jono','anggota regu ular',NULL,'2026-03-09 07:18:47'),(2,'adilijokowi@gmail.com','panjul','anggota regu cobra',NULL,'2026-03-15 00:13:01');
 /*!40000 ALTER TABLE `anggota_offline` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -139,13 +139,15 @@ DROP TABLE IF EXISTS `jawaban_peserta`;
 CREATE TABLE `jawaban_peserta` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int DEFAULT NULL,
+  `paket` varchar(100) NOT NULL DEFAULT '',
+  `nomor_to` int NOT NULL DEFAULT '1',
   `question_id` int DEFAULT NULL,
   `jawaban_user` varchar(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`,`question_id`),
   KEY `user_id_2` (`user_id`),
   KEY `idx_jawaban_peserta_user_question` (`user_id`,`question_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=400 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=507 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -154,7 +156,7 @@ CREATE TABLE `jawaban_peserta` (
 
 LOCK TABLES `jawaban_peserta` WRITE;
 /*!40000 ALTER TABLE `jawaban_peserta` DISABLE KEYS */;
-INSERT INTO `jawaban_peserta` VALUES (73,28,13,'c'),(156,49,2,'a'),(157,49,1,'a'),(158,49,3,'b'),(159,49,37,'a'),(160,49,39,'b'),(161,49,38,'a'),(162,28,2,'c'),(163,28,1,'a'),(164,28,3,'b'),(165,28,37,'b'),(166,28,38,'b'),(167,28,39,'c'),(168,49,5,'a'),(169,49,4,'e'),(170,49,6,'c'),(171,49,7,'b'),(172,49,40,'e'),(173,49,41,'a'),(174,49,8,'c'),(175,49,42,'c'),(176,49,43,'b'),(177,49,44,'c'),(248,49,52,'b'),(249,49,51,'b'),(272,48,9,'a'),(273,48,10,'a'),(274,48,11,'a'),(275,48,46,'a'),(276,48,12,'a'),(277,48,47,'a'),(278,48,45,'a'),(279,48,48,'a'),(296,49,53,'d'),(303,49,55,NULL),(304,49,54,'a'),(305,49,58,NULL),(306,49,57,NULL),(307,49,56,NULL),(308,49,59,NULL),(309,49,60,NULL),(310,28,54,'c'),(311,28,55,'a'),(312,28,58,'c'),(313,28,59,'c'),(314,28,60,'c'),(315,28,56,'a'),(316,28,57,'a'),(355,49,61,NULL),(357,49,62,NULL),(379,49,63,NULL),(384,28,61,'a'),(385,28,63,'a'),(387,28,62,'a');
+INSERT INTO `jawaban_peserta` VALUES (73,28,'',1,13,'c'),(162,28,'',1,2,'c'),(163,28,'',1,1,'a'),(164,28,'',1,3,'b'),(165,28,'',1,37,'b'),(166,28,'',1,38,'b'),(167,28,'',1,39,'c'),(272,48,'',1,9,'a'),(273,48,'',1,10,'a'),(274,48,'',1,11,'a'),(275,48,'',1,46,'a'),(276,48,'',1,12,'a'),(277,48,'',1,47,'a'),(278,48,'',1,45,'a'),(279,48,'',1,48,'a'),(310,28,'',1,54,'c'),(311,28,'',1,55,'a'),(312,28,'',1,58,'c'),(313,28,'',1,59,'c'),(314,28,'',1,60,'c'),(315,28,'',1,56,'a'),(316,28,'',1,57,'a'),(384,28,'',1,61,'a'),(385,28,'',1,63,'a'),(387,28,'',1,62,'a'),(400,50,'',1,59,NULL),(401,50,'',1,63,'c'),(402,50,'',1,60,NULL),(403,50,'',1,55,'a'),(404,50,'',1,62,'a'),(405,50,'',1,61,'c'),(406,50,'',1,56,'a'),(407,50,'',1,54,'b'),(408,50,'',1,57,'c'),(409,50,'',1,58,'c'),(420,51,'Paket Akademik Polri',1,6,NULL),(421,51,'Paket Akademik Polri',1,4,NULL),(422,51,'Paket Akademik Polri',1,43,NULL),(423,51,'Paket Akademik Polri',1,42,NULL),(424,51,'Paket Akademik Polri',1,44,NULL),(425,51,'Paket Akademik Polri',1,40,NULL),(426,51,'Paket Akademik Polri',1,8,NULL),(427,51,'Paket Akademik Polri',1,41,NULL),(428,51,'Paket Akademik Polri',1,7,NULL),(429,51,'Paket Akademik Polri',1,5,NULL),(430,51,'Paket SKD/TKD',1,54,NULL),(431,51,'Paket SKD/TKD',1,55,NULL),(432,51,'Paket SKD/TKD',1,56,NULL),(433,51,'Paket SKD/TKD',1,62,NULL),(434,51,'Paket SKD/TKD',1,57,NULL),(435,51,'Paket SKD/TKD',1,58,NULL),(436,51,'Paket SKD/TKD',1,59,NULL),(437,51,'Paket SKD/TKD',1,60,NULL),(438,51,'Paket SKD/TKD',1,61,NULL),(439,51,'Paket SKD/TKD',1,63,NULL),(470,53,'Paket PPPK',1,9,'a'),(471,53,'Paket PPPK',1,10,'b'),(472,53,'Paket PPPK',1,11,'c'),(473,53,'Paket PPPK',1,12,'c'),(474,53,'Paket PPPK',1,45,'a'),(475,53,'Paket PPPK',1,46,'b'),(476,53,'Paket PPPK',1,47,'b'),(477,53,'Paket PPPK',1,48,'a'),(478,53,'Paket PPPK',1,69,'a'),(479,54,'Paket PPPK',1,9,'c'),(480,54,'Paket PPPK',1,10,'d'),(481,54,'Paket PPPK',1,11,'b'),(482,54,'Paket PPPK',1,12,'a'),(483,54,'Paket PPPK',1,45,'a'),(484,54,'Paket PPPK',1,46,'b'),(485,54,'Paket PPPK',1,47,'c'),(486,54,'Paket PPPK',1,48,NULL),(487,54,'Paket PPPK',1,69,'b'),(497,55,'Paket SKD/TKD',1,54,'a'),(498,55,'Paket SKD/TKD',1,55,'a'),(499,55,'Paket SKD/TKD',1,56,'b'),(500,55,'Paket SKD/TKD',1,57,'c'),(501,55,'Paket SKD/TKD',1,58,'c'),(502,55,'Paket SKD/TKD',1,59,NULL),(503,55,'Paket SKD/TKD',1,60,NULL),(504,55,'Paket SKD/TKD',1,61,'a'),(505,55,'Paket SKD/TKD',1,62,NULL),(506,55,'Paket SKD/TKD',1,63,NULL);
 /*!40000 ALTER TABLE `jawaban_peserta` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -262,7 +264,7 @@ CREATE TABLE `paket_to` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_paket_to` (`paket`,`nomor_to`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -271,7 +273,7 @@ CREATE TABLE `paket_to` (
 
 LOCK TABLES `paket_to` WRITE;
 /*!40000 ALTER TABLE `paket_to` DISABLE KEYS */;
-INSERT INTO `paket_to` VALUES (2,'Paket Akademik Polri',1,NULL,0,0,'2026-03-16 02:40:04'),(3,'Paket PPPK',1,NULL,0,0,'2026-03-16 02:40:04'),(7,'Paket SKD/TKD',1,NULL,0,1,'2026-03-16 04:44:25');
+INSERT INTO `paket_to` VALUES (2,'Paket Akademik Polri',1,NULL,0,0,'2026-03-16 02:40:04'),(3,'Paket PPPK',1,NULL,0,0,'2026-03-16 02:40:04'),(7,'Paket SKD/TKD',1,NULL,0,0,'2026-03-16 04:44:25'),(10,'Paket PPPK',2,NULL,0,0,'2026-05-18 02:24:36'),(12,'Paket SKD/TKD',2,NULL,0,0,'2026-05-18 03:44:32');
 /*!40000 ALTER TABLE `paket_to` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -329,7 +331,7 @@ CREATE TABLE `payments` (
   KEY `idx_user_paket` (`user_id`,`paket`),
   KEY `idx_status` (`status`),
   KEY `idx_payments_lookup` (`user_id`,`paket`,`nomor_to`,`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -338,7 +340,7 @@ CREATE TABLE `payments` (
 
 LOCK TABLES `payments` WRITE;
 /*!40000 ALTER TABLE `payments` DISABLE KEYS */;
-INSERT INTO `payments` VALUES (1,123,'',1,NULL,NULL,'cash','PENDING','2026-02-04 07:57:12',NULL),(2,14,'',1,NULL,NULL,'bukti-14-1770262648924-626653815.jpeg','PENDING','2026-02-05 03:37:28',NULL),(7,18,'',1,NULL,NULL,'bukti-18-1770711982616-991169500.png','PENDING','2026-02-10 08:26:22',NULL),(8,13,'',1,NULL,NULL,'bukti-13-1770773881443-136416692.jpeg','PENDING','2026-02-11 01:38:01',NULL),(9,6,'',1,NULL,NULL,'bukti-6-1770797000331-332470884.png','PENDING','2026-02-11 08:03:20',NULL),(11,19,'',1,NULL,NULL,'bukti-19-1770815324204-780622657.jpeg','PENDING','2026-02-11 13:08:44',NULL),(13,21,'',1,NULL,NULL,'bukti-21-1771042626730-239695429.png','LUNAS','2026-02-14 04:17:06',NULL),(14,22,'',1,NULL,NULL,'bukti-22-1771044039087-723859638.png','LUNAS','2026-02-14 04:40:39',NULL),(56,28,'Paket SKD/TKD',1,'CA53B06B','2026-03-16 13:20:12','bukti-28-1773641998751.png','LUNAS','2026-03-16 06:19:58',NULL);
+INSERT INTO `payments` VALUES (1,123,'',1,NULL,NULL,'cash','PENDING','2026-02-04 07:57:12',NULL),(2,14,'',1,NULL,NULL,'bukti-14-1770262648924-626653815.jpeg','PENDING','2026-02-05 03:37:28',NULL),(7,18,'',1,NULL,NULL,'bukti-18-1770711982616-991169500.png','PENDING','2026-02-10 08:26:22',NULL),(8,13,'',1,NULL,NULL,'bukti-13-1770773881443-136416692.jpeg','PENDING','2026-02-11 01:38:01',NULL),(9,6,'',1,NULL,NULL,'bukti-6-1770797000331-332470884.png','PENDING','2026-02-11 08:03:20',NULL),(11,19,'',1,NULL,NULL,'bukti-19-1770815324204-780622657.jpeg','PENDING','2026-02-11 13:08:44',NULL),(13,21,'',1,NULL,NULL,'bukti-21-1771042626730-239695429.png','LUNAS','2026-02-14 04:17:06',NULL),(14,22,'',1,NULL,NULL,'bukti-22-1771044039087-723859638.png','LUNAS','2026-02-14 04:40:39',NULL),(56,28,'Paket SKD/TKD',1,'CA53B06B','2026-03-16 13:20:12','bukti-28-1773641998751.png','LUNAS','2026-03-16 06:19:58',NULL),(57,50,'Paket SKD/TKD',1,'DC8282A8','2026-05-18 11:02:40','bukti-50-1779076916245.png','LUNAS','2026-05-18 04:01:56',NULL),(58,51,'Paket Akademik Polri',3,'0AE0E11B','2026-05-21 13:53:16','bukti-51-1779346364681.jpg','LUNAS','2026-05-21 06:52:44',NULL),(59,51,'Paket Akademik Polri',1,'CFB86531','2026-05-21 13:54:50','bukti-51-1779346460082.png','LUNAS','2026-05-21 06:54:20',NULL),(60,51,'Paket SKD/TKD',1,'F59E56F3','2026-05-21 14:56:46','bukti-51-1779350169885.jpg','LUNAS','2026-05-21 07:56:09',NULL),(61,52,'Paket PPPK',1,'2606E8A9','2026-05-21 17:46:45','bukti-52-1779359938789.png','LUNAS','2026-05-21 10:38:58',NULL),(62,53,'Paket PPPK',1,'D070224D','2026-05-21 18:08:14','bukti-53-1779361656028.png','LUNAS','2026-05-21 11:07:36',NULL),(63,54,'Paket PPPK',1,'20476CDB','2026-05-21 18:16:40','bukti-54-1779362174025.png','LUNAS','2026-05-21 11:16:14',NULL),(64,55,'Paket SKD/TKD',1,'9E958D24','2026-05-21 18:34:45','bukti-55-1779363256400.png','LUNAS','2026-05-21 11:34:16',NULL);
 /*!40000 ALTER TABLE `payments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -377,12 +379,13 @@ CREATE TABLE `questions` (
   `gambar_c` varchar(255) DEFAULT NULL,
   `gambar_d` varchar(255) DEFAULT NULL,
   `gambar_e` varchar(255) DEFAULT NULL,
+  `gambar_pembahasan` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_soal` (`paket`,`nomor_to`,`materi_id`,`nomor_urut`),
   KEY `idx_paket_active` (`paket`,`is_active`),
   KEY `idx_questions_paket_to` (`paket`,`nomor_to`,`is_active`),
   KEY `idx_questions_materi` (`materi_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -391,8 +394,43 @@ CREATE TABLE `questions` (
 
 LOCK TABLES `questions` WRITE;
 /*!40000 ALTER TABLE `questions` DISABLE KEYS */;
-INSERT INTO `questions` VALUES (4,'Paket Akademik Polri',1,4,1,'Contoh soal PU: Ibu kota Indonesia adalah...','Jakarta','Bandung','Medan','Surabaya','IKN','e','tes',1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(5,'Paket Akademik Polri',1,5,26,'Contoh soal WK: Pancasila lahir tanggal...','46174','17 Ags','46296','46144','46336','A',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(6,'Paket Akademik Polri',1,6,51,'Contoh soal Numerik: 10 + 10 x 0 = ...','20','0','10','100','5','C',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(7,'Paket Akademik Polri',1,7,76,'Contoh soal B.Indo: Antonim besar adalah...','Luas','Kecil','Lebar','Tinggi','Jauh','B',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(8,'Paket Akademik Polri',1,8,101,'Contoh soal B.Inggris: I ... a student.','Is','Are','Am','Was','Were','C',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(9,'Paket PPPK',1,9,1,'Contoh soal Teknis: Jelaskan tupoksi...','A','B','C','D','E','a','',1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(10,'Paket PPPK',1,10,91,'Contoh soal Manajerial: Cara memimpin...','A','B','C','D','E','B',NULL,1,5,'BOBOT_OPSI',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(11,'Paket PPPK',1,11,116,'Contoh soal Sosio: Toleransi adalah...','A','B','C','D','E','C',NULL,1,5,'BOBOT_OPSI',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(12,'Paket PPPK',1,12,136,'Contoh soal Wawancara: Alasan mendaftar...','A','B','C','D','E','D',NULL,1,5,'BOBOT_OPSI',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(40,'Paket Akademik Polri',1,4,2,'Contoh soal PU: Ibu kota Indonesia adalah...','Jakarta','Bandung','Medan','Surabaya','IKN','E',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(41,'Paket Akademik Polri',1,5,27,'Contoh soal WK: Pancasila lahir tanggal...','46174','17 Ags','46296','46144','46336','A',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(42,'Paket Akademik Polri',1,6,52,'Contoh soal Numerik: 10 + 10 x 0 = ...','20','0','10','100','5','C',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(43,'Paket Akademik Polri',1,7,77,'Contoh soal B.Indo: Antonim besar adalah...','Luas','Kecil','Lebar','Tinggi','Jauh','B',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(44,'Paket Akademik Polri',1,8,102,'Contoh soal B.Inggris: I ... a student.','Is','Are','Am','Was','Were','C',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(45,'Paket PPPK',1,9,2,'Contoh soal Teknis: Jelaskan tupoksi...','A','B','C','D','E','A',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(46,'Paket PPPK',1,10,92,'Contoh soal Manajerial: Cara memimpin...','A','B','C','D','E','B',NULL,1,5,'BOBOT_OPSI',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(47,'Paket PPPK',1,11,117,'Contoh soal Sosio: Toleransi adalah...','A','B','C','D','E','C',NULL,1,5,'BOBOT_OPSI',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(48,'Paket PPPK',1,12,137,'Contoh soal Wawancara: Alasan mendaftar...','A','B','C','D','E','D',NULL,1,5,'BOBOT_OPSI',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(54,'Paket SKD/TKD',1,1,1,'Nilai dasar yang terkandung dalam Pancasila sila ke-3 adalah…','Ketuhanan','Persatuan','. Musyawarah','Keadilan','Kemanusiaan','B','',1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(55,'Paket SKD/TKD',1,1,2,'Semboyan Bhinneka Tunggal Ika memiliki arti…','Berbeda-beda tetapi tetap satu','.Bersatu kita teguh','Persatuan dan kesatuan','Berbeda budaya','Satu bangsa satu negara','A','',1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(56,'Paket SKD/TKD',1,1,3,'Lembaga yang memiliki kewenangan mengubah dan menetapkan UUD 1945 adalah…','Presiden','DPR','MPR','Mahkamah Konstitusi','DPD','C','',1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(57,'Paket SKD/TKD',1,2,4,'Jika 4 + 6 × 3 = …','30','22','18','28','24','B','(6×3 = 18, 18 + 4 = 22)',1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(58,'Paket SKD/TKD',1,2,5,'Sinonim kata abstrak adalah…','Nyata','Konkret','Tidak Berwujud','Terlihat','Terbuka','C','',1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL),(59,'Paket SKD/TKD',1,3,6,'Anda diminta menyelesaikan pekerjaan mendadak oleh atasan sementara pekerjaan lama belum selesai. Sikap Anda adalah…','Menolak tugas baru','Menyelesaikan tugas lama saja','Mengatur prioritas pekerjaan','Menunggu perintah selanjutnya','Membiarkan pekerjaan tertunda','C','',1,5,'BOBOT_OPSI',1,2,5,3,4,NULL,NULL,NULL,NULL,NULL,NULL),(60,'Paket SKD/TKD',1,3,7,'Rekan kerja melakukan kesalahan yang dapat merugikan tim. Sikap Anda adalah..','Membiarkannya','Melaporkan langsung ke pimpinan','Mengingatkan dan membantu memperbaiki','Menyalahkan rekan kerja','Menghindari masalah','C','',1,5,'BOBOT_OPSI',1,2,5,3,4,NULL,NULL,NULL,NULL,NULL,NULL),(61,'Paket SKD/TKD',1,2,8,'Gambar berikut adalah gambar apa..','logo unimed','logo unpad','logo UIN','logo UI','Logo IPB','A','logo unimed itu bang',1,5,'BENAR_SALAH',0,0,0,0,0,'soal-1773809595802-120603817.png',NULL,NULL,NULL,NULL,NULL),(62,'Paket SKD/TKD',1,2,9,'Apa makna logo ini','','','','','','A','',1,5,'BENAR_SALAH',0,0,0,0,0,'soal-1773809920609-883516924.png','soal-1773809920613-546325739.png','soal-1773809920617-171822221.png','soal-1773809920620-3173069.png','soal-1773809920623-352580600.png','soal-1773809920626-36109010.png'),(63,'Paket SKD/TKD',1,2,10,'Siapakah artis berikut','Atta Halilintar','Pragos','Gali Armando','Udin peetot','mumuk','A','atta halilintar cosplay gembel',1,5,'BENAR_SALAH',0,0,0,0,0,'soal-1773810678694-332898347.JPG',NULL,NULL,NULL,NULL,NULL);
+INSERT INTO `questions` VALUES (4,'Paket Akademik Polri',1,4,1,'Contoh soal PU: Ibu kota Indonesia adalah...','Jakarta','Bandung','Medan','Surabaya','IKN','e','tes',1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(5,'Paket Akademik Polri',1,5,26,'Contoh soal WK: Pancasila lahir tanggal...','46174','17 Ags','46296','46144','46336','A',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(6,'Paket Akademik Polri',1,6,51,'Contoh soal Numerik: 10 + 10 x 0 = ...','20','0','10','100','5','C',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(7,'Paket Akademik Polri',1,7,76,'Contoh soal B.Indo: Antonim besar adalah...','Luas','Kecil','Lebar','Tinggi','Jauh','B',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(8,'Paket Akademik Polri',1,8,101,'Contoh soal B.Inggris: I ... a student.','Is','Are','Am','Was','Were','C',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(9,'Paket PPPK',1,9,1,'Contoh soal Teknis: Jelaskan tupoksi...','A','B','C','D','E','a','',1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(10,'Paket PPPK',1,10,91,'Contoh soal Manajerial: Cara memimpin...','A','B','C','D','E','B',NULL,1,5,'BOBOT_OPSI',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(11,'Paket PPPK',1,11,116,'Contoh soal Sosio: Toleransi adalah...','A','B','C','D','E','C',NULL,1,5,'BOBOT_OPSI',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(12,'Paket PPPK',1,12,136,'Contoh soal Wawancara: Alasan mendaftar...','A','B','C','D','E','D',NULL,1,5,'BOBOT_OPSI',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(40,'Paket Akademik Polri',1,4,2,'Contoh soal PU: Ibu kota Indonesia adalah...','Jakarta','Bandung','Medan','Surabaya','IKN','E',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(41,'Paket Akademik Polri',1,5,27,'Contoh soal WK: Pancasila lahir tanggal...','46174','17 Ags','46296','46144','46336','A',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(42,'Paket Akademik Polri',1,6,52,'Contoh soal Numerik: 10 + 10 x 0 = ...','20','0','10','100','5','C',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(43,'Paket Akademik Polri',1,7,77,'Contoh soal B.Indo: Antonim besar adalah...','Luas','Kecil','Lebar','Tinggi','Jauh','B',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(44,'Paket Akademik Polri',1,8,102,'Contoh soal B.Inggris: I ... a student.','Is','Are','Am','Was','Were','C',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(45,'Paket PPPK',1,9,2,'Contoh soal Teknis: Jelaskan tupoksi...','A','B','C','D','E','A',NULL,1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(46,'Paket PPPK',1,10,92,'Contoh soal Manajerial: Cara memimpin...','A','B','C','D','E','B',NULL,1,5,'BOBOT_OPSI',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(47,'Paket PPPK',1,11,117,'Contoh soal Sosio: Toleransi adalah...','A','B','C','D','E','C',NULL,1,5,'BOBOT_OPSI',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(48,'Paket PPPK',1,12,137,'Contoh soal Wawancara: Alasan mendaftar...','A','B','C','D','E','D',NULL,1,5,'BOBOT_OPSI',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(54,'Paket SKD/TKD',1,1,1,'Nilai dasar yang terkandung dalam Pancasila sila ke-3 adalah…','Ketuhanan','Persatuan','. Musyawarah','Keadilan','Kemanusiaan','b','dadadadaxfaer',1,5,'BENAR_SALAH',0,0,0,0,0,'soal-1779350114677-449438496.jpg','soal-1779350114678-314863123.jpg','soal-1779350114680-983418208.jpg','soal-1779350114681-797441531.png','soal-1779350114686-585120753.jpg',NULL,'soal-1779350114687-658970230.jpg'),(55,'Paket SKD/TKD',1,1,2,'Semboyan Bhinneka Tunggal Ika memiliki arti…','Berbeda-beda tetapi tetap satu','.Bersatu kita teguh','Persatuan dan kesatuan','Berbeda budaya','Satu bangsa satu negara','A','',1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(56,'Paket SKD/TKD',1,1,3,'Lembaga yang memiliki kewenangan mengubah dan menetapkan UUD 1945 adalah…','Presiden','DPR','MPR','Mahkamah Konstitusi','DPD','C','',1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(57,'Paket SKD/TKD',1,2,4,'Jika 4 + 6 × 3 = …','30','22','18','28','24','B','(6×3 = 18, 18 + 4 = 22)',1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(58,'Paket SKD/TKD',1,2,5,'Sinonim kata abstrak adalah…','Nyata','Konkret','Tidak Berwujud','Terlihat','Terbuka','C','',1,5,'BENAR_SALAH',0,0,0,0,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(59,'Paket SKD/TKD',1,3,6,'Anda diminta menyelesaikan pekerjaan mendadak oleh atasan sementara pekerjaan lama belum selesai. Sikap Anda adalah…','Menolak tugas baru','Menyelesaikan tugas lama saja','Mengatur prioritas pekerjaan','Menunggu perintah selanjutnya','Membiarkan pekerjaan tertunda','C','',1,5,'BOBOT_OPSI',1,2,5,3,4,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(60,'Paket SKD/TKD',1,3,7,'Rekan kerja melakukan kesalahan yang dapat merugikan tim. Sikap Anda adalah..','Membiarkannya','Melaporkan langsung ke pimpinan','Mengingatkan dan membantu memperbaiki','Menyalahkan rekan kerja','Menghindari masalah','C','',1,5,'BOBOT_OPSI',1,2,5,3,4,NULL,NULL,NULL,NULL,NULL,NULL,NULL),(61,'Paket SKD/TKD',1,2,8,'Gambar berikut adalah gambar apa..','logo unimed','logo unpad','logo UIN','logo UI','Logo IPB','A','logo unimed itu bang',1,5,'BENAR_SALAH',0,0,0,0,0,'soal-1773809595802-120603817.png',NULL,NULL,NULL,NULL,NULL,NULL),(62,'Paket SKD/TKD',1,2,9,'Apa makna logo ini','','','','','','A','',1,5,'BENAR_SALAH',0,0,0,0,0,'soal-1773809920609-883516924.png','soal-1773809920613-546325739.png','soal-1773809920617-171822221.png','soal-1773809920620-3173069.png','soal-1773809920623-352580600.png','soal-1773809920626-36109010.png',NULL),(63,'Paket SKD/TKD',1,2,10,'Siapakah artis berikut','Atta Halilintar','Pragos','Gali Armando','Udin peetot','mumuk','A','atta halilintar cosplay gembel',1,5,'BENAR_SALAH',0,0,0,0,0,'soal-1773810678694-332898347.JPG',NULL,NULL,NULL,NULL,NULL,NULL),(65,'Paket PPPK',2,1,1,'','','','','','','A','',1,5,'BENAR_SALAH',0,0,0,0,0,'soal-1779071151194-497855092.png','soal-1779071151232-805524984.png','soal-1779071151238-527395989.png','soal-1779071151246-529618836.png','soal-1779071151262-849384052.png','soal-1779071151266-908619727.png',NULL),(69,'Paket PPPK',1,9,3,'siaiasoa','adasd','asdaa','asdas','asdasd','asdasdas','a','adsasasdas',1,5,'BENAR_SALAH',0,0,0,0,0,'soal-1779360356868-779340516.png','soal-1779360356875-247964490.png','soal-1779360356882-146249159.png','soal-1779360356890-92130548.png','soal-1779360356901-949683161.png','soal-1779360356907-793133996.png','soal-1779360356912-462050355.png');
 /*!40000 ALTER TABLE `questions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `riwayat_subtest`
+--
+
+DROP TABLE IF EXISTS `riwayat_subtest`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `riwayat_subtest` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `riwayat_ujian_id` int NOT NULL,
+  `materi_id` int NOT NULL,
+  `nama_materi` varchar(100) NOT NULL DEFAULT '',
+  `jumlah_soal` int NOT NULL DEFAULT '0',
+  `jumlah_benar` int NOT NULL DEFAULT '0',
+  `jumlah_salah` int NOT NULL DEFAULT '0',
+  `skor_subtest` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `skor_maks` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_riwayat` (`riwayat_ujian_id`),
+  KEY `idx_materi` (`materi_id`),
+  CONSTRAINT `riwayat_subtest_ibfk_1` FOREIGN KEY (`riwayat_ujian_id`) REFERENCES `riwayat_ujian` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `riwayat_subtest`
+--
+
+LOCK TABLES `riwayat_subtest` WRITE;
+/*!40000 ALTER TABLE `riwayat_subtest` DISABLE KEYS */;
+INSERT INTO `riwayat_subtest` VALUES (1,41,9,'Kompetensi Teknis',3,1,2,5.00,0.00,'2026-05-21 11:17:18'),(2,41,10,'Kompetensi Manajerial',2,2,0,0.00,0.00,'2026-05-21 11:17:18'),(3,41,11,'Kompetensi Sosial-Kultural',2,2,0,0.00,0.00,'2026-05-21 11:17:18'),(4,41,12,'Kompetensi Wawancara',2,2,0,0.00,0.00,'2026-05-21 11:17:18'),(5,42,9,'Kompetensi Teknis',3,1,2,5.00,15.00,'2026-05-21 11:24:10'),(6,42,10,'Kompetensi Manajerial',2,2,0,0.00,0.00,'2026-05-21 11:24:10'),(7,42,11,'Kompetensi Sosial-Kultural',2,2,0,0.00,0.00,'2026-05-21 11:24:10'),(8,42,12,'Kompetensi Wawancara',2,1,1,0.00,0.00,'2026-05-21 11:24:10'),(9,43,1,'TWK',3,1,2,5.00,15.00,'2026-05-21 11:35:50'),(10,43,2,'TIU',5,2,3,10.00,25.00,'2026-05-21 11:35:50'),(11,43,3,'TKP',2,0,2,0.00,10.00,'2026-05-21 11:35:50');
+/*!40000 ALTER TABLE `riwayat_subtest` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -415,7 +453,7 @@ CREATE TABLE `riwayat_ujian` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `idx_riwayat_user_to` (`user_id`,`nomor_to`)
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -424,7 +462,7 @@ CREATE TABLE `riwayat_ujian` (
 
 LOCK TABLES `riwayat_ujian` WRITE;
 /*!40000 ALTER TABLE `riwayat_ujian` DISABLE KEYS */;
-INSERT INTO `riwayat_ujian` VALUES (1,49,'Paket SKD/TKD',1,17,1,6,'2026-03-14 12:54:14',1),(2,49,'Paket Akademik Polri',1,0,0,10,'2026-03-14 12:59:27',1),(3,49,'Paket Akademik Polri',1,10,1,10,'2026-03-14 13:01:50',1),(4,49,'Paket Akademik Polri',1,10,1,10,'2026-03-14 13:12:40',1),(5,49,'Paket Akademik Polri',1,100,10,10,'2026-03-14 13:20:18',1),(6,49,'Paket SKD/TKD',1,5,1,2,'2026-03-14 23:41:22',1),(7,49,'Paket SKD/TKD',1,5,0,2,'2026-03-14 23:49:43',1),(8,49,'Paket SKD/TKD',1,10,1,2,'2026-03-14 23:50:20',1),(9,49,'Paket SKD/TKD',1,10,2,2,'2026-03-15 00:02:31',1),(10,49,'Paket SKD/TKD',1,8,2,2,'2026-03-15 00:04:30',1),(11,49,'Paket SKD/TKD',1,5,1,2,'2026-03-15 00:07:29',1),(12,49,'Paket SKD/TKD',1,7,2,2,'2026-03-15 00:07:47',1),(13,49,'Paket Akademik Polri',1,10,10,10,'2026-03-15 07:05:55',1),(14,48,'Paket PPPK',1,10,8,8,'2026-03-15 07:14:29',1),(15,49,'Paket SKD/TKD',1,10,2,2,'2026-03-15 07:22:11',1),(16,49,'Paket SKD/TKD',1,10,2,2,'2026-03-15 07:48:00',1),(17,49,'Paket Akademik Polri',1,10,10,10,'2026-03-15 07:48:48',1),(18,49,'Paket SKD/TKD',1,6,2,3,'2026-03-16 10:22:56',1),(19,49,'Paket SKD/TKD',1,6,2,3,'2026-03-16 10:24:46',1),(20,49,'Paket SKD/TKD',1,9,2,3,'2026-03-16 10:25:57',1),(21,49,'Paket SKD/TKD',1,28,7,7,'2026-03-16 11:55:43',1),(22,28,'Paket SKD/TKD',1,12,4,7,'2026-03-16 13:02:36',1),(23,28,'Paket SKD/TKD',1,29,7,7,'2026-03-16 13:17:06',1),(24,28,'Paket SKD/TKD',1,5,1,7,'2026-03-16 13:17:27',1),(25,28,'Paket SKD/TKD',1,18,4,7,'2026-03-16 13:21:27',1),(26,28,'Paket SKD/TKD',1,0,0,7,'2026-03-16 13:32:45',1),(27,28,'Paket SKD/TKD',1,0,0,7,'2026-03-16 13:33:38',1),(28,49,'Paket SKD/TKD',1,25,5,9,'2026-03-18 12:00:04',1),(29,49,'Paket SKD/TKD',1,17,5,9,'2026-03-18 12:05:10',1),(30,49,'Paket SKD/TKD',1,0,0,10,'2026-03-18 12:14:15',1),(31,28,'Paket SKD/TKD',1,17,5,10,'2026-03-18 12:20:05',1),(32,28,'Paket SKD/TKD',1,35,7,10,'2026-03-18 12:24:34',1);
+INSERT INTO `riwayat_ujian` VALUES (33,50,'Paket SKD/TKD',1,10,2,10,'2026-05-18 11:03:27',1),(34,50,'Paket SKD/TKD',1,20,4,10,'2026-05-18 11:05:56',1),(35,51,'Paket Akademik Polri',1,0,0,10,'2026-05-21 14:00:13',1),(36,51,'Paket SKD/TKD',1,0,0,10,'2026-05-21 14:57:22',1),(37,51,'Paket SKD/TKD',1,37,8,10,'2026-05-21 14:58:55',1),(38,51,'Paket SKD/TKD',1,0,0,10,'2026-05-21 17:08:58',1),(39,51,'Paket Akademik Polri',1,0,0,10,'2026-05-21 17:10:04',1),(40,53,'Paket PPPK',1,15,9,9,'2026-05-21 18:09:15',1),(41,54,'Paket PPPK',1,5,7,9,'2026-05-21 18:17:18',1),(42,54,'Paket PPPK',1,5,6,9,'2026-05-21 18:24:10',1),(43,55,'Paket SKD/TKD',1,15,3,10,'2026-05-21 18:35:50',1);
 /*!40000 ALTER TABLE `riwayat_ujian` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -455,7 +493,7 @@ CREATE TABLE `users` (
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `username_2` (`username`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -464,7 +502,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (2,'admin123','$2b$10$Pzx1yjnpbQ5w7NBRkLOcROeVEOF.9XXr4C6tqKa8Z35dox/TrGjVO','admin@gmail.com','admin','2026-01-27 14:23:38',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(28,'ucup','$2b$10$hE6v7cvn98kWONGKGiD36uhsh9qRJn.jHxrlOs2dX6hoLSfqyLDt2','ucup@gmail.com','users','2026-02-23 00:56:50',5,'IDLE',NULL,'2026-11-08 16:13:59',1,'2026-02-23 13:08:52',0,0,0),(32,'guhu','$2b$10$lCRnMLtrM9fwbpgH94djaegaqyTt9qRIF/4kursBgXmHRgvmciuYy','teguharif5505@gmail.com','users','2026-02-24 16:54:37',0,'IDLE',NULL,'2026-05-06 17:26:06',1,NULL,0,0,0),(42,'user_desember','$2b$10$qmYoctWQiGcBo0tgOGnz6u6h05ai0fN7IgSvLkd1.RlBdnEtcuBNK','des@test.com','users','2025-12-15 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(43,'user_januari','$2b$10$Qujk4Ng74n1KRVO1rDMMhO9fli8RxpQZAQWDwJE2B9./4SkefsObe','jan@test.com','users','2026-01-10 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(44,'user_januari2','$2b$10$TObF.nCDlTHHeWGPWzYKQuMSk13MptLW9yHSpPAlWRwpHaFBNwjHu','jan2@test.com','users','2026-01-20 07:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(46,'user_januar','$2b$10$gGO7LRO/hRk70YnVZ2R1MeKpec7cpnCRwdwvbFfAMIDMgfTd5G35W','jin@test.com','users','2026-01-10 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(48,'wwww','$2b$10$yk05qxkx5/0uIZwAku02A.TG7VTVLoCdl19jfkmTPjFVWJULcsIm6','w@gmail.com','users','2026-03-06 17:58:32',0,'IDLE',NULL,'2026-07-05 01:37:21',1,NULL,0,0,0),(49,'jono','$2b$10$tNkCL5IdpKtWdM/RtR7yc.iHLO5ThiZUiiMQWcP3qpmMaynDjrGoG','jono@gmail.com','users','2026-03-09 07:10:06',0,'IDLE',NULL,NULL,0,NULL,0,0,1),(50,'naruto','$2b$10$bZd2pkZLYVx69gy84FKUaOvZbFGsp.XdBBoXDeEc3xL07wqRgClZy','ijazahnyamana@gmail.com','users','2026-03-15 07:43:16',0,'IDLE',NULL,'2026-05-14 14:45:58',1,NULL,0,0,0);
+INSERT INTO `users` VALUES (2,'admin123','$2b$10$oRAmnjSlLCaEc0hVAwcZDOQqFzCr2CeO.c7rjhvPlYuQUywRHNCm2','admin@gmail.com','admin','2026-01-27 14:23:38',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(28,'ucup','$2b$10$hE6v7cvn98kWONGKGiD36uhsh9qRJn.jHxrlOs2dX6hoLSfqyLDt2','ucup@gmail.com','users','2026-02-23 00:56:50',5,'IDLE',NULL,'2026-11-08 16:13:59',1,'2026-02-23 13:08:52',0,0,0),(32,'guhu','$2b$10$lCRnMLtrM9fwbpgH94djaegaqyTt9qRIF/4kursBgXmHRgvmciuYy','teguharif5505@gmail.com','users','2026-02-24 16:54:37',0,'IDLE',NULL,'2026-05-06 17:26:06',1,NULL,0,0,0),(42,'user_desember','$2b$10$qmYoctWQiGcBo0tgOGnz6u6h05ai0fN7IgSvLkd1.RlBdnEtcuBNK','des@test.com','users','2025-12-15 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(43,'user_januari','$2b$10$Qujk4Ng74n1KRVO1rDMMhO9fli8RxpQZAQWDwJE2B9./4SkefsObe','jan@test.com','users','2026-01-10 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(44,'user_januari2','$2b$10$TObF.nCDlTHHeWGPWzYKQuMSk13MptLW9yHSpPAlWRwpHaFBNwjHu','jan2@test.com','users','2026-01-20 07:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(46,'user_januar','$2b$10$gGO7LRO/hRk70YnVZ2R1MeKpec7cpnCRwdwvbFfAMIDMgfTd5G35W','jin@test.com','users','2026-01-10 03:00:00',0,'IDLE',NULL,NULL,0,NULL,0,0,0),(48,'wwww','$2b$10$yk05qxkx5/0uIZwAku02A.TG7VTVLoCdl19jfkmTPjFVWJULcsIm6','w@gmail.com','users','2026-03-06 17:58:32',0,'IDLE',NULL,'2026-07-05 01:37:21',1,NULL,0,0,0),(50,'naruto','$2b$10$oZyASaS9Bpc0JLU3BFj54.ELxoySrn2ITUJaIKRSQ4csW9btZKL4O','ijazahnyamana@gmail.com','users','2026-03-15 07:43:16',0,'IDLE',NULL,'2026-05-25 11:02:41',1,NULL,0,0,0),(51,'jono','$2b$10$irgAOHMGbl6atD1l0RHigeDH.kyAmnqtJDpDKE9gHDPwO8OZ.E2oG','dadang@gmail.com','users','2026-05-21 06:52:25',0,'IDLE',NULL,'2026-06-11 13:53:17',1,NULL,0,0,0),(52,'prabowo','$2b$10$LsmxBV7.W9pEcNev9ea5DOjCHQi9oj1PEo0hD/EZ/J.3TfaG4m2UK','adsada@gmail.com','users','2026-05-21 10:37:38',0,'SEDANG_UJIAN',NULL,'2026-05-28 17:46:46',1,NULL,0,0,0),(53,'wowo','$2b$10$GiPM4OFWf3p/HaRc6LtVh.Js7FEvj0SAlBxt46Byw6FJb9bfOb1Bq','dasd@gmail.com','users','2026-05-21 11:06:48',0,'SEDANG_UJIAN',NULL,'2026-05-28 18:08:14',1,NULL,0,0,0),(54,'wowok','$2b$10$hxQIANvFNSLlIVzdZXHlGexgIWgWlvGRoSWLZYMkUToe5rCn/8UUC','asdasd@gmail.com','users','2026-05-21 11:15:54',0,'SEDANG_UJIAN',NULL,'2026-05-28 18:16:40',1,NULL,0,0,0),(55,'wokwok','$2b$10$2X.i9FPWgUt6WV1fWinZgOT4FUDY3r37aEg49rN9BUUdJ7JgpiZI2','dakjdak@gmail.com','users','2026-05-21 11:33:55',0,'IDLE',NULL,'2026-05-28 18:34:46',1,NULL,0,0,0);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -477,4 +515,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-18 12:33:41
+-- Dump completed on 2026-05-21 18:39:12

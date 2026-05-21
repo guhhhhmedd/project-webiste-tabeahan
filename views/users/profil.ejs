@@ -5,261 +5,233 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Profil - Tabeahan Cendekia</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
     :root { --gold:#c8a020; --dark:#7a1010; --cream:#fff8f8; --muted:#9b6b6b; --red-deep:#5a0a0a; }
-    body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--dark); }
+    body  { font-family:'DM Sans',sans-serif; background:var(--cream); }
     .font-display { font-family:'Playfair Display',serif; }
-    .nav-glass { background:var(--red-deep); border-bottom:1px solid rgba(200,160,32,0.25); box-shadow:0 2px 12px rgba(90,10,10,0.18); }
-
-    .card { background:white; border:1.5px solid #f0e8d8; box-shadow:0 2px 12px rgba(90,10,10,0.05); border-radius:6px; overflow:hidden; }
-    .card-hd { padding:0.875rem 1.25rem; background:linear-gradient(135deg,var(--red-deep),#6b1a1a); border-bottom:1px solid rgba(200,160,32,0.15); }
-    .card-hd h3 { color:white; font-family:'Playfair Display',serif; font-size:0.875rem; margin:0; }
-
-    .info-row { display:flex; justify-content:space-between; align-items:center; padding:0.625rem 0; border-bottom:1px solid #f0e8d8; font-size:0.75rem; }
-    .info-row:last-child { border-bottom:none; }
-
-    /* ===== RIWAYAT CARD ===== */
-    .riwayat-card { border:1.5px solid #f0e8d8; border-radius:6px; background:white; overflow:hidden; transition:box-shadow 0.2s; }
-    .riwayat-card:hover { box-shadow:0 4px 20px rgba(90,10,10,0.08); }
-
-    .riwayat-header { padding:0.875rem 1.25rem; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:0.75rem; }
-    .riwayat-header:hover { background:rgba(200,160,32,0.03); }
-
-    /* ===== BADGE STATUS PG ===== */
-    .pg-lulus       { background:rgba(21,128,61,0.1);  color:#15803d; border:1px solid rgba(21,128,61,0.2); }
-    .pg-tidak       { background:rgba(220,38,38,0.08); color:#b91c1c; border:1px solid rgba(220,38,38,0.15); }
-    .pg-peringkat   { background:rgba(29,78,216,0.08); color:#1d4ed8; border:1px solid rgba(29,78,216,0.15); }
-    .pg-info        { background:rgba(161,98,7,0.08);  color:#a16207; border:1px solid rgba(161,98,7,0.15); }
-
-    .pg-badge { font-size:0.6rem; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; padding:0.2rem 0.5rem; border-radius:3px; white-space:nowrap; }
-
-    /* ===== SUBTEST ROW ===== */
-    .subtest-detail { border-top:1px solid #f0e8d8; padding:0.875rem 1.25rem; background:#fdfaf5; }
-    .subtest-row { display:flex; align-items:center; gap:0.5rem; padding:0.4rem 0; border-bottom:1px dashed #f0e8d8; }
-    .subtest-row:last-child { border-bottom:none; }
-
-    .prog-track { flex:1; height:5px; background:#f0e8d8; border-radius:99px; overflow:hidden; }
-    .prog-fill  { height:100%; border-radius:99px; }
-    .fill-green { background:linear-gradient(90deg,#16a34a,#4ade80); }
-    .fill-red   { background:linear-gradient(90deg,#dc2626,#f87171); }
-    .fill-gold  { background:linear-gradient(90deg,var(--gold),#e0c040); }
-    .fill-blue  { background:linear-gradient(90deg,#1d4ed8,#60a5fa); }
-
-    /* ===== AKSI ===== */
-    .btn-review {
-      padding:0.3rem 0.75rem; border-radius:4px; font-size:0.65rem; font-weight:800;
-      text-decoration:none; background:rgba(90,10,10,0.07); color:var(--dark);
-      border:1px solid rgba(90,10,10,0.15); white-space:nowrap; transition:all 0.2s;
-    }
-    .btn-review:hover { background:var(--red-deep); color:var(--gold); }
-
-    .btn-danger { background:none; border:1px solid rgba(220,38,38,0.2); color:#b91c1c; padding:0.5rem 1.25rem; border-radius:4px; font-size:0.72rem; font-weight:700; cursor:pointer; transition:all 0.2s; }
-    .btn-danger:hover { background:rgba(220,38,38,0.07); }
-
-    /* ===== ACCORDION ===== */
-    .accordion-body { display:none; }
-    .accordion-body.open { display:block; }
-    .chevron { transition:transform 0.25s; font-size:0.75rem; }
+    .acc-body { display:none; }
+    .acc-body.open { display:block; }
+    .chevron { transition:transform .25s; }
     .chevron.open { transform:rotate(180deg); }
   </style>
 </head>
-<body>
+<body class="min-h-screen" style="color:var(--dark)">
 
-<!-- NAVBAR -->
-<nav class="nav-glass sticky top-0 z-50">
-  <div class="max-w-3xl mx-auto px-4 py-3.5 flex justify-between items-center">
-    <div class="flex items-center gap-3">
-      <img src="/asset/logo.png" alt="Logo" class="h-8 w-8 object-cover rounded-full"/>
-      <span class="font-display font-bold text-base text-white">
+<!-- ── NAVBAR ── -->
+<nav class="sticky top-0 z-50 shadow-md" style="background:var(--red-deep);border-bottom:1px solid rgba(200,160,32,.25)">
+  <div class="max-w-2xl mx-auto px-4 py-3 flex justify-between items-center">
+    <div class="flex items-center gap-2.5">
+      <img src="/asset/logo.png" alt="Logo" class="h-8 w-8 rounded-full object-cover"/>
+      <span class="font-display font-bold text-sm text-white">
         Tabeahan <span style="color:var(--gold)">Cendekia</span>
       </span>
     </div>
     <a href="/dashboardPembayaranUjian"
-      style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.15);border-radius:4px;padding:0.35rem 1rem;font-size:0.72rem;font-weight:700;text-decoration:none;transition:all 0.2s"
-      onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='rgba(255,255,255,0.75)'">
+       class="text-[11px] font-bold px-3 py-1.5 rounded transition"
+       style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.15)"
+       onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='rgba(255,255,255,.75)'">
       ← Kembali
     </a>
   </div>
 </nav>
 
-<!-- MAIN -->
-<main class="max-w-3xl mx-auto px-4 py-8 space-y-5">
+<!-- ── MAIN ── -->
+<main class="max-w-2xl mx-auto px-4 py-8 space-y-4">
 
-  <!-- Header -->
-  <div class="flex items-center gap-4 mb-2">
+  <!-- Avatar + Nama -->
+  <div class="flex items-center gap-4">
     <div class="w-14 h-14 rounded-full flex items-center justify-center font-display font-black text-2xl text-white flex-shrink-0"
-      style="background:linear-gradient(135deg,var(--red-deep),#6b1a1a)">
+         style="background:linear-gradient(135deg,var(--red-deep),#6b1a1a)">
       <%= user.username.charAt(0).toUpperCase() %>
     </div>
     <div>
-      <h1 class="font-display font-black text-2xl leading-tight" style="color:var(--dark)"><%= user.username %></h1>
+      <h1 class="font-display font-black text-2xl leading-tight"><%= user.username %></h1>
       <p class="text-sm" style="color:var(--muted)"><%= user.email %></p>
     </div>
   </div>
 
-  <!-- Info Akun -->
-  <div class="card">
-    <div class="card-hd"><h3>👤 Info Akun</h3></div>
-    <div class="px-5 py-1">
-      <div class="info-row">
-        <span style="color:var(--muted)">Username</span>
-        <span class="font-bold text-sm"><%= user.username %></span>
+  <!-- ── INFO AKUN ── -->
+  <div class="bg-white rounded-xl border overflow-hidden" style="border-color:#f0e8d8">
+    <div class="px-4 py-2.5 flex items-center gap-2" style="background:linear-gradient(135deg,var(--red-deep),#6b1a1a)">
+      <span class="text-white font-display font-bold text-sm"> Info Akun</span>
+    </div>
+    <div class="divide-y px-5" style="divide-color:#f0e8d8">
+      <% [
+        { label:'Username', val: user.username },
+        { label:'Email', val: user.email },
+        { label:'ID Akun', val: '' + user.id, mono: true },
+      ].forEach(row => { %>
+      <div class="flex justify-between items-center py-2.5">
+        <span class="text-xs" style="color:var(--muted)"><%= row.label %></span>
+        <span class="text-sm font-bold <%= row.mono ? 'font-mono' : '' %>"><%= row.val %></span>
       </div>
-      <div class="info-row">
-        <span style="color:var(--muted)">Email</span>
-        <span class="font-semibold text-sm truncate max-w-[200px]"><%= user.email %></span>
-      </div>
-      <div class="info-row">
-        <span style="color:var(--muted)">ID Akun</span>
-        <span class="font-mono font-bold text-sm"><%= user.id %></span>
-      </div>
-      <div class="info-row">
-        <span style="color:var(--muted)">Status Ujian</span>
-        <span class="font-bold text-xs uppercase px-2 py-0.5"
-          style="border-radius:4px;background:<%= user.status_ujian==='SEDANG_UJIAN'?'rgba(234,179,8,0.12)':'rgba(155,107,107,0.08)' %>;color:<%= user.status_ujian==='SEDANG_UJIAN'?'#a16207':'var(--muted)' %>">
+      <% }) %>
+      <div class="flex justify-between items-center py-2.5">
+        <span class="text-xs" style="color:var(--muted)">Status Ujian</span>
+        <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded"
+          style="background:<%= user.status_ujian==='SEDANG_UJIAN'?'rgba(234,179,8,.12)':'rgba(155,107,107,.08)' %>;
+                 color:<%= user.status_ujian==='SEDANG_UJIAN'?'#a16207':'var(--muted)' %>">
           <%= user.status_ujian || 'IDLE' %>
         </span>
       </div>
       <% if (user.is_anggota) { %>
-      <div class="info-row">
-        <span style="color:var(--muted)">Tipe Akun</span>
-        <span class="font-bold text-xs px-2 py-0.5" style="border-radius:4px;background:rgba(21,128,61,0.1);color:#15803d">
-          🎓 Anggota Kelas Offline
-        </span>
+      <div class="flex justify-between items-center py-2.5">
+        <span class="text-xs" style="color:var(--muted)">Tipe Akun</span>
+        <span class="text-[10px] font-black px-2 py-0.5 rounded"
+              style="background:rgba(21,128,61,.1);color:#15803d"> Anggota Kelas Offline</span>
       </div>
       <% } %>
     </div>
   </div>
 
-  <!-- Statistik -->
+  <!-- ── STATISTIK ── -->
   <% if (typeof riwayatUjian !== 'undefined' && riwayatUjian.length > 0) { %>
   <%
-    const totalSesi    = riwayatUjian.length;
-    const skorMax      = Math.max(...riwayatUjian.map(r => r.skor || 0));
-    const skorRataRata = Math.round(riwayatUjian.reduce((a, r) => a + (r.skor || 0), 0) / totalSesi);
-    const totalLulus   = riwayatUjian.filter(r => r.statusPG === 'LULUS').length;
+    const totalSesi = riwayatUjian.length;
+    const skorMax = Math.max(...riwayatUjian.map(r => r.skor || 0));
+    const skorAvg = Math.round(riwayatUjian.reduce((a,r) => a+(r.skor||0), 0) / totalSesi);
+    const totalLulus  = riwayatUjian.filter(r => r.statusPG === 'LULUS').length;
+    const skorColor = s => s >= 311 ? '#16a34a' : s >= 150 ? 'var(--gold)' : '#b91c1c';
   %>
   <div class="grid grid-cols-4 gap-3">
-    <div class="card p-4 text-center">
-      <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Total Sesi</p>
-      <p class="font-display font-black text-2xl" style="color:var(--dark)"><%= totalSesi %></p>
+    <% [
+      { label:'Total Sesi',   val: totalSesi,  color:'var(--dark)' },
+      { label:'Skor Terbaik', val: skorMax,    color: skorColor(skorMax) },
+      { label:'Rata-rata',    val: skorAvg,    color: skorColor(skorAvg) },
+      { label:'Lulus PG',     val: totalLulus, color: totalLulus > 0 ? '#16a34a' : 'var(--muted)' },
+    ].forEach(s => { %>
+    <div class="bg-white rounded-xl border p-3 text-center" style="border-color:#f0e8d8">
+      <p class="text-[9px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)"><%= s.label %></p>
+      <p class="font-display font-black text-2xl" style="color:<%= s.color %>"><%= s.val %></p>
     </div>
-    <div class="card p-4 text-center">
-      <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Skor Terbaik</p>
-      <p class="font-display font-black text-2xl" style="color:<%= skorMax>=311?'#16a34a':skorMax>=150?'var(--gold)':'#b91c1c' %>"><%= skorMax %></p>
-    </div>
-    <div class="card p-4 text-center">
-      <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Rata-rata</p>
-      <p class="font-display font-black text-2xl" style="color:<%= skorRataRata>=311?'#16a34a':skorRataRata>=150?'var(--gold)':'#b91c1c' %>"><%= skorRataRata %></p>
-    </div>
-    <div class="card p-4 text-center">
-      <p class="text-[10px] font-bold uppercase tracking-widest mb-1" style="color:var(--muted)">Lulus PG</p>
-      <p class="font-display font-black text-2xl" style="color:<%= totalLulus>0?'#16a34a':'var(--muted)' %>"><%= totalLulus %></p>
-    </div>
+    <% }) %>
   </div>
   <% } %>
 
-  <!-- Riwayat Ujian -->
-  <div class="card">
-    <div class="card-hd flex items-center justify-between">
-      <h3>📜 Riwayat Ujian</h3>
+  <!-- ── RANKING ── -->
+  <% if (typeof paketGroups !== 'undefined') { %>
+  <%
+    const paketNames  = Object.keys(paketGroups);
+    let totalPeserta  = 0, skorTertinggi = 0;
+    paketNames.forEach(n => {
+      const rows = paketGroups[n];
+      totalPeserta += rows.length;
+      if (rows.length && rows[0].total_skor > skorTertinggi) skorTertinggi = rows[0].total_skor;
+    });
+  %>
+
+    <!-- ── RIWAYAT UJIAN ── -->
+  <div class="bg-white rounded-xl border overflow-hidden" style="border-color:#f0e8d8">
+    <div class="px-4 py-2.5 flex items-center justify-between" style="background:linear-gradient(135deg,var(--red-deep),#6b1a1a)">
+      <span class="text-white font-display font-bold text-sm"> Riwayat Ujian</span>
       <% if (typeof riwayatUjian !== 'undefined' && riwayatUjian.length > 0) { %>
-      <span style="font-size:0.6rem;color:rgba(255,255,255,0.4)"><%= riwayatUjian.length %> sesi</span>
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+              style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.6)">
+          <%= riwayatUjian.length %> sesi
+        </span>
       <% } %>
     </div>
 
     <% if (typeof riwayatUjian !== 'undefined' && riwayatUjian.length > 0) { %>
-    <div class="divide-y divide-[#f0e8d8]">
+    <div>
       <% riwayatUjian.forEach((r, idx) => {
-        let pgBadgeClass, pgBadgeText;
-        if (r.statusPG === 'LULUS')        { pgBadgeClass = 'pg-lulus';     pgBadgeText = '✅ LULUS'; }
-        else if (r.statusPG === 'TIDAK_LULUS') { pgBadgeClass = 'pg-tidak'; pgBadgeText = '❌ Belum'; }
-        else if (r.statusPG === 'INFO')    { pgBadgeClass = 'pg-info';      pgBadgeText = '📋 Indikatif'; }
-        else                               { pgBadgeClass = 'pg-peringkat'; pgBadgeText = '📊 Peringkat'; }
+        let pgCls, pgTxt;
+        if      (r.statusPG==='LULUS')       { pgCls='bg-green-50 text-green-700 border-green-200';  pgTxt='LULUS'; }
+        else if (r.statusPG==='TIDAK_LULUS') { pgCls='bg-red-50 text-red-700 border-red-200';        pgTxt='TIDAK LULUS'; }
+        else if (r.statusPG==='INFO')        { pgCls='bg-amber-50 text-amber-700 border-amber-200';  pgTxt='Indikatif'; }
+        else                                 { pgCls='bg-blue-50 text-blue-700 border-blue-200';     pgTxt='Peringkat'; }
+        const sColor = r.skor>=311?'#16a34a':r.skor>=150?'var(--gold)':'#b91c1c';
       %>
-      <div class="riwayat-card mx-0 rounded-none border-0 border-b border-[#f0e8d8] last:border-0">
+      <div class="<%= idx > 0 ? 'border-t' : '' %>" style="border-color:#f0e8d8">
 
-        <!-- Header accordion -->
-        <div class="riwayat-header" onclick="toggleAccordion(<%= idx %>)" id="rh-<%= idx %>">
+        <!-- Accordion header -->
+        <div class="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-orange-50 transition"
+             onclick="toggleAcc(<%= idx %>)">
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
-              <p class="font-bold text-sm leading-tight" style="color:var(--dark)"><%= r.paket %></p>
-              <span class="pg-badge <%= pgBadgeClass %>"><%= pgBadgeText %></span>
+              <span class="font-bold text-sm"><%= r.paket %></span>
+              <span class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded border <%= pgCls %>"><%= pgTxt %></span>
             </div>
-            <p class="text-xs mt-0.5 flex items-center gap-1.5 flex-wrap" style="color:var(--muted)">
-              <span>TO <%= r.nomor_to %></span> &middot;
-              <span><%= r.jml_benar %>/<%= r.jml_soal %> benar</span> &middot;
+            <p class="text-[11px] mt-0.5 flex items-center gap-1.5 flex-wrap" style="color:var(--muted)">
+              <span>TO <%= r.nomor_to %></span>
+              <span>·</span>
+              <span><%= r.jml_benar %>/<%= r.jml_soal %> benar</span>
+              <span>·</span>
               <span><%= r.tgl_selesai ? new Date(r.tgl_selesai).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '-' %></span>
-              <% if (r.nilaiAkhir !== null) { %>
-                &middot; <span class="font-bold" style="color:var(--gold)"><%= r.nilaiAkhir %>%</span>
+              <% if (r.nilaiAkhir !== null && r.nilaiAkhir !== undefined) { %>
+                <span>·</span>
+                <span class="font-bold" style="color:var(--gold)"><%= r.nilaiAkhir %>%</span>
               <% } %>
               <%
                 if (r.payment_created_at) {
-                  const pCreated = new Date(r.payment_created_at);
-                  const diff = (pCreated.getTime() + 7 * 24 * 60 * 60 * 1000) - Date.now();
+                  const diff = (new Date(r.payment_created_at).getTime() + 7*24*60*60*1000) - Date.now();
                   if (diff > 0) {
-                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const sisaText = days > 0 ? `${days}h ${hours}j` : `${hours}j`;
+                    const d = Math.floor(diff/(1000*60*60*24));
+                    const h = Math.floor((diff%(1000*60*60*24))/(1000*60*60));
               %>
-                &middot; <span class="inline-flex items-center gap-0.5 text-[9px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200/40">⏳ sisa <%= sisaText %></span>
+                <span>·</span>
+                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-600 border border-amber-200">⏳ sisa <%= d>0?d+'h '+h+'j':h+'j' %></span>
               <% } else { %>
-                &middot; <span class="inline-flex items-center gap-0.5 text-[9px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-200/40">🔒 Kadaluarsa</span>
+                <span>·</span>
+                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-50 text-red-600 border border-red-200">🔒 Kadaluarsa</span>
               <% } } %>
             </p>
           </div>
-          <!-- Kanan: skor + chevron -->
-          <div class="flex items-center gap-3 flex-shrink-0 ml-2">
+          <!-- Skor + Review + Chevron -->
+          <div class="flex items-center gap-2.5 flex-shrink-0">
             <div class="text-right">
-              <p class="font-display font-black text-lg" style="color:<%= r.skor>=311?'#16a34a':r.skor>=150?'var(--gold)':'#b91c1c' %>"><%= r.skor %></p>
+              <p class="font-display font-black text-lg" style="color:<%= sColor %>"><%= r.skor %></p>
               <p class="text-[9px]" style="color:var(--muted)">skor</p>
             </div>
             <a href="/ujian/review?nomor_to=<%= r.nomor_to %>&paket=<%= encodeURIComponent(r.paket) %>"
-              class="btn-review" onclick="event.stopPropagation()">
-              📝 Review
+               onclick="event.stopPropagation()"
+               class="text-[10px] font-bold px-2 py-1 rounded transition whitespace-nowrap"
+               style="background:rgba(90,10,10,.07);color:var(--dark);border:1px solid rgba(90,10,10,.15)"
+               onmouseover="this.style.background='var(--red-deep)';this.style.color='var(--gold)'"
+               onmouseout="this.style.background='rgba(90,10,10,.07)';this.style.color='var(--dark)'">
+                Review
             </a>
-            <span class="chevron" id="chevron-<%= idx %>" style="color:var(--muted)">▼</span>
+            <span class="chevron text-[10px]" style="color:var(--muted)" id="chev-<%= idx %>">▼</span>
           </div>
         </div>
 
-        <!-- Accordion body: skor per subtest -->
-        <div class="accordion-body" id="acc-<%= idx %>">
+
+
+        <!-- Subtest detail -->
+        <div class="acc-body" id="acc-<%= idx %>">
           <% if (r.subtests && r.subtests.length > 0) { %>
-          <div class="subtest-detail">
+          <div class="px-4 pb-3 pt-1" style="background:#fdfaf5;border-top:1px solid #f0e8d8">
             <p class="text-[9px] font-bold uppercase tracking-widest mb-2" style="color:var(--muted)">Skor Per Subtest</p>
             <% r.subtests.forEach(sub => {
-              const persen = sub.skor_maks > 0 ? Math.min(Math.round(sub.skor_subtest / sub.skor_maks * 100), 100) : 0;
-              let fillClass;
-              if (r.statusPG === 'LULUS' || r.statusPG === 'TIDAK_LULUS') {
-                fillClass = sub.lulus ? 'fill-green' : 'fill-red';
-              } else if (r.statusPG === 'INFO') {
-                fillClass = persen >= 70 ? 'fill-green' : 'fill-gold';
-              } else {
-                fillClass = 'fill-blue';
-              }
+              const persen = sub.skor_maks > 0 ? Math.min(Math.round(sub.skor_subtest/sub.skor_maks*100),100) : 0;
+              const barColor = (r.statusPG==='LULUS'||r.statusPG==='TIDAK_LULUS')
+                ? (sub.lulus ? '#16a34a' : '#dc2626')
+                : r.statusPG==='INFO'
+                  ? (persen>=70?'#16a34a':'var(--gold)')
+                  : '#1d4ed8';
             %>
-            <div class="subtest-row">
-              <div style="min-width:120px;max-width:140px">
-                <p class="text-[10px] font-bold leading-tight truncate" style="color:var(--dark)"><%= sub.nama_materi %></p>
-                <% if ((r.statusPG === 'LULUS' || r.statusPG === 'TIDAK_LULUS') && sub.min_skor) { %>
+            <div class="flex items-center gap-2 py-1.5 border-b border-dashed last:border-0" style="border-color:#f0e8d8">
+              <div class="min-w-[110px] max-w-[130px]">
+                <p class="text-[10px] font-bold truncate"><%= sub.nama_materi %></p>
+                <% if ((r.statusPG==='LULUS'||r.statusPG==='TIDAK_LULUS') && sub.min_skor) { %>
                   <p class="text-[9px]" style="color:var(--muted)">min <%= sub.min_skor %></p>
                 <% } %>
               </div>
-              <div class="prog-track">
-                <div class="prog-fill <%= fillClass %>" style="width:<%= persen %>%"></div>
+              <div class="flex-1 h-1.5 rounded-full overflow-hidden" style="background:#f0e8d8">
+                <div class="h-full rounded-full" style="width:<%= persen %>%;background:<%= barColor %>"></div>
               </div>
-              <span class="text-[10px] font-bold font-mono" style="min-width:64px;text-align:right;color:var(--dark)">
+              <span class="text-[10px] font-bold font-mono text-right" style="min-width:60px;color:var(--dark)">
                 <%= sub.skor_subtest %><span style="color:var(--muted);font-weight:400">/<%= sub.skor_maks %></span>
               </span>
-              <% if (r.statusPG === 'LULUS' || r.statusPG === 'TIDAK_LULUS') { %>
-                <span class="text-[9px] font-black" style="min-width:20px;text-align:center"><%= sub.lulus ? '✅' : '❌' %></span>
+              <% if (r.statusPG==='LULUS'||r.statusPG==='TIDAK_LULUS') { %>
+                <span class="text-[10px]"><%= sub.lulus?'✅':'❌' %></span>
               <% } %>
             </div>
             <% }) %>
           </div>
           <% } else { %>
-          <div class="subtest-detail text-center">
+          <div class="px-4 py-3 text-center" style="background:#fdfaf5;border-top:1px solid #f0e8d8">
             <p class="text-xs" style="color:var(--muted)">Data subtest tidak tersedia (ujian lama).</p>
           </div>
           <% } %>
@@ -269,8 +241,8 @@
       <% }) %>
     </div>
     <% } else { %>
-    <div class="px-5 py-10 text-center">
-      <p class="text-3xl opacity-20 mb-3">📋</p>
+    <div class="py-10 text-center">
+      <p class="text-4xl opacity-20 mb-3">📋</p>
       <p class="text-sm font-semibold" style="color:var(--muted)">Belum ada riwayat ujian.</p>
       <a href="/dashboardPembayaranUjian" class="inline-block mt-3 text-xs font-bold" style="color:var(--gold)">
         Mulai ujian pertamamu →
@@ -279,37 +251,131 @@
     <% } %>
   </div>
 
-  <!-- Zona Bahaya -->
-  <div class="card p-5">
-    <p class="text-xs mb-4" style="color:var(--muted)">Tindakan di bawah ini tidak dapat dibatalkan.</p>
-    <form action="/deleteAccount" method="POST" class="confirm-hapus inline">
+  
+  <!-- Header + mini stats -->
+  <div class="bg-white rounded-xl border overflow-hidden" style="border-color:#f0e8d8">
+    <div class="px-4 py-2.5 flex items-center justify-between" style="background:linear-gradient(135deg,var(--red-deep),#6b1a1a)">
+      <span class="text-white font-display font-bold text-sm"> Ranking Ujian</span>
+      <span class="text-[10px]" style="color:rgba(255,255,255,.45)">Peringkat berdasarkan skor tertinggi</span>
+    </div>
+    <div class="grid grid-cols-2 divide-x border-b" style="divide-color:#f0e8d8;border-color:#f0e8d8">
+      <div class="py-3 text-center">
+        <p class="text-[9px] font-bold uppercase tracking-widest mb-0.5" style="color:var(--muted)">Total Peserta</p>
+        <p class="font-display font-black text-xl" style="color:var(--dark)"><%= totalPeserta %></p>
+      </div>
+      <div class="py-3 text-center">
+        <p class="text-[9px] font-bold uppercase tracking-widest mb-0.5" style="color:var(--muted)">Skor Tertinggi</p>
+        <p class="font-display font-black text-xl" style="color:var(--gold)"><%= skorTertinggi || '—' %></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid 3 kolom per paket (sama persis dengan aslinya) -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    <% paketNames.forEach(paketName => { %>
+    <% const rankings = paketGroups[paketName]; %>
+    <div class="bg-white rounded-xl border overflow-hidden" style="border-color:#f0e8d8">
+
+      <!-- Paket header -->
+      <div class="flex items-center gap-2 px-3 py-2.5 border-b" style="background:#fcf5f5;border-color:#f0e8d8">
+        <div class="w-2 h-2 rounded-full flex-shrink-0" style="background:var(--gold)"></div>
+        <p class="font-display font-bold text-sm flex-1 truncate" style="color:var(--red-deep)"><%= paketName %></p>
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white border" style="color:var(--muted);border-color:#f0e8d8">
+          <%= rankings.length %> peserta
+        </span>
+      </div>
+
+      <!-- Rank list -->
+      <% if (rankings.length === 0) { %>
+        <div class="py-8 text-center">
+          <p class="text-2xl opacity-20 mb-1">📋</p>
+          <p class="text-xs" style="color:var(--muted)">Belum ada data</p>
+        </div>
+      <% } else { %>
+        <% rankings.forEach((r, i) => { %>
+        <div class="flex items-center gap-2 px-3 py-2 border-b last:border-0 text-sm"
+             style="border-color:#f0e8d8;background:<%= i===0?'#fefaec':i===1?'#f9f9f9':i===2?'#fdf7f0':'white' %>">
+          <!-- Nomor / medali -->
+          <div class="w-5 text-center flex-shrink-0 font-black text-sm">
+            <%= i===0?'1':i===1?'2':i===2?'3':'<span style=color:var(--muted);font-size:10px>'+(i+1)+'</span>' %>
+          </div>
+          <!-- Avatar -->
+          <div class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black text-white flex-shrink-0"
+               style="background:<%= i===0?'#b8860b':i===1?'#888':i===2?'#a0522d':'var(--red-deep)' %>">
+            <%= r.username.charAt(0).toUpperCase() %>
+          </div>
+          <!-- Info -->
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-xs truncate"><%= r.username %></p>
+            <p class="text-[9px]" style="color:var(--muted)"><%= r.jml_benar %>/<%= r.jml_soal %> benar</p>
+          </div>
+          <!-- TO -->
+          <span class="text-[9px] font-bold px-1.5 py-0.5 rounded flex-shrink-0"
+                style="background:rgba(21,128,61,.1);color:#15803d;border:1px solid rgba(21,128,61,.2)">
+            TO <%= r.nomor_to %>
+          </span>
+          <!-- Skor -->
+          <span class="font-display font-black text-sm flex-shrink-0"
+                style="color:<%= i===0?'var(--gold)':'var(--dark)' %>"><%= r.total_skor %></span>
+        </div>
+        <% }) %>
+      <% } %>
+    </div>
+    <% }) %>
+
+    <!-- Isi kolom kosong kalau paket < 3 -->
+    <% for (let i = paketNames.length; i < 3; i++) { %>
+    <div class="bg-white rounded-xl border overflow-hidden opacity-40" style="border-color:#f0e8d8">
+      <div class="flex items-center gap-2 px-3 py-2.5 border-b" style="background:#fcf5f5;border-color:#f0e8d8">
+        <div class="w-2 h-2 rounded-full" style="background:#ccc"></div>
+        <p class="font-display font-bold text-sm" style="color:#bbb">—</p>
+      </div>
+      <div class="py-8 text-center">
+        <p class="text-xs" style="color:#ccc">Belum ada data</p>
+      </div>
+    </div>
+    <% } %>
+  </div>
+  <% } %>
+
+
+  <!-- ── ZONA BAHAYA ── -->
+  <div class="bg-white rounded-xl border p-4" style="border-color:#f0e8d8">
+    <p class="text-[11px] mb-3" style="color:var(--muted)">⚠️ Tindakan di bawah tidak dapat dibatalkan.</p>
+    <form action="/deleteAccount" method="POST" class="confirm-hapus">
       <input type="hidden" name="id" value="<%= user.id %>">
-      <button type="submit" class="btn-danger">🗑️ Hapus Akun Permanen</button>
+      <button type="submit"
+              class="text-xs font-bold px-4 py-2 rounded transition"
+              style="background:none;border:1px solid rgba(220,38,38,.25);color:#b91c1c"
+              onmouseover="this.style.background='rgba(220,38,38,.06)'"
+              onmouseout="this.style.background='none'">
+        🗑️ Hapus Akun Permanen
+      </button>
     </form>
   </div>
 
-  <p style="text-align:center;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:rgba(155,107,107,0.35);margin-top:1rem">
+  <p class="text-center text-[10px] font-bold uppercase tracking-widest pb-4" style="color:rgba(155,107,107,.35)">
     Tabeahan Cendekia
   </p>
 
 </main>
 
 <script>
-  // Accordion toggle
-  function toggleAccordion(idx) {
-    const body    = document.getElementById('acc-' + idx);
-    const chevron = document.getElementById('chevron-' + idx);
-    const isOpen  = body.classList.contains('open');
-    body.classList.toggle('open', !isOpen);
-    chevron.classList.toggle('open', !isOpen);
+  // Riwayat ujian accordion
+  function toggleAcc(idx) {
+    const body = document.getElementById('acc-' + idx);
+    const chev = document.getElementById('chev-' + idx);
+    const open = body.classList.toggle('open');
+    chev.classList.toggle('open', open);
   }
 
+  // Konfirmasi hapus akun
   document.querySelectorAll('.confirm-hapus').forEach(form => {
     form.addEventListener('submit', e => {
-      if (!confirm('Akun akan dihapus permanen beserta semua data ujian! Yakin?')) e.preventDefault();
+      if (!confirm('⚠️ Akun akan dihapus PERMANEN beserta semua data ujian!\nTindakan ini tidak bisa dibatalkan.\n\nYakin?'))
+        e.preventDefault();
     });
   });
 </script>
-
 </body>
 </html>

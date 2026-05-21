@@ -1,80 +1,57 @@
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ujian - Tabeahan Cendekia</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900&family=DM+Sans:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
+    /* ===== TOKENS ===== */
     :root {
-      --gold: #c8a020;
-      --gold-light: #e0b830;
-      --dark: #7a1010;
-      --cream: #fff8f8;
-      --muted: #9b6b6b;
-      --red-deep: #5a0a0a;
+      --gold:      #c8a020;
+      --gold-light:#e0b830;
+      --dark:      #7a1010;
+      --cream:     #fff8f8;
+      --muted:     #9b6b6b;
+      --red-deep:  #5a0a0a;
     }
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--cream);
-      color: var(--dark);
-    }
+    /* ===== BASE ===== */
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--dark); }
+    .font-display { font-family: 'Playfair Display', serif; }
 
-    .font-display {
-      font-family: 'Playfair Display', serif;
-    }
-
+    /* ===== NAVBAR ===== */
     .nav-glass {
       background: var(--red-deep);
       backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(200, 160, 32, 0.25);
-      box-shadow: 0 2px 12px rgba(90, 10, 10, 0.18);
+      border-bottom: 1px solid rgba(200,160,32,0.25);
+      box-shadow: 0 2px 12px rgba(90,10,10,0.18);
     }
 
-    .paket-card {
+    /* ===== CARDS ===== */
+    .card {
       background: white;
       border-radius: 4px;
       border: 1.5px solid #f0e8d8;
-      box-shadow: 0 2px 16px rgba(90, 10, 10, 0.06);
+      box-shadow: 0 2px 16px rgba(90,10,10,0.06);
       overflow: hidden;
-      transition: all 0.25s;
+      transition: transform 0.25s, box-shadow 0.25s;
     }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(90,10,10,0.08); }
 
-    .paket-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(90, 10, 10, 0.08);
-    }
+    /* TO card status variants */
+    .to-lunas   { background: rgba(22,163,74,0.05);  border-color: rgba(22,163,74,0.25)  !important; }
+    .to-pending { background: rgba(234,179,8,0.05);  border-color: rgba(234,179,8,0.25)  !important; }
+    .to-ditolak { background: rgba(220,38,38,0.05);  border-color: rgba(220,38,38,0.25)  !important; }
+    .to-kosong  { background: white;                 border-color: #f0e8d8               !important; }
 
-    .to-card-lunas {
-      background: rgba(22, 163, 74, 0.05);
-      border-color: rgba(22, 163, 74, 0.25) !important;
-    }
-
-    .to-card-pending {
-      background: rgba(234, 179, 8, 0.05);
-      border-color: rgba(234, 179, 8, 0.25) !important;
-    }
-
-    .to-card-ditolak {
-      background: rgba(220, 38, 38, 0.05);
-      border-color: rgba(220, 38, 38, 0.25) !important;
-    }
-
-    .to-card-kosong {
-      background: white;
-      border-color: #f0e8d8 !important;
-    }
-
+    /* ===== PAKET DROPDOWN ===== */
     .paket-selector {
       appearance: none;
       -webkit-appearance: none;
       background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c8a020' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 1rem center;
-      border: 2px solid rgba(200, 160, 32, 0.35);
+      border: 2px solid rgba(200,160,32,0.35);
       border-radius: 4px;
       padding: 0.9rem 3rem 0.9rem 1.25rem;
       font-family: 'Playfair Display', serif;
@@ -83,73 +60,51 @@
       color: var(--dark);
       cursor: pointer;
       width: 100%;
-      box-shadow: 0 2px 12px rgba(90, 10, 10, 0.05);
-      transition: all 0.2s;
+      box-shadow: 0 2px 12px rgba(90,10,10,0.05);
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-
     .paket-selector:focus {
       outline: none;
       border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(200, 160, 32, 0.15);
+      box-shadow: 0 0 0 3px rgba(200,160,32,0.15);
     }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 0.875rem;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      top: 0;
+      transition: filter 0.15s, top 0.15s, box-shadow 0.15s;
+    }
+    .btn:hover  { filter: brightness(1.08); }
 
     .btn-green {
       background: linear-gradient(135deg, #16a34a, #14532d);
       color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 0.75rem 1rem;
-      font-family: 'Playfair Display', serif;
-      font-weight: 700;
-      font-size: 0.875rem;
-      cursor: pointer;
-      width: 100%;
       box-shadow: 0 4px 0 #0f4022;
-      transition: all 0.15s;
-      position: relative;
-      top: 0;
-      display: block;
-      text-align: center;
     }
-
-    .btn-green:hover {
-      filter: brightness(1.08);
-    }
-
-    .btn-green:active {
-      top: 3px;
-      box-shadow: 0 1px 0 #0f4022;
-    }
+    .btn-green:active { top: 3px; box-shadow: 0 1px 0 #0f4022; }
 
     .btn-gold {
       background: linear-gradient(135deg, var(--gold), #a88010);
       color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 0.75rem 1rem;
-      font-family: 'Playfair Display', serif;
-      font-weight: 700;
-      font-size: 0.875rem;
-      cursor: pointer;
-      width: 100%;
       box-shadow: 0 4px 0 #7a6010;
-      transition: all 0.15s;
-      position: relative;
-      top: 0;
     }
+    .btn-gold:active { top: 3px; box-shadow: 0 1px 0 #7a6010; }
 
-    .btn-gold:hover {
-      filter: brightness(1.07);
-    }
-
-    .btn-gold:active {
-      top: 3px;
-      box-shadow: 0 1px 0 #7a6010;
-    }
-
+    /* ===== TOKEN BOX ===== */
     .token-box {
       background: var(--red-deep);
-      border: 1px solid rgba(200, 160, 32, 0.35);
+      border: 1px solid rgba(200,160,32,0.35);
       border-radius: 4px;
       padding: 0.3rem 0.75rem;
       letter-spacing: 0.12em;
@@ -158,57 +113,25 @@
       text-align: center;
     }
 
-    .riwayat-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.5rem 0;
-      border-bottom: 1px solid #f0e8d8;
-    }
-
-    .riwayat-row:last-child {
-      border-bottom: none;
-    }
-
-    .rank-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.5rem 0.75rem;
-      border-radius: 4px;
-      transition: background 0.15s;
-    }
-
-    .rank-row:hover {
-      background: rgba(200, 160, 32, 0.05);
-    }
-
-    .rank-row.me {
-      background: rgba(200, 160, 32, 0.1);
-      border: 1px solid rgba(200, 160, 32, 0.2);
-    }
-
-    .user-menu {
-      position: relative;
-    }
-
-    .user-menu-dropdown {
+    /* ===== USER DROPDOWN ===== */
+    .user-dropdown {
       position: absolute;
       right: 0;
       top: calc(100% + 8px);
       width: 220px;
       background: white;
       border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-      border: 1px solid rgba(0, 0, 0, 0.07);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      border: 1px solid rgba(0,0,0,0.07);
       overflow: hidden;
       z-index: 100;
     }
 
+    /* ===== MODAL ===== */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0,0,0,0.7);
       backdrop-filter: blur(6px);
       z-index: 9999;
       display: flex;
@@ -216,470 +139,378 @@
       justify-content: center;
       padding: 1rem;
     }
-
     .upload-zone {
       border: 2px dashed #d4c5a8;
       border-radius: 4px;
       padding: 1.5rem;
       text-align: center;
       cursor: pointer;
-      transition: all 0.2s;
-      position: relative;
+      transition: border-color 0.2s, background 0.2s;
     }
-
     .upload-zone:hover {
       border-color: var(--gold);
-      background: rgba(200, 160, 32, 0.04);
+      background: rgba(200,160,32,0.04);
     }
 
-    @keyframes slideIn {
-      from {
-        transform: translateX(120%);
-        opacity: 0;
-      }
-
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-
-    .toast {
-      animation: slideIn 0.3s ease forwards;
-    }
-
-    .toast.hide {
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    .paket-section {
-      display: none;
-    }
-
+    /* ===== PAKET SECTIONS ===== */
+    .paket-section { display: none; }
     .paket-section.active {
       display: block;
       animation: fadeUp 0.25s ease forwards;
     }
 
+    /* ===== PAKET HEADER GRADIENTS ===== */
+    .grad-0 { background: linear-gradient(135deg, #1a1a2e, #16213e); }
+    .grad-1 { background: linear-gradient(135deg, #0f3a1a, #1a6b2e); }
+    .grad-2 { background: linear-gradient(135deg, #3a0f0f, #6b1a1a); }
+
+    /* ===== TOAST ===== */
+    @keyframes slideIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+    .toast { animation: slideIn 0.3s ease forwards; }
+    .toast.hide { opacity: 0; transition: opacity 0.3s; }
+
+    /* ===== ANIMATIONS ===== */
     @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(12px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0);    }
     }
 
-    .grad-0 {
-      background: linear-gradient(135deg, #1a1a2e, #16213e);
-    }
-
-    .grad-1 {
-      background: linear-gradient(135deg, #0f3a1a, #1a6b2e);
-    }
-
-    .grad-2 {
-      background: linear-gradient(135deg, #3a0f0f, #6b1a1a);
-    }
-
-    .hidden {
-      display: none !important;
-    }
+    /* ===== UTILITIES ===== */
+    .hidden { display: none !important; }
   </style>
 </head>
-
 <body>
 
-  <!-- ===== TOAST ERROR ===== -->
-  <% if (typeof uploadError !=='undefined' && uploadError) { %>
-    <div id="toast" class="toast fixed top-4 right-4 z-[9998] max-w-sm">
-      <div class="bg-white shadow-2xl p-4 flex items-start gap-3 border-l-4 border-red-500" style="border-radius:4px">
-        <span class="text-xl">❌</span>
-        <div class="flex-1">
-          <p class="font-bold text-red-600 text-xs uppercase">Gagal</p>
-          <p class="text-xs text-slate-600 mt-0.5">
-            <%= uploadError %>
-          </p>
-        </div>
-        <button id="closeToast"
-          class="text-slate-300 hover:text-slate-500 cursor-pointer text-lg leading-none">×</button>
+  <%# ===== TOAST ERROR ===== %>
+  <% if (typeof uploadError !== 'undefined' && uploadError) { %>
+  <div id="toast" class="toast fixed top-4 right-4 z-[9998] max-w-sm">
+    <div class="bg-white shadow-2xl p-4 flex items-start gap-3 border-l-4 border-red-500" style="border-radius:4px">
+      <span class="text-xl">❌</span>
+      <div class="flex-1">
+        <p class="font-bold text-red-600 text-xs uppercase">Gagal</p>
+        <p class="text-xs text-slate-600 mt-0.5"><%= uploadError %></p>
+      </div>
+      <button id="closeToast" class="text-slate-300 hover:text-slate-500 cursor-pointer text-lg leading-none">×</button>
+    </div>
+  </div>
+  <% } %>
+
+  <%# ===== TOAST SUCCESS ===== %>
+  <% if (typeof successMsg !== 'undefined' && successMsg) { %>
+  <div id="toastSuccess" class="toast fixed top-4 right-4 z-[9998] max-w-sm">
+    <div class="bg-white shadow-2xl p-4 flex items-start gap-3 border-l-4 border-green-500" style="border-radius:4px">
+      <span class="text-xl">✅</span>
+      <div class="flex-1">
+        <p class="font-bold text-green-600 text-xs uppercase">Berhasil</p>
+        <p class="text-xs text-slate-600 mt-0.5"><%= successMsg %></p>
       </div>
     </div>
-    <% } %>
+  </div>
+  <% } %>
 
-      <!-- ===== TOAST SUCCESS ===== -->
-      <% if (typeof successMsg !=='undefined' && successMsg) { %>
-        <div id="toastSuccess" class="toast fixed top-4 right-4 z-[9998] max-w-sm">
-          <div class="bg-white shadow-2xl p-4 flex items-start gap-3 border-l-4 border-green-500"
-            style="border-radius:4px">
-            <span class="text-xl">✅</span>
-            <div class="flex-1">
-              <p class="font-bold text-green-600 text-xs uppercase">Berhasil</p>
-              <p class="text-xs text-slate-600 mt-0.5">
-                <%= successMsg %>
-              </p>
+  <%# ===== NAVBAR ===== %>
+  <nav class="nav-glass fixed w-full z-50">
+    <div class="max-w-6xl mx-auto px-6 py-3 flex justify-between items-center">
+
+      <a href="/dashboard" class="flex items-center gap-3">
+        <img src="/asset/logo.png" alt="Logo" class="h-10 w-10 object-cover rounded-full" />
+        <span class="font-display font-bold text-base text-white">
+          Tabeahan <span style="color:var(--gold)">Cendekia</span>
+        </span>
+      </a>
+
+      <div class="flex items-center gap-4">
+        <a href="/dashboard" class="hidden md:inline-block text-[0.72rem] font-bold"
+          style="background:white;color:var(--dark);border:1px solid rgba(184,146,74,0.3);border-radius:4px;padding:0.35rem 1rem;text-decoration:none;transition:color 0.2s"
+          onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--dark)'">
+          ← Kembali
+        </a>
+
+        <%# User menu %>
+        <div class="relative" id="userMenuWrap">
+          <button id="userMenuBtn"
+            class="flex items-center gap-2 px-3 py-2 cursor-pointer"
+            style="border-radius:4px;background:rgba(184,146,74,0.15);border:1px solid rgba(184,146,74,0.3)">
+            <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white"
+              style="background:var(--gold)">
+              <%= user.username.charAt(0).toUpperCase() %>
+            </div>
+            <span class="hidden md:inline-block text-sm font-semibold text-white truncate max-w-[90px]">
+              <%= user.username %>
+            </span>
+            <svg class="w-3 h-3 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <div id="userMenuDropdown" class="user-dropdown hidden">
+            <div class="px-4 py-3 border-b bg-slate-50">
+              <p class="text-[10px] text-slate-400 font-bold uppercase">Akun</p>
+              <p class="text-xs font-semibold text-slate-700 truncate"><%= user.email %></p>
+              <p class="text-[10px] text-slate-400">ID <%= user.id %></p>
+            </div>
+            <div class="p-2">
+              <a href="/dashboard" class="flex items-center gap-2 px-3 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 rounded-lg transition">🏠 Beranda</a>
+              <a href="/profil"    class="flex items-center gap-2 px-3 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 rounded-lg transition">👤 Profil & Riwayat</a>
+              <a href="/logout"   class="flex items-center gap-2 px-3 py-2.5 text-xs font-semibold text-red-500  hover:bg-red-50  rounded-lg transition">🚪 Logout</a>
+              <hr class="my-1 border-slate-100">
+              <form action="/deleteAccount" method="POST" class="confirm-hapus">
+                <input type="hidden" name="id" value="<%= user.id %>">
+                <button type="submit"
+                  class="w-full text-left flex items-center gap-2 px-3 py-2.5 text-[11px] font-semibold text-red-400 hover:bg-red-50 rounded-lg transition cursor-pointer">
+                  🗑️ Hapus Akun
+                </button>
+              </form>
             </div>
           </div>
         </div>
-        <% } %>
+      </div>
 
-          <!-- ===== NAVBAR ===== -->
-          <nav class="nav-glass fixed w-full z-50">
-            <div class="max-w-6xl mx-auto px-6 py-3 flex justify-between items-center">
-              <a href="/dashboard" class="flex items-center gap-3">
-                <img src="/asset/logo.png" alt="Logo" class="h-10 w-10 object-cover rounded-full" />
-                <span class="font-display font-bold text-base text-white">Tabeahan <span
-                    style="color:var(--gold)">Cendekia</span></span>
-              </a>
-              <div class="flex items-center gap-4">
-                <a href="/dashboard" class="hidden md:inline-block"
-                  style="background:#ffffff;color:var(--dark);border:1px solid rgba(184,146,74,0.3);border-radius:4px;padding:0.35rem 1rem;font-size:0.72rem;font-weight:700;text-decoration:none;transition:all 0.2s"
-                  onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--dark)'">
-                  ← Kembali
-                </a>
-                <div class="user-menu relative" id="userMenuContainerUjian">
-                  <button id="userMenuBtnUjian" class="flex items-center gap-2 px-3 py-2 cursor-pointer"
-                    style="border-radius:4px;background:rgba(184,146,74,0.15);border:1px solid rgba(184,146,74,0.3)">
-                    <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white"
-                      style="background:var(--gold)">
-                      <%= user.username.charAt(0).toUpperCase() %>
+      <a href="/dashboard" class="md:hidden text-white/60 hover:text-white text-sm font-medium">← Kembali</a>
+    </div>
+  </nav>
+
+  <%# ===== MAIN ===== %>
+  <main class="pt-20 md:pt-24 min-h-screen">
+    <div class="max-w-6xl mx-auto px-4 md:px-8 py-8">
+
+      <%# Page heading %>
+      <div class="mb-6">
+        <p class="text-sm font-medium" style="color:var(--muted)">Dashboard Ujian</p>
+        <h1 class="text-3xl font-display font-black">
+          Halo, <span style="color:var(--gold)"><%= user.username %></span> 👋
+        </h1>
+        <p class="text-sm mt-1" style="color:var(--muted)">
+          Pilih paket, lalu pilih nomor try out yang ingin dikerjakan
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <%# ===== KONTEN UTAMA ===== %>
+        <div class="lg:col-span-2 space-y-5">
+
+          <%# Dropdown paket %>
+          <div class="card p-5">
+            <label class="block text-[10px] font-bold uppercase tracking-widest mb-2" style="color:var(--muted)">
+              📚 Pilih Paket Ujian
+            </label>
+            <select id="paketDropdown" class="paket-selector">
+              <option value="">— Pilih Paket —</option>
+              <% if (typeof paketList !== 'undefined') { %>
+                <% paketList.forEach(p => { %>
+                  <option value="<%= p.key %>"><%= p.label %> · <%= p.durasi %> menit</option>
+                <% }) %>
+              <% } %>
+            </select>
+          </div>
+
+          <%# Placeholder %>
+          <div id="placeholderPilih" class="card p-12 text-center">
+            <p class="font-display font-bold text-xl">Pilih Paket Dulu</p>
+            <p class="text-sm mt-2" style="color:var(--muted)">
+              Setelah memilih paket di atas, Try Out akan muncul di sini.
+            </p>
+          </div>
+
+          <%# ===== SECTION PER PAKET ===== %>
+          <% if (typeof paketList !== 'undefined') { %>
+            <% paketList.forEach((paket, idx) => {
+              const sectionId = 'section-' + paket.key.replace(/\//g, '-').replace(/\s+/g, '_');
+
+              let tos = [];
+              if (typeof tryoutList !== 'undefined' && tryoutList.length > 0) {
+                tos = tryoutList.filter(t => t.paket === paket.key);
+              } else {
+                for (let i = 1; i <= 10; i++) tos.push({ paket: paket.key, nomor_to: i });
+              }
+
+              let lunasCount = 0;
+              for (const toObj of tos) {
+                const mk = paket.key + '_' + toObj.nomor_to;
+                if (paymentMap[mk] && paymentMap[mk].status.toUpperCase() === 'LUNAS') lunasCount++;
+              }
+            %>
+            <div id="<%= sectionId %>" class="paket-section space-y-4">
+
+              <%# Paket header card %>
+              <div class="card overflow-hidden">
+                <div class="p-5 text-white grad-<%= idx % 3 %>">
+                  <div class="flex items-center justify-between gap-4">
+                    <div class="flex-1 min-w-0">
+                      <p class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Paket Ujian</p>
+                      <h2 class="font-display font-bold text-2xl leading-tight"><%= paket.label %></h2>
+                      <p class="text-xs text-white/60 mt-1">⏱ Durasi <%= paket.durasi %> menit per sesi</p>
+                      <% if (paket.deskripsi) { %>
+                        <p class="text-xs text-white/50 mt-2 leading-relaxed line-clamp-2"><%= paket.deskripsi %></p>
+                      <% } %>
                     </div>
-                    <span class="hidden md:inline-block text-sm font-semibold text-white truncate max-w-[90px]">
-                      <%= user.username %>
-                    </span>
-                    <svg class="w-3 h-3 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  <div id="userMenuDropdownUjian" class="user-menu-dropdown hidden">
-                    <div class="px-4 py-3 border-b bg-slate-50">
-                      <p class="text-[10px] text-slate-400 font-bold uppercase">Akun</p>
-                      <p class="text-xs font-semibold text-slate-700 truncate">
-                        <%= user.email %>
+                    <div class="flex-shrink-0 text-right">
+                      <% if (paket.harga_asli && paket.harga_asli > paket.harga) { %>
+                        <p class="text-xs line-through text-white/30">
+                          Rp <%= paket.harga_asli.toLocaleString('id-ID') %>
+                        </p>
+                      <% } %>
+                      <p class="font-display font-black text-xl" style="color:var(--gold)">
+                        Rp <%= (paket.harga || 50000).toLocaleString('id-ID') %>
                       </p>
-                      <p class="text-[10px] text-slate-400">ID <%= user.id %>
-                      </p>
-                    </div>
-                    <div class="p-2">
-                      <a href="/dashboard"
-                        class="flex items-center gap-2 px-3 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 rounded-lg transition">🏠
-                        Beranda</a>
-                      <a href="/profil"
-                        class="flex items-center gap-2 px-3 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 rounded-lg transition">👤
-                        Profil & Riwayat</a>
-                      <a href="/logout"
-                        class="flex items-center gap-2 px-3 py-2.5 text-xs font-semibold text-red-500 hover:bg-red-50 rounded-lg transition">🚪
-                        Logout</a>
-                      <hr class="my-1 border-slate-100">
-                      <form action="/deleteAccount" method="POST" class="confirm-hapus">
-                        <input type="hidden" name="id" value="<%= user.id %>">
-                        <button type="submit"
-                          class="w-full text-left flex items-center gap-2 px-3 py-2.5 text-[11px] font-semibold text-red-400 hover:bg-red-50 rounded-lg transition cursor-pointer">🗑️
-                          Hapus Akun</button>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <a href="/dashboard" class="md:hidden text-white/60 hover:text-white text-sm font-medium">← Kembali</a>
-            </div>
-          </nav>
-
-          <!-- ===== MAIN ===== -->
-          <main class="pt-20 md:pt-24 min-h-screen">
-            <div class="max-w-6xl mx-auto px-4 md:px-8 py-8">
-
-              <div class="mb-6">
-                <p class="text-sm font-medium" style="color:var(--muted)">Dashboard Ujian</p>
-                <h1 class="text-3xl font-display font-black">Halo, <span style="color:var(--gold)">
-                    <%= user.username %>
-                  </span> 👋</h1>
-                <p class="text-sm mt-1" style="color:var(--muted)">Pilih paket, lalu pilih nomor try out yang ingin
-                  dikerjakan</p>
-              </div>
-
-              <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" id="mainGrid">
-
-                <!-- ===== KONTEN UTAMA ===== -->
-                <div class="lg:col-span-2 space-y-5">
-
-                  <!-- Dropdown -->
-                  <div class="paket-card p-5">
-                    <label class="block text-[10px] font-bold uppercase tracking-widest mb-2"
-                      style="color:var(--muted)">
-                      📚 Pilih Paket Ujian
-                    </label>
-                    <select id="paketDropdown" class="paket-selector">
-                      <option value="">— Pilih Paket —</option>
-                      <% if (typeof paketList !=='undefined' ) { %>
-                        <% paketList.forEach((p)=> { %>
-                          <option value="<%= p.key %>">
-                            <%= p.label %> · <%= p.durasi %> menit
-                          </option>
-                          <% }) %>
-                            <% } %>
-                    </select>
-                  </div>
-
-                  <!-- Placeholder -->
-                  <div id="placeholderPilih" class="paket-card p-12 text-center">
-                    <p class="font-display font-bold text-xl">Pilih Paket Dulu</p>
-                    <p class="text-sm mt-2" style="color:var(--muted)">Setelah memilih paket di atas, Try Out akan
-                      muncul di sini.</p>
-                  </div>
-
-                  <!-- ===== SECTION PER PAKET ===== -->
-                  <% if (typeof paketList !=='undefined' ) { %>
-                    <% paketList.forEach((paket, idx)=> {
-                      const sectionId = 'section-' + paket.key.replace(/\//g, '-').replace(/\s+/g, '_');
-                      let lunasCount = 0;
-                      let tos = [];
-                      if (typeof tryoutList !== 'undefined' && tryoutList.length > 0) {
-                      tos = tryoutList.filter(t => t.paket === paket.key);
-                      } else {
-                      for(let i=1; i<=10; i++) tos.push({paket: paket.key, nomor_to: i}); } for (let toObj of tos) {
-                        const mk=paket.key + '_' + toObj.nomor_to; if (paymentMap[mk] &&
-                        paymentMap[mk].status.toUpperCase()==='LUNAS' ) lunasCount++; } %>
-                        <div id="<%= sectionId %>" class="paket-section space-y-4">
-
-                          <!-- Header info paket -->
-                          <div class="paket-card overflow-hidden">
-                            <div class="p-5 text-white grad-<%= idx % 3 %>">
-                              <div class="flex items-center justify-between gap-4">
-                                <div class="flex-1 min-w-0">
-                                  <p class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Paket
-                                    Ujian</p>
-                                  <h2 class="font-display font-bold text-2xl leading-tight">
-                                    <%= paket.label %>
-                                  </h2>
-                                  <p class="text-xs text-white/60 mt-1">⏱ Durasi <%= paket.durasi %> menit per sesi</p>
-                                  <% if (paket.deskripsi) { %>
-                                    <p class="text-xs text-white/50 mt-2 leading-relaxed line-clamp-2">
-                                      <%= paket.deskripsi %>
-                                    </p>
-                                    <% } %>
-                                </div>
-                                <div class="flex-shrink-0 text-right">
-                                  <% if (paket.harga_asli && paket.harga_asli> paket.harga) { %>
-                                    <p class="text-xs line-through text-white/30">Rp <%=
-                                        paket.harga_asli.toLocaleString('id-ID') %>
-                                    </p>
-                                    <% } %>
-                                      <p class="font-display font-black text-xl" style="color:var(--gold)">
-                                        Rp <%= (paket.harga || 50000).toLocaleString('id-ID') %>
-                                      </p>
-                                      <p class="text-[9px] text-white/40 mt-0.5">per Try Out</p>
-                                      <% if (lunasCount> 0) { %>
-                                        <div
-                                          class="mt-2 inline-block px-3 py-1 text-[9px] font-black uppercase tracking-wide"
-                                          style="background:rgba(255,255,255,0.12);border-radius:4px">
-                                          <%= lunasCount %> TO Aktif
-                                        </div>
-                                        <% } %>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <!-- Grid TO -->
-                          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <% if (tos.length===0) { %>
-                              <div class="col-span-full paket-card p-8 text-center" style="background:#fafafa">
-                                <p class="text-sm font-medium" style="color:var(--muted)">Belum ada Try Out tersedia.
-                                </p>
-                              </div>
-                              <% } else { %>
-                                <% tos.forEach(toObj=> {
-                                  const i = toObj.nomor_to;
-                                  const key = paket.key + '_' + i;
-                                  const pay = paymentMap[key] || null;
-                                  const status = pay ? pay.status.toUpperCase() : 'KOSONG';
-                                  const cardCls = status==='LUNAS' ? 'to-card-lunas' :
-                                  status==='PENDING' ? 'to-card-pending' :
-                                  status==='DITOLAK' ? 'to-card-ditolak' : 'to-card-kosong';
-                                  %>
-                                  <div class="paket-card border-2 p-4 <%= cardCls %>">
-                                    <!-- Header TO -->
-                                    <div class="flex items-center justify-between mb-3">
-                                      <div class="flex items-center gap-2.5">
-                                        <div
-                                          class="w-10 h-10 flex items-center justify-center font-display font-black text-base text-white flex-shrink-0"
-                                          style="border-radius:4px;background:<%= status==='LUNAS'?'#16a34a':status==='PENDING'?'#a16207':status==='DITOLAK'?'#b91c1c':'var(--muted)' %>">
-                                          <%= i %>
-                                        </div>
-                                        <div>
-                                          <p class="text-sm font-bold leading-tight" style="color:var(--dark)">Try Out
-                                            <%= i %>
-                                          </p>
-                                          <p class="text-[10px]" style="color:var(--muted)">
-                                            <%= paket.durasi %> menit
-                                          </p>
-                                          <% if (status==='LUNAS' && pay && pay.sisaWaktuText) { %>
-                                            <p class="text-[9px] font-bold mt-0.5" style="color:#a16207"> sisa <%=
-                                                pay.sisaWaktuText %>
-                                            </p>
-                                            <% } %>
-                                        </div>
-                                      </div>
-                                      <span class="text-[9px] font-black uppercase px-2 py-0.5"
-                                        style="border-radius:4px;<%= status==='LUNAS'?'background:rgba(22,163,74,0.12);color:#15803d':status==='PENDING'?'background:rgba(234,179,8,0.15);color:#a16207':status==='DITOLAK'?'background:rgba(220,38,38,0.12);color:#b91c1c':'background:#f0e8d8;color:var(--muted)' %>">
-                                        <%= status==='LUNAS' ?' Aktif':status==='PENDING' ?'⏳ Proses':status==='DITOLAK'
-                                          ?' Ditolak':'— Beli' %>
-                                      </span>
-                                    </div>
-
-                                    <!-- Token jika LUNAS -->
-                                    <% if (status==='LUNAS' && pay && pay.is_gratis) { %>
-                                      <div class="mb-3 text-center">
-                                        <span class="text-[10px] font-black uppercase px-3 py-1"
-                                          style="border-radius:4px;background:rgba(21,128,61,0.12);color:#15803d;border:1px solid rgba(21,128,61,0.2)">
-                                          🎓 Gratis — Anggota Kelas Offline
-                                        </span>
-                                      </div>
-                                      <% } else if (status==='LUNAS' && pay && pay.token_ujian) { %>
-                                        <div class="mb-3">
-                                          <div class="token-box">
-                                            <span class="font-display font-black text-sm" style="color:var(--gold)">
-                                              <%= pay.token_ujian %>
-                                            </span>
-                                          </div>
-                                        </div>
-                                        <% } %>
-
-                                          <!-- Aksi -->
-                                          <% if (status==='LUNAS' ) { %>
-                                            <% if (user.status_ujian==='SEDANG_UJIAN' ) { %>
-                                              <a href="/ujian/soal/1" class="btn-green">▶️ Lanjutkan Ujian</a>
-                                              <p class="text-[10px] text-center mt-1.5" style="color:var(--muted)">
-                                                Selesaikan ujian aktifmu dulu</p>
-                                              <% } else { %>
-                                                <form action="/ujian/mulai" method="POST" class="confirm-mulai">
-                                                  <input type="hidden" name="paket_pilihan" value="<%= paket.key %>">
-                                                  <input type="hidden" name="nomor_to" value="<%= i %>">
-                                                  <button type="submit" class="btn-green"> Mulai Ujian TO <%= i %>
-                                                      </button>
-                                                </form>
-                                                <a href="/ujian/review?nomor_to=<%= i %>&paket=<%= encodeURIComponent(paket.key) %>"
-                                                  class="block text-center text-[10px] font-semibold mt-2"
-                                                  style="color:var(--muted)">
-                                                  📝 Lihat Review Jawaban
-                                                </a>
-                                                <% } %>
-                                                  <% } else if (status==='PENDING' ) { %>
-                                                    <div class="p-2.5 text-center"
-                                                      style="border-radius:4px;background:rgba(234,179,8,0.08)">
-                                                      <p class="text-[11px] font-semibold" style="color:#a16207">⏳
-                                                        Menunggu verifikasi</p>
-                                                      <p class="text-[10px] mt-0.5" style="color:var(--muted)">Proses
-                                                        1×24 jam</p>
-                                                    </div>
-                                                    <% } else { %>
-                                                      <button type="button" class="open-upload-modal btn-gold"
-                                                        data-paket="<%= paket.key %>" data-label="<%= paket.label %>"
-                                                        data-to="<%= i %>" data-harga="<%= paket.harga || 50000 %>"
-                                                        data-harga-asli="<%= paket.harga_asli || '' %>">
-                                                        <%= status==='DITOLAK' ? ' Upload Ulang' : ' Beli TO ini' %>
-                                                      </button>
-                                                      <% } %>
-                                  </div>
-                                  <% }) %>
-                                    <% } %>
-                          </div>
-
+                      <p class="text-[9px] text-white/40 mt-0.5">per Try Out</p>
+                      <% if (lunasCount > 0) { %>
+                        <div class="mt-2 inline-block px-3 py-1 text-[9px] font-black uppercase tracking-wide"
+                          style="background:rgba(255,255,255,0.12);border-radius:4px">
+                          <%= lunasCount %> TO Aktif
                         </div>
-                        <% }) %>
-                          <% } %>
-
-                </div>
-                <!-- /KONTEN UTAMA -->
-
-                <!-- ===== SIDEBAR ===== -->
-                <div class="space-y-4">
-
-                  <!-- Link ke Profil -->
-                  <a href="/profil" class="paket-card p-5 flex items-center justify-between gap-3"
-                    style="text-decoration:none">
-                    <div class="flex items-center gap-3">
-                      <div class="w-9 h-9 flex items-center justify-center text-sm flex-shrink-0"
-                        style="background:rgba(200,160,32,0.1);border-radius:4px">👤</div>
-                      <div>
-                        <p class="font-display font-bold text-sm" style="color:var(--dark)">Info Akun & Riwayat</p>
-                        <p class="text-[10px]" style="color:var(--muted)">Profil & riwayat ujian</p>
-                      </div>
+                      <% } %>
                     </div>
-                    <span style="color:var(--muted);font-size:1rem">→</span>
-                  </a>
+                  </div>
+                </div>
+              </div>
 
-                  <!-- Ranking Global -->
-                  <div class="paket-card p-5">
+              <%# Grid TO cards %>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <% if (tos.length === 0) { %>
+                  <div class="col-span-full card p-8 text-center" style="background:#fafafa">
+                    <p class="text-sm font-medium" style="color:var(--muted)">Belum ada Try Out tersedia.</p>
+                  </div>
+                <% } else { %>
+                  <% tos.forEach(toObj => {
+                    const i      = toObj.nomor_to;
+                    const key    = paket.key + '_' + i;
+                    const pay    = paymentMap[key] || null;
+                    const status = pay ? pay.status.toUpperCase() : 'KOSONG';
+
+                    const cardCls   = status === 'LUNAS'   ? 'to-lunas'
+                                    : status === 'PENDING' ? 'to-pending'
+                                    : status === 'DITOLAK' ? 'to-ditolak'
+                                    :                        'to-kosong';
+
+                    const badgeBg   = status === 'LUNAS'   ? '#16a34a'
+                                    : status === 'PENDING' ? '#a16207'
+                                    : status === 'DITOLAK' ? '#b91c1c'
+                                    :                        'var(--muted)';
+
+                    const badgeStyle = status === 'LUNAS'   ? 'background:rgba(22,163,74,0.12);color:#15803d'
+                                     : status === 'PENDING' ? 'background:rgba(234,179,8,0.15);color:#a16207'
+                                     : status === 'DITOLAK' ? 'background:rgba(220,38,38,0.12);color:#b91c1c'
+                                     :                        'background:#f0e8d8;color:var(--muted)';
+
+                    const badgeText  = status === 'LUNAS'   ? '✅ Aktif'
+                                     : status === 'PENDING' ? '⏳ Proses'
+                                     : status === 'DITOLAK' ? '❌ Ditolak'
+                                     :                        '— Beli';
+                  %>
+                  <div class="card border-2 p-4 <%= cardCls %>">
+
+                    <%# TO header row %>
                     <div class="flex items-center justify-between mb-3">
-                      <h3 class="font-display font-bold text-base">🏆 Ranking Global</h3>
-                      <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full"
-                        style="background:rgba(200,160,32,0.1);color:var(--gold);border:1px solid rgba(200,160,32,0.2)">
-                        Ujian Pertama
+                      <div class="flex items-center gap-2.5">
+                        <div class="w-10 h-10 flex items-center justify-center font-display font-black text-base text-white flex-shrink-0"
+                          style="border-radius:4px;background:<%= badgeBg %>">
+                          <%= i %>
+                        </div>
+                        <div>
+                          <p class="text-sm font-bold leading-tight" style="color:var(--dark)">Try Out <%= i %></p>
+                          <p class="text-[10px]" style="color:var(--muted)"><%= paket.durasi %> menit</p>
+                          <% if (status === 'LUNAS' && pay && pay.sisaWaktuText) { %>
+                            <p class="text-[9px] font-bold mt-0.5" style="color:#a16207">
+                              sisa <%= pay.sisaWaktuText %>
+                            </p>
+                          <% } %>
+                        </div>
+                      </div>
+                      <span class="text-[9px] font-black uppercase px-2 py-0.5"
+                        style="border-radius:4px;<%= badgeStyle %>">
+                        <%= badgeText %>
                       </span>
                     </div>
 
-                    <% if (typeof rankings !=='undefined' && rankings.length> 0) { %>
-                      <% rankings.forEach((r, i)=> { %>
-                        <div class="rank-row <%= r.id === user.id ? 'me' : '' %>">
-                          <div class="flex items-center gap-2.5 min-w-0">
-                            <span class="text-sm w-5 text-center flex-shrink-0">
-                              <%= i===0 ? '🥇' : i===1 ? '🥈' : i===2 ? '🥉' : '#' + (i+1) %>
-                            </span>
-                            <div
-                              class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black text-white flex-shrink-0"
-                              style="background:var(--red-deep)">
-                              <%= r.username.charAt(0).toUpperCase() %>
-                            </div>
-                            <div class="min-w-0">
-                              <p class="text-xs font-semibold truncate" style="color:var(--dark)">
-                                <%= r.username %>
-                                  <%= r.id===user.id ? ' 👈' : '' %>
-                              </p>
-                              <p class="text-[9px] truncate" style="color:var(--muted)">
-                                <%= r.paket ? r.paket.replace('Paket ', '') : 'Umum' %> · TO <%= r.nomor_to || '-' %>
-          </p>
+                    <%# Token / gratis badge %>
+                    <% if (status === 'LUNAS' && pay && pay.is_gratis) { %>
+                      <div class="mb-3 text-center">
+                        <span class="text-[10px] font-black uppercase px-3 py-1"
+                          style="border-radius:4px;background:rgba(21,128,61,0.12);color:#15803d;border:1px solid rgba(21,128,61,0.2)">
+                          🎓 Gratis — Anggota Kelas Offline
+                        </span>
+                      </div>
+                    <% } else if (status === 'LUNAS' && pay && pay.token_ujian) { %>
+                      <div class="mb-3">
+                        <div class="token-box">
+                          <span class="font-display font-black text-sm" style="color:var(--gold)">
+                            <%= pay.token_ujian %>
+                          </span>
+                        </div>
+                      </div>
+                    <% } %>
+
+                    <%# Action area %>
+                    <% if (status === 'LUNAS') { %>
+                      <% if (user.status_ujian === 'SEDANG_UJIAN') { %>
+                        <a href="/ujian/soal/1" class="btn btn-green">▶️ Lanjutkan Ujian</a>
+                        <p class="text-[10px] text-center mt-1.5" style="color:var(--muted)">
+                          Selesaikan ujian aktifmu dulu
+                        </p>
+                      <% } else { %>
+                        <form action="/ujian/mulai" method="POST" class="confirm-mulai">
+                          <input type="hidden" name="paket_pilihan" value="<%= paket.key %>">
+                          <input type="hidden" name="nomor_to"      value="<%= i %>">
+                          <button type="submit" class="btn btn-green">▶ Mulai Ujian TO <%= i %></button>
+                        </form>
+                        <a href="/ujian/review?nomor_to=<%= i %>&paket=<%= encodeURIComponent(paket.key) %>"
+                          class="block text-center text-[10px] font-semibold mt-2" style="color:var(--muted)">
+                          📝 Lihat Review Jawaban
+                        </a>
+                      <% } %>
+                    <% } else if (status === 'PENDING') { %>
+                      <div class="p-2.5 text-center" style="border-radius:4px;background:rgba(234,179,8,0.08)">
+                        <p class="text-[11px] font-semibold" style="color:#a16207">⏳ Menunggu verifikasi</p>
+                        <p class="text-[10px] mt-0.5" style="color:var(--muted)">Proses 1×24 jam</p>
+                      </div>
+                    <% } else { %>
+                      <button type="button" class="btn btn-gold open-upload-modal"
+                        data-paket="<%= paket.key %>"
+                        data-label="<%= paket.label %>"
+                        data-to="<%= i %>"
+                        data-harga="<%= paket.harga || 50000 %>"
+                        data-harga-asli="<%= paket.harga_asli || '' %>">
+                        <%= status === 'DITOLAK' ? '🔄 Upload Ulang' : '🛒 Beli TO ini' %>
+                      </button>
+                    <% } %>
+
+                  </div>
+                  <% }) %>
+                <% } %>
+              </div>
+
+            </div>
+            <% }) %>
+          <% } %>
+
         </div>
-      </div>
-      <span class="text-sm font-black flex-shrink-0 ml-2" style="color:var(--gold)">
-        <%= r.skor %>
-      </span>
-    </div>
-    <% }) %>
+        <%# /KONTEN UTAMA %>
 
-    <!-- Posisi user kalau di luar top 10 -->
-    <% if (myRank === 0) { %>
-    <div class="mt-3 pt-3 border-t text-center" style="border-color:#f0e8d8">
-      <p class="text-[10px] font-semibold" style="color:var(--muted)">
-        Kamu belum masuk top 10. Ikuti ujian untuk tampil di sini!
-      </p>
-    </div>
-    <% } else if (myRank > 10) { %>
-    <div class="mt-3 pt-3 border-t text-center" style="border-color:#f0e8d8">
-      <p class="text-[10px] font-semibold" style="color:var(--muted)">
-        Peringkatmu saat ini: <strong style="color:var(--dark)"><%= myRank %></strong>
-      </p>
-    </div>
-    <% } %>
+        <%# ===== SIDEBAR ===== %>
+        <div class="space-y-4">
 
-  <% } else { %>
-    <div class="py-6 text-center">
-      <p class="text-2xl mb-2">📋</p>
-      <p class="text-xs font-semibold" style="color:var(--muted)">Belum ada peserta yang ujian.</p>
-    </div>
-  <% } %>
-</div>
+          <a href="/profil" class="card p-5 flex items-center justify-between gap-3" style="text-decoration:none">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 flex items-center justify-center text-sm flex-shrink-0"
+                style="background:rgba(200,160,32,0.1);border-radius:4px">👤</div>
+              <div>
+                <p class="font-display font-bold text-sm" style="color:var(--dark)">Info Akun & Riwayat</p>
+                <p class="text-[10px]" style="color:var(--muted)">Profil & riwayat ujian</p>
+              </div>
+            </div>
+            <span style="color:var(--muted);font-size:1rem">→</span>
+          </a>
 
-
-          <!-- Bantuan -->
-          <div class="paket-card p-5 space-y-3">
+          <div class="card p-5 space-y-3">
             <h3 class="font-display font-bold text-base">💬 Bantuan</h3>
-            <p class="text-xs leading-relaxed" style="color:var(--muted)">Kendala pembayaran atau verifikasi? Hubungi admin via WhatsApp.</p>
+            <p class="text-xs leading-relaxed" style="color:var(--muted)">
+              Kendala pembayaran atau verifikasi? Hubungi admin via WhatsApp.
+            </p>
             <a href="https://wa.me/6282324090580?text=Halo+min+saya+butuh+bantuan" target="_blank"
               class="flex items-center justify-center gap-2 py-2.5 text-xs font-semibold"
               style="border-radius:4px;background:rgba(22,163,74,0.1);color:#15803d;border:1px solid rgba(22,163,74,0.2)">
@@ -688,33 +519,44 @@
           </div>
 
         </div>
-        <!-- /SIDEBAR -->
+        <%# /SIDEBAR %>
 
       </div>
     </div>
   </main>
 
-  <!-- ===== MODAL UPLOAD BUKTI ===== -->
+  <%# ===== MODAL UPLOAD BUKTI ===== %>
   <div id="uploadModal" class="modal-overlay hidden">
     <div class="bg-white max-w-sm w-full mx-4 overflow-hidden shadow-2xl" style="border-radius:4px">
-      <div class="p-5 text-white flex justify-between items-start" style="background:linear-gradient(135deg,#3a0f0f,#6b1a1a)">
+
+      <%# Modal header %>
+      <div class="p-5 text-white flex justify-between items-start"
+        style="background:linear-gradient(135deg,#3a0f0f,#6b1a1a)">
         <div>
-          <h3 class="font-display font-bold text-lg">💳 Upload Bukti Bayar</h3>
+          <h3 class="font-display font-bold text-lg">📤 Upload Bukti Bayar</h3>
           <p class="text-xs opacity-60" id="mSubtitle">—</p>
         </div>
-        <button onclick="closeModal()" class="text-white/50 hover:text-white text-2xl font-bold leading-none cursor-pointer mt-0.5">×</button>
+        <button onclick="closeModal()"
+          class="text-white/50 hover:text-white text-2xl font-bold leading-none cursor-pointer mt-0.5">×</button>
       </div>
-      <form action="/upload-bukti" method="POST" enctype="multipart/form-data" class="p-5 space-y-4" id="formUploadMain">
+
+      <form action="/upload-bukti" method="POST" enctype="multipart/form-data" class="p-5 space-y-4" id="formUpload">
         <input type="hidden" name="paket_pilihan" id="mPaket">
-        <input type="hidden" name="nomor_to" id="mTo">
-        <div class="flex items-center gap-3 p-3" style="border-radius:4px;background:rgba(184,146,74,0.07);border:1px solid rgba(184,146,74,0.15)">
-          <div class="w-10 h-10 flex items-center justify-center font-display font-black text-lg text-white flex-shrink-0" style="border-radius:4px;background:var(--gold)" id="mToBadge">—</div>
+        <input type="hidden" name="nomor_to"      id="mTo">
+
+        <%# Summary row %>
+        <div class="flex items-center gap-3 p-3"
+          style="border-radius:4px;background:rgba(184,146,74,0.07);border:1px solid rgba(184,146,74,0.15)">
+          <div class="w-10 h-10 flex items-center justify-center font-display font-black text-lg text-white flex-shrink-0"
+            style="border-radius:4px;background:var(--gold)" id="mToBadge">—</div>
           <div>
             <p class="text-xs font-bold" style="color:var(--dark)" id="mPaketLabel">—</p>
             <p class="text-[10px]" style="color:var(--muted)" id="mToLabel">Try Out —</p>
           </div>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-center">
+
+        <%# Harga + rekening %>
+        <div class="grid grid-cols-2 gap-2 text-center">
           <div class="p-2.5" style="border-radius:4px;background:rgba(184,146,74,0.07);border:1px solid rgba(184,146,74,0.15)">
             <p class="text-[10px]" style="color:var(--muted)">Biaya per TO</p>
             <p id="mHargaCoret" class="text-[10px] line-through" style="color:var(--muted);display:none"></p>
@@ -723,16 +565,20 @@
           <div class="p-2.5" style="border-radius:4px;background:var(--dark)">
             <p class="text-[10px] text-white/40">BRI</p>
             <p class="font-bold text-xs" style="color:var(--gold)">0336-0102-1299-538</p>
-             <p class="text-[10px] text-white/40">DANA</p>
+            <p class="text-[10px] text-white/40 mt-1">DANA</p>
             <p class="font-bold text-xs" style="color:var(--gold)">0823-2409-0580</p>
             <p class="text-[9px] text-white/40">a.n Ady Martin Sinaga</p>
           </div>
         </div>
+
+        <%# Upload zone %>
         <div>
-          <label class="block text-[10px] font-bold uppercase tracking-widest mb-1.5" style="color:var(--muted)">Bukti Transfer</label>
-          <div class="upload-zone" id="dropZoneArea" style="border-radius:4px">
+          <label class="block text-[10px] font-bold uppercase tracking-widest mb-1.5" style="color:var(--muted)">
+            Bukti Transfer
+          </label>
+          <div class="upload-zone" id="dropZone">
             <input type="file" name="bukti" id="fileInp" class="hidden" accept=".jpg,.jpeg,.png">
-            <div id="promptUpload" class="pointer-events-none">
+            <div id="promptUpload">
               <p class="text-xs font-semibold" style="color:var(--dark)">Klik untuk upload foto bukti pembayaran</p>
               <p class="text-[10px] mt-1" style="color:var(--muted)">JPG / PNG · Maks 2MB</p>
             </div>
@@ -741,9 +587,12 @@
               <p id="fileNameDisplay" class="text-[10px] text-center font-mono truncate" style="color:var(--muted)"></p>
             </div>
           </div>
-          <p id="errTxt" class="hidden text-[11px] text-red-600 font-bold mt-2 p-2.5 text-center" style="border-radius:4px;background:rgba(220,38,38,0.07);border:1px solid rgba(220,38,38,0.2)"></p>
+          <p id="errTxt" class="hidden text-[11px] text-red-600 font-bold mt-2 p-2.5 text-center"
+            style="border-radius:4px;background:rgba(220,38,38,0.07);border:1px solid rgba(220,38,38,0.2)"></p>
         </div>
-        <button type="submit" id="btnSub" disabled class="btn-gold opacity-50 cursor-not-allowed uppercase text-xs tracking-widest">
+
+        <button type="submit" id="btnSub" disabled
+          class="btn btn-gold opacity-50 cursor-not-allowed uppercase text-xs tracking-widest">
           📤 Kirim Bukti Sekarang
         </button>
       </form>
@@ -751,30 +600,34 @@
   </div>
 
   <script>
-    // ── Toast ──
-    [' toast', 'toastSuccess'].forEach(id => {
+    // ── Toast auto-dismiss ──
+    ['toast', 'toastSuccess'].forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
-      setTimeout(() => { el.classList.add('hide'); setTimeout(() => el.remove(), 300); },
-        4500);
+      setTimeout(() => { el.classList.add('hide'); setTimeout(() => el.remove(), 300); }, 4500);
     });
-    const ctb = document.getElementById('closeToast');
-    if (ctb) ctb.addEventListener('click', () => {
+    document.getElementById('closeToast')?.addEventListener('click', () => {
       const el = document.getElementById('toast');
       if (el) { el.classList.add('hide'); setTimeout(() => el.remove(), 300); }
     });
 
-    // ── Dropdown paket ──
+    // ── Paket dropdown ──
     const dp = document.getElementById('paketDropdown');
     const ph = document.getElementById('placeholderPilih');
     dp.addEventListener('change', () => {
       ph.style.display = dp.value ? 'none' : 'block';
-      document.querySelectorAll('.paket-section').forEach(s =>
-        s.classList.remove('active'));
+      document.querySelectorAll('.paket-section').forEach(s => s.classList.remove('active'));
       if (!dp.value) return;
       const id = 'section-' + dp.value.replace(/\//g, '-').replace(/\s+/g, '_');
-      const t = document.getElementById(id);
-      if (t) t.classList.add('active');
+      document.getElementById(id)?.classList.add('active');
+    });
+
+    // ── User dropdown ──
+    const menuBtn = document.getElementById('userMenuBtn');
+    const menuDrop = document.getElementById('userMenuDropdown');
+    menuBtn?.addEventListener('click', e => { e.stopPropagation(); menuDrop.classList.toggle('hidden'); });
+    document.addEventListener('click', e => {
+      if (!menuBtn?.contains(e.target) && !menuDrop?.contains(e.target)) menuDrop?.classList.add('hidden');
     });
 
     // ── Modal ──
@@ -784,90 +637,72 @@
 
     document.querySelectorAll('.open-upload-modal').forEach(btn => {
       btn.addEventListener('click', () => {
-        const paket = btn.dataset.paket;
-        const label = btn.dataset.label;
-        const to = btn.dataset.to;
-        document.getElementById('mPaket').value = paket;
-        document.getElementById('mTo').value = to;
-        document.getElementById('mSubtitle').textContent = label + ' · TO ' + to;
-        document.getElementById('mToBadge').textContent = to;
+        const { paket, label, to, harga, hargaAsli } = btn.dataset;
+        document.getElementById('mPaket').value         = paket;
+        document.getElementById('mTo').value            = to;
+        document.getElementById('mSubtitle').textContent = `${label} · TO ${to}`;
+        document.getElementById('mToBadge').textContent  = to;
         document.getElementById('mPaketLabel').textContent = label;
-        document.getElementById('mToLabel').textContent = 'Try Out ' + to;
-        const harga = parseInt(btn.dataset.harga) || 50000;
-        const hargaAsli = parseInt(btn.dataset.hargaAsli) || 0;
-        const fmt = n => 'Rp ' + n.toLocaleString('id-ID');
-        document.getElementById('mHarga').textContent = fmt(harga);
+        document.getElementById('mToLabel').textContent  = `Try Out ${to}`;
+
+        const fmt = n => 'Rp ' + parseInt(n).toLocaleString('id-ID');
+        document.getElementById('mHarga').textContent = fmt(harga || 50000);
         const elCoret = document.getElementById('mHargaCoret');
-        if (hargaAsli > harga) {
-          elCoret.textContent = fmt(hargaAsli); elCoret.style.display =
-            '';
-        }
-        else { elCoret.style.display = 'none'; }
+        elCoret.style.display = (hargaAsli && parseInt(hargaAsli) > parseInt(harga)) ? '' : 'none';
+        if (elCoret.style.display !== 'none') elCoret.textContent = fmt(hargaAsli);
+
         resetForm();
         modal.classList.remove('hidden');
       });
     });
 
-    // ── Upload logic ──
-    const zone = document.getElementById('dropZoneArea');
-    const input = document.getElementById('fileInp');
-    const btnSub = document.getElementById('btnSub');
-    const errTxt = document.getElementById('errTxt');
+    // ── File upload ──
+    const zone    = document.getElementById('dropZone');
+    const fileInp = document.getElementById('fileInp');
+    const btnSub  = document.getElementById('btnSub');
+    const errTxt  = document.getElementById('errTxt');
 
-    zone.addEventListener('click', () => input.click());
+    zone.addEventListener('click', () => fileInp.click());
 
-    input.addEventListener('change', function () {
+    fileInp.addEventListener('change', function () {
       const file = this.files[0];
       if (!file) return;
 
-      // 1. Blokir double extension — misal: shell.php.jpg
       const parts = file.name.toLowerCase().split('.');
-      if (parts.length !== 2) {
-        showError('🚨 Nama file tidak valid! Jangan gunakan double extension.');
-        return;
+      if (parts.length !== 2 || !['jpg','jpeg','png'].includes(parts[1])) {
+        return showErr('🚨 Format ditolak! Hanya .jpg atau .png yang diizinkan.');
       }
-      const ext = parts[1];
-      if (!['jpg', 'jpeg', 'png'].includes(ext)) {
-        showError('🚨 Format ditolak! Hanya .jpg atau .png yang diizinkan.');
-        return;
+      if (!['image/jpeg','image/png'].includes(file.type)) {
+        return showErr('🚨 Tipe file tidak valid!');
       }
-
-      // 2. Cek MIME type di sisi client
-      const allowedMime = ['image/jpeg', 'image/png'];
-      if (!allowedMime.includes(file.type)) {
-        showError('🚨 Tipe file tidak valid! Harus gambar JPG atau PNG.');
-        return;
-      }
-
-      // 3. Cek ukuran
       if (file.size > 2 * 1024 * 1024) {
-        showError('❌ Ukuran terlalu besar! Maks 2MB.');
-        return;
+        return showErr('❌ Ukuran terlalu besar! Maks 2MB.');
       }
 
       errTxt.classList.add('hidden');
       btnSub.disabled = false;
       btnSub.classList.remove('opacity-50', 'cursor-not-allowed');
+
       const reader = new FileReader();
       reader.onload = e => {
         document.getElementById('imgPrev').src = e.target.result;
-        document.getElementById('fileNameDisplay').innerText = file.name;
+        document.getElementById('fileNameDisplay').textContent = file.name;
         document.getElementById('promptUpload').classList.add('hidden');
         document.getElementById('previewArea').classList.remove('hidden');
       };
       reader.readAsDataURL(file);
     });
 
-    function showError(msg) {
-      errTxt.innerText = msg;
+    function showErr(msg) {
+      errTxt.textContent = msg;
       errTxt.classList.remove('hidden');
-      input.value = '';
+      fileInp.value = '';
       btnSub.disabled = true;
       btnSub.classList.add('opacity-50', 'cursor-not-allowed');
     }
 
     function resetForm() {
-      document.getElementById('formUploadMain').reset();
+      document.getElementById('formUpload').reset();
       document.getElementById('promptUpload').classList.remove('hidden');
       document.getElementById('previewArea').classList.add('hidden');
       errTxt.classList.add('hidden');
@@ -875,36 +710,17 @@
       btnSub.classList.add('opacity-50', 'cursor-not-allowed');
     }
 
-    // ── Confirm mulai ujian ──
+    // ── Konfirmasi form ──
     document.querySelectorAll('.confirm-mulai').forEach(form => {
       form.addEventListener('submit', e => {
-        if (!confirm('Waktu akan mulai berjalan. Pastikan koneksi dan baterai stabil. Siap?'))
-          e.preventDefault();
+        if (!confirm('Waktu akan mulai berjalan. Pastikan koneksi dan baterai stabil. Siap?')) e.preventDefault();
       });
     });
-
-    // ── Confirm hapus akun ──
     document.querySelectorAll('.confirm-hapus').forEach(form => {
       form.addEventListener('submit', e => {
         if (!confirm('Akun akan dihapus permanen! Yakin?')) e.preventDefault();
       });
     });
-
-    // ── Dropdown user click ──
-    const userMenuBtnUjian = document.getElementById('userMenuBtnUjian');
-    const userMenuDropdownUjian = document.getElementById('userMenuDropdownUjian');
-    if (userMenuBtnUjian && userMenuDropdownUjian) {
-      userMenuBtnUjian.addEventListener('click', (e) => {
-        e.stopPropagation();
-        userMenuDropdownUjian.classList.toggle('hidden');
-      });
-      document.addEventListener('click', (e) => {
-        if (!userMenuBtnUjian.contains(e.target) && !userMenuDropdownUjian.contains(e.target)) {
-          userMenuDropdownUjian.classList.add('hidden');
-        }
-      });
-    }
   </script>
 </body>
-
 </html>
