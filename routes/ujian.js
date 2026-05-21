@@ -1,12 +1,8 @@
 const express = require("express");
-const router  = express.Router();
-const db      = require("../config/db");
+const router = express.Router();
+const db = require("../config/db");
 
-
-// ─────────────────────────────────────────
 // MIDDLEWARE
-// ─────────────────────────────────────────
-
 function isSedangUjian(req, res, next) {
   if (req.session.ujian) return next();
   res.redirect("/dashboardPembayaranUjian");
@@ -36,35 +32,28 @@ async function isLogin(req, res, next) {
 }
 
 
-// ─────────────────────────────────────────
 // KONSTANTA
-// ─────────────────────────────────────────
-
 const DEFAULT_BOBOT_BENAR = 500;
 
 const PASSING_GRADE = {
   'Paket SKD/TKD': {
-    type:          'PER_SUBTEST',
-    perSubtest:    { 1: 65, 2: 80, 3: 166 },
-    kumulatif:     311,
+    type: 'PER_SUBTEST',
+    perSubtest: { 1: 65, 2: 80, 3: 166 },
+    kumulatif: 311,
     skorMaksTotal: 550,
   },
   'Paket Akademik Polri': {
-    type:          'PERSENTASE',
-    minPersen:     70,
+    type: 'PERSENTASE',
+    minPersen: 70,
     skorMaksTotal: 125,
   },
   'Paket PPPK': {
-    type:          'PERINGKAT',
+    type:'PERINGKAT',
     skorMaksTotal: 670,
   },
 };
 
-
-// ─────────────────────────────────────────
 // POST /ujian/mulai
-// ─────────────────────────────────────────
-
 router.post("/mulai", isLogin, async (req, res) => {
   const { paket_pilihan, nomor_to } = req.body;
   const userId = req.session.user.id;
@@ -117,10 +106,10 @@ router.post("/mulai", isLogin, async (req, res) => {
 
     req.session.ujian = {
       paymentId,
-      paket:     paket_pilihan,
-      nomorTO:   parseInt(nomor_to),
-      soalIds:   flatSoalIds,
-      jawaban:   {},
+      paket: paket_pilihan,
+      nomorTO: parseInt(nomor_to),
+      soalIds: flatSoalIds,
+      jawaban: {},
       startTime: Date.now(),
       durasiMs,
     };
@@ -135,10 +124,7 @@ router.post("/mulai", isLogin, async (req, res) => {
 });
 
 
-// ─────────────────────────────────────────
 // GET /ujian/soal/:index
-// ─────────────────────────────────────────
-
 router.get("/soal/:index", isLogin, isSedangUjian, async (req, res) => {
   const sesi         = req.session.ujian;
   const currentIndex = parseInt(req.params.index) - 1;
@@ -175,18 +161,17 @@ router.get("/soal/:index", isLogin, isSedangUjian, async (req, res) => {
       });
     }
 
-    // Hitung sisa waktu di server agar timer tidak reset saat refresh
     const sisaWaktuMs = (sesi.startTime + sesi.durasiMs) - Date.now();
 
     res.render("ujian-soal", {
-      soal:         allSoalRows,
+      soal: allSoalRows,
       currentIndex: currentIndex + 1,
-      totalSoal:    sesi.soalIds.length,
-      jawaban:      sesi.jawaban,
-      sisaWaktuMs:  Math.max(sisaWaktuMs, 0),
-      paket:        sesi.paket,
-      nomorTO:      sesi.nomorTO,
-      user:         req.session.user,
+      totalSoal: sesi.soalIds.length,
+      jawaban: sesi.jawaban,
+      sisaWaktuMs: Math.max(sisaWaktuMs, 0),
+      paket: sesi.paket,
+      nomorTO: sesi.nomorTO,
+      user: req.session.user,
     });
   } catch (err) {
     console.error("Error /soal:", err);
@@ -195,10 +180,7 @@ router.get("/soal/:index", isLogin, isSedangUjian, async (req, res) => {
 });
 
 
-// ─────────────────────────────────────────
 // POST /ujian/simpan-jawaban
-// ─────────────────────────────────────────
-
 router.post("/simpan-jawaban", isLogin, isSedangUjian, async (req, res) => {
   const sesi = req.session.ujian;
   const { questionId, jawaban } = req.body;
@@ -216,33 +198,21 @@ router.post("/simpan-jawaban", isLogin, isSedangUjian, async (req, res) => {
   }
 });
 
-
-// ─────────────────────────────────────────
 // POST /ujian/selesai
-// ─────────────────────────────────────────
-
 router.post("/selesai", isLogin, async (req, res) => {
   if (!req.session.ujian)
     return res.json({ ok: false, redirect: "/dashboardPembayaranUjian" });
   await hitungDanSimpanSkor(req, res, true);
 });
 
-
-// ─────────────────────────────────────────
 // GET /ujian/selesai-paksa
-// ─────────────────────────────────────────
-
 router.get("/selesai-paksa", isLogin, async (req, res) => {
   if (!req.session.ujian)
     return res.redirect("/dashboardPembayaranUjian");
   await hitungDanSimpanSkor(req, res, false);
 });
 
-
-// ─────────────────────────────────────────
 // HITUNG & SIMPAN SKOR
-// ─────────────────────────────────────────
-
 async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
   const sesi   = req.session.ujian;
   const userId = req.session.user.id;
@@ -269,24 +239,23 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
       });
     }
 
-    // 2. Hitung skor per soal & akumulasi per materi
     const jawabanUserSesi = sesi.jawaban || {};
-    const skorPerMateri   = {};
-    let totalPoin  = 0;
+    const skorPerMateri = {};
+    let totalPoin = 0;
     let totalBenar = 0;
     const valuesJawaban = [];
 
     soalRows.forEach((s) => {
-      const mid         = s.materi_id || 0;
+      const mid = s.materi_id || 0;
       const jawabanUser = (jawabanUserSesi[s.id] || '').toLowerCase();
-      const kunci       = (s.kunci || '').toLowerCase();
+      const kunci = (s.kunci || '').toLowerCase();
 
       if (!skorPerMateri[mid]) {
         skorPerMateri[mid] = {
           materi_id: mid || null,
-          nama:  s.nama_materi || `Materi ${mid}`,
-          skor:  0,
-          maks:  0,
+          nama: s.nama_materi || `Materi ${mid}`,
+          skor: 0,
+          maks: 0,
           benar: 0,
           total: 0,
         };
@@ -307,7 +276,6 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
           totalBenar++;
         }
       } else {
-        // BENAR_SALAH
         const bb = (s.bobot_benar_materi && s.bobot_benar_materi > 0)
           ? s.bobot_benar_materi / 100
           : DEFAULT_BOBOT_BENAR / 100;
@@ -325,7 +293,6 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
       valuesJawaban.push([userId, sesi.paket, sesi.nomorTO, s.id, jawabanUser || null]);
     });
 
-    // 3. Simpan jawaban peserta (bulk)
     if (valuesJawaban.length > 0) {
       await db.query(
         `INSERT INTO jawaban_peserta (user_id, paket, nomor_to, question_id, jawaban_user)
@@ -335,9 +302,8 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
       );
     }
 
-    // 4. Simpan ke riwayat_ujian
     const totalSoal = soalRows.length;
-    const skor      = Math.round(totalPoin);
+    const skor = Math.round(totalPoin);
 
     const [riwayatResult] = await db.query(
       `INSERT INTO riwayat_ujian (user_id, paket, nomor_to, skor, jml_benar, jml_soal, tgl_selesai)
@@ -346,11 +312,6 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
     );
     const riwayatUjianId = riwayatResult.insertId;
 
-    // 5. Simpan skor per subtest (bulk)
-    // Kolom tabel riwayat_subtest:
-    // id, riwayat_ujian_id, materi_id, nama_materi,
-    // jumlah_soal, jumlah_benar, jumlah_salah,
-    // skor_subtest, skor_maks, created_at
     const valuesSubtest = Object.values(skorPerMateri).map((sub) => [
       riwayatUjianId,
       sub.materi_id,
@@ -389,11 +350,7 @@ async function hitungDanSimpanSkor(req, res, jsonResponse = false) {
   }
 }
 
-
-// ─────────────────────────────────────────
 // POST /ujian/reset-ujian (admin only)
-// ─────────────────────────────────────────
-
 router.post("/reset-ujian", isLogin, isAdmin, async (req, res) => {
   const { userIdTarget, paket_pilihan, nomor_to } = req.body;
 
@@ -422,10 +379,7 @@ router.post("/reset-ujian", isLogin, isAdmin, async (req, res) => {
 });
 
 
-// ─────────────────────────────────────────
 // GET /ujian/hasil
-// ─────────────────────────────────────────
-
 router.get("/hasil", isLogin, async (req, res) => {
   try {
     const userId = req.session.user.id;
@@ -438,7 +392,6 @@ router.get("/hasil", isLogin, async (req, res) => {
     if (riwayatRows.length === 0) return res.redirect("/dashboardPembayaranUjian");
     const riwayat = riwayatRows[0];
 
-    // Data per subtest — alias kolom agar cocok dengan template EJS
     const [subtestRows] = await db.query(
       `SELECT
          id,
@@ -479,15 +432,14 @@ router.get("/hasil", isLogin, async (req, res) => {
         : 0;
       statusKelulusan = 'INFO';
     }
-    // PPPK: statusKelulusan tetap 'PERINGKAT'
 
     res.render("hasilUjian", {
-      skor:            riwayat.skor,
-      benar:           riwayat.jml_benar,
-      totalSoal:       riwayat.jml_soal,
-      paket:           riwayat.paket,
-      nomorTO:         riwayat.nomor_to,
-      user:            req.session.user,
+      skor: riwayat.skor,
+      benar: riwayat.jml_benar,
+      totalSoal: riwayat.jml_soal,
+      paket: riwayat.paket,
+      nomorTO: riwayat.nomor_to,
+      user: req.session.user,
       subtestData,
       statusKelulusan,
       pgConfig:        pg,
@@ -500,9 +452,7 @@ router.get("/hasil", isLogin, async (req, res) => {
 });
 
 
-// ─────────────────────────────────────────
 // GET /ujian/review
-// ─────────────────────────────────────────
 
 router.get("/review", isLogin, async (req, res) => {
   const { nomor_to, paket } = req.query;
