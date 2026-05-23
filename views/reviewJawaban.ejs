@@ -4,151 +4,384 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Review Jawaban | Tabeahan Cendekia</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --cream:#fff8f8; --gold:#c8a020; --dark:#7a1010; --red-deep:#5a0a0a; --muted:#9b6b6b; }
-    *, *::before, *::after { box-sizing:border-box; }
-    body { font-family:"DM Sans",sans-serif; background:var(--cream); color:var(--dark); min-height:100vh; }
-    h1,h2,h3,h4 { font-family:"Playfair Display",serif; }
-
-    .nav { background:var(--red-deep); border-bottom:1px solid rgba(200,160,32,0.25); position:sticky; top:0; z-index:50; box-shadow:0 2px 12px rgba(90,10,10,0.18); }
-
-    /* ── Stat pill ── */
-    .stat-pill { display:inline-flex; align-items:center; gap:0.4rem; padding:0.45rem 0.9rem; border-radius:4px; font-size:0.72rem; font-weight:800; }
-    .stat-benar  { background:rgba(21,128,61,0.1);  color:#15803d; border:1px solid rgba(21,128,61,0.2); }
-    .stat-salah  { background:rgba(220,38,38,0.08); color:#b91c1c; border:1px solid rgba(220,38,38,0.15); }
-    .stat-skor   { background:rgba(200,160,32,0.1); color:#92400e; border:1px solid rgba(200,160,32,0.25); }
-
-    /* ── Filter tabs ── */
-    .ftab { padding:0.35rem 0.9rem; border-radius:4px; font-size:0.65rem; font-weight:700; cursor:pointer; border:1px solid rgba(200,160,32,0.2); background:white; color:var(--muted); transition:all 0.2s; }
-    .ftab.active, .ftab:hover { background:var(--red-deep); color:var(--gold); border-color:transparent; }
-
-    /* ── Subtest Section ── */
-    .subtest-section { border:1.5px solid #f0e8d8; border-radius:6px; overflow:hidden; }
-    .subtest-header {
-      padding:0.875rem 1.25rem; cursor:pointer;
-      display:flex; align-items:center; justify-content:space-between; gap:0.75rem;
-      background:linear-gradient(135deg, rgba(90,10,10,0.04), rgba(90,10,10,0.02));
-      border-bottom:1px solid #f0e8d8;
+    :root {
+      --cream: #fdf6ee;
+      --cream-2: #f5ebe0;
+      --gold: #c8922a;
+      --gold-light: #e8b84b;
+      --dark: #1e0f05;
+      --red: #8b1a1a;
+      --red-deep: #5a0a0a;
+      --muted: #8a6a55;
+      --green: #1a6b3c;
+      --green-bg: #eef7f2;
+      --red-err: #b91c1c;
+      --red-bg: #fdf2f2;
+      --border: rgba(200,146,42,0.18);
     }
-    .subtest-header:hover { background:rgba(200,160,32,0.05); }
-    .subtest-body { display:none; }
-    .subtest-body.open { display:block; }
-    .chevron { transition:transform 0.25s; font-size:0.7rem; color:var(--muted); }
-    .chevron.open { transform:rotate(180deg); }
 
-    /* ── Subtest progress ── */
-    .sub-prog-track { height:5px; background:#f0e8d8; border-radius:99px; overflow:hidden; flex:1; }
-    .sub-prog-fill  { height:100%; border-radius:99px; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── Soal card ── */
-    .soal-card { background:white; border-radius:4px; border:1px solid rgba(200,160,32,0.12); box-shadow:0 2px 8px rgba(90,10,10,0.04); overflow:hidden; transition:box-shadow 0.2s; }
-    .soal-card:hover { box-shadow:0 4px 16px rgba(90,10,10,0.08); }
-    .soal-card.benar { border-left:4px solid #16a34a; }
-    .soal-card.salah { border-left:4px solid #dc2626; }
+    body {
+      font-family: 'Instrument Sans', sans-serif;
+      background: var(--cream);
+      color: var(--dark);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
 
-    .soal-header { padding:0.75rem 1.25rem; display:flex; align-items:center; justify-content:space-between; gap:0.5rem; border-bottom:1px solid rgba(200,160,32,0.08); }
-    .soal-header.benar { background:rgba(21,128,61,0.04); }
-    .soal-header.salah { background:rgba(220,38,38,0.03); }
+    /* ─── NOISE TEXTURE overlay ─── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.5;
+    }
 
-    .nomor-badge { width:2rem; height:2rem; border-radius:4px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-family:"Playfair Display",serif; font-weight:900; font-size:0.8rem; color:white; }
-    .nomor-badge.benar { background:#16a34a; }
-    .nomor-badge.salah { background:#dc2626; }
+    /* ─── NAV ─── */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--red-deep);
+      border-bottom: 2px solid rgba(200,146,42,0.3);
+      box-shadow: 0 4px 24px rgba(90,10,10,0.22);
+    }
+    .nav-inner {
+      max-width: 900px; margin: 0 auto; padding: 0 1.5rem;
+      height: 60px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .nav-brand img { height: 32px; width: auto; }
+    .nav-brand-text {
+      font-family: 'Fraunces', serif;
+      color: white; font-size: 1.05rem; font-weight: 700; letter-spacing: -0.01em;
+    }
+    .nav-brand-text span { color: var(--gold-light); }
+    .nav-back {
+      display: flex; align-items: center; gap: 0.4rem;
+      color: rgba(255,255,255,0.65); background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 6px;
+      padding: 0.4rem 1rem; font-size: 0.75rem; font-weight: 600;
+      text-decoration: none; transition: all 0.2s; letter-spacing: 0.02em;
+    }
+    .nav-back:hover { color: var(--gold-light); border-color: rgba(200,146,42,0.4); background: rgba(200,146,42,0.1); }
 
-    /* ── Opsi ── */
-    .opsi-row { display:flex; align-items:flex-start; gap:0.75rem; padding:0.55rem 0.75rem; border-radius:4px; font-size:0.82rem; transition:background 0.15s; }
-    .opsi-row.kunci     { background:rgba(21,128,61,0.08);  border:1px solid rgba(21,128,61,0.2); }
-    .opsi-row.salah-user { background:rgba(220,38,38,0.06); border:1px solid rgba(220,38,38,0.18); }
-    .opsi-row.normal    { background:rgba(200,160,32,0.03);  border:1px solid rgba(200,160,32,0.1); }
+    /* ─── LAYOUT ─── */
+    .main { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; position: relative; z-index: 1; }
 
-    .opsi-huruf { width:1.5rem; height:1.5rem; border-radius:3px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:800; text-transform:uppercase; }
-    .opsi-huruf.kunci      { background:#16a34a; color:white; }
-    .opsi-huruf.salah-user { background:#dc2626; color:white; }
-    .opsi-huruf.normal     { background:rgba(200,160,32,0.15); color:var(--muted); }
+    /* ─── HEADER CARD ─── */
+    .header-card {
+      background: white;
+      border-radius: 16px;
+      border: 1.5px solid var(--border);
+      padding: 2rem 2rem 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 20px rgba(30,15,5,0.06);
+      position: relative; overflow: hidden;
+    }
+    .header-card::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--red-deep), var(--gold), var(--red-deep));
+    }
+    .header-eyebrow {
+      font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.2em; color: var(--muted); margin-bottom: 0.5rem;
+    }
+    .header-title {
+      font-family: 'Fraunces', serif;
+      font-size: 2rem; font-weight: 900; color: var(--dark);
+      line-height: 1.1; margin-bottom: 0.4rem;
+    }
+    .header-sub { font-size: 0.8rem; color: var(--muted); }
 
-    /* ── Pembahasan ── */
-    .pembahasan-box { background:linear-gradient(135deg, rgba(200,160,32,0.06), rgba(200,160,32,0.03)); border:1px solid rgba(200,160,32,0.25); border-radius:4px; padding:1rem 1.25rem; position:relative; }
-    .pembahasan-box::before { content:'💡'; position:absolute; top:-0.6rem; left:1rem; background:var(--cream); padding:0 0.25rem; font-size:0.85rem; }
-    .pembahasan-label { font-size:0.55rem; font-weight:800; text-transform:uppercase; letter-spacing:0.12em; color:var(--gold); margin-bottom:0.5rem; display:block; }
-    .pembahasan-text { font-size:0.82rem; line-height:1.75; color:var(--dark); white-space:pre-wrap; }
+    /* ─── COUNTDOWN BADGE ─── */
+    .countdown-badge {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      background: #fffbeb; border: 1px solid #f59e0b40;
+      color: #92400e; font-size: 0.7rem; font-weight: 700;
+      padding: 0.3rem 0.75rem; border-radius: 99px; margin-top: 0.6rem;
+    }
 
-    /* ── Scroll to top ── */
-    #scrollTop { position:fixed; bottom:1.5rem; right:1.5rem; z-index:40; width:2.5rem; height:2.5rem; border-radius:4px; background:var(--red-deep); color:var(--gold); border:none; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(90,10,10,0.25); transition:all 0.2s; opacity:0; pointer-events:none; }
-    #scrollTop.show { opacity:1; pointer-events:auto; }
-    #scrollTop:hover { background:var(--gold); color:white; }
+    /* ─── SCORE SUMMARY ─── */
+    .score-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 600px) { .score-grid { grid-template-columns: repeat(2, 1fr); } }
 
-    .soal-hidden { display:none !important; }
+    .score-card {
+      background: white; border-radius: 12px; border: 1.5px solid var(--border);
+      padding: 1rem 1.1rem; text-align: center;
+      box-shadow: 0 1px 8px rgba(30,15,5,0.04);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .score-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(30,15,5,0.08); }
+    .score-card .label {
+      font-size: 0.58rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--muted); margin-bottom: 0.4rem;
+    }
+    .score-card .value {
+      font-family: 'Fraunces', serif; font-size: 1.8rem; font-weight: 900; line-height: 1;
+    }
+    .score-card.green .value { color: var(--green); }
+    .score-card.red .value { color: var(--red-err); }
+    .score-card.gold .value { color: var(--gold); }
+    .score-card.dark .value { color: var(--dark); }
+
+    /* ─── FILTER PILLS ─── */
+    .filter-bar {
+      display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+      margin-bottom: 1.75rem;
+    }
+    .filter-label {
+      font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--muted);
+    }
+    .ftab {
+      padding: 0.4rem 1rem; border-radius: 99px; font-size: 0.72rem; font-weight: 700;
+      cursor: pointer; border: 1.5px solid var(--border);
+      background: white; color: var(--muted);
+      transition: all 0.18s; letter-spacing: 0.02em;
+    }
+    .ftab.active { background: var(--red-deep); color: white; border-color: transparent; box-shadow: 0 4px 12px rgba(90,10,10,0.22); }
+    .ftab:not(.active):hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ─── SUBTEST SECTION ─── */
+    .subtest-section {
+      background: white; border-radius: 14px;
+      border: 1.5px solid var(--border);
+      box-shadow: 0 2px 12px rgba(30,15,5,0.04);
+      overflow: hidden; margin-bottom: 1rem;
+    }
+    .subtest-header {
+      padding: 1.1rem 1.5rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      border-bottom: 1.5px solid var(--border);
+      transition: background 0.18s;
+      user-select: none;
+    }
+    .subtest-header:hover { background: rgba(200,146,42,0.04); }
+    .sub-title { font-size: 0.95rem; font-weight: 700; color: var(--dark); }
+    .sub-badge {
+      font-size: 0.65rem; font-weight: 800; padding: 0.25rem 0.65rem;
+      border-radius: 99px; letter-spacing: 0.04em;
+    }
+    .sub-badge.good { background: var(--green-bg); color: var(--green); }
+    .sub-badge.bad  { background: var(--red-bg);   color: var(--red-err); }
+    .sub-badge.mid  { background: #fffbeb; color: #92400e; }
+
+    .prog-track { height: 6px; background: var(--cream-2); border-radius: 99px; overflow: hidden; flex: 1; min-width: 60px; }
+    .prog-fill  { height: 100%; border-radius: 99px; transition: width 0.6s ease; }
+
+    .chevron { font-size: 0.75rem; color: var(--muted); transition: transform 0.25s; display: inline-block; }
+    .chevron.open { transform: rotate(180deg); }
+
+    .subtest-body { display: none; }
+    .subtest-body.open { display: block; padding: 1.25rem; }
+    .cards-grid { display: flex; flex-direction: column; gap: 0.875rem; }
+
+    /* ─── SOAL CARD ─── */
+    .soal-card {
+      border-radius: 10px; overflow: hidden;
+      border: 1.5px solid var(--border);
+      box-shadow: 0 1px 6px rgba(30,15,5,0.04);
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .soal-card:hover { box-shadow: 0 6px 20px rgba(30,15,5,0.09); transform: translateY(-1px); }
+    .soal-card.benar { border-left: 4px solid #16a34a; }
+    .soal-card.salah { border-left: 4px solid #dc2626; }
+
+    .soal-header {
+      display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+      padding: 0.8rem 1.1rem; border-bottom: 1px solid rgba(200,146,42,0.1);
+    }
+    .soal-header.benar { background: linear-gradient(90deg, rgba(21,128,61,0.06), transparent); }
+    .soal-header.salah { background: linear-gradient(90deg, rgba(220,38,38,0.05), transparent); }
+
+    .nomor-badge {
+      width: 2rem; height: 2rem; border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Fraunces', serif; font-weight: 900; font-size: 0.85rem; color: white;
+    }
+    .nomor-badge.benar { background: linear-gradient(135deg, #16a34a, #22c55e); }
+    .nomor-badge.salah { background: linear-gradient(135deg, #dc2626, #ef4444); }
+
+    .soal-meta { flex: 1; min-width: 0; }
+    .soal-meta-label { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+    .soal-meta-info { font-size: 0.7rem; font-weight: 700; margin-top: 0.1rem; }
+    .soal-meta-info.benar { color: var(--green); }
+    .soal-meta-info.salah { color: var(--red-err); }
+
+    .status-chip {
+      display: flex; align-items: center; gap: 0.3rem;
+      font-size: 0.72rem; font-weight: 800; padding: 0.3rem 0.75rem; border-radius: 99px; flex-shrink: 0;
+    }
+    .status-chip.benar { background: var(--green-bg); color: var(--green); }
+    .status-chip.salah { background: var(--red-bg); color: var(--red-err); }
+
+    .soal-body { padding: 1.1rem 1.2rem 1.25rem; }
+    .soal-text { font-size: 0.88rem; line-height: 1.75; color: var(--dark); font-weight: 500; margin-bottom: 1rem; }
+
+    /* ─── OPSI ─── */
+    .opsi-list { display: flex; flex-direction: column; gap: 0.45rem; margin-bottom: 1rem; }
+    .opsi-row {
+      display: flex; align-items: flex-start; gap: 0.7rem;
+      padding: 0.6rem 0.85rem; border-radius: 8px;
+      border: 1.5px solid transparent; transition: all 0.15s;
+    }
+    .opsi-row.normal    { background: var(--cream); border-color: var(--border); }
+    .opsi-row.kunci     { background: var(--green-bg); border-color: rgba(22,163,74,0.3); }
+    .opsi-row.salah-user { background: var(--red-bg); border-color: rgba(220,38,38,0.25); }
+
+    .opsi-huruf {
+      width: 1.5rem; height: 1.5rem; border-radius: 6px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
+    }
+    .opsi-huruf.normal     { background: var(--cream-2); color: var(--muted); }
+    .opsi-huruf.kunci      { background: #16a34a; color: white; }
+    .opsi-huruf.salah-user { background: #dc2626; color: white; }
+
+    .opsi-text { font-size: 0.82rem; line-height: 1.55; flex: 1; min-width: 0; word-break: break-word; }
+    .opsi-text.kunci { color: var(--green); font-weight: 600; }
+    .opsi-text.salah-user { color: var(--red-err); font-weight: 600; }
+
+    /* ─── PEMBAHASAN ─── */
+    .pembahasan-box {
+      background: linear-gradient(135deg, #fffbeb, #fff8e6);
+      border: 1.5px solid rgba(200,146,42,0.25);
+      border-radius: 10px; padding: 1rem 1.1rem; position: relative;
+    }
+    .pembahasan-icon {
+      position: absolute; top: -0.65rem; left: 1rem;
+      background: var(--cream); padding: 0 0.3rem;
+      font-size: 0.85rem; line-height: 1;
+    }
+    .pembahasan-label {
+      font-size: 0.57rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.15em; color: var(--gold); margin-bottom: 0.5rem; display: block;
+    }
+    .pembahasan-text { font-size: 0.83rem; line-height: 1.75; color: #5a3e25; white-space: pre-wrap; }
+
+    /* ─── SOAL IMAGE ─── */
+    .soal-img {
+      max-width: 380px; max-height: 220px; object-fit: contain;
+      border-radius: 8px; border: 1.5px solid var(--border);
+      margin-bottom: 0.75rem; display: block;
+    }
+    .opsi-img {
+      max-width: 140px; max-height: 90px; object-fit: contain;
+      border-radius: 6px; border: 1.5px solid var(--border); margin-top: 4px;
+    }
+
+    /* ─── EMPTY STATE ─── */
+    #emptyFilter {
+      display: none; text-align: center; padding: 4rem 1rem;
+      background: white; border-radius: 14px; border: 1.5px dashed var(--border);
+    }
+    #emptyFilter .icon { font-size: 2.5rem; opacity: 0.25; margin-bottom: 0.75rem; }
+    #emptyFilter p { color: var(--muted); font-weight: 600; }
+
+    /* ─── BACK BUTTON ─── */
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: linear-gradient(135deg, var(--red-deep), #6b1a1a);
+      color: white; padding: 0.75rem 2rem; border-radius: 10px;
+      font-size: 0.8rem; font-weight: 700; text-decoration: none;
+      letter-spacing: 0.06em; box-shadow: 0 6px 18px rgba(90,10,10,0.28);
+      transition: all 0.2s;
+    }
+    .back-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(90,10,10,0.35); }
+
+    /* ─── SCROLL TOP ─── */
+    #scrollTop {
+      position: fixed; bottom: 1.75rem; right: 1.75rem; z-index: 40;
+      width: 2.75rem; height: 2.75rem; border-radius: 10px;
+      background: var(--red-deep); color: var(--gold-light);
+      border: none; cursor: pointer; font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 18px rgba(90,10,10,0.3);
+      transition: all 0.2s; opacity: 0; pointer-events: none;
+    }
+    #scrollTop.show { opacity: 1; pointer-events: auto; }
+    #scrollTop:hover { background: var(--gold); color: white; transform: translateY(-2px); }
+
+    .soal-hidden { display: none !important; }
+
+    /* ─── BOBOT CHIP ─── */
+    .bobot-chip {
+      font-size: 0.62rem; font-weight: 800; color: var(--muted);
+      background: rgba(200,146,42,0.12); padding: 0.15rem 0.45rem;
+      border-radius: 4px; margin-left: auto; white-space: nowrap; flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
 
 <!-- NAVBAR -->
 <nav class="nav">
-  <div class="max-w-4xl mx-auto px-4 py-3.5 flex justify-between items-center">
-    <div class="flex items-center gap-2.5">
-      <img src="/asset/logo.png" alt="Logo" class="h-8 w-auto">
-      <span style="font-family:'Playfair Display',serif;color:white;font-size:0.95rem;font-weight:700">
-        Tabeahan <span style="color:var(--gold)">Cendekia</span>
-      </span>
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <img src="/asset/logo.png" alt="Logo">
+      <span class="nav-brand-text">Tabeahan <span>Cendekia</span></span>
     </div>
-    <a href="/profil"
-      style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.15);border-radius:4px;padding:0.35rem 1rem;font-size:0.72rem;font-weight:700;text-decoration:none;transition:all 0.2s"
-      onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='rgba(255,255,255,0.75)'">
-      ← Riwayat
-    </a>
+    <a href="/ujian/hasil" class="nav-back">← Riwayat</a>
   </div>
 </nav>
 
 <!-- MAIN -->
-<div class="max-w-4xl mx-auto px-4 py-8">
+<div class="main">
 
-  <!-- Header -->
-  <div class="mb-6">
-    <p style="font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--muted);margin-bottom:0.35rem">
-      <%= paket %> · Try Out #<%= nomor_to %>
-    </p>
-    <% if (typeof sisaWaktuText !== 'undefined' && sisaWaktuText) { %>
-      <div class="mt-1">
-        <span class="inline-flex items-center gap-1 text-[9px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50">
-          ⏳ Sisa Masa Aktif Review: <%= sisaWaktuText %>
-        </span>
-      </div>
-    <% } %>
-    <h1 style="font-size:1.75rem;font-weight:900;color:var(--dark);margin:0.3rem 0 0.35rem">Review Jawaban</h1>
+  <!-- Header Card -->
+  <div class="header-card">
+    <p class="header-eyebrow"><%= paket %> · Try Out #<%= nomor_to %></p>
+    <h1 class="header-title">Review Jawaban</h1>
     <% if (tglSelesai) { %>
-    <p style="font-size:0.75rem;color:var(--muted)">
+    <p class="header-sub">
       Diselesaikan pada <%= new Date(tglSelesai).toLocaleDateString('id-ID', {weekday:'long', day:'2-digit', month:'long', year:'numeric'}) %>
     </p>
     <% } %>
+    <% if (typeof sisaWaktuText !== 'undefined' && sisaWaktuText) { %>
+    <div class="countdown-badge">⏳ Sisa Masa Aktif: <%= sisaWaktuText %></div>
+    <% } %>
   </div>
 
-  <!-- Stat bar -->
-  <div class="flex flex-wrap gap-2.5 mb-5">
-    <span class="stat-pill stat-benar">✅ <%= totalBenar %> Benar</span>
-    <span class="stat-pill stat-salah">❌ <%= totalSalah %> Salah</span>
-    <span class="stat-pill stat-skor">🎯 Skor <%= skor %></span>
-    <span class="stat-pill" style="background:rgba(90,10,10,0.06);color:var(--dark);border:1px solid rgba(90,10,10,0.1)">
-      📄 <%= totalSoal %> Soal
-    </span>
+  <!-- Score Grid -->
+  <div class="score-grid">
+    <div class="score-card green">
+      <div class="label">Benar</div>
+      <div class="value"><%= totalBenar %></div>
+    </div>
+    <div class="score-card red">
+      <div class="label">Salah</div>
+      <div class="value"><%= totalSalah %></div>
+    </div>
+    <div class="score-card gold">
+      <div class="label">Skor</div>
+      <div class="value"><%= skor %></div>
+    </div>
+    <div class="score-card dark">
+      <div class="label">Total Soal</div>
+      <div class="value"><%= totalSoal %></div>
+    </div>
   </div>
 
-  <!-- Filter global -->
-  <div class="flex items-center gap-2 mb-6 flex-wrap">
-    <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted)">Tampilkan:</span>
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <span class="filter-label">Tampilkan:</span>
     <button class="ftab active" data-filter="all">Semua (<%= totalSoal %>)</button>
-    <button class="ftab" data-filter="benar">✅ Benar (<%= totalBenar %>)</button>
-    <button class="ftab" data-filter="salah">❌ Salah (<%= totalSalah %>)</button>
+    <button class="ftab" data-filter="benar"> Benar (<%= totalBenar %>)</button>
+    <button class="ftab" data-filter="salah"> Salah (<%= totalSalah %>)</button>
   </div>
 
   <%
-    // Kelompokkan soal per materi/subtest
     const subtestGroups = {};
     soalRows.forEach(item => {
-      // Coba ambil dari paket atau materi
       const materiKey = item.materi_id || 0;
-      // Kita tidak punya nama materi langsung dari soalRows tapi bisa coba pakai query join di route
-      // Untuk sementara kita gunakan data yang ada
       if (!subtestGroups[materiKey]) subtestGroups[materiKey] = [];
       subtestGroups[materiKey].push(item);
     });
@@ -156,165 +389,149 @@
     let globalCounter = 0;
   %>
 
-  <!-- List Soal Per Subtest -->
-  <div class="space-y-4" id="allSubtests">
+  <!-- Subtest List -->
+  <div id="allSubtests">
   <% subtestKeys.forEach((matKey, secIdx) => {
     const items = subtestGroups[matKey];
     const subtestBenar = items.filter(i => i.is_benar).length;
-    const subtestSalah = items.length - subtestBenar;
     const subtestPersen = items.length > 0 ? Math.round(subtestBenar / items.length * 100) : 0;
-    // Nama materi dari soal pertama di grup (jika ada)
     const firstItem = items[0];
     const namaMateri = firstItem.nama_materi || firstItem.materi || `Subtest ${matKey}`;
+    const badgeClass = subtestBenar === items.length ? 'good' : subtestBenar === 0 ? 'bad' : 'mid';
+    const fillColor = subtestBenar === items.length ? 'linear-gradient(90deg,#16a34a,#4ade80)'
+                    : subtestBenar === 0 ? 'linear-gradient(90deg,#dc2626,#f87171)'
+                    : 'linear-gradient(90deg,var(--gold),var(--gold-light))';
   %>
   <div class="subtest-section" data-subtest="<%= secIdx %>">
-
-    <!-- Subtest Header (accordion trigger) -->
-    <div class="subtest-header" onclick="toggleSubtest(<%= secIdx %>)" id="sh-<%= secIdx %>">
-      <div class="flex-1 min-w-0">
-        <div class="flex items-center gap-2.5 flex-wrap">
-          <h2 style="font-size:1rem;font-weight:800;color:var(--dark);margin:0;font-family:'DM Sans',sans-serif"><%= namaMateri %></h2>
-          <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full" style="background:<%= subtestBenar===items.length?'rgba(21,128,61,0.12)':'rgba(220,38,38,0.08)' %>;color:<%= subtestBenar===items.length?'#15803d':'#b91c1c' %>">
-            <%= subtestBenar %>/<%= items.length %> benar
-          </span>
+    <div class="subtest-header" onclick="toggleSubtest(<%= secIdx %>)">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.6rem">
+          <span class="sub-title"><%= namaMateri %></span>
+          <span class="sub-badge <%= badgeClass %>"><%= subtestBenar %>/<%= items.length %> benar</span>
         </div>
-        <!-- Mini progress bar -->
-        <div class="flex items-center gap-2 mt-2">
-          <div class="sub-prog-track">
-            <div class="sub-prog-fill" style="width:<%= subtestPersen %>%;background:linear-gradient(90deg,<%= subtestBenar===items.length?'#16a34a,#4ade80':subtestBenar===0?'#dc2626,#f87171':'var(--gold),#e0c040' %>)"></div>
+        <div style="display:flex;align-items:center;gap:0.75rem">
+          <div class="prog-track">
+            <div class="prog-fill" style="width:<%= subtestPersen %>%;background:<%= fillColor %>"></div>
           </div>
-          <span style="font-size:0.65rem;font-weight:700;color:var(--muted);min-width:28px;text-align:right"><%= subtestPersen %>%</span>
+          <span style="font-size:0.65rem;font-weight:800;color:var(--muted);min-width:32px;text-align:right"><%= subtestPersen %>%</span>
         </div>
       </div>
-      <div class="flex items-center gap-2 flex-shrink-0">
-        <span style="font-size:0.7rem;color:var(--muted)"><%= items.length %> soal</span>
+      <div style="display:flex;align-items:center;gap:0.75rem;flex-shrink:0">
+        <span style="font-size:0.7rem;color:var(--muted);font-weight:600"><%= items.length %> soal</span>
         <span class="chevron open" id="chevron-sub-<%= secIdx %>">▼</span>
       </div>
     </div>
 
-    <!-- Subtest Body -->
-    <div class="subtest-body open p-4 space-y-4" id="sb-<%= secIdx %>">
-    <% items.forEach((item) => {
-      globalCounter++;
-      const statusClass = item.is_benar ? 'benar' : 'salah';
-      const opsiMap = { a: item.opsi_a, b: item.opsi_b, c: item.opsi_c, d: item.opsi_d, e: item.opsi_e };
-      const kunciLower   = (item.kunci     || '').toLowerCase();
-      const jawabanLower = (item.jawaban_user || '').toLowerCase();
-      const gcopy = globalCounter;
-    %>
-    <div class="soal-card <%= statusClass %>" data-status="<%= statusClass %>" data-subtest-sec="<%= secIdx %>">
+    <div class="subtest-body open" id="sb-<%= secIdx %>">
+      <div class="cards-grid">
+      <% items.forEach((item) => {
+        globalCounter++;
+        const statusClass = item.is_benar ? 'benar' : 'salah';
+        const opsiMap = { a: item.opsi_a, b: item.opsi_b, c: item.opsi_c, d: item.opsi_d, e: item.opsi_e };
+        const kunciLower = (item.kunci || '').toLowerCase();
+        const jawabanLower = (item.jawaban_user || '').toLowerCase();
+        const gcopy = globalCounter;
+      %>
+      <div class="soal-card <%= statusClass %>" data-status="<%= statusClass %>" data-subtest-sec="<%= secIdx %>">
 
-      <!-- Card header -->
-      <div class="soal-header <%= statusClass %>">
-        <div style="display:flex;align-items:center;gap:0.75rem">
+        <!-- Card Header -->
+        <div class="soal-header <%= statusClass %>">
           <div class="nomor-badge <%= statusClass %>"><%= gcopy %></div>
-          <div>
-            <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted)">Soal <%= item.nomor_urut %></span>
+          <div class="soal-meta">
+            <div class="soal-meta-label">Soal <%= item.nomor_urut %></div>
             <% if (!item.is_benar && item.tipe_penilaian !== 'BOBOT_OPSI') { %>
-            <p style="font-size:0.65rem;color:#b91c1c;font-weight:700;margin:0">
-              Jawabanmu: <strong><%= jawabanLower.toUpperCase() || '-' %></strong> · Kunci: <strong><%= kunciLower.toUpperCase() %></strong>
-            </p>
+            <div class="soal-meta-info salah">
+              Jawabanmu: <strong><%= jawabanLower.toUpperCase() || '-' %></strong> &nbsp;·&nbsp; Kunci: <strong><%= kunciLower.toUpperCase() %></strong>
+            </div>
             <% } else if (item.tipe_penilaian === 'BOBOT_OPSI' && jawabanLower) { %>
-            <p style="font-size:0.65rem;color:#15803d;font-weight:700;margin:0">
+            <div class="soal-meta-info benar">
               Jawabanmu: <strong><%= jawabanLower.toUpperCase() %></strong>
-            </p>
+            </div>
             <% } %>
           </div>
+          <div class="status-chip <%= statusClass %>">
+            <% if (item.is_benar) { %> Benar <% } else { %> Salah <% } %>
+          </div>
         </div>
-        <% if (item.is_benar) { %>
-          <span style="font-size:0.75rem;color:#15803d;font-weight:800">✅ Benar</span>
-        <% } else { %>
-          <span style="font-size:0.75rem;color:#b91c1c;font-weight:800">❌ Salah</span>
-        <% } %>
-      </div>
 
-      <!-- Body soal -->
-      <div class="p-5 space-y-4">
-        <p style="font-size:0.9rem;line-height:1.7;color:var(--dark);font-weight:500"><%= item.soal %></p>
-        <% if (item.gambar) { %>
-          <img src="/uploads/soal/<%= item.gambar %>" alt="Gambar Soal" style="max-width:380px;max-height:220px;object-fit:contain;border-radius:6px;border:1px solid #f0e8d8">
-        <% } %>
+        <!-- Card Body -->
+        <div class="soal-body">
+          <p class="soal-text"><%= item.soal %></p>
+          <% if (item.gambar) { %>
+            <img src="/uploads/soal/<%= item.gambar %>" alt="Gambar Soal" class="soal-img">
+          <% } %>
 
-        <!-- Opsi -->
-        <div class="space-y-2">
-        <% ['a','b','c','d','e'].forEach(huruf => { %>
-          <%
-            let rowClass = 'normal', hurufClass = 'normal', icon = '';
+          <!-- Opsi -->
+          <div class="opsi-list">
+          <% ['a','b','c','d','e'].forEach(huruf => {
+            let rowClass = 'normal', hurufClass = 'normal', textClass = '', icon = '';
             if (item.tipe_penilaian === 'BOBOT_OPSI') {
-              if (huruf === jawabanLower) { rowClass = 'kunci'; hurufClass = 'kunci'; icon = '✅ '; }
+              if (huruf === jawabanLower) { rowClass = 'kunci'; hurufClass = 'kunci'; textClass = 'kunci'; }
             } else {
-              if (huruf === kunciLower) { rowClass = 'kunci'; hurufClass = 'kunci'; icon = '✅ '; }
-              else if (huruf === jawabanLower && !item.is_benar) { rowClass = 'salah-user'; hurufClass = 'salah-user'; icon = '❌ '; }
+              if (huruf === kunciLower) { rowClass = 'kunci'; hurufClass = 'kunci'; textClass = 'kunci'; icon = '✓ '; }
+              else if (huruf === jawabanLower && !item.is_benar) { rowClass = 'salah-user'; hurufClass = 'salah-user'; textClass = 'salah-user'; icon = '✗ '; }
             }
-            let bobotText = '';
-            if (item.tipe_penilaian === 'BOBOT_OPSI') {
-              const bobot = item['bobot_' + huruf] || 0;
-              bobotText = `<span style="font-size:0.65rem;font-weight:800;color:var(--muted);background:rgba(200,160,32,0.15);padding:0.15rem 0.4rem;border-radius:3px;margin-left:auto;white-space:nowrap">Bobot: ${bobot}</span>`;
-            }
+            const bobot = item['bobot_' + huruf] || 0;
           %>
           <% if (opsiMap[huruf] || item['gambar_' + huruf]) { %>
           <div class="opsi-row <%= rowClass %>">
             <div class="opsi-huruf <%= hurufClass %>"><%= huruf %></div>
-            <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:0">
-              <span style="font-size:0.82rem;line-height:1.5;word-break:break-word"><%= icon %><%= opsiMap[huruf] || '' %></span>
+            <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:0">
+              <span class="opsi-text <%= textClass %>"><%= icon %><%= opsiMap[huruf] || '' %></span>
               <% if (item['gambar_' + huruf]) { %>
-                <img src="/uploads/soal/<%= item['gambar_' + huruf] %>" alt="Opsi <%= huruf.toUpperCase() %>" style="max-width:140px;max-height:90px;object-fit:contain;border-radius:5px;border:1px solid #f0e8d8">
+                <img src="/uploads/soal/<%= item['gambar_' + huruf] %>" alt="Opsi <%= huruf.toUpperCase() %>" class="opsi-img">
               <% } %>
             </div>
-            <%- bobotText %>
+            <% if (item.tipe_penilaian === 'BOBOT_OPSI') { %>
+              <span class="bobot-chip">Bobot: <%= bobot %></span>
+            <% } %>
           </div>
           <% } %>
-        <% }) %>
-        </div>
+          <% }) %>
+          </div>
 
-        <!-- Pembahasan -->
-       <!-- Pembahasan -->
-        <% if ((item.pembahasan && item.pembahasan.trim() !== '') || item.gambar_pembahasan) { %>
-        <div class="pembahasan-box">
-          <span class="pembahasan-label">Pembahasan</span>
-          <% if (item.pembahasan && item.pembahasan.trim() !== '') { %>
-            <p class="pembahasan-text"><%= item.pembahasan %></p>
-          <% } %>
-          <% if (item.gambar_pembahasan) { %>
-            <img src="/uploads/soal/<%= item.gambar_pembahasan %>"
-              alt="Gambar Pembahasan"
-              style="max-width:420px;max-height:280px;object-fit:contain;border-radius:6px;border:1px solid rgba(200,160,32,0.2);margin-top:0.75rem">
+          <!-- Pembahasan -->
+          <% if ((item.pembahasan && item.pembahasan.trim() !== '') || item.gambar_pembahasan) { %>
+          <div class="pembahasan-box">
+            <span class="pembahasan-label">Pembahasan</span>
+            <% if (item.pembahasan && item.pembahasan.trim() !== '') { %>
+              <p class="pembahasan-text"><%= item.pembahasan %></p>
+            <% } %>
+            <% if (item.gambar_pembahasan) { %>
+              <img src="/uploads/soal/<%= item.gambar_pembahasan %>" alt="Gambar Pembahasan"
+                style="max-width:420px;max-height:280px;object-fit:contain;border-radius:8px;border:1.5px solid rgba(200,146,42,0.2);margin-top:0.75rem;display:block">
+            <% } %>
+          </div>
           <% } %>
         </div>
-        <% } %>
       </div>
-
-    </div>
-    <% }) %>
+      <% }) %>
+      </div>
     </div>
   </div>
   <% }) %>
   </div>
 
-  <!-- Empty state -->
-  <div id="emptyFilter" style="display:none;text-align:center;padding:3rem">
-    <div style="font-size:2.5rem;opacity:0.2;margin-bottom:0.75rem">🔍</div>
-    <p style="color:var(--muted);font-weight:600">Tidak ada soal dengan filter ini.</p>
+  <!-- Empty State -->
+  <div id="emptyFilter">
+    <div class="icon">🔍</div>
+    <p>Tidak ada soal dengan filter ini.</p>
   </div>
 
-  <div class="mt-8 flex justify-center">
-    <a href="/profil"
-      style="background:linear-gradient(135deg,var(--red-deep),#6b1a1a);color:white;padding:0.75rem 2rem;border-radius:4px;font-size:0.8rem;font-weight:700;text-decoration:none;letter-spacing:0.05em">
-      ← Kembali ke Riwayat
-    </a>
+  <!-- Back Button -->
+  <div style="margin-top:2.5rem;display:flex;justify-content:center">
+    <a href="/ujian/hasil" class="back-btn">← Kembali ke Riwayat</a>
   </div>
 
-  <p style="margin-top:2rem;text-align:center;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:rgba(155,107,107,0.35)">
+  <p style="margin-top:2rem;text-align:center;font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.2em;color:rgba(155,107,107,0.3)">
     Tabeahan Cendekia
   </p>
-
 </div>
 
-<!-- Scroll to top -->
+<!-- Scroll Top -->
 <button id="scrollTop" title="Ke atas">↑</button>
 
 <script>
-  // ── Accordion subtest ──
   function toggleSubtest(idx) {
     const body    = document.getElementById('sb-' + idx);
     const chevron = document.getElementById('chevron-sub-' + idx);
@@ -323,35 +540,28 @@
     chevron.classList.toggle('open', !isOpen);
   }
 
-  // ── Filter tabs ──
   document.querySelectorAll('.ftab').forEach(tab => {
     tab.addEventListener('click', function () {
       document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
       this.classList.add('active');
       const filter = this.dataset.filter;
       let shownTotal = 0;
-
       document.querySelectorAll('.soal-card').forEach(card => {
         const match = filter === 'all' || card.dataset.status === filter;
         card.classList.toggle('soal-hidden', !match);
         if (match) shownTotal++;
       });
-
-      // Untuk setiap subtest section, cek apakah ada soal yang tampil
       document.querySelectorAll('.subtest-section').forEach(sec => {
-        const visibleCards = sec.querySelectorAll('.soal-card:not(.soal-hidden)');
-        sec.style.display = visibleCards.length > 0 ? '' : 'none';
+        const visible = sec.querySelectorAll('.soal-card:not(.soal-hidden)');
+        sec.style.display = visible.length > 0 ? '' : 'none';
       });
-
       document.getElementById('emptyFilter').style.display = shownTotal === 0 ? '' : 'none';
     });
   });
 
-  // ── Scroll to top ──
   const scrollBtn = document.getElementById('scrollTop');
   window.addEventListener('scroll', () => { scrollBtn.classList.toggle('show', window.scrollY > 400); });
   scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 </script>
-
 </body>
 </html>

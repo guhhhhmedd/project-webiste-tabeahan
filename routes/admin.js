@@ -7,18 +7,17 @@ const fs = require("fs");
 const crypto = require("crypto");
 const XLSX = require("xlsx");
 const bcrypt = require("bcrypt");
-const { text } = require("stream/consumers");
 
 const SALT_ROUNDS = 10;
 
+
+// ─────────────────────────────────────────
 // MIDDLEWARE
+// ─────────────────────────────────────────
+
 function isAdmin(req, res, next) {
   if (req.session.user && req.session.user.role === "admin") return next();
-  res.render("login", {
-    error: "Hanya admin yang bisa masuk!",
-    rateLimited: false,
-    resetTime: null,
-  });
+  res.render("login", { error: "Hanya admin yang bisa masuk!", rateLimited: false, resetTime: null });
 }
 
 async function isLogin(req, res, next) {
@@ -26,11 +25,11 @@ async function isLogin(req, res, next) {
   try {
     const [rows] = await db.query(
       "SELECT expired_at, is_active FROM users WHERE id = ?",
-      [req.session.user.id],
+      [req.session.user.id]
     );
     if (rows.length > 0) {
       req.session.user.expired_at = rows[0].expired_at;
-      req.session.user.is_active = rows[0].is_active;
+      req.session.user.is_active  = rows[0].is_active;
     }
     next();
   } catch (err) {
@@ -39,7 +38,11 @@ async function isLogin(req, res, next) {
   }
 }
 
+
+// ─────────────────────────────────────────
 // MULTER — EXCEL
+// ─────────────────────────────────────────
+
 const storageExcel = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = "public/uploads/excel_temp/";
@@ -51,118 +54,107 @@ const storageExcel = multer.diskStorage({
 });
 const uploadExcel = multer({ storage: storageExcel });
 
-// MULTER — SOAL IMAGES
+
+// ─────────────────────────────────────────
+// MULTER — GAMBAR SOAL
+// ─────────────────────────────────────────
+
 const storageSoal = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = "public/uploads/soal/";
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
-  filename: (req, file, cb) => {
-    cb(null, `soal-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`);
-  }
+  filename: (req, file, cb) =>
+    cb(null, `soal-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`),
 });
 
 const uploadSoal = multer({
   storage: storageSoal,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
+  limits: { fileSize: 2 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    if (file.mimetype === "image/png" || file.mimetype === "image/jpeg" || file.mimetype === "image/jpg") {
-      cb(null, true);
-    } else {
-      cb(new Error("Hanya file JPG/PNG yang diperbolehkan!"), false);
-    }
-  }
+    if (["image/png", "image/jpeg", "image/jpg"].includes(file.mimetype)) cb(null, true);
+    else cb(new Error("Hanya file JPG/PNG yang diperbolehkan!"), false);
+  },
 });
+
 const cpUploadSoal = uploadSoal.fields([
-  { name: 'gambar', maxCount: 1 },
-  { name: 'gambar_a', maxCount: 1 },
-  { name: 'gambar_b', maxCount: 1 },
-  { name: 'gambar_c', maxCount: 1 },
-  { name: 'gambar_d', maxCount: 1 },
-  { name: 'gambar_e', maxCount: 1 },
-  { name: 'gambar_pembahasan', maxCount: 1 }
+  { name: "gambar",            maxCount: 1 },
+  { name: "gambar_a",          maxCount: 1 },
+  { name: "gambar_b",          maxCount: 1 },
+  { name: "gambar_c",          maxCount: 1 },
+  { name: "gambar_d",          maxCount: 1 },
+  { name: "gambar_e",          maxCount: 1 },
+  { name: "gambar_pembahasan", maxCount: 1 },
 ]);
 
-// DASHBOARD ADMIN
+// Helper ambil filename dari req.files
+function getFile(files, name) {
+  return files && files[name] ? files[name][0].filename : null;
+}
+
+
+// ─────────────────────────────────────────
+// GET /dashboardAdmin
+// ─────────────────────────────────────────
+
 router.get("/dashboardAdmin", isAdmin, async (req, res) => {
   try {
-    const [statsSoal] = await db.query(`
-      SELECT TRIM(paket) AS paket, COUNT(*) AS total 
-      FROM questions 
-      GROUP BY TRIM(paket)
-    `);
+    const [statsSoal] = await db.query(
+      "SELECT TRIM(paket) AS paket, COUNT(*) AS total FROM questions GROUP BY TRIM(paket)"
+    );
 
     const [[userStats]] = await db.query(`
-  SELECT 
-    COUNT(*) AS total_users,
-    SUM(CASE WHEN DATE(create_at) = CURDATE() THEN 1 ELSE 0 END) AS today_users,
-    SUM(CASE WHEN status_ujian = 'SEDANG_UJIAN' THEN 1 ELSE 0 END) AS active_exam,
-    SUM(CASE WHEN status_ujian = 'SELESAI' THEN 1 ELSE 0 END) AS finished_exam
-  FROM users WHERE role != 'admin'
-`);
+      SELECT
+        COUNT(*) AS total_users,
+        SUM(CASE WHEN DATE(create_at) = CURDATE() THEN 1 ELSE 0 END) AS today_users,
+        SUM(CASE WHEN status_ujian = 'SEDANG_UJIAN' THEN 1 ELSE 0 END) AS active_exam,
+        SUM(CASE WHEN status_ujian = 'SELESAI'      THEN 1 ELSE 0 END) AS finished_exam
+      FROM users WHERE role != 'admin'
+    `);
 
     const [chartDataRaw] = await db.query(`
-  SELECT 
-    DATE_FORMAT(create_at, '%b %Y') AS bulan,
-    YEAR(create_at) AS tahun,
-    MONTH(create_at) AS bulan_num,
-    COUNT(*) AS jumlah
-  FROM users
-  WHERE role != 'admin'
-  GROUP BY YEAR(create_at), MONTH(create_at), DATE_FORMAT(create_at, '%b %Y')
-  ORDER BY YEAR(create_at) ASC, MONTH(create_at) ASC
-`);
+      SELECT DATE_FORMAT(create_at, '%b %Y') AS bulan,
+             YEAR(create_at) AS tahun, MONTH(create_at) AS bulan_num, COUNT(*) AS jumlah
+      FROM users WHERE role != 'admin'
+      GROUP BY YEAR(create_at), MONTH(create_at), DATE_FORMAT(create_at, '%b %Y')
+      ORDER BY YEAR(create_at) ASC, MONTH(create_at) ASC
+    `);
 
     let cumulative = 0;
     const chartData = {
-      labels: chartDataRaw.map((d) => d.bulan),
-      values: chartDataRaw.map((d) => {
-        cumulative += parseInt(d.jumlah) || 0;
-        return cumulative;
-      }),
+      labels: chartDataRaw.map(d => d.bulan),
+      values: chartDataRaw.map(d => { cumulative += parseInt(d.jumlah) || 0; return cumulative; }),
     };
-
-    if (!chartData.labels.length) {
-      chartData.labels = ["Belum ada data"];
-      chartData.values = [0];
-    }
+    if (!chartData.labels.length) { chartData.labels = ["Belum ada data"]; chartData.values = [0]; }
 
     const [daftarPaket] = await db.query("SELECT * FROM paket_ujian");
 
-    // Ambil user + 1 payment PENDING terbaru (untuk preview di dashboard)
     const [users] = await db.query(`
       SELECT u.id, u.username, u.email, u.status_ujian, u.skor, u.expired_at, u.is_active,
              p.id AS payment_id, p.paket AS payment_paket, p.nomor_to,
              p.bukti_transfer, p.status AS payment_status, p.token_ujian
       FROM users u
       LEFT JOIN payments p ON p.id = (
-        SELECT id FROM payments 
-        WHERE user_id = u.id AND UPPER(status) = 'PENDING'
+        SELECT id FROM payments WHERE user_id = u.id AND UPPER(status) = 'PENDING'
         ORDER BY created_at DESC LIMIT 1
       )
       WHERE u.role != 'admin'
       ORDER BY u.id DESC
     `);
 
-    // Hitung user yang punya minimal 1 payment PENDING
     const [[pendingRow]] = await db.query(`
       SELECT COUNT(DISTINCT p.user_id) AS cnt
       FROM payments p
       INNER JOIN users u ON u.id = p.user_id AND u.role != 'admin'
       WHERE UPPER(p.status) = 'PENDING'
     `);
-    const pendingCount = pendingRow.cnt || 0;
 
     res.render("admin/dashboardAdmin", {
-      statsSoal,
-      daftarPaket,
-      users,
-      userStats,
-      chartData,
-      pendingCount,
+      statsSoal, daftarPaket, users, userStats, chartData,
+      pendingCount: pendingRow.cnt || 0,
       message: req.query.message || null,
-      error: req.query.error || null,
+      error:   req.query.error   || null,
     });
   } catch (err) {
     console.error("Gagal di dashboardAdmin:", err);
@@ -170,10 +162,13 @@ router.get("/dashboardAdmin", isAdmin, async (req, res) => {
   }
 });
 
-// Ranking Ujian
+
+// ─────────────────────────────────────────
+// GET /admin/rankUjian
+// ─────────────────────────────────────────
+
 router.get("/admin/rankUjian", isAdmin, async (req, res) => {
   try {
-    // Ambil hanya ujian PERTAMA per user per paket (ORDER BY tgl_selesai ASC, ambil yang pertama)
     const [rows] = await db.query(`
       SELECT r.*, u.username, u.email
       FROM riwayat_ujian r
@@ -181,61 +176,48 @@ router.get("/admin/rankUjian", isAdmin, async (req, res) => {
       WHERE r.id = (
         SELECT id FROM riwayat_ujian r2
         WHERE r2.user_id = r.user_id AND r2.paket = r.paket
-        ORDER BY r2.tgl_selesai ASC
-        LIMIT 1
+        ORDER BY r2.tgl_selesai ASC LIMIT 1
       )
       ORDER BY r.paket ASC, r.skor DESC, r.tgl_selesai ASC
     `);
 
-    // Kelompokkan per paket dan tambahkan ranking
     const paketGroups = {};
     for (const row of rows) {
       const p = row.paket.trim();
       if (!paketGroups[p]) paketGroups[p] = [];
       paketGroups[p].push(row);
     }
-
-    // Tambahkan nomor ranking per paket
     for (const paket in paketGroups) {
-      paketGroups[paket] = paketGroups[paket].map((r, i) => ({
-        ...r,
-        ranking: i + 1,
-        total_skor: r.skor
-      }));
+      paketGroups[paket] = paketGroups[paket].map((r, i) => ({ ...r, ranking: i + 1, total_skor: r.skor }));
     }
 
-    res.render("admin/rankUjian", {
-      paketGroups,
-      title: "Ranking Ujian Peserta"
-    });
-  } catch (error) {
-    console.error("Error pada rankUjian:", error);
-    res.status(500).send("Terjadi kesalahan pada server saat memuat ranking.");
+    res.render("admin/rankUjian", { paketGroups, title: "Ranking Ujian Peserta" });
+  } catch (err) {
+    console.error("Error rankUjian:", err);
+    res.status(500).send("Terjadi kesalahan saat memuat ranking.");
   }
 });
 
-// DAFTAR PESERTA
+
+// ─────────────────────────────────────────
+// GET /admin/daftarPeserta
+// ─────────────────────────────────────────
+
 router.get("/admin/daftarPeserta", isAdmin, async (req, res) => {
   try {
     const [users] = await db.query(`
       SELECT u.id, u.username, u.email, u.create_at, u.password, u.status_ujian, u.skor
-      FROM users u
-      WHERE u.role != 'admin'
-      ORDER BY u.id DESC
+      FROM users u WHERE u.role != 'admin' ORDER BY u.id DESC
     `);
 
-    // Ambil semua payment — status di-UPPER agar konsisten di EJS
     const [allPayments] = await db.query(`
       SELECT p.id, p.user_id, p.paket, p.nomor_to, p.token_ujian,
-             p.tgl_lunas, p.bukti_transfer, UPPER(p.status) AS status,
-             p.created_at, p.expired_at
-      FROM payments p
-      JOIN users u ON u.id = p.user_id
+             p.tgl_lunas, p.bukti_transfer, UPPER(p.status) AS status, p.created_at, p.expired_at
+      FROM payments p JOIN users u ON u.id = p.user_id
       WHERE u.role != 'admin'
       ORDER BY p.paket ASC, p.nomor_to ASC, p.created_at DESC
     `);
 
-    // Build paymentsMap: { user_id: [payment, ...] }
     const paymentsMap = {};
     for (const p of allPayments) {
       if (!paymentsMap[p.user_id]) paymentsMap[p.user_id] = [];
@@ -243,10 +225,9 @@ router.get("/admin/daftarPeserta", isAdmin, async (req, res) => {
     }
 
     res.render("admin/daftarPeserta", {
-      users,
-      paymentsMap,
+      users, paymentsMap,
       message: req.query.success || null,
-      error: req.query.error || null,
+      error:   req.query.error   || null,
     });
   } catch (err) {
     console.error(err);
@@ -254,57 +235,72 @@ router.get("/admin/daftarPeserta", isAdmin, async (req, res) => {
   }
 });
 
-// KELOLA SOAL PER PAKET
+
+// ─────────────────────────────────────────
+// GET /admin/kelola-soal/:paket
+// (sudah include query passing grade)
+// ─────────────────────────────────────────
+
 router.get("/admin/kelola-soal/:paket", isAdmin, async (req, res) => {
   const namaPaket = decodeURIComponent(req.params.paket);
-  const filterTo = parseInt(req.query.to) || 1;
+  const filterTo  = parseInt(req.query.to) || 1;
 
   try {
     const [soalList] = await db.query(
-      `SELECT q.*, m.nama_materi 
-       FROM questions q 
-       LEFT JOIN materi_list m ON q.materi_id = m.id 
-       WHERE TRIM(q.paket) = ? AND q.nomor_to = ? 
+      `SELECT q.*, m.nama_materi
+       FROM questions q LEFT JOIN materi_list m ON q.materi_id = m.id
+       WHERE TRIM(q.paket) = ? AND q.nomor_to = ?
        ORDER BY q.nomor_urut ASC`,
-      [namaPaket, filterTo],
+      [namaPaket, filterTo]
     );
 
-    const totalAktif = soalList.filter((s) => s.is_active == 1).length;
+    const totalAktif = soalList.filter(s => s.is_active == 1).length;
 
     const [configRows] = await db.query(
       "SELECT jumlah_soal, durasi_menit, deskripsi, harga, harga_asli FROM paket_ujian WHERE nama_paket = ?",
-      [namaPaket],
+      [namaPaket]
     );
-    const config = configRows[0] || {
-      jumlah_soal: 0,
-      durasi_menit: 0,
-      deskripsi: "",
-      harga: 50000,
-      harga_asli: null,
-    };
+    const config = configRows[0] || { jumlah_soal: 0, durasi_menit: 0, deskripsi: "", harga: 50000, harga_asli: null };
 
     const [availTo] = await db.query(
       "SELECT * FROM paket_to WHERE TRIM(paket) = ? ORDER BY nomor_to ASC",
-      [namaPaket],
+      [namaPaket]
     );
 
-    const currentTOData = availTo.find((t) => t.nomor_to === filterTo) || {};
+    const currentTOData = availTo.find(t => t.nomor_to === filterTo) || {};
 
-    const [materiList] = await db.query(
-      "SELECT * FROM materi_list ORDER BY id ASC",
+    const [materiList] = await db.query("SELECT * FROM materi_list ORDER BY id ASC");
+
+    // Ambil config passing grade paket ini
+    const [pgRows] = await db.query(
+      "SELECT id, pg_type, pg_kumulatif, pg_min_persen, pg_skor_maks FROM paket_ujian WHERE TRIM(nama_paket) = ? LIMIT 1",
+      [namaPaket]
     );
+    const paketPg = pgRows[0] || null;
+
+    // Ambil min skor per subtest (hanya jika PER_SUBTEST)
+    let pgSubtestList = [];
+    if (paketPg && paketPg.pg_type === "PER_SUBTEST") {
+      const [subRows] = await db.query(
+        "SELECT * FROM paket_pg_subtest WHERE paket_id = ? ORDER BY materi_id ASC",
+        [paketPg.id]
+      );
+      pgSubtestList = subRows;
+    }
 
     res.render("admin/kelolaSoal", {
       paket: namaPaket,
       soalList,
       totalAktif,
       config,
-      currentTo: filterTo,
-      availTo: availTo,
+      currentTo:    filterTo,
+      availTo,
       currentTOData,
       materiList,
-      message: req.query.msg || req.query.message || null,
-      error: req.query.err || req.query.error || null,
+      paketPg,
+      pgSubtestList,
+      message: req.query.msg  || req.query.message || null,
+      error:   req.query.err  || req.query.error   || null,
     });
   } catch (err) {
     console.error(err);
@@ -312,12 +308,14 @@ router.get("/admin/kelola-soal/:paket", isAdmin, async (req, res) => {
   }
 });
 
-// EDIT SOAL — GET FORM
+
+// ─────────────────────────────────────────
+// GET /admin/editSoal/:id
+// ─────────────────────────────────────────
+
 router.get("/admin/editSoal/:id", isAdmin, async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT * FROM questions WHERE id = ?", [
-      req.params.id,
-    ]);
+    const [rows] = await db.query("SELECT * FROM questions WHERE id = ?", [req.params.id]);
     if (!rows.length) return res.redirect("/dashboardAdmin");
     res.render("admin/editSoal", { s: rows[0] });
   } catch (err) {
@@ -326,20 +324,20 @@ router.get("/admin/editSoal/:id", isAdmin, async (req, res) => {
   }
 });
 
-// GET /admin/anggota — halaman kelola anggota offline
+
+// ─────────────────────────────────────────
+// GET /admin/anggota
+// ─────────────────────────────────────────
+
 router.get("/admin/anggota", isAdmin, async (req, res) => {
   try {
-    const [anggota] = await db.query(
-      "SELECT * FROM anggota_offline ORDER BY created_at DESC",
-    );
-    const [userCount] = await db.query(
-      "SELECT COUNT(*) AS total FROM users WHERE is_anggota = 1",
-    );
+    const [anggota]   = await db.query("SELECT * FROM anggota_offline ORDER BY created_at DESC");
+    const [userCount] = await db.query("SELECT COUNT(*) AS total FROM users WHERE is_anggota = 1");
     res.render("admin/anggota", {
       anggota,
       totalAktif: userCount[0].total,
       message: req.query.success ? decodeURIComponent(req.query.success) : null,
-      error: req.query.error ? decodeURIComponent(req.query.error) : null,
+      error:   req.query.error   ? decodeURIComponent(req.query.error)   : null,
     });
   } catch (err) {
     console.error(err);
@@ -347,422 +345,263 @@ router.get("/admin/anggota", isAdmin, async (req, res) => {
   }
 });
 
-// VERIFIKASI PEMBAYARAN
+
+// ─────────────────────────────────────────
+// POST /admin/verify/:paymentId
+// ─────────────────────────────────────────
+
 router.post("/admin/verify/:paymentId", isAdmin, async (req, res) => {
   const { paymentId } = req.params;
   try {
-    const [payments] = await db.query(
-      "SELECT user_id, paket, nomor_to FROM payments WHERE id = ?",
-      [paymentId],
-    );
-    if (!payments.length)
-      return res.redirect("/admin/daftarPeserta?error=Data+tidak+ada");
+    const [payments] = await db.query("SELECT user_id FROM payments WHERE id = ?", [paymentId]);
+    if (!payments.length) return res.redirect("/admin/daftarPeserta?error=Data+tidak+ada");
 
     const userId = payments[0].user_id;
-    const token = crypto.randomBytes(4).toString("hex").toUpperCase();
+    const token  = crypto.randomBytes(4).toString("hex").toUpperCase();
 
-    const [userRows] = await db.query(
-      "SELECT expired_at FROM users WHERE id = ?",
-      [userId],
-    );
+    const [userRows] = await db.query("SELECT expired_at FROM users WHERE id = ?", [userId]);
     let newExpiredDate = new Date();
     const currentExpired = userRows[0]?.expired_at;
-    if (currentExpired && new Date(currentExpired) > new Date()) {
-      newExpiredDate = new Date(currentExpired);
-    }
+    if (currentExpired && new Date(currentExpired) > new Date()) newExpiredDate = new Date(currentExpired);
     newExpiredDate.setDate(newExpiredDate.getDate() + 7);
 
     await Promise.all([
-      db.query(
-        "UPDATE payments SET status = 'LUNAS', token_ujian = ?, tgl_lunas = NOW() WHERE id = ?",
-        [token, paymentId],
-      ),
-      db.query("UPDATE users SET expired_at = ?, is_active = 1 WHERE id = ?", [
-        newExpiredDate,
-        userId,
-      ]),
+      db.query("UPDATE payments SET status = 'LUNAS', token_ujian = ?, tgl_lunas = NOW() WHERE id = ?", [token, paymentId]),
+      db.query("UPDATE users SET expired_at = ?, is_active = 1 WHERE id = ?", [newExpiredDate, userId]),
     ]);
 
-    res.redirect(
-      "/admin/daftarPeserta?success=Pembayaran+berhasil+diverifikasi",
-    );
+    res.redirect("/admin/daftarPeserta?success=Pembayaran+berhasil+diverifikasi");
   } catch (err) {
     console.error(err);
     res.redirect("/admin/daftarPeserta?error=Gagal+verifikasi");
   }
 });
 
-// TOLAK PEMBAYARAN
+
+// ─────────────────────────────────────────
+// POST /admin/reject/:paymentId
+// ─────────────────────────────────────────
+
 router.post("/admin/reject/:paymentId", isAdmin, async (req, res) => {
-  const { paymentId } = req.params;
   try {
-    await db.query("UPDATE payments SET status = 'DITOLAK' WHERE id = ?", [
-      paymentId,
-    ]);
+    await db.query("UPDATE payments SET status = 'DITOLAK' WHERE id = ?", [req.params.paymentId]);
     res.redirect("/admin/daftarPeserta?success=Pembayaran+ditolak.");
   } catch (err) {
-    console.error("ERROR REJECT:", err);
+    console.error(err);
     res.redirect("/admin/daftarPeserta?error=Gagal+menolak.");
   }
 });
 
-// TAMBAH SOAL MANUAL
+
+// ─────────────────────────────────────────
+// POST /admin/tambah-soal
+// ─────────────────────────────────────────
+
 router.post("/admin/tambah-soal", isAdmin, (req, res, next) => {
-  cpUploadSoal(req, res, function (err) {
-    if (err instanceof multer.MulterError) {
-      if (err.code === "LIMIT_FILE_SIZE") {
-        return res.redirect("/dashboardAdmin?error=Ukuran+gambar+maksimal+2MB.");
-      }
+  cpUploadSoal(req, res, err => {
+    if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE")
+      return res.redirect("/dashboardAdmin?error=Ukuran+gambar+maksimal+2MB.");
+    if (err instanceof multer.MulterError)
       return res.redirect("/dashboardAdmin?error=Kesalahan+upload+gambar.");
-    } else if (err) {
-      return res.redirect("/dashboardAdmin?error=" + encodeURIComponent(err.message));
-    }
+    if (err) return res.redirect("/dashboardAdmin?error=" + encodeURIComponent(err.message));
     next();
   });
 }, async (req, res) => {
-  const {
-    paket,
-    nomor_to,
-    materi_id,
-    nomor_urut,
-    soal,
-    a,
-    b,
-    c,
-    d,
-    e,
-    kunci,
-    pembahasan,
-    bobot_a,
-    bobot_b,
-    bobot_c,
-    bobot_d,
-    bobot_e,
-    
-  } = req.body;
+  const { paket, nomor_to, materi_id, nomor_urut, soal, a, b, c, d, e,
+          kunci, pembahasan, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e } = req.body;
   try {
-    const bobotMateriIds = [3, 10, 11, 12];
-    const tipe_penilaian = bobotMateriIds.includes(parseInt(materi_id))
-      ? "BOBOT_OPSI"
-      : "BENAR_SALAH";
-
-    const gambar = req.files && req.files['gambar'] ? req.files['gambar'][0].filename : null;
-    const gambar_a = req.files && req.files['gambar_a'] ? req.files['gambar_a'][0].filename : null;
-    const gambar_b = req.files && req.files['gambar_b'] ? req.files['gambar_b'][0].filename : null;
-    const gambar_c = req.files && req.files['gambar_c'] ? req.files['gambar_c'][0].filename : null;
-    const gambar_d = req.files && req.files['gambar_d'] ? req.files['gambar_d'][0].filename : null;
-    const gambar_e = req.files && req.files['gambar_e'] ? req.files['gambar_e'][0].filename : null;
-    const gambar_pembahasan = req.files && req.files['gambar_pembahasan'] ? req.files['gambar_pembahasan'][0].filename : null;
-
+    const tipe = [3,10,11,12].includes(parseInt(materi_id)) ? "BOBOT_OPSI" : "BENAR_SALAH";
     await db.query(
-      `INSERT INTO questions (paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan, tipe_penilaian, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e, gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e, gambar_pembahasan) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO questions
+         (paket, nomor_to, materi_id, nomor_urut, soal,
+          opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan,
+          tipe_penilaian, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e,
+          gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e, gambar_pembahasan)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
       [
-        paket,
-        nomor_to,
-        materi_id,
-        nomor_urut,
-        soal,
-        a,
-        b,
-        c,
-        d,
-        e,
-        kunci || "",
-        pembahasan || "",
-        tipe_penilaian,
-        bobot_a || 0,
-        bobot_b || 0,
-        bobot_c || 0,
-        bobot_d || 0,
-        bobot_e || 0,
-        gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e, gambar_pembahasan
-      ],
+        paket, nomor_to, materi_id, nomor_urut, soal,
+        a, b, c, d, e, kunci || "", pembahasan || "", tipe,
+        bobot_a||0, bobot_b||0, bobot_c||0, bobot_d||0, bobot_e||0,
+        getFile(req.files,"gambar"), getFile(req.files,"gambar_a"),
+        getFile(req.files,"gambar_b"), getFile(req.files,"gambar_c"),
+        getFile(req.files,"gambar_d"), getFile(req.files,"gambar_e"),
+        getFile(req.files,"gambar_pembahasan"),
+      ]
     );
     res.redirect("/dashboardAdmin?message=Soal+berhasil+ditambah");
   } catch (err) {
     console.error(err);
-    if (err.code === "ER_DUP_ENTRY") {
-      return res.redirect(
-        `/dashboardAdmin?error=Gagal!+Nomor+urut+${nomor_urut}+sudah+ada+di+paket+dan+TO+ini.`,
-      );
-    }
+    if (err.code === "ER_DUP_ENTRY")
+      return res.redirect(`/dashboardAdmin?error=Gagal!+Nomor+urut+${nomor_urut}+sudah+ada.`);
     res.redirect("/dashboardAdmin?error=Gagal+tambah+soal.");
   }
 });
 
-// UPDATE SOAL
+
+// ─────────────────────────────────────────
+// POST /admin/updateSoal
+// ─────────────────────────────────────────
+
 router.post("/admin/updateSoal", isAdmin, (req, res, next) => {
-  cpUploadSoal(req, res, function (err) {
-    const paramTo = req.body.nomor_to || req.query.to || 1;
-    const paramPaket = req.body.paket || req.query.paket || "";
-    if (err instanceof multer.MulterError) {
-      if (err.code === "LIMIT_FILE_SIZE") {
-        return res.redirect(`/admin/kelola-soal/${encodeURIComponent(paramPaket)}?to=${paramTo}&error=Ukuran+gambar+maksimal+2MB.`);
-      }
-      return res.redirect(`/admin/kelola-soal/${encodeURIComponent(paramPaket)}?to=${paramTo}&error=Kesalahan+upload+gambar.`);
-    } else if (err) {
-      return res.redirect(`/admin/kelola-soal/${encodeURIComponent(paramPaket)}?to=${paramTo}&error=` + encodeURIComponent(err.message));
-    }
+  cpUploadSoal(req, res, err => {
+    const to    = req.body.nomor_to || 1;
+    const paket = req.body.paket    || "";
+    const back  = `/admin/kelola-soal/${encodeURIComponent(paket)}?to=${to}`;
+    if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE")
+      return res.redirect(back + "&error=Ukuran+gambar+maksimal+2MB.");
+    if (err instanceof multer.MulterError) return res.redirect(back + "&error=Kesalahan+upload+gambar.");
+    if (err) return res.redirect(back + "&error=" + encodeURIComponent(err.message));
     next();
   });
 }, async (req, res) => {
-  const {
-    id,
-    paket,
-    nomor_to,
-    materi_id,
-    nomor_urut,
-    soal,
-    opsi_a,
-    opsi_b,
-    opsi_c,
-    opsi_d,
-    opsi_e,
-    kunci,
-    pembahasan,
-    bobot_a,
-    bobot_b,
-    bobot_c,
-    bobot_d,
-    bobot_e,
-    
-  } = req.body;
+  const { id, paket, nomor_to, materi_id, nomor_urut, soal,
+          opsi_a, opsi_b, opsi_c, opsi_d, opsi_e,
+          kunci, pembahasan, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e } = req.body;
   try {
-    const bobotMateriIds = [3, 10, 11, 12];
-    const tipe_penilaian = bobotMateriIds.includes(parseInt(materi_id))
-      ? "BOBOT_OPSI"
-      : "BENAR_SALAH";
+    const tipe = [3,10,11,12].includes(parseInt(materi_id)) ? "BOBOT_OPSI" : "BENAR_SALAH";
 
-    const gambar = req.files && req.files['gambar'] ? req.files['gambar'][0].filename : null;
-    const gambar_a = req.files && req.files['gambar_a'] ? req.files['gambar_a'][0].filename : null;
-    const gambar_b = req.files && req.files['gambar_b'] ? req.files['gambar_b'][0].filename : null;
-    const gambar_c = req.files && req.files['gambar_c'] ? req.files['gambar_c'][0].filename : null;
-    const gambar_d = req.files && req.files['gambar_d'] ? req.files['gambar_d'][0].filename : null;
-    const gambar_e = req.files && req.files['gambar_e'] ? req.files['gambar_e'][0].filename : null;
-
-    let updateQuery = `UPDATE questions 
-       SET paket=?, nomor_to=?, materi_id=?, nomor_urut=?, soal=?,
-           opsi_a=?, opsi_b=?, opsi_c=?, opsi_d=?, opsi_e=?, kunci=?, pembahasan=?,
-           tipe_penilaian=?, bobot_a=?, bobot_b=?, bobot_c=?, bobot_d=?, bobot_e=?`;
-    const queryParams = [
-      paket,
-      nomor_to,
-      materi_id,
-      nomor_urut,
-      soal,
-      opsi_a,
-      opsi_b,
-      opsi_c,
-      opsi_d,
-      opsi_e,
-      kunci || "",
-      pembahasan || "",
-      tipe_penilaian,
-      bobot_a || 0,
-      bobot_b || 0,
-      bobot_c || 0,
-      bobot_d || 0,
-      bobot_e || 0,
+    let q = `UPDATE questions
+             SET paket=?, nomor_to=?, materi_id=?, nomor_urut=?, soal=?,
+                 opsi_a=?, opsi_b=?, opsi_c=?, opsi_d=?, opsi_e=?,
+                 kunci=?, pembahasan=?, tipe_penilaian=?,
+                 bobot_a=?, bobot_b=?, bobot_c=?, bobot_d=?, bobot_e=?`;
+    const p = [
+      paket, nomor_to, materi_id, nomor_urut, soal,
+      opsi_a, opsi_b, opsi_c, opsi_d, opsi_e,
+      kunci||"", pembahasan||"", tipe,
+      bobot_a||0, bobot_b||0, bobot_c||0, bobot_d||0, bobot_e||0,
     ];
 
-    if (gambar) { updateQuery += `, gambar=?`; queryParams.push(gambar); }
-    if (gambar_a) { updateQuery += `, gambar_a=?`; queryParams.push(gambar_a); }
-    if (gambar_b) { updateQuery += `, gambar_b=?`; queryParams.push(gambar_b); }
-    if (gambar_c) { updateQuery += `, gambar_c=?`; queryParams.push(gambar_c); }
-    if (gambar_d) { updateQuery += `, gambar_d=?`; queryParams.push(gambar_d); }
-    if (gambar_e) { updateQuery += `, gambar_e=?`; queryParams.push(gambar_e); }
+    for (const f of ["gambar","gambar_a","gambar_b","gambar_c","gambar_d","gambar_e","gambar_pembahasan"]) {
+      const fn = getFile(req.files, f);
+      if (fn) { q += `, ${f}=?`; p.push(fn); }
+    }
 
-    updateQuery += ` WHERE id=?`;
-    queryParams.push(id);
+    q += " WHERE id=?";
+    p.push(id);
 
-    await db.query(updateQuery, queryParams);
-    res.redirect(
-      `/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}`,
-    );
+    await db.query(q, p);
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}`);
   } catch (err) {
     console.error(err);
     res.status(500).send("Gagal update soal.");
   }
 });
 
-// IMPORT SOAL — EXCEL
+
+// ─────────────────────────────────────────
+// POST /admin/upload-soal (import Excel)
+// ─────────────────────────────────────────
+
 router.post("/admin/upload-soal", isAdmin, uploadExcel.single("fileExcel"), async (req, res) => {
-    if (!req.file) return res.status(400).send("File tidak ditemukan.");
-
-    try {
-      const workbook = XLSX.readFile(req.file.path);
-      const sheetName = workbook.SheetNames[0];
-      const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
-        range: 1,
-        defval: null,
-      });
-
-      let inserted = 0,
-        skipped = 0;
-      const duplicateErrors = [];
-
-      for (const row of rows) {
-        const paket = (row.paket || "").trim();
-        const nomorTo = parseInt(row.nomor_to);
-        const nomorUrut = row.nomor_urut;
-
-        if (!nomorTo || isNaN(nomorTo)) {
-          skipped++;
-          continue;
-        }
-
-        try {
-          await db.query(
-            `INSERT INTO questions 
-           (paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan,
-            tipe_penilaian, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e) 
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [
-              paket,
-              nomorTo,
-              row.materi_id,
-              nomorUrut,
-              row.soal,
-              row.a,
-              row.b,
-              row.c,
-              row.d,
-              row.e,
-              (row.kunci || "").toString().trim().toUpperCase(),
-              (row.pembahasan || "").toString().trim(),
-              [3, 10, 11, 12].includes(parseInt(row.materi_id))
-                ? "BOBOT_OPSI"
-                : "BENAR_SALAH",
-              Number(row.bobot_a) || 0,
-              Number(row.bobot_b) || 0,
-              Number(row.bobot_c) || 0,
-              Number(row.bobot_d) || 0,
-              Number(row.bobot_e) || 0,
-            ],
-          );
-          inserted++;
-        } catch (dbErr) {
-          if (dbErr.code === "ER_DUP_ENTRY") {
-            duplicateErrors.push(`No.${nomorUrut} (${paket} TO ${nomorTo})`);
-            skipped++;
-          } else {
-            throw dbErr;
-          }
-        }
-      }
-
-      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-
-      let msg = `Import selesai: ${inserted} soal ditambah.`;
-      if (duplicateErrors.length > 0)
-        msg += ` ${duplicateErrors.length} nomor duplikat dilewati.`;
-
-      res.redirect(`/dashboardAdmin?message=${encodeURIComponent(msg)}`);
-    } catch (err) {
-      console.error("ERROR IMPORT EXCEL:", err);
-      if (req.file && fs.existsSync(req.file.path))
-        fs.unlinkSync(req.file.path);
-      res.redirect(
-        "/dashboardAdmin?error=Gagal+proses+Excel.+Cek+format+kolom+dan+materi_id.",
-      );
-    }
-  },
-);
-
-// TAMBAH SOAL MANUAL (di halaman kelola soal)
-router.post("/admin/tambah-soal-manual", isAdmin, (req, res, next) => {
-  cpUploadSoal(req, res, function (err) {
-    const paramTo = req.body.nomor_to || req.query.to || 1;
-    const paramPaket = req.body.paket || req.query.paket || "";
-    if (err instanceof multer.MulterError) {
-      if (err.code === "LIMIT_FILE_SIZE") {
-        return res.redirect(`/admin/kelola-soal/${encodeURIComponent(paramPaket)}?to=${paramTo}&error=Ukuran+gambar+maksimal+2MB.`);
-      }
-      return res.redirect(`/admin/kelola-soal/${encodeURIComponent(paramPaket)}?to=${paramTo}&error=Kesalahan+upload+gambar.`);
-    } else if (err) {
-      return res.redirect(`/admin/kelola-soal/${encodeURIComponent(paramPaket)}?to=${paramTo}&error=` + encodeURIComponent(err.message));
-    }
-    next();
-  });
-}, async (req, res) => {
-  const {
-    paket,
-    nomor_to,
-    materi_id,
-    nomor_urut,
-    soal,
-    opsi_a,
-    opsi_b,
-    opsi_c,
-    opsi_d,
-    opsi_e,
-    kunci,
-    pembahasan,
-    bobot_a,
-    bobot_b,
-    bobot_c,
-    bobot_d,
-    bobot_e,
-    
-  } = req.body;
+  if (!req.file) return res.status(400).send("File tidak ditemukan.");
   try {
-    const m_id = parseInt(materi_id) || 1;
-    const isBobot = [3, 10, 11, 12].includes(m_id);
-
-    const gambar = req.files && req.files['gambar'] ? req.files['gambar'][0].filename : null;
-    const gambar_a = req.files && req.files['gambar_a'] ? req.files['gambar_a'][0].filename : null;
-    const gambar_b = req.files && req.files['gambar_b'] ? req.files['gambar_b'][0].filename : null;
-    const gambar_c = req.files && req.files['gambar_c'] ? req.files['gambar_c'][0].filename : null;
-    const gambar_d = req.files && req.files['gambar_d'] ? req.files['gambar_d'][0].filename : null;
-    const gambar_e = req.files && req.files['gambar_e'] ? req.files['gambar_e'][0].filename : null;
-    const gambar_pembahasan = req.files && req.files['gambar_pembahasan'] ? req.files['gambar_pembahasan'][0].filename : null;
-
-    await db.query(
-      `INSERT INTO questions 
-       (paket, nomor_to, materi_id, nomor_urut, soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan,
-        tipe_penilaian, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e, gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e, gambar_pembahasan) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        paket,
-        nomor_to,
-        m_id,
-        nomor_urut,
-        soal,
-        opsi_a,
-        opsi_b,
-        opsi_c,
-        opsi_d,
-        opsi_e,
-        (kunci || "A").toString().trim().toUpperCase(),
-        (pembahasan || "").toString().trim(),
-        isBobot ? "BOBOT_OPSI" : "BENAR_SALAH",
-        Number(bobot_a) || 0,
-        Number(bobot_b) || 0,
-        Number(bobot_c) || 0,
-        Number(bobot_d) || 0,
-        Number(bobot_e) || 0,
-        gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e, gambar_pembahasan
-      ],
+    const rows = XLSX.utils.sheet_to_json(
+      XLSX.readFile(req.file.path).Sheets[XLSX.readFile(req.file.path).SheetNames[0]],
+      { range: 1, defval: null }
     );
-    res.redirect(
-      `/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}&message=Soal+berhasil+ditambahkan`,
-    );
+
+    let inserted = 0, skipped = 0;
+    const duplicateErrors = [];
+
+    for (const row of rows) {
+      const paket    = (row.paket || "").trim();
+      const nomorTo  = parseInt(row.nomor_to);
+      if (!nomorTo || isNaN(nomorTo)) { skipped++; continue; }
+
+      try {
+        await db.query(
+          `INSERT INTO questions
+             (paket, nomor_to, materi_id, nomor_urut, soal,
+              opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan,
+              tipe_penilaian, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+          [
+            paket, nomorTo, row.materi_id, row.nomor_urut, row.soal,
+            row.a, row.b, row.c, row.d, row.e,
+            (row.kunci||"").toString().trim().toUpperCase(),
+            (row.pembahasan||"").toString().trim(),
+            [3,10,11,12].includes(parseInt(row.materi_id)) ? "BOBOT_OPSI" : "BENAR_SALAH",
+            Number(row.bobot_a)||0, Number(row.bobot_b)||0,
+            Number(row.bobot_c)||0, Number(row.bobot_d)||0, Number(row.bobot_e)||0,
+          ]
+        );
+        inserted++;
+      } catch (dbErr) {
+        if (dbErr.code === "ER_DUP_ENTRY") { duplicateErrors.push(`No.${row.nomor_urut}`); skipped++; }
+        else throw dbErr;
+      }
+    }
+
+    if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+
+    let msg = `Import selesai: ${inserted} soal ditambah.`;
+    if (duplicateErrors.length) msg += ` ${duplicateErrors.length} duplikat dilewati.`;
+    res.redirect(`/dashboardAdmin?message=${encodeURIComponent(msg)}`);
   } catch (err) {
-    console.error(err);
-    res.redirect(
-      `/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}&error=Gagal+menambahkan+soal`,
-    );
+    console.error("ERROR IMPORT EXCEL:", err);
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+    res.redirect("/dashboardAdmin?error=Gagal+proses+Excel.+Cek+format+kolom+dan+materi_id.");
   }
 });
 
-router.post("/admin/toggle-soal", isAdmin, async (req, res) => {
-  const { id, is_active } = req.body;
+
+// ─────────────────────────────────────────
+// POST /admin/tambah-soal-manual
+// ─────────────────────────────────────────
+
+router.post("/admin/tambah-soal-manual", isAdmin, (req, res, next) => {
+  cpUploadSoal(req, res, err => {
+    const to    = req.body.nomor_to || 1;
+    const paket = req.body.paket    || "";
+    const back  = `/admin/kelola-soal/${encodeURIComponent(paket)}?to=${to}`;
+    if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE")
+      return res.redirect(back + "&error=Ukuran+gambar+maksimal+2MB.");
+    if (err instanceof multer.MulterError) return res.redirect(back + "&error=Kesalahan+upload+gambar.");
+    if (err) return res.redirect(back + "&error=" + encodeURIComponent(err.message));
+    next();
+  });
+}, async (req, res) => {
+  const { paket, nomor_to, materi_id, nomor_urut, soal,
+          opsi_a, opsi_b, opsi_c, opsi_d, opsi_e,
+          kunci, pembahasan, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e } = req.body;
   try {
-    await db.query("UPDATE questions SET is_active = ? WHERE id = ?", [
-      is_active,
-      id,
-    ]);
+    const m_id = parseInt(materi_id) || 1;
+    await db.query(
+      `INSERT INTO questions
+         (paket, nomor_to, materi_id, nomor_urut, soal,
+          opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci, pembahasan,
+          tipe_penilaian, bobot_a, bobot_b, bobot_c, bobot_d, bobot_e,
+          gambar, gambar_a, gambar_b, gambar_c, gambar_d, gambar_e, gambar_pembahasan)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+      [
+        paket, nomor_to, m_id, nomor_urut, soal,
+        opsi_a, opsi_b, opsi_c, opsi_d, opsi_e,
+        (kunci||"A").toString().trim().toUpperCase(),
+        (pembahasan||"").toString().trim(),
+        [3,10,11,12].includes(m_id) ? "BOBOT_OPSI" : "BENAR_SALAH",
+        Number(bobot_a)||0, Number(bobot_b)||0, Number(bobot_c)||0, Number(bobot_d)||0, Number(bobot_e)||0,
+        getFile(req.files,"gambar"), getFile(req.files,"gambar_a"),
+        getFile(req.files,"gambar_b"), getFile(req.files,"gambar_c"),
+        getFile(req.files,"gambar_d"), getFile(req.files,"gambar_e"),
+        getFile(req.files,"gambar_pembahasan"),
+      ]
+    );
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}&message=Soal+berhasil+ditambahkan`);
+  } catch (err) {
+    console.error(err);
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}&error=Gagal+menambahkan+soal`);
+  }
+});
+
+
+// ─────────────────────────────────────────
+// POST /admin/toggle-soal
+// ─────────────────────────────────────────
+
+router.post("/admin/toggle-soal", isAdmin, async (req, res) => {
+  try {
+    await db.query("UPDATE questions SET is_active = ? WHERE id = ?", [req.body.is_active, req.body.id]);
     res.json({ ok: true });
   } catch (err) {
     console.error(err);
@@ -770,359 +609,330 @@ router.post("/admin/toggle-soal", isAdmin, async (req, res) => {
   }
 });
 
-// TOGGLE SEMUA SOAL DALAM SATU TO
+
+// ─────────────────────────────────────────
+// POST /admin/toggle-all-soal
+// ─────────────────────────────────────────
+
 router.post("/admin/toggle-all-soal", isAdmin, async (req, res) => {
   const { paket, is_active, current_to } = req.body;
   try {
-    await db.query(
-      "UPDATE questions SET is_active = ? WHERE paket = ? AND nomor_to = ?",
-      [is_active, paket, current_to],
-    );
-    res.redirect(
-      `/admin/kelola-soal/${encodeURIComponent(paket)}?to=${current_to}&message=Status+TO+Nomor+${current_to}+berhasil+diubah`,
-    );
+    await db.query("UPDATE questions SET is_active = ? WHERE paket = ? AND nomor_to = ?", [is_active, paket, current_to]);
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${current_to}&message=Status+TO+${current_to}+berhasil+diubah`);
   } catch (err) {
-    res.redirect(
-      `/admin/kelola-soal/${encodeURIComponent(paket)}?to=${current_to}&error=Gagal+update`,
-    );
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${current_to}&error=Gagal+update`);
   }
 });
 
-// UPDATE CONFIG PAKET (jumlah soal + durasi)
+
+// ─────────────────────────────────────────
+// POST /admin/update-config-paket
+// ─────────────────────────────────────────
+
 router.post("/admin/update-config-paket", isAdmin, async (req, res) => {
-  const { paket, jumlah_soal, durasi_menit, deskripsi, harga, harga_asli } =
-    req.body;
+  const { paket, jumlah_soal, durasi_menit, deskripsi, harga, harga_asli } = req.body;
   try {
     await db.query(
-      `UPDATE paket_ujian 
-       SET jumlah_soal = ?, durasi_menit = ?, deskripsi = ?, harga = ?, harga_asli = ?
-       WHERE nama_paket = ?`,
-      [
-        parseInt(jumlah_soal),
-        parseInt(durasi_menit),
-        deskripsi || null,
-        parseInt(harga) || 50000,
-        harga_asli ? parseInt(harga_asli) : null,
-        paket,
-      ],
+      `UPDATE paket_ujian
+       SET jumlah_soal=?, durasi_menit=?, deskripsi=?, harga=?, harga_asli=?
+       WHERE nama_paket=?`,
+      [parseInt(jumlah_soal), parseInt(durasi_menit), deskripsi||null,
+       parseInt(harga)||50000, harga_asli ? parseInt(harga_asli) : null, paket]
     );
-    res.redirect(
-      `/admin/kelola-soal/${encodeURIComponent(paket)}?message=Konfigurasi+berhasil+diupdate`,
-    );
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?message=Konfigurasi+berhasil+diupdate`);
   } catch (err) {
     console.error(err);
-    res.redirect(
-      `/admin/kelola-soal/${encodeURIComponent(paket)}?error=Gagal+update`,
-    );
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?error=Gagal+update`);
   }
 });
 
-// HAPUS SOAL
+
+// ─────────────────────────────────────────
+// POST /admin/delete-soal
+// ─────────────────────────────────────────
+
 router.post("/admin/delete-soal", isAdmin, async (req, res) => {
   const { id, paket } = req.body;
   try {
     await db.query("DELETE FROM questions WHERE id = ?", [id]);
-    res.redirect(
-      `/admin/kelola-soal/${encodeURIComponent(paket)}?message=Soal+berhasil+dihapus`,
-    );
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?message=Soal+berhasil+dihapus`);
   } catch (err) {
     console.error(err);
     res.status(500).send("Gagal menghapus soal.");
   }
 });
 
-// UPDATE DURASI PAKET
+
+// ─────────────────────────────────────────
+// POST /admin/update-durasi
+// ─────────────────────────────────────────
+
 router.post("/admin/update-durasi", isAdmin, async (req, res) => {
-  const { id, durasi } = req.body;
   try {
-    await db.query("UPDATE paket_ujian SET durasi_menit = ? WHERE id = ?", [
-      durasi,
-      id,
-    ]);
+    await db.query("UPDATE paket_ujian SET durasi_menit = ? WHERE id = ?", [req.body.durasi, req.body.id]);
     res.redirect("/dashboardAdmin?message=Durasi+berhasil+diperbarui");
   } catch (err) {
     res.redirect("/dashboardAdmin?error=Gagal+update+durasi");
   }
 });
 
-// HAPUS AKUN DARI ADMIN
+
+// ─────────────────────────────────────────
+// POST /deleteAccountFromAdmin
+// ─────────────────────────────────────────
+
 router.post("/deleteAccountFromAdmin", isAdmin, async (req, res) => {
   const { id } = req.body;
   try {
-    const [payments] = await db.query(
-      "SELECT bukti_transfer FROM payments WHERE user_id = ?",
-      [id],
-    );
-    payments.forEach((p) => {
+    const [payments] = await db.query("SELECT bukti_transfer FROM payments WHERE user_id = ?", [id]);
+    payments.forEach(p => {
       if (p.bukti_transfer) {
-        const filePath = path.join(
-          process.cwd(),
-          "public",
-          "uploads",
-          "bukti",
-          p.bukti_transfer,
-        );
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        const fp = path.join(process.cwd(), "public", "uploads", "bukti", p.bukti_transfer);
+        if (fs.existsSync(fp)) fs.unlinkSync(fp);
       }
     });
-
     await Promise.all([
       db.query("DELETE FROM jawaban_peserta WHERE user_id = ?", [id]),
       db.query("DELETE FROM riwayat_ujian WHERE user_id = ?", [id]),
       db.query("DELETE FROM payments WHERE user_id = ?", [id]),
       db.query("DELETE FROM users WHERE id = ?", [id]),
     ]);
-
-    res.redirect(
-      "/dashboardAdmin?message=Akun+dan+seluruh+data+terkait+berhasil+dihapus",
-    );
+    res.redirect("/dashboardAdmin?message=Akun+dan+seluruh+data+terkait+berhasil+dihapus");
   } catch (err) {
     console.error(err);
     res.status(500).send("Gagal hapus data.");
   }
 });
 
-// RESET UJIAN USER (admin)
+
+// ─────────────────────────────────────────
+// POST /admin/reset-ujian-user
+// ─────────────────────────────────────────
+
 router.post("/admin/reset-ujian-user", isAdmin, async (req, res) => {
   const { userIdTarget, paket_pilihan, nomor_to } = req.body;
   try {
     await Promise.all([
-      db.query(
-        "UPDATE payments SET status = 'LUNAS' WHERE user_id = ? AND paket = ? AND nomor_to = ?",
-        [userIdTarget, paket_pilihan, nomor_to],
-      ),
-      db.query(
-        `DELETE FROM jawaban_peserta
-         WHERE user_id = ?
-           AND question_id IN (SELECT id FROM questions WHERE paket = ? AND nomor_to = ?)`,
-        [userIdTarget, paket_pilihan, nomor_to],
-      ),
-      db.query("UPDATE users SET status_ujian = 'IDLE' WHERE id = ?", [
-        userIdTarget,
-      ]),
+      db.query("UPDATE payments SET status = 'LUNAS' WHERE user_id = ? AND paket = ? AND nomor_to = ?",
+        [userIdTarget, paket_pilihan, nomor_to]),
+      db.query(`DELETE FROM jawaban_peserta WHERE user_id = ?
+                AND question_id IN (SELECT id FROM questions WHERE paket = ? AND nomor_to = ?)`,
+        [userIdTarget, paket_pilihan, nomor_to]),
+      db.query("UPDATE users SET status_ujian = 'IDLE' WHERE id = ?", [userIdTarget]),
     ]);
-    res.redirect(
-      "/admin/daftarPeserta?success=Ujian+berhasil+direset%2C+user+bisa+ujian+kembali",
-    );
+    res.redirect("/admin/daftarPeserta?success=Ujian+berhasil+direset%2C+user+bisa+ujian+kembali");
   } catch (err) {
     console.error(err);
     res.redirect("/admin/daftarPeserta?error=Gagal+reset+ujian");
   }
 });
 
-// HAPUS SATU RIWAYAT PAYMENT (per TO)
+
+// ─────────────────────────────────────────
+// POST /admin/delete-payment
+// ─────────────────────────────────────────
+
 router.post("/admin/delete-payment", isAdmin, async (req, res) => {
   const { paymentId } = req.body;
   try {
-    const [rows] = await db.query(
-      "SELECT bukti_transfer FROM payments WHERE id = ?",
-      [paymentId],
-    );
+    const [rows] = await db.query("SELECT bukti_transfer FROM payments WHERE id = ?", [paymentId]);
     if (rows.length > 0 && rows[0].bukti_transfer) {
-      const filePath = path.join(
-        process.cwd(),
-        "public",
-        "uploads",
-        "bukti",
-        rows[0].bukti_transfer,
-      );
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      const fp = path.join(process.cwd(), "public", "uploads", "bukti", rows[0].bukti_transfer);
+      if (fs.existsSync(fp)) fs.unlinkSync(fp);
     }
     await db.query("DELETE FROM payments WHERE id = ?", [paymentId]);
-    res.redirect(
-      "/admin/daftarPeserta?success=Riwayat+pembayaran+berhasil+dihapus",
-    );
+    res.redirect("/admin/daftarPeserta?success=Riwayat+pembayaran+berhasil+dihapus");
   } catch (err) {
     console.error(err);
     res.redirect("/admin/daftarPeserta?error=Gagal+hapus+riwayat");
   }
 });
 
-// POST /admin/anggota/tambah — tambah email anggota
+
+// ─────────────────────────────────────────
+// POST /admin/anggota/tambah
+// ─────────────────────────────────────────
+
 router.post("/admin/anggota/tambah", isAdmin, async (req, res) => {
   const { email, nama, catatan } = req.body;
-
-  if (!email || !email.includes("@")) {
-    return res.redirect(
-      "/admin/anggota?error=" + encodeURIComponent("Email tidak valid."),
-    );
-  }
-
+  if (!email || !email.includes("@"))
+    return res.redirect("/admin/anggota?error=" + encodeURIComponent("Email tidak valid."));
   try {
-    await db.query(
-      "INSERT INTO anggota_offline (email, nama, catatan) VALUES (?, ?, ?)",
-      [email.toLowerCase().trim(), nama || null, catatan || null],
-    );
-
-    await db.query(
-      "UPDATE users SET is_anggota = 1 WHERE LOWER(email) = LOWER(?)",
-      [email.trim()],
-    );
-
-    res.redirect(
-      "/admin/anggota?success=" +
-        encodeURIComponent(`Email ${email} berhasil ditambahkan.`),
-    );
+    await db.query("INSERT INTO anggota_offline (email, nama, catatan) VALUES (?,?,?)",
+      [email.toLowerCase().trim(), nama||null, catatan||null]);
+    await db.query("UPDATE users SET is_anggota = 1 WHERE LOWER(email) = LOWER(?)", [email.trim()]);
+    res.redirect("/admin/anggota?success=" + encodeURIComponent(`Email ${email} berhasil ditambahkan.`));
   } catch (err) {
-    if (err.code === "ER_DUP_ENTRY") {
-      return res.redirect(
-        "/admin/anggota?error=" +
-          encodeURIComponent("Email sudah terdaftar di whitelist."),
-      );
-    }
+    if (err.code === "ER_DUP_ENTRY")
+      return res.redirect("/admin/anggota?error=" + encodeURIComponent("Email sudah terdaftar di whitelist."));
     console.error(err);
-    res.redirect(
-      "/admin/anggota?error=" + encodeURIComponent("Gagal menambahkan email."),
-    );
+    res.redirect("/admin/anggota?error=" + encodeURIComponent("Gagal menambahkan email."));
   }
 });
 
-// POST /admin/reset-password — admin set password baru untuk user
+
+// ─────────────────────────────────────────
+// POST /admin/reset-password
+// ─────────────────────────────────────────
+
 router.post("/admin/reset-password", isAdmin, async (req, res) => {
   const { userId, newPassword } = req.body;
-
-  if (!newPassword || newPassword.length < 6) {
-    return res.redirect(
-      "/admin/daftarPeserta?error=" +
-        encodeURIComponent("Password minimal 6 karakter."),
-    );
-  }
-
+  if (!newPassword || newPassword.length < 6)
+    return res.redirect("/admin/daftarPeserta?error=" + encodeURIComponent("Password minimal 6 karakter."));
   try {
-    const hashed = await bcrypt.hash(newPassword, SALT_ROUNDS);
-    await db.query("UPDATE users SET password = ? WHERE id = ?", [
-      hashed,
-      userId,
-    ]);
-    res.redirect(
-      "/admin/daftarPeserta?success=" +
-        encodeURIComponent("Password berhasil direset."),
-    );
+    await db.query("UPDATE users SET password = ? WHERE id = ?", [await bcrypt.hash(newPassword, SALT_ROUNDS), userId]);
+    res.redirect("/admin/daftarPeserta?success=" + encodeURIComponent("Password berhasil direset."));
   } catch (err) {
     console.error(err);
-    res.redirect(
-      "/admin/daftarPeserta?error=" +
-        encodeURIComponent("Gagal reset password."),
-    );
+    res.redirect("/admin/daftarPeserta?error=" + encodeURIComponent("Gagal reset password."));
   }
 });
 
-// POST /admin/anggota/hapus — hapus email dari whitelist
+
+// ─────────────────────────────────────────
+// POST /admin/anggota/hapus
+// ─────────────────────────────────────────
+
 router.post("/admin/anggota/hapus", isAdmin, async (req, res) => {
   const { id, email } = req.body;
-
   try {
     await db.query("DELETE FROM anggota_offline WHERE id = ?", [id]);
-
-    await db.query(
-      "UPDATE users SET is_anggota = 0 WHERE LOWER(email) = LOWER(?)",
-      [email],
-    );
-
-    res.redirect(
-      "/admin/anggota?success=" +
-        encodeURIComponent("Email berhasil dihapus dari whitelist."),
-    );
+    await db.query("UPDATE users SET is_anggota = 0 WHERE LOWER(email) = LOWER(?)", [email]);
+    res.redirect("/admin/anggota?success=" + encodeURIComponent("Email berhasil dihapus dari whitelist."));
   } catch (err) {
     console.error(err);
-    res.redirect(
-      "/admin/anggota?error=" + encodeURIComponent("Gagal menghapus email."),
-    );
+    res.redirect("/admin/anggota?error=" + encodeURIComponent("Gagal menghapus email."));
   }
 });
 
-// TAMBAH, HAPUS, DAN PUBLISH TRYOUT BARU
+
+// ─────────────────────────────────────────
+// POST /admin/tryout/tambah
+// ─────────────────────────────────────────
+
 router.post("/admin/tryout/tambah", isAdmin, async (req, res) => {
   const { paket } = req.body;
   try {
-    const [rows] = await db.query(
-      "SELECT MAX(nomor_to) AS maxTo FROM paket_to WHERE TRIM(paket) = ?",
-      [paket],
-    );
+    const [rows] = await db.query("SELECT MAX(nomor_to) AS maxTo FROM paket_to WHERE TRIM(paket) = ?", [paket]);
     const nextTo = (rows[0].maxTo || 0) + 1;
-    await db.query("INSERT INTO paket_to (paket, nomor_to) VALUES (?, ?)", [
-      paket,
-      nextTo,
-    ]);
-    res.redirect(
-      `/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nextTo}&message=${encodeURIComponent("TryOut baru berhasil dibuat")}`,
-    );
+    await db.query("INSERT INTO paket_to (paket, nomor_to) VALUES (?,?)", [paket, nextTo]);
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nextTo}&message=${encodeURIComponent("TryOut baru berhasil dibuat")}`);
   } catch (err) {
     console.error(err);
-    res.redirect(
-      `/admin/kelola-soal/${encodeURIComponent(paket)}?error=${encodeURIComponent("Gagal tambah TryOut")}`,
-    );
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?error=${encodeURIComponent("Gagal tambah TryOut")}`);
   }
 });
 
-// delete tryout
+
+// ─────────────────────────────────────────
+// POST /admin/tryout/delete
+// ─────────────────────────────────────────
+
 router.post("/admin/tryout/delete", isAdmin, async (req, res) => {
   const { paket, nomor_to } = req.body;
   const deletedTo = parseInt(nomor_to);
-  
   try {
-    await db.query(
-      "DELETE FROM questions WHERE TRIM(paket) = ? AND nomor_to = ?",
-      [paket, deletedTo]
-    );
-    await db.query(
-      "DELETE FROM paket_to WHERE TRIM(paket) = ? AND nomor_to = ?",
-      [paket, deletedTo]
-    );
+    await db.query("DELETE FROM questions WHERE TRIM(paket) = ? AND nomor_to = ?", [paket, deletedTo]);
+    await db.query("DELETE FROM paket_to WHERE TRIM(paket) = ? AND nomor_to = ?", [paket, deletedTo]);
 
     const [toList] = await db.query(
       "SELECT nomor_to FROM paket_to WHERE TRIM(paket) = ? AND nomor_to > ? ORDER BY nomor_to ASC",
       [paket, deletedTo]
     );
-
     for (const row of toList) {
-      const oldTo = row.nomor_to;
-      const newTo = oldTo - 1;
-
-      await db.query(
-        "UPDATE questions SET nomor_to = ? WHERE TRIM(paket) = ? AND nomor_to = ?",
-        [newTo, paket, oldTo]
-      );
-      await db.query(
-        "UPDATE paket_to SET nomor_to = ? WHERE TRIM(paket) = ? AND nomor_to = ?",
-        [newTo, paket, oldTo]
-      );
-      // update payments agar akses user tidak kacau
-      await db.query(
-        "UPDATE payments SET nomor_to = ? WHERE TRIM(paket) = ? AND nomor_to = ?",
-        [newTo, paket, oldTo]
-      );
+      const oldTo = row.nomor_to, newTo = oldTo - 1;
+      await db.query("UPDATE questions SET nomor_to=? WHERE TRIM(paket)=? AND nomor_to=?", [newTo, paket, oldTo]);
+      await db.query("UPDATE paket_to  SET nomor_to=? WHERE TRIM(paket)=? AND nomor_to=?", [newTo, paket, oldTo]);
+      await db.query("UPDATE payments  SET nomor_to=? WHERE TRIM(paket)=? AND nomor_to=?", [newTo, paket, oldTo]);
     }
-
-    res.redirect(
-      `/admin/kelola-soal/${encodeURIComponent(paket)}?message=${encodeURIComponent("TryOut berhasil dihapus")}`
-    );
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?message=${encodeURIComponent("TryOut berhasil dihapus")}`);
   } catch (err) {
     console.error(err);
-    res.redirect(
-      `/admin/kelola-soal/${encodeURIComponent(paket)}?error=${encodeURIComponent("Gagal hapus TryOut")}`
-    );
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?error=${encodeURIComponent("Gagal hapus TryOut")}`);
   }
 });
 
 
-// menampilkan tryout
+// ─────────────────────────────────────────
+// POST /admin/tryout/publish
+// ─────────────────────────────────────────
+
 router.post("/admin/tryout/publish", isAdmin, async (req, res) => {
   const { paket, nomor_to, is_published } = req.body;
   try {
-    await db.query(
-      "UPDATE paket_to SET is_published = ? WHERE TRIM(paket) = ? AND nomor_to = ?",
-      [is_published, paket, nomor_to],
-    );
-    res.redirect(
-      `/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}&message=${encodeURIComponent("Status penjualan TO berhasil diupdate")}`,
-    );
+    await db.query("UPDATE paket_to SET is_published=? WHERE TRIM(paket)=? AND nomor_to=?", [is_published, paket, nomor_to]);
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}&message=${encodeURIComponent("Status penjualan TO berhasil diupdate")}`);
   } catch (err) {
     console.error(err);
-    res.redirect(
-      `/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}&error=${encodeURIComponent("Gagal update penjualan")}`,
-    );
+    res.redirect(`/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}&error=${encodeURIComponent("Gagal update penjualan")}`);
   }
 });
+
+
+// ═══════════════════════════════════════════
+// PASSING GRADE — semua route ada di sini
+// ═══════════════════════════════════════════
+
+// POST /admin/passing-grade/update
+router.post("/admin/passing-grade/update", isAdmin, async (req, res) => {
+  const { paket_id, pg_type, pg_kumulatif, pg_min_persen, pg_skor_maks, redirect_to } = req.body;
+  const back = redirect_to || "/dashboardAdmin";
+  try {
+    await db.query(
+      `UPDATE paket_ujian
+       SET pg_type=?, pg_kumulatif=?, pg_min_persen=?, pg_skor_maks=?
+       WHERE id=?`,
+      [
+        pg_type,
+        pg_kumulatif  ? parseInt(pg_kumulatif)   : null,
+        pg_min_persen ? parseFloat(pg_min_persen) : null,
+        pg_skor_maks  ? parseInt(pg_skor_maks)    : null,
+        parseInt(paket_id),
+      ]
+    );
+    const sep = back.includes("?") ? "&" : "?";
+    res.redirect(back + sep + "message=" + encodeURIComponent("Passing grade berhasil disimpan."));
+  } catch (err) {
+    console.error(err);
+    const sep = back.includes("?") ? "&" : "?";
+    res.redirect(back + sep + "error=" + encodeURIComponent("Gagal menyimpan passing grade."));
+  }
+});
+
+// POST /admin/passing-grade/subtest/save
+router.post("/admin/passing-grade/subtest/save", isAdmin, async (req, res) => {
+  const { paket_id, materi_id, nama_materi, min_skor, redirect_to } = req.body;
+  const back = redirect_to || "/dashboardAdmin";
+  try {
+    await db.query(
+      `INSERT INTO paket_pg_subtest (paket_id, materi_id, nama_materi, min_skor)
+       VALUES (?,?,?,?)
+       ON DUPLICATE KEY UPDATE nama_materi=VALUES(nama_materi), min_skor=VALUES(min_skor)`,
+      [parseInt(paket_id), parseInt(materi_id), nama_materi||"", parseInt(min_skor)||0]
+    );
+    const sep = back.includes("?") ? "&" : "?";
+    res.redirect(back + sep + "message=" + encodeURIComponent("Min skor subtest berhasil disimpan."));
+  } catch (err) {
+    console.error(err);
+    const sep = back.includes("?") ? "&" : "?";
+    res.redirect(back + sep + "error=" + encodeURIComponent("Gagal menyimpan subtest."));
+  }
+});
+
+// POST /admin/passing-grade/subtest/delete
+router.post("/admin/passing-grade/subtest/delete", isAdmin, async (req, res) => {
+  const { id, redirect_to } = req.body;
+  const back = redirect_to || "/dashboardAdmin";
+  try {
+    await db.query("DELETE FROM paket_pg_subtest WHERE id=?", [parseInt(id)]);
+    const sep = back.includes("?") ? "&" : "?";
+    res.redirect(back + sep + "message=" + encodeURIComponent("Subtest berhasil dihapus."));
+  } catch (err) {
+    console.error(err);
+    const sep = back.includes("?") ? "&" : "?";
+    res.redirect(back + sep + "error=" + encodeURIComponent("Gagal menghapus subtest."));
+  }
+});
+
 
 module.exports = router;
