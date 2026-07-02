@@ -7,21 +7,21 @@
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    /* ===== TOKENS ===== */
+    /*  TOKENS  */
     :root {
-      --gold:      #c8a020;
+      --gold: #c8a020;
       --gold-light:#e0b830;
-      --dark:      #7a1010;
-      --cream:     #fff8f8;
-      --muted:     #9b6b6b;
-      --red-deep:  #5a0a0a;
+      --dark: #7a1010;
+      --cream: #fff8f8;
+      --muted: #9b6b6b;
+      --red-deep: #5a0a0a;
     }
 
-    /* ===== BASE ===== */
+    /*  BASE */
     body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--dark); }
     .font-display { font-family: 'Playfair Display', serif; }
 
-    /* ===== NAVBAR ===== */
+    /* NAVBAR  */
     .nav-glass {
       background: var(--red-deep);
       backdrop-filter: blur(12px);
@@ -29,7 +29,7 @@
       box-shadow: 0 2px 12px rgba(90,10,10,0.18);
     }
 
-    /* ===== CARDS ===== */
+    /*  CARDS */
     .card {
       background: white;
       border-radius: 4px;
@@ -41,12 +41,12 @@
     .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(90,10,10,0.08); }
 
     /* TO card status variants */
-    .to-lunas   { background: rgba(22,163,74,0.05);  border-color: rgba(22,163,74,0.25)  !important; }
-    .to-pending { background: rgba(234,179,8,0.05);  border-color: rgba(234,179,8,0.25)  !important; }
-    .to-ditolak { background: rgba(220,38,38,0.05);  border-color: rgba(220,38,38,0.25)  !important; }
-    .to-kosong  { background: white;                 border-color: #f0e8d8               !important; }
+    .to-lunas { background: rgba(22,163,74,0.05); border-color: rgba(22,163,74,0.25) !important; }
+    .to-pending { background: rgba(234,179,8,0.05); border-color: rgba(234,179,8,0.25) !important; }
+    .to-ditolak { background: rgba(220,38,38,0.05); border-color: rgba(220,38,38,0.25) !important; }
+    .to-kosong { background: white; border-color: #f0e8d8 !important; }
 
-    /* ===== PAKET DROPDOWN ===== */
+    /* PAKET DROPDOWN  */
     .paket-selector {
       appearance: none;
       -webkit-appearance: none;
@@ -69,7 +69,7 @@
       box-shadow: 0 0 0 3px rgba(200,160,32,0.15);
     }
 
-    /* ===== BUTTONS ===== */
+    /*  BUTTONS */
     .btn {
       display: block;
       width: 100%;
@@ -101,7 +101,7 @@
     }
     .btn-gold:active { top: 3px; box-shadow: 0 1px 0 #7a6010; }
 
-    /* ===== TOKEN BOX ===== */
+    /* TOKEN BOX  */
     .token-box {
       background: var(--red-deep);
       border: 1px solid rgba(200,160,32,0.35);
@@ -113,7 +113,28 @@
       text-align: center;
     }
 
-    /* ===== USER DROPDOWN ===== */
+    /* TOKEN INPUT (modal mulai ujian) */
+    .token-input {
+      width: 100%;
+      text-align: center;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      font-family: 'Playfair Display', serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      padding: 0.75rem 1rem;
+      border: 2px solid rgba(200,160,32,0.35);
+      border-radius: 4px;
+      color: var(--dark);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .token-input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(200,160,32,0.15);
+    }
+
+    /* USER DROPDOWN  */
     .user-dropdown {
       position: absolute;
       right: 0;
@@ -127,7 +148,7 @@
       z-index: 100;
     }
 
-    /* ===== MODAL ===== */
+    /*  MODAL  */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -152,14 +173,14 @@
       background: rgba(200,160,32,0.04);
     }
 
-    /* ===== PAKET SECTIONS ===== */
+    /* PAKET SECTIONS  */
     .paket-section { display: none; }
     .paket-section.active {
       display: block;
       animation: fadeUp 0.25s ease forwards;
     }
 
-    /* ===== PAKET HEADER GRADIENTS ===== */
+    /* PAKET HEADER GRADIENTS  */
     .grad-0 { background: linear-gradient(135deg, #1a1a2e, #16213e); }
     .grad-1 { background: linear-gradient(135deg, #0f3a1a, #1a6b2e); }
     .grad-2 { background: linear-gradient(135deg, #3a0f0f, #6b1a1a); }
@@ -167,28 +188,27 @@
     /* ===== TOAST ===== */
     @keyframes slideIn {
       from { transform: translateX(120%); opacity: 0; }
-      to   { transform: translateX(0);    opacity: 1; }
+      to { transform: translateX(0); opacity: 1; }
     }
     .toast { animation: slideIn 0.3s ease forwards; }
     .toast.hide { opacity: 0; transition: opacity 0.3s; }
 
-    /* ===== ANIMATIONS ===== */
+    /* ANIMATIONS  */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0);    }
+      to { opacity: 1; transform: translateY(0);    }
     }
 
-    /* ===== UTILITIES ===== */
+    /* UTILITIES  */
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <%# ===== TOAST ERROR ===== %>
+  <%# TOAST ERROR  %>
   <% if (typeof uploadError !== 'undefined' && uploadError) { %>
   <div id="toast" class="toast fixed top-4 right-4 z-[9998] max-w-sm">
     <div class="bg-white shadow-2xl p-4 flex items-start gap-3 border-l-4 border-red-500" style="border-radius:4px">
-      <span class="text-xl">❌</span>
       <div class="flex-1">
         <p class="font-bold text-red-600 text-xs uppercase">Gagal</p>
         <p class="text-xs text-slate-600 mt-0.5"><%= uploadError %></p>
@@ -198,11 +218,10 @@
   </div>
   <% } %>
 
-  <%# ===== TOAST SUCCESS ===== %>
+  <%#  TOAST SUCCESS  %>
   <% if (typeof successMsg !== 'undefined' && successMsg) { %>
   <div id="toastSuccess" class="toast fixed top-4 right-4 z-[9998] max-w-sm">
     <div class="bg-white shadow-2xl p-4 flex items-start gap-3 border-l-4 border-green-500" style="border-radius:4px">
-      <span class="text-xl">✅</span>
       <div class="flex-1">
         <p class="font-bold text-green-600 text-xs uppercase">Berhasil</p>
         <p class="text-xs text-slate-600 mt-0.5"><%= successMsg %></p>
@@ -211,7 +230,7 @@
   </div>
   <% } %>
 
-  <%# ===== NAVBAR ===== %>
+  <%#  NAVBAR %>
   <nav class="nav-glass fixed w-full z-50">
     <div class="max-w-6xl mx-auto px-6 py-3 flex justify-between items-center">
 
@@ -273,7 +292,7 @@
     </div>
   </nav>
 
-  <%# ===== MAIN ===== %>
+  <%# MAIN  %>
   <main class="pt-20 md:pt-24 min-h-screen">
     <div class="max-w-6xl mx-auto px-4 md:px-8 py-8">
 
@@ -290,7 +309,7 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <%# ===== KONTEN UTAMA ===== %>
+        <%# KONTEN UTAMA  %>
         <div class="lg:col-span-2 space-y-5">
 
           <%# Dropdown paket %>
@@ -316,7 +335,7 @@
             </p>
           </div>
 
-          <%# ===== SECTION PER PAKET ===== %>
+          <%# SECTION PER PAKET  %>
           <% if (typeof paketList !== 'undefined') { %>
             <% paketList.forEach((paket, idx) => {
               const sectionId = 'section-' + paket.key.replace(/\//g, '-').replace(/\s+/g, '_');
@@ -377,30 +396,30 @@
                   </div>
                 <% } else { %>
                   <% tos.forEach(toObj => {
-                    const i      = toObj.nomor_to;
-                    const key    = paket.key + '_' + i;
-                    const pay    = paymentMap[key] || null;
+                    const i = toObj.nomor_to;
+                    const key = paket.key + '_' + i;
+                    const pay = paymentMap[key] || null;
                     const status = pay ? pay.status.toUpperCase() : 'KOSONG';
 
-                    const cardCls   = status === 'LUNAS'   ? 'to-lunas'
+                    const cardCls   = status === 'LUNAS' ? 'to-lunas'
                                     : status === 'PENDING' ? 'to-pending'
                                     : status === 'DITOLAK' ? 'to-ditolak'
-                                    :                        'to-kosong';
+                                    : 'to-kosong';
 
-                    const badgeBg   = status === 'LUNAS'   ? '#16a34a'
+                    const badgeBg   = status === 'LUNAS' ? '#16a34a'
                                     : status === 'PENDING' ? '#a16207'
                                     : status === 'DITOLAK' ? '#b91c1c'
-                                    :                        'var(--muted)';
+                                    : 'var(--muted)';
 
-                    const badgeStyle = status === 'LUNAS'   ? 'background:rgba(22,163,74,0.12);color:#15803d'
+                    const badgeStyle = status === 'LUNAS' ? 'background:rgba(22,163,74,0.12);color:#15803d'
                                      : status === 'PENDING' ? 'background:rgba(234,179,8,0.15);color:#a16207'
                                      : status === 'DITOLAK' ? 'background:rgba(220,38,38,0.12);color:#b91c1c'
-                                     :                        'background:#f0e8d8;color:var(--muted)';
+                                     : 'background:#f0e8d8;color:var(--muted)';
 
-                    const badgeText  = status === 'LUNAS'   ? '✅ Aktif'
-                                     : status === 'PENDING' ? '⏳ Proses'
-                                     : status === 'DITOLAK' ? '❌ Ditolak'
-                                     :                        '— Beli';
+                    const badgeText  = status === 'LUNAS' ? ' Aktif'
+                                     : status === 'PENDING' ? ' Proses'
+                                     : status === 'DITOLAK' ? ' Ditolak'
+                                     : '— Beli';
                   %>
                   <div class="card border-2 p-4 <%= cardCls %>">
 
@@ -448,16 +467,20 @@
                     <%# Action area %>
                     <% if (status === 'LUNAS') { %>
                       <% if (user.status_ujian === 'SEDANG_UJIAN') { %>
-                        <a href="/ujian/soal/1" class="btn btn-green">▶️ Lanjutkan Ujian</a>
+                        <a href="/ujian/soal/1" class="btn btn-green"> Lanjutkan Ujian</a>
                         <p class="text-[10px] text-center mt-1.5" style="color:var(--muted)">
                           Selesaikan ujian aktifmu dulu
                         </p>
                       <% } else { %>
-                        <form action="/ujian/mulai" method="POST" class="confirm-mulai">
-                          <input type="hidden" name="paket_pilihan" value="<%= paket.key %>">
-                          <input type="hidden" name="nomor_to"      value="<%= i %>">
-                          <button type="submit" class="btn btn-green">▶ Mulai Ujian TO <%= i %></button>
-                        </form>
+                        <%# [FIX] Tombol ini sekarang membuka modal input token,
+                            bukan langsung submit form. Token wajib diisi & divalidasi
+                            di server (route POST /ujian/mulai) sebelum ujian dimulai. %>
+                        <button type="button" class="btn btn-green open-mulai-modal"
+                          data-paket="<%= paket.key %>"
+                          data-label="<%= paket.label %>"
+                          data-to="<%= i %>">
+                           Mulai Ujian TO <%= i %>
+                        </button>
                         <a href="/ujian/review?nomor_to=<%= i %>&paket=<%= encodeURIComponent(paket.key) %>"
                           class="block text-center text-[10px] font-semibold mt-2" style="color:var(--muted)">
                           📝 Lihat Review Jawaban
@@ -491,7 +514,7 @@
         </div>
         <%# /KONTEN UTAMA %>
 
-        <%# ===== SIDEBAR ===== %>
+        <%# SIDEBAR %>
         <div class="space-y-4">
 
           <a href="/profil" class="card p-5 flex items-center justify-between gap-3" style="text-decoration:none">
@@ -525,7 +548,7 @@
     </div>
   </main>
 
-  <%# ===== MODAL UPLOAD BUKTI ===== %>
+  <%# MODAL UPLOAD BUKTI  %>
   <div id="uploadModal" class="modal-overlay hidden">
     <div class="bg-white max-w-sm w-full mx-4 overflow-hidden shadow-2xl" style="border-radius:4px">
 
@@ -533,7 +556,7 @@
       <div class="p-5 text-white flex justify-between items-start"
         style="background:linear-gradient(135deg,#3a0f0f,#6b1a1a)">
         <div>
-          <h3 class="font-display font-bold text-lg">📤 Upload Bukti Bayar</h3>
+          <h3 class="font-display font-bold text-lg"> Upload Bukti Bayar</h3>
           <p class="text-xs opacity-60" id="mSubtitle">—</p>
         </div>
         <button onclick="closeModal()"
@@ -542,7 +565,7 @@
 
       <form action="/upload-bukti" method="POST" enctype="multipart/form-data" class="p-5 space-y-4" id="formUpload">
         <input type="hidden" name="paket_pilihan" id="mPaket">
-        <input type="hidden" name="nomor_to"      id="mTo">
+        <input type="hidden" name="nomor_to" id="mTo">
 
         <%# Summary row %>
         <div class="flex items-center gap-3 p-3"
@@ -593,14 +616,62 @@
 
         <button type="submit" id="btnSub" disabled
           class="btn btn-gold opacity-50 cursor-not-allowed uppercase text-xs tracking-widest">
-          📤 Kirim Bukti Sekarang
+           Kirim Bukti Sekarang
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <%#  MODAL INPUT TOKEN — MULAI UJIAN  %>
+  <%#  user wajib memasukkan token ujian (dikasih admin setelah
+      pembayaran diverifikasi) sebelum bisa memulai ujian. %>
+  <div id="mulaiUjianModal" class="modal-overlay hidden">
+    <div class="bg-white max-w-sm w-full mx-4 overflow-hidden shadow-2xl" style="border-radius:4px">
+
+      <div class="p-5 text-white flex justify-between items-start"
+        style="background:linear-gradient(135deg,#0f3a1a,#1a6b2e)">
+        <div>
+          <h3 class="font-display font-bold text-lg">🔑 Masukkan Token Ujian</h3>
+          <p class="text-xs opacity-60" id="tmSubtitle">—</p>
+        </div>
+        <button onclick="closeMulaiModal()"
+          class="text-white/50 hover:text-white text-2xl font-bold leading-none cursor-pointer mt-0.5">×</button>
+      </div>
+
+      <form action="/ujian/mulai" method="POST" class="p-5 space-y-4 confirm-mulai" id="formMulaiUjian">
+        <input type="hidden" name="paket_pilihan" id="tmPaket">
+        <input type="hidden" name="nomor_to"      id="tmTo">
+
+        <div class="flex items-center gap-3 p-3"
+          style="border-radius:4px;background:rgba(22,163,74,0.07);border:1px solid rgba(22,163,74,0.15)">
+          <div class="w-10 h-10 flex items-center justify-center font-display font-black text-lg text-white flex-shrink-0"
+            style="border-radius:4px;background:#16a34a" id="tmToBadge">—</div>
+          <div>
+            <p class="text-xs font-bold" style="color:var(--dark)" id="tmPaketLabel">—</p>
+            <p class="text-[10px]" style="color:var(--muted)" id="tmToLabel">Try Out —</p>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-widest mb-1.5" style="color:var(--muted)">
+            Token Ujian
+          </label>
+          <input type="text" name="token_input" id="tokenInput" class="token-input"
+            placeholder="XXXXXXXX" maxlength="20" autocomplete="off" required>
+          <p class="text-[10px] mt-1.5 leading-relaxed" style="color:var(--muted)">
+            Token bisa dilihat pada kartu TO ini setelah pembayaran diverifikasi admin.
+          </p>
+        </div>
+
+        <button type="submit" class="btn btn-green uppercase text-xs tracking-widest">
+           Mulai Ujian Sekarang
         </button>
       </form>
     </div>
   </div>
 
   <script>
-    // ── Toast auto-dismiss ──
+    //  Toast auto-dismiss 
     ['toast', 'toastSuccess'].forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
@@ -611,7 +682,7 @@
       if (el) { el.classList.add('hide'); setTimeout(() => el.remove(), 300); }
     });
 
-    // ── Paket dropdown ──
+    // Paket dropdown 
     const dp = document.getElementById('paketDropdown');
     const ph = document.getElementById('placeholderPilih');
     dp.addEventListener('change', () => {
@@ -622,7 +693,7 @@
       document.getElementById(id)?.classList.add('active');
     });
 
-    // ── User dropdown ──
+    //  User dropdown 
     const menuBtn = document.getElementById('userMenuBtn');
     const menuDrop = document.getElementById('userMenuDropdown');
     menuBtn?.addEventListener('click', e => { e.stopPropagation(); menuDrop.classList.toggle('hidden'); });
@@ -630,7 +701,7 @@
       if (!menuBtn?.contains(e.target) && !menuDrop?.contains(e.target)) menuDrop?.classList.add('hidden');
     });
 
-    // ── Modal ──
+    // Modal Upload Bukti 
     const modal = document.getElementById('uploadModal');
     function closeModal() { modal.classList.add('hidden'); }
     modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
@@ -656,11 +727,35 @@
       });
     });
 
-    // ── File upload ──
-    const zone    = document.getElementById('dropZone');
+    // Modal Mulai Ujian (Token)
+    const mulaiModal = document.getElementById('mulaiUjianModal');
+    function closeMulaiModal() {
+      mulaiModal.classList.add('hidden');
+      document.getElementById('formMulaiUjian').reset();
+    }
+    mulaiModal.addEventListener('click', e => { if (e.target === mulaiModal) closeMulaiModal(); });
+
+    document.querySelectorAll('.open-mulai-modal').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const { paket, label, to } = btn.dataset;
+        document.getElementById('tmPaket').value = paket;
+        document.getElementById('tmTo').value    = to;
+        document.getElementById('tmSubtitle').textContent  = `${label} · TO ${to}`;
+        document.getElementById('tmToBadge').textContent   = to;
+        document.getElementById('tmPaketLabel').textContent = label;
+        document.getElementById('tmToLabel').textContent   = `Try Out ${to}`;
+        document.getElementById('tokenInput').value = '';
+
+        mulaiModal.classList.remove('hidden');
+        setTimeout(() => document.getElementById('tokenInput')?.focus(), 100);
+      });
+    });
+
+    //  File upload validation & preview 
+    const zone = document.getElementById('dropZone');
     const fileInp = document.getElementById('fileInp');
-    const btnSub  = document.getElementById('btnSub');
-    const errTxt  = document.getElementById('errTxt');
+    const btnSub = document.getElementById('btnSub');
+    const errTxt = document.getElementById('errTxt');
 
     zone.addEventListener('click', () => fileInp.click());
 
@@ -670,13 +765,13 @@
 
       const parts = file.name.toLowerCase().split('.');
       if (parts.length !== 2 || !['jpg','jpeg','png'].includes(parts[1])) {
-        return showErr('🚨 Format ditolak! Hanya .jpg atau .png yang diizinkan.');
+        return showErr(' Format ditolak! Hanya .jpg atau .png yang diizinkan.');
       }
       if (!['image/jpeg','image/png'].includes(file.type)) {
-        return showErr('🚨 Tipe file tidak valid!');
+        return showErr(' Tipe file tidak valid!');
       }
       if (file.size > 2 * 1024 * 1024) {
-        return showErr('❌ Ukuran terlalu besar! Maks 2MB.');
+        return showErr(' Ukuran terlalu besar! Maks 2MB.');
       }
 
       errTxt.classList.add('hidden');
@@ -710,7 +805,7 @@
       btnSub.classList.add('opacity-50', 'cursor-not-allowed');
     }
 
-    // ── Konfirmasi form ──
+    // Konfirmasi form
     document.querySelectorAll('.confirm-mulai').forEach(form => {
       form.addEventListener('submit', e => {
         if (!confirm('Waktu akan mulai berjalan. Pastikan koneksi dan baterai stabil. Siap?')) e.preventDefault();
