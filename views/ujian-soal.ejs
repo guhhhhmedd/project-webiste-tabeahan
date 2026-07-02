@@ -17,22 +17,22 @@
 
     .exam-layout { display: grid; grid-template-columns: 1fr 300px; grid-template-rows: auto 1fr; height: 100vh; overflow: hidden; }
 
-    /* ── Topbar ── */
+    /*  Topbar  */
     .topbar { grid-column: 1 / -1; background: #5a0a0a; display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; height: 56px; border-bottom: 3px solid var(--accent); position: relative; z-index: 10; }
     .topbar-title { font-size: 13px; font-weight: 700; color: white; letter-spacing: 0.03em; }
     .topbar-paket { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.5); margin-top: 1px; }
 
-    /* ── Timer ── */
+    /*  Timer  */
     .timer-box { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18); border-radius: 8px; padding: 6px 20px; position: absolute; left: 50%; transform: translateX(-50%); }
     #timer { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; color: white; letter-spacing: 0.05em; }
     #timer.warning { color: var(--danger); animation: pulse 1s ease-in-out infinite; }
     @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
 
-    /* ── User ── */
+    /* User  */
     .topbar-user { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.8); }
     .user-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; }
 
-    /* ── Soal panel ── */
+    /*  Soal panel */
     .soal-panel { overflow-y: auto; background: var(--bg); display: flex; flex-direction: column; }
     .soal-panel::-webkit-scrollbar { width: 5px; }
     .soal-panel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
@@ -48,7 +48,7 @@
     .soal-number-badge { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; background: var(--primary); color: white; font-size: 13px; font-weight: 800; flex-shrink: 0; }
     .soal-text { font-size: 15px; line-height: 1.75; font-weight: 500; color: var(--text); flex: 1; }
 
-    /* ── Opsi ── */
+    /*  Opsi  */
     .opsi-label { display: flex; align-items: flex-start; gap: 14px; padding: 14px 18px; border-radius: 12px; border: 2px solid var(--border); background: white; cursor: pointer; transition: all 0.15s ease; margin-bottom: 10px; user-select: none; }
     .opsi-label:hover { border-color: var(--accent); background: rgba(245,158,11,0.03); transform: translateX(2px); }
     .opsi-label.selected { border-color: var(--accent); background: rgba(245,158,11,0.06); box-shadow: 0 0 0 3px rgba(245,158,11,0.12); }
@@ -58,7 +58,7 @@
     .opsi-text { font-size: 14px; font-weight: 500; color: #475569; line-height: 1.5; padding-top: 3px; }
     .opsi-label.selected .opsi-text { color: var(--primary); font-weight: 600; }
 
-    /* ── Nav bawah ── */
+    /*  Nav bawah  */
     .soal-nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; background: white; border-top: 1px solid var(--border); position: sticky; bottom: 0; }
     .btn-nav { display: flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; transition: all 0.15s; }
     .btn-nav.prev { background: white; border: 2px solid var(--border); color: var(--muted); }
@@ -69,7 +69,7 @@
     .soal-counter { font-size: 12px; font-weight: 600; color: var(--muted); }
     .soal-counter strong { color: var(--text); }
 
-    /* ── Sidebar ── */
+    /*  Sidebar  */
     .sidebar { background: white; border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
     .sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); background: #f8fafc; }
     .sidebar-header h3 { font-size: 12px; font-weight: 800; color: var(--text); text-transform: uppercase; letter-spacing: 0.08em; }
@@ -94,13 +94,13 @@
     .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; color: var(--muted); }
     .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
 
-    /* ── Tombol selesai ── */
+    /* Tombol selesai  */
     .sidebar-footer { padding: 14px 16px; border-top: 1px solid var(--border); }
     #btnSelesai { width: 100%; padding: 12px; border-radius: 10px; background: linear-gradient(135deg, #dc2626, #b91c1c); color: white; font-size: 13px; font-weight: 800; letter-spacing: 0.03em; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(220,38,38,0.3), 0 3px 0 #991b1b; transition: all 0.15s; position: relative; top: 0; }
     #btnSelesai:hover { filter: brightness(1.08); }
     #btnSelesai:active { top: 3px; box-shadow: 0 1px 6px rgba(220,38,38,0.3), 0 0px 0 #991b1b; }
 
-    /* ── Modal ── */
+    /*  Modal  */
     .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.55); backdrop-filter: blur(4px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 1rem; }
     .modal-bg.open { display: flex; }
     .modal-box { background: white; border-radius: 20px; max-width: 400px; width: 100%; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.2); animation: popIn 0.25s ease; }
@@ -109,7 +109,7 @@
     .modal-body { padding: 24px; }
     .modal-emoji { font-size: 40px; margin-bottom: 8px; }
 
-    /* ── Responsive ── */
+    /*  Responsive  */
     @media (max-width: 768px) {
       .exam-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; height: auto; min-height: 100vh; overflow: auto; }
       .soal-panel { overflow: visible; }
@@ -219,7 +219,7 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-header">
-        <h3>📋 Navigasi Soal</h3>
+        <h3> Navigasi Soal</h3>
       </div>
       <div class="stats-strip">
         <div class="stat-item">
@@ -248,13 +248,12 @@
         <div class="legend-item"><div class="legend-dot" style="background:white;border:2px solid var(--border)"></div>Belum</div>
       </div>
       <div class="sidebar-footer">
-        <button id="btnSelesai">🚩 AKHIRI UJIAN</button>
+        <button id="btnSelesai"> AKHIRI UJIAN</button>
       </div>
     </aside>
 
   </div>
 
-  <!-- Modal konfirmasi selesai -->
   <div class="modal-bg" id="modalSelesai">
     <div class="modal-box">
       <div class="modal-header">
@@ -291,68 +290,134 @@
   </div>
 
   <script>
-    // ── Data ujian ──
-    const examData  = document.getElementById('exam-data').dataset;
-    const totalSoal = parseInt(examData.total);
+    // [FIX] SAFETY NET GLOBAL — menangkap SEMUA error JS yang tidak terduga
+    // (typo, elemen tidak ketemu, dsb). Sebelumnya error seperti ini bikin
+    // script berhenti diam-diam dan halaman jadi terasa "blank"/macet tanpa
+    // penjelasan. Sekarang: alert dulu (biar kelihatan pas debugging), lalu
+    // otomatis balik ke dashboard supaya user tidak nyangkut di halaman rusak.
+    let sudahRedirectKarenaError = false;
 
-    // Sisa waktu dari server — akurat walau refresh berkali-kali
-    const sisaMs  = Number(examData.sisa);
-    const endTime = Date.now() + sisaMs;
+    function backToDashboardKarenaError(sumber, pesan) {
+      if (sudahRedirectKarenaError) return; // cegah alert dobel/bertumpuk
+      sudahRedirectKarenaError = true;
+      console.error(`[UJIAN ERROR @ ${sumber}]`, pesan);
+      alert(
+        `Terjadi masalah saat ujian.\n\nLokasi: ${sumber}\nDetail: ${pesan}\n\nKamu akan diarahkan kembali ke dashboard. Jawaban yang sudah tersimpan tetap aman.`
+      );
+      window.location.href =
+        '/dashboardPembayaranUjian?uploadError=' +
+        encodeURIComponent(`Ujian dihentikan karena error di ${sumber}: ${pesan}`);
+    }
 
-    // ── Jawaban ──
-    let jawabanMap = {};
-    try { jawabanMap = JSON.parse(document.getElementById('existing-jawaban').textContent); } catch(e) {}
+    // Tangkap error JS yang tidak ketangkep try/catch manapun
+    window.addEventListener('error', function (e) {
+      backToDashboardKarenaError('window.onerror', e.message || 'Unknown error');
+    });
+
+    // Tangkap Promise yang reject tapi tidak di-.catch()
+    window.addEventListener('unhandledrejection', function (e) {
+      const pesan = (e.reason && e.reason.message) ? e.reason.message : String(e.reason);
+      backToDashboardKarenaError('unhandledrejection', pesan);
+    });
+
+    // INISIALISASI — dibungkus try/catch supaya kalau data awal rusak
+    // (elemen tidak ada, JSON tidak valid, dsb), langsung ketauan dan
+    // redirect, bukan macet di tengah proses.
+    let examData, totalSoal, sisaMs, endTime, jawabanMap = {};
+
+    try {
+      const examDataEl = document.getElementById('exam-data');
+      if (!examDataEl) throw new Error('Elemen #exam-data tidak ditemukan di halaman.');
+      examData = examDataEl.dataset;
+
+      totalSoal = parseInt(examData.total);
+      if (!totalSoal || isNaN(totalSoal) || totalSoal <= 0) {
+        throw new Error('Jumlah soal tidak valid (total: ' + examData.total + '). Soal mungkin belum tersedia.');
+      }
+
+      sisaMs = Number(examData.sisa);
+      if (isNaN(sisaMs)) throw new Error('Sisa waktu ujian tidak valid.');
+      endTime = Date.now() + sisaMs;
+
+      const jawabanEl = document.getElementById('existing-jawaban');
+      if (jawabanEl) {
+        try {
+          jawabanMap = JSON.parse(jawabanEl.textContent);
+        } catch (parseErr) {
+          console.error('Gagal parse existing-jawaban, pakai objek kosong:', parseErr);
+          jawabanMap = {};
+        }
+      }
+    } catch (initErr) {
+      backToDashboardKarenaError('inisialisasi data ujian', initErr.message);
+      // Hentikan eksekusi script selanjutnya karena data dasar rusak
+      throw initErr;
+    }
 
     let currentIdx = 0;
 
-    // ── Statistik & progress ──
+    //  Statistik & progress 
     function updateStats() {
-      const answered = Object.keys(jawabanMap).length;
-      document.getElementById('statDijawab').textContent = answered;
-      document.getElementById('statBelum').textContent   = totalSoal - answered;
-      document.getElementById('progressFill').style.width = Math.round((answered / totalSoal) * 100) + '%';
+      try {
+        const answered = Object.keys(jawabanMap).length;
+        document.getElementById('statDijawab').textContent = answered;
+        document.getElementById('statBelum').textContent   = totalSoal - answered;
+        document.getElementById('progressFill').style.width = Math.round((answered / totalSoal) * 100) + '%';
+      } catch (e) {
+        backToDashboardKarenaError('updateStats', e.message);
+      }
     }
 
-    // ── Gaya opsi terpilih ──
+    // Gaya opsi terpilih 
     function applySelectedStyle(qid, val) {
       document.querySelectorAll(`label[id^="label-${qid}-"]`).forEach(lbl => lbl.classList.remove('selected'));
       if (val) document.getElementById(`label-${qid}-${val}`)?.classList.add('selected');
     }
 
-    // ── Tandai soal terjawab di navigasi ──
+    // Tandai soal terjawab di navigasi
     function markAnswered(idx) {
       document.querySelector(`.nav-item[data-index="${idx}"]`)?.classList.add('answered');
     }
 
-    // ── Pulihkan jawaban dari sesi ──
+    // Pulihkan jawaban dari sesi
     function restoreJawaban() {
-      Object.entries(jawabanMap).forEach(([qid, jawaban]) => {
-        const radio = document.querySelector(`input[name="q_${qid}"][value="${jawaban}"]`);
-        if (radio) {
-          radio.checked = true;
-          applySelectedStyle(qid, jawaban);
-          markAnswered(parseInt(radio.dataset.idx));
-        }
-      });
-      updateStats();
+      try {
+        Object.entries(jawabanMap).forEach(([qid, jawaban]) => {
+          const radio = document.querySelector(`input[name="q_${qid}"][value="${jawaban}"]`);
+          if (radio) {
+            radio.checked = true;
+            applySelectedStyle(qid, jawaban);
+            markAnswered(parseInt(radio.dataset.idx));
+          }
+        });
+        updateStats();
+      } catch (e) {
+        backToDashboardKarenaError('restoreJawaban', e.message);
+      }
     }
 
-    // ── Tampilkan soal aktif ──
+    // Tampilkan soal aktif
     function updateView() {
-      document.querySelectorAll('.soal-box').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      try {
+        document.querySelectorAll('.soal-box').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
-      document.getElementById(`box-${currentIdx}`)?.classList.remove('hidden');
+        const currentBox = document.getElementById(`box-${currentIdx}`);
+        if (!currentBox) throw new Error(`Elemen soal box-${currentIdx} tidak ditemukan.`);
+        currentBox.classList.remove('hidden');
 
-      const nav = document.querySelector(`.nav-item[data-index="${currentIdx}"]`);
-      if (nav) { nav.classList.add('active'); nav.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+        const nav = document.querySelector(`.nav-item[data-index="${currentIdx}"]`);
+        if (nav) { nav.classList.add('active'); nav.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
 
-      document.getElementById('btnKembali').disabled = currentIdx === 0;
-      document.getElementById('btnLanjut').disabled  = currentIdx === totalSoal - 1;
-      document.getElementById('counterCurrent').textContent = currentIdx + 1;
+        document.getElementById('btnKembali').disabled = currentIdx === 0;
+        document.getElementById('btnLanjut').disabled  = currentIdx === totalSoal - 1;
+        document.getElementById('counterCurrent').textContent = currentIdx + 1;
+      } catch (e) {
+        backToDashboardKarenaError('updateView', e.message);
+      }
     }
 
-    // ── Navigasi ──
+    // Navigasi 
     document.getElementById('btnKembali').addEventListener('click', () => { if (currentIdx > 0) { currentIdx--; updateView(); } });
     document.getElementById('btnLanjut').addEventListener('click', () => { if (currentIdx < totalSoal - 1) { currentIdx++; updateView(); } });
     document.getElementById('nav-grid').addEventListener('click', e => {
@@ -362,7 +427,10 @@
       updateView();
     });
 
-    // ── Simpan jawaban ──
+    // Kalau gagal simpan ke server (koneksi putus, dll), user diberi
+    // tahu lewat alert tapi TIDAK dipaksa keluar dari ujian — supaya tidak
+    // kehilangan progres cuma karena satu request gagal. Jawaban tetap
+    // tersimpan di jawabanMap lokal dan akan ikut terkirim saat submit selesai.
     document.querySelectorAll('.jawaban-radio').forEach(radio => {
       radio.addEventListener('change', function () {
         const qId = this.dataset.qid;
@@ -377,18 +445,28 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ questionId: qId, jawaban: jaw }),
         })
-        .then(r => r.json())
+        .then(r => {
+          if (!r.ok) throw new Error(`Server merespons status ${r.status} saat menyimpan jawaban.`);
+          return r.json();
+        })
         .then(data => {
           if (data.expired) {
             alert('Waktu ujian sudah habis!');
             window.location.href = '/ujian/selesai-paksa';
           }
         })
-        .catch(err => console.error("Gagal simpan jawaban:", err));
+        .catch(err => {
+          console.error('[UJIAN ERROR @ simpan-jawaban]', err);
+          alert(
+            `Gagal menyimpan jawaban soal nomor ${parseInt(this.dataset.idx) + 1} ke server.\n` +
+            `Detail: ${err.message}\n\n` +
+            `Jawabanmu tetap tersimpan sementara di browser ini — lanjutkan mengerjakan, ` +
+            `lalu pastikan koneksi internet stabil sebelum mengakhiri ujian.`
+          );
+        });
       });
     });
 
-    // ── Timer — dihitung dari endTime yang akurat ──
     const timerEl = document.getElementById('timer');
 
     function formatTimer(diff) {
@@ -401,33 +479,59 @@
     }
 
     const timerInterval = setInterval(() => {
-      const diff = endTime - Date.now();
-      if (diff <= 0) {
+      try {
+        const diff = endTime - Date.now();
+        if (diff <= 0) {
+          clearInterval(timerInterval);
+          timerEl.textContent = "00:00";
+          alert("Waktu habis! Jawaban Anda dikirim otomatis.");
+          submitSelesai();
+          return;
+        }
+        timerEl.textContent = formatTimer(diff);
+        if (diff < 300000) timerEl.classList.add('warning');  // merah di 5 menit terakhir
+      } catch (e) {
         clearInterval(timerInterval);
-        timerEl.textContent = "00:00";
-        alert("Waktu habis! Jawaban Anda dikirim otomatis.");
-        submitSelesai();
-        return;
+        backToDashboardKarenaError('timer', e.message);
       }
-      timerEl.textContent = formatTimer(diff);
-      if (diff < 300000) timerEl.classList.add('warning');  // merah di 5 menit terakhir
     }, 1000);
 
-    // ── Submit selesai ──
+    // Kalau gagal kirim hasil akhir, JANGAN redirect ke /ujian/hasil
+    // seperti sebelumnya (karena hasil belum tentu tersimpan di server — bisa
+    // bikin user lihat halaman hasil yang salah/kosong). Beri tahu lewat alert
+    // dan arahkan ke dashboard supaya user bisa cek status / hubungi admin.
     function submitSelesai() {
       clearInterval(timerInterval);
       fetch('/ujian/selesai', { method: 'POST' })
-        .then(r => r.json())
-        .then(data => { window.location.href = data.redirect || '/ujian/hasil'; })
-        .catch(() => { window.location.href = '/ujian/hasil'; });
+        .then(r => {
+          if (!r.ok) throw new Error(`Server merespons status ${r.status} saat submit ujian.`);
+          return r.json();
+        })
+        .then(data => {
+          if (data.ok === false) {
+            throw new Error('Server menolak menyimpan hasil ujian (sesi mungkin sudah berakhir).');
+          }
+          window.location.href = data.redirect || '/ujian/hasil';
+        })
+        .catch(err => {
+          console.error('[UJIAN ERROR @ submitSelesai]', err);
+          alert(
+            `⚠️ Gagal mengirim hasil ujian ke server.\n` +
+            `Detail: ${err.message}\n\n` +
+            `Kamu akan diarahkan ke dashboard. Jika ujian sudah selesai dikerjakan tapi ` +
+            `hasil tidak muncul, segera hubungi admin agar dicek manual.`
+          );
+          window.location.href = '/dashboardPembayaranUjian?uploadError=' +
+            encodeURIComponent('Gagal mengirim hasil ujian: ' + err.message);
+        });
     }
 
-    // ── Modal selesai ──
+    // Modal selesai 
     const modalSelesai = document.getElementById('modalSelesai');
 
     document.getElementById('btnSelesai').addEventListener('click', () => {
       const dijawab = Object.keys(jawabanMap).length;
-      const belum   = totalSoal - dijawab;
+      const belum = totalSoal - dijawab;
       document.getElementById('modalDijawab').textContent = dijawab;
       document.getElementById('modalBelum').textContent   = belum;
       document.getElementById('modalPesan').textContent   = belum > 0
@@ -446,7 +550,7 @@
       submitSelesai();
     });
 
-    // ── Keamanan: blokir devtools & tab switch ──
+    // Keamanan: blokir devtools & tab switch 
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('keydown', e => {
       if (e.key === 'F12') { e.preventDefault(); return false; }
@@ -467,7 +571,7 @@
       }
     });
 
-    // ── Init ──
+    // Init 
     restoreJawaban();
     updateView();
   </script>
