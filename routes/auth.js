@@ -1,8 +1,8 @@
-const express   = require("express");
-const router    = express.Router();
-const db        = require("../config/db");
+const express = require("express");
+const router = express.Router();
+const db = require("../config/db");
 const rateLimit = require("express-rate-limit");
-const bcrypt    = require("bcrypt");
+const bcrypt = require("bcrypt");
 const SALT_ROUNDS = 10;
 
 // RATE LIMITER — Login
@@ -13,7 +13,7 @@ const loginLimiter = rateLimit({
   legacyHeaders: false,
   skipSuccessfulRequests: true,
   handler: (req, res) => {
-    const resetDate  = new Date(req.rateLimit.resetTime);
+    const resetDate = new Date(req.rateLimit.resetTime);
     const retryAfter = Math.ceil((resetDate.getTime() - Date.now()) / 1000);
     res.status(429).render("login", {
       error: null,
@@ -40,17 +40,14 @@ const registerLimiter = rateLimit({
 async function syncStatusAnggota(userId, email) {
   const [anggota] = await db.query(
     "SELECT id FROM anggota_offline WHERE LOWER(email) = LOWER(?)",
-    [email]
+    [email],
   );
   if (anggota.length > 0) {
     await Promise.all([
-      db.query(
-        "UPDATE users SET is_anggota = 1 WHERE id = ?",
-        [userId]
-      ),
+      db.query("UPDATE users SET is_anggota = 1 WHERE id = ?", [userId]),
       db.query(
         "UPDATE anggota_offline SET user_id = ? WHERE LOWER(email) = LOWER(?)",
-        [userId, email]
+        [userId, email],
       ),
     ]);
     return true;
@@ -69,10 +66,9 @@ router.post("/login", loginLimiter, async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const [rows] = await db.query(
-      "SELECT * FROM users WHERE username = ?",
-      [username]
-    );
+    const [rows] = await db.query("SELECT * FROM users WHERE username = ?", [
+      username,
+    ]);
 
     if (rows.length === 0) {
       return res.status(401).render("login", {
@@ -91,24 +87,24 @@ router.post("/login", loginLimiter, async (req, res) => {
       });
     }
 
-    const user     = rows[0];
+    const user = rows[0];
     const userRole = user.role.toLowerCase();
 
     await syncStatusAnggota(user.id, user.email);
 
     const [fresh] = await db.query(
       "SELECT is_anggota, status_ujian FROM users WHERE id = ?",
-      [user.id]
+      [user.id],
     );
 
     req.session.user = {
-      id:           user.id,
-      username:     user.username,
-      email:        user.email,
-      role:         userRole,
-      expired_at:   user.expired_at,
-      is_active:    user.is_active,
-      is_anggota:   fresh[0].is_anggota,   
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: userRole,
+      expired_at: user.expired_at,
+      is_active: user.is_active,
+      is_anggota: fresh[0].is_anggota,
       status_ujian: fresh[0].status_ujian,
     };
 
@@ -156,14 +152,15 @@ router.post("/register", registerLimiter, async (req, res) => {
 
     const [result] = await db.query(
       "INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, 'users')",
-      [username, hashedPassword, email]
+      [username, hashedPassword, email],
     );
 
-     await syncStatusAnggota(result.insertId, email);
+    await syncStatusAnggota(result.insertId, email);
 
-    res.redirect("/login?success=" + encodeURIComponent(
-      "Registrasi berhasil! Silakan login."
-    ));
+    res.redirect(
+      "/login?success=" +
+        encodeURIComponent("Registrasi berhasil! Silakan login."),
+    );
   } catch (err) {
     console.error("ERROR REGISTER:", err);
     let pesanError = "Gagal registrasi.";
