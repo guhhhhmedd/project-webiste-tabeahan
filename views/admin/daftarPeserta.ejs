@@ -301,12 +301,33 @@
       color: var(--gold);
       border-color: transparent;
     }
+
+    /* [FIX] Info hasil ujian per TO */
+    .exam-info {
+      font-size: 0.62rem;
+      margin-top: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    .exam-score {
+      font-weight: 800;
+      font-family: "Playfair Display", serif;
+      color: var(--gold);
+    }
+
+    .exam-detail {
+      color: var(--muted);
+      font-weight: 600;
+    }
   </style>
 </head>
 
 <body>
 
-  <!-- ===== NAVBAR ===== -->
+  <!-- NAVBAR  -->
   <nav class="adm-nav">
     <div class="max-w-7xl mx-auto px-4 md:px-8 py-3.5 flex justify-between items-center">
       <div class="flex items-center gap-6">
@@ -331,11 +352,12 @@
 
         </div>
       </div>
-      <a href="/logout" class="bg-red-600 hover:bg-red-700 px-5 py-1.5 rounded text-white text-xs font-bold transition">Logout</a>
+      <a href="/logout"
+        class="bg-red-600 hover:bg-red-700 px-5 py-1.5 rounded text-white text-xs font-bold transition">Logout</a>
     </div>
   </nav>
 
-  <!-- ===== MAIN ===== -->
+  <!--  MAIN -->
   <div class="max-w-7xl mx-auto px-4 py-8">
 
     <!-- Header -->
@@ -348,7 +370,7 @@
           ← Dashboard
         </a>
         <h1 style="font-size:1.75rem;font-weight:900;color:var(--dark);margin:0">Daftar Peserta</h1>
-        <p style="font-size:0.875rem;color:var(--muted);margin-top:0.25rem">Verifikasi pembayaran per Try Out</p>
+        <p style="font-size:0.875rem;color:var(--muted);margin-top:0.25rem">Verifikasi pembayaran & hasil ujian per Try Out</p>
       </div>
       <div class="flex items-center gap-3 flex-wrap">
         <% let totalPending=0; users.forEach(u=> {
@@ -429,16 +451,16 @@
                       <th>No</th>
                       <th>Peserta</th>
                       <th>Reset Password</th>
-                      <th>Status Ujian</th>
-                      <th>Pembayaran Per TO</th>
+                      <th>Pembayaran & Hasil Ujian Per TO</th>
                       <th style="text-align:right">Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
 
-                    <% /* ═══════════════════════════════ LOOP UTAMA — satu baris per user
-                      ═══════════════════════════════ */ users.forEach((u, i)=> {
+                    <% /* LOOP UTAMA — satu baris per user
+                       */ users.forEach((u, i)=> {
                       const userPayments = paymentsMap[u.id] || [];
+                      const userRiwayat = riwayatMap[u.id] || {};
 
                       /* Group by paket */
                       const grouped = {};
@@ -498,28 +520,14 @@
                           </form>
                         </td>
 
-                        <!-- Status Ujian -->
-                        <td>
-                          <% if (u.status_ujian==='SELESAI' ) { %>
-                            <span class="badge badge-selesai">Selesai</span>
-                            <p style="font-size:0.75rem;font-weight:800;color:var(--gold);margin-top:0.25rem">Skor: <%=
-                                u.skor || 0 %>
-                            </p>
-                            <% } else if (u.status_ujian==='SEDANG_UJIAN' ) { %>
-                              <span class="badge badge-pending">Ujian</span>
-                              <% } else { %>
-                                <span class="badge badge-idle">Idle</span>
-                                <% } %>
-                        </td>
-
-                        <!-- Pembayaran Per TO -->
-                        <td style="min-width:320px">
+                        <!-- Pembayaran & Hasil Ujian Per TO -->
+                        <td style="min-width:340px">
                           <% if (userPayments.length===0) { %>
                             <p style="font-size:0.7rem;font-style:italic;color:var(--muted)">Belum ada pembayaran</p>
                             <% } else { %>
 
-                              <% /* ───────────────────────────────── LOOP PAKET — group per nama paket
-                                ───────────────────────────────── */ Object.keys(grouped).forEach(namaP=> {
+                              <% /* LOOP PAKET — group per nama paket
+                                 */ Object.keys(grouped).forEach(namaP=> {
                                 const paysInPaket = grouped[namaP];
                                 paysInPaket.sort((a, b) => a.nomor_to - b.nomor_to);
                                 const lCount = paysInPaket.filter(p => p.status.toUpperCase() === 'LUNAS').length;
@@ -549,9 +557,11 @@
                                     </div>
                                   </div>
 
-                                  <% /* ───────────────────────── LOOP TO — baris per nomor TO ─────────────────────────
+                                  <% /* LOOP TO — baris per nomor TO 
                                     */ paysInPaket.forEach(pay=> {
                                     const st = pay.status.toUpperCase();
+                                    // [FIX] Ambil hasil ujian spesifik untuk paket + nomor_to ini
+                                    const examResult = userRiwayat[`${pay.paket}|${pay.nomor_to}`] || null;
                                     %>
                                     <div class="to-row">
 
@@ -571,6 +581,25 @@
                                             style="margin-top:2px;display:inline-block">
                                             <%= pay.status %>
                                           </span>
+
+                                          <% if (st==='LUNAS' || st==='SELESAI') { %>
+                                            <% if (examResult) { %>
+                                              <div class="exam-info">
+                                                <span class="badge badge-selesai">Selesai</span>
+                                                <span class="exam-score">Skor <%= examResult.skor %></span>
+                                                <span class="exam-detail">(<%= examResult.jml_benar %>/<%= examResult.jml_soal %>)</span>
+                                              </div>
+                                              <% if (examResult.tgl_selesai) { %>
+                                                <p style="font-size:0.58rem;color:var(--muted);margin:0.1rem 0 0 0">
+                                                  <%= new Date(examResult.tgl_selesai).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }) %>
+                                                </p>
+                                              <% } %>
+                                            <% } else { %>
+                                              <div class="exam-info">
+                                                <span class="badge badge-idle">Belum Ujian</span>
+                                              </div>
+                                            <% } %>
+                                          <% } %>
                                         </div>
                                       </div>
 
@@ -618,19 +647,16 @@
                                                         <form action="/admin/delete-payment" method="POST"
                                                           class="confirm-delete-payment" style="display:inline">
                                                           <input type="hidden" name="paymentId" value="<%= pay.id %>">
-                                                          <button type="submit"
-                                                            style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:0.85rem;padding:0.2rem 0.35rem;border-radius:5px;transition:all 0.2s"
-                                                            onmouseover="this.style.background='rgba(220,38,38,0.08)';this.style.color='#b91c1c'"
-                                                            onmouseout="this.style.background='none';this.style.color='var(--muted)'"
+                                                          <button type="submit" class="btn-reject" style="background:rgba(220,38,38,0.08);color:#b91c1c;border:1px solid rgba(220,38,38,0.18)"
                                                             title="Hapus riwayat TO ini">hapus</button>
                                                         </form>
                                           </div>
 
                                     </div>
-                                    <% }) /* ── END LOOP TO ── */ %>
+                                    <% }) /* END LOOP TO */ %>
 
                                 </div>
-                                <% }) /* ── END LOOP PAKET ── */ %>
+                                <% }) /* END LOOP PAKET*/ %>
 
                                   <% } /* end else userPayments.length */ %>
                         </td>
@@ -649,7 +675,7 @@
                         </td>
 
                       </tr>
-                      <% }) /* ══ END LOOP UTAMA ══ */ %>
+                      <% }) /* END LOOP UTAMA  */ %>
 
                   </tbody>
                 </table>
@@ -672,7 +698,6 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      // ── State ──
       let activeFilter = 'all';
       let searchQuery = '';
 
@@ -705,7 +730,6 @@
             textName.includes(searchQuery) ||
             textEmail.includes(searchQuery);
 
-          // Eksekusi Tampilan
           if (matchFilter && matchSearch) {
             row.style.display = '';
             visible++;
@@ -714,7 +738,6 @@
           }
         });
 
-        // Update Counter
         if (searchQuery !== '') {
           counter.style.display = 'block';
           counter.textContent = `${visible} peserta ditemukan untuk "${searchQuery}"`;
@@ -726,7 +749,6 @@
       // Event Listener untuk Tabs
       filterTabs.forEach(tab => {
         tab.addEventListener('click', function () {
-          // Update UI Tombol
           filterTabs.forEach(t => t.classList.remove('active'));
           this.classList.add('active');
 
@@ -743,9 +765,6 @@
           applyFilters();
         });
       }
-
-      // --- Logika Konfirmasi (Verify, Reject, dll tetap sama) ---
-      // ... (masukkan kode confirm-verify dkk kamu di sini)
     });
   </script>
 
