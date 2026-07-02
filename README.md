@@ -99,15 +99,54 @@ Aplikasi akan berjalan di `http://localhost:3000` (atau sesuai `PORT` di `.env`)
 
 ```
 .
-├── app.js                    # Titik masuk utama aplikasi
+├── app.js                          # Titik masuk utama aplikasi
+├── database.sql                    # Skema & data awal database
+├── migration_scoring.sql           # Migrasi skema untuk sistem scoring
+├── migrate-add-gambar-soal.js      # Script migrasi: tambah kolom gambar di soal
+├── migrate-fix-jawaban-peserta.js  # Script migrasi: perbaikan data jawaban peserta
+├── migrate-fix-jawaban-v2.js       # Script migrasi: revisi lanjutan jawaban peserta
+├── migrate-paket-to.js             # Script migrasi: struktur paket & try out
+├── migrate-passwords.js            # Script migrasi: hashing/reset password
+├── migrate-riwayat-subtest.js      # Script migrasi: riwayat skor per subtes
+├── reset-status.js                 # Script util: reset status_ujian user
+│
 ├── config/
-│   └── db.js                 # Koneksi pool database
-├── routes/                   # Logika routing (auth, admin, ujian, dashboard)
-├── views/                    # Template tampilan (EJS)
-├── public/
-│   └── uploads/
-│       └── bukti/            # Penyimpanan bukti transfer peserta
-└── database.sql              # Skema & data awal database
+│   └── db.js                       # Koneksi pool database
+│
+├── routes/
+│   ├── admin.js                    # Route admin: kelola soal, peserta, paket, dsb
+│   ├── auth.js                     # Route login, register, logout
+│   ├── ujian.js                    # Route alur ujian: mulai, soal, submit, hasil
+│   └── users.js                    # Route dashboard & profil peserta
+│
+├── views/
+│   ├── admin/                      # Template halaman admin
+│   │   ├── anggota.ejs
+│   │   ├── daftarPeserta.ejs
+│   │   ├── dashboardAdmin.ejs
+│   │   ├── editSoal.ejs
+│   │   ├── kelolaSoal.ejs
+│   │   └── rankUjian.ejs
+│   ├── users/                      # Template halaman peserta
+│   │   ├── dashboard.ejs
+│   │   ├── dashboardPembayaranUjian.ejs
+│   │   └── profil.ejs
+│   ├── globalStyle.css
+│   ├── landing.ejs
+│   ├── login.ejs
+│   ├── privacy.ejs
+│   ├── register.ejs
+│   ├── reviewJawaban.ejs
+│   ├── terms.ejs
+│   └── ujian-soal.ejs              # Halaman pengerjaan soal saat ujian berlangsung
+│
+└── public/
+    ├── asset/                      # Logo, banner, gambar landing page
+    ├── css/
+    │   └── style.css
+    ├── images/
+    ├── uploads/                    # Bukti transfer & gambar soal ter-upload
+    └── templateSoal.xlsx           # Template import soal via Excel
 ```
 
 ---
@@ -142,7 +181,7 @@ Aplikasi akan berjalan di `http://localhost:3000` (atau sesuai `PORT` di `.env`)
 ## 📌 Catatan Sebelum Push
 
 - **`database.sql`** — pastikan file ini hasil export **terbaru** dari MySQL lokal kamu (sudah termasuk kolom `pembahasan` dan `bobot_a`–`bobot_e`), supaya siapa pun yang clone project dapat skema yang sinkron dengan kode.
-- **Folder upload kosong** — Git tidak melacak folder kosong. Tambahkan file `.gitkeep` di dalam `public/uploads/bukti/` supaya folder tersebut ikut ter-push meski belum ada isinya.
+- **Folder upload kosong** — Git tidak melacak folder kosong. Tambahkan file `.gitkeep` di dalam `public/uploads/` (dan subfoldernya, misal `bukti/` serta `soal/`) supaya folder tersebut ikut ter-push meski belum ada isinya.
 
 ---
 
