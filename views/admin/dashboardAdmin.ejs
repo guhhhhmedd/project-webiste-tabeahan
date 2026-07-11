@@ -416,7 +416,7 @@
                       <form action="/admin/upload-soal" method="POST" enctype="multipart/form-data"
                         id="formImportExcel">
 
-                        <!-- Drop zone besar -->
+                        <!-- Drop zone soal-->
                         <div class="drop-zone" id="dropZoneExcel" style="padding:2rem;cursor:pointer"
                           onclick="document.getElementById('fileExcelInput').click()">
                           <div style="font-size:2.5rem;margin-bottom:0.75rem">📂</div>
@@ -676,7 +676,7 @@
               </div>
 
               <script>
-                // ── File input display ──
+                //  File input display 
                 const fileInput = document.getElementById('fileExcelInput');
                 const fileDisplay = document.getElementById('fileNameDisplay');
                 const dropZone = document.getElementById('dropZoneExcel');
@@ -684,14 +684,14 @@
                 if (fileInput) {
                   fileInput.addEventListener('change', function () {
                     if (this.files[0]) {
-                      fileDisplay.textContent = '✅ ' + this.files[0].name;
+                      fileDisplay.textContent = this.files[0].name;
                       fileDisplay.classList.remove('hidden');
                       dropZone.style.borderColor = '#16a34a';
                     }
                   });
                 }
 
-                // ── Toggle format kolom ──
+                //  Toggle format kolom 
                 const toggleBtn = document.getElementById('toggleFormat');
                 const formatDetail = document.getElementById('formatDetail');
                 const toggleIcon = document.getElementById('toggleIcon');
@@ -703,7 +703,7 @@
                   });
                 }
 
-                // ── Toast ──
+                // Toast 
                 function showToast(msg) {
                   const t = document.getElementById('toast');
                   if (!t) return;
@@ -719,8 +719,8 @@
                 document.querySelectorAll('form').forEach(form => {
                   form.addEventListener('submit', () => {
                     const a = form.action;
-                    if (a.includes('upload-soal')) showToast('📂 Memproses file Excel...');
-                    if (a.includes('update-config-paket')) showToast('⚙️ Konfigurasi Paket Berhasil Disimpan!');
+                    if (a.includes('upload-soal')) showToast(' Memproses file Excel...');
+                    if (a.includes('update-config-paket')) showToast(' Konfigurasi Paket Berhasil Disimpan!');
                   });
                 });
 
