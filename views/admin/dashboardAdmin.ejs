@@ -881,8 +881,8 @@
                   });
                 });
 
-                const chartLabels = <% - JSON.stringify(chartData.labels || []) %>;
-                const chartValues = <% - JSON.stringify(chartData.values || []) %>;
+                const chartLabels = <%- JSON.stringify(chartData.labels || []) %>;
+                const chartValues = <%- JSON.stringify(chartData.values || []) %>;
 
                 const ctx = document.getElementById('userChart').getContext('2d');
                 new Chart(ctx, {
