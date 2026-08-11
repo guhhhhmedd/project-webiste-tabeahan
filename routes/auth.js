@@ -164,8 +164,15 @@ router.post("/register", registerLimiter, async (req, res) => {
   } catch (err) {
     console.error("ERROR REGISTER:", err);
     let pesanError = "Gagal registrasi.";
-    if (err.code === "ER_DUP_ENTRY")
-      pesanError = "Username atau Email sudah terdaftar!";
+    if (err.code === "ER_DUP_ENTRY") {
+      if (err.sqlMessage && err.sqlMessage.includes("email")) {
+        pesanError = "Email sudah terdaftar!";
+      } else if (err.sqlMessage && err.sqlMessage.includes("username")) {
+        pesanError = "Username sudah terdaftar!";
+      } else {
+        pesanError = "Username atau Email sudah terdaftar!";
+      }
+    }
     res.render("register", { err: pesanError });
   }
 });

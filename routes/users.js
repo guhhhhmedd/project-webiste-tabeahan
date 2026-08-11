@@ -11,7 +11,7 @@ function isLogin(req, res, next) {
   res.redirect("/login");
 }
 
-// MULTER — upload bukti transfer (SECURE VERSION)
+// MULTER — upload bukti transfer 
 const storageBukti = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadPath = path.join(process.cwd(), "public", "uploads", "bukti");
@@ -406,11 +406,7 @@ router.get("/profil", isLogin, async (req, res) => {
 });
 
 // POST /upload-bukti
-router.post(
-  "/upload-bukti",
-  isLogin,
-  uploadBukti.single("bukti"),
-  async (req, res) => {
+router.post("/upload-bukti", isLogin, uploadBukti.single("bukti"), async (req, res) => {
     const { paket_pilihan, nomor_to } = req.body;
     const userId = req.session.user.id;
     const buktiFilename = req.file ? req.file.filename : null;

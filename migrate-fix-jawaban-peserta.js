@@ -8,7 +8,7 @@ const db = require('./config/db');
 
 async function migrate() {
   try {
-    console.log('⏳ Memperbarui tabel jawaban_peserta...');
+    console.log(' Memperbarui tabel jawaban_peserta...');
 
     // 1. Tambah kolom paket (jika belum ada)
     await db.query(`
@@ -49,12 +49,12 @@ async function migrate() {
       console.log('  → Index idx_jawaban_sesi sudah ada, dilewati.');
     });
 
-    console.log('✅ Tabel jawaban_peserta berhasil diperbarui!');
-    console.log('   Kolom baru: paket, nomor_to');
-    console.log('   UNIQUE KEY baru: (user_id, paket, nomor_to, question_id)');
+    console.log(' Tabel jawaban_peserta berhasil diperbarui!');
+    console.log(' Kolom baru: paket, nomor_to');
+    console.log(' UNIQUE KEY baru: (user_id, paket, nomor_to, question_id)');
     process.exit(0);
   } catch (err) {
-    console.error('❌ Gagal migrasi:', err.message);
+    console.error(' Gagal migrasi:', err.message);
     process.exit(1);
   }
 }

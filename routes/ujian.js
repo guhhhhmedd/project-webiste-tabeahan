@@ -94,7 +94,7 @@ router.post("/mulai", isLogin, async (req, res) => {
 
     const paymentId = payment.length > 0 ? payment[0].id : null;
 
-    if (paymentId) {
+    if (paymentId && !isAnggota) {
       const tokenAsli = (payment[0].token_ujian || "").trim().toUpperCase();
       const tokenInput = (token_input || "").trim().toUpperCase();
 

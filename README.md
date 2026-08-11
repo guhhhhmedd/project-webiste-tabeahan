@@ -1,10 +1,10 @@
-# 📘 Ujian CAT Web — Tabeahan Cendekia
+# Ujian CAT Web — Tabeahan Cendekia
 
 Aplikasi simulasi ujian **CAT (Computer Assisted Test)** yang mendukung berbagai jenis paket ujian seperti SKD/TKD, Akademik POLRI, dan PPPK, lengkap dengan sistem penilaian dinamis dan passing grade otomatis.
 
 ---
 
-## 🚀 Fitur Utama
+##  Fitur Utama
 
 | Fitur | Deskripsi |
 |---|---|
@@ -16,7 +16,7 @@ Aplikasi simulasi ujian **CAT (Computer Assisted Test)** yang mendukung berbagai
 
 ---
 
-## 🛠️ Stack Teknologi
+##  Stack Teknologi
 
 - **Backend** — Node.js, Express.js
 - **Frontend** — EJS (Embedded JavaScript Templates), Tailwind CSS
@@ -26,7 +26,7 @@ Aplikasi simulasi ujian **CAT (Computer Assisted Test)** yang mendukung berbagai
 
 ---
 
-## 💻 Cara Menjalankan Project (Local Setup)
+## Cara Menjalankan Project (Local Setup)
 
 ### 1. Clone Repository
 
@@ -95,12 +95,13 @@ Aplikasi akan berjalan di `http://localhost:3000` (atau sesuai `PORT` di `.env`)
 
 ---
 
-## 📂 Struktur Project
+##  Struktur Project
 
 ```
 .
 ├── app.js                          # Titik masuk utama aplikasi
 ├── database.sql                    # Skema & data awal database
+├── .env                            # kunci koneksi database(pastikan isi dari file env sesuai dengan format diatas)
 ├── migration_scoring.sql           # Migrasi skema untuk sistem scoring
 ├── migrate-add-gambar-soal.js      # Script migrasi: tambah kolom gambar di soal
 ├── migrate-fix-jawaban-peserta.js  # Script migrasi: perbaikan data jawaban peserta
@@ -151,7 +152,7 @@ Aplikasi akan berjalan di `http://localhost:3000` (atau sesuai `PORT` di `.env`)
 
 ---
 
-## 📝 Aturan Penilaian
+##  Aturan Penilaian
 
 **Paket SKD/TKD**
 - TWK & TIU — Benar `+5`, Salah `0`
@@ -168,7 +169,7 @@ Aplikasi akan berjalan di `http://localhost:3000` (atau sesuai `PORT` di `.env`)
 
 ---
 
-## ⚠️ Troubleshooting
+##  Troubleshooting
 
 | Masalah | Solusi |
 |---|---|
@@ -178,13 +179,13 @@ Aplikasi akan berjalan di `http://localhost:3000` (atau sesuai `PORT` di `.env`)
 
 ---
 
-## 📌 Catatan Sebelum Push
+##  Catatan Sebelum Push
 
 - **`database.sql`** — pastikan file ini hasil export **terbaru** dari MySQL lokal kamu (sudah termasuk kolom `pembahasan` dan `bobot_a`–`bobot_e`), supaya siapa pun yang clone project dapat skema yang sinkron dengan kode.
 - **Folder upload kosong** — Git tidak melacak folder kosong. Tambahkan file `.gitkeep` di dalam `public/uploads/` (dan subfoldernya, misal `bukti/` serta `soal/`) supaya folder tersebut ikut ter-push meski belum ada isinya.
 
 ---
 
-## 👨‍💻 Developer
+##  Developer
 
-Project ini dikembangkan untuk sistem simulasi ujian **Tabeahan Cendekia**.
+Project ini dikembangkan untuk sistem simulasi ujian dan pelatihan dalam tes penilaian CPNS **Tabeahan Cendekia**.

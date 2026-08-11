@@ -38,7 +38,7 @@
       font-family: "Playfair Display", serif;
     }
 
-    .adm-nav {
+     .adm-nav {
       background: var(--red-deep);
       border-bottom: 1px solid rgba(200, 160, 32, 0.25);
       position: sticky;
@@ -54,11 +54,96 @@
       text-transform: uppercase;
       letter-spacing: 0.12em;
       transition: color 0.2s;
+      text-decoration: none;
     }
 
     .adm-nav-link:hover,
     .adm-nav-link.active {
       color: var(--gold);
+    }
+
+    .hamburger-btn {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      width: 2.25rem;
+      height: 2.25rem;
+      background: rgba(200, 160, 32, 0.12);
+      border: 1px solid rgba(200, 160, 32, 0.25);
+      border-radius: 8px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .hamburger-btn span {
+      display: block;
+      width: 16px;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 2px;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    .hamburger-btn.open span:nth-child(1) {
+      transform: translateY(6px) rotate(45deg);
+    }
+
+    .hamburger-btn.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger-btn.open span:nth-child(3) {
+      transform: translateY(-6px) rotate(-45deg);
+    }
+
+    .mobile-nav-panel {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--red-deep);
+      border-bottom: 1px solid rgba(200, 160, 32, 0.25);
+      box-shadow: 0 8px 20px rgba(90, 10, 10, 0.25);
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .mobile-nav-panel.open {
+      max-height: 320px;
+    }
+
+    .mobile-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.25rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.75);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .mobile-nav-link:last-child {
+      border-bottom: none;
+    }
+
+    .mobile-nav-link:hover,
+    .mobile-nav-link.active {
+      background: rgba(200, 160, 32, 0.1);
+      color: var(--gold);
+    }
+
+    @media (max-width: 767px) {
+      .hamburger-btn {
+        display: flex;
+      }
     }
 
     .tbl-card {
@@ -328,11 +413,11 @@
 <body>
 
   <!-- NAVBAR  -->
-  <nav class="adm-nav">
+   <nav class="adm-nav relative">
     <div class="max-w-7xl mx-auto px-4 md:px-8 py-3.5 flex justify-between items-center">
       <div class="flex items-center gap-6">
         <div class="flex items-center gap-2.5">
-          <img src="../asset/logo.png" alt="Logo" class="h-9 w-auto">
+          <img src="/asset/logo.png" alt="Logo" class="h-9 w-auto">
           <div>
             <span
               style="font-family:'Playfair Display',serif;color:white;font-size:1rem;font-weight:700;display:block;line-height:1.2">
@@ -344,16 +429,35 @@
             </span>
           </div>
         </div>
-        <div class="hidden md:flex gap-5">
+        <!-- Desktop nav links -->
+        <div class="hidden md:flex gap-5 items-center">
           <a href="/dashboardAdmin" class="adm-nav-link">Dashboard</a>
-          <a href="/admin/daftarPeserta" class="adm-nav-link active">Peserta Ujian</a>
+          <a href="/admin/daftarPeserta" class="adm-nav-link">Peserta Ujian</a>
           <a href="/admin/anggota" class="adm-nav-link">Anggota Gratis</a>
-          <a href="/admin/rankUjian" class="adm-nav-link">Rangking</a>
-
+          <a href="/admin/rankUjian" class="adm-nav-link active">Rangking</a>
         </div>
       </div>
-      <a href="/logout"
-        class="bg-red-600 hover:bg-red-700 px-5 py-1.5 rounded text-white text-xs font-bold transition">Logout</a>
+
+      <div class="flex items-center gap-3">
+        <a href="/logout"
+          class="hidden md:inline-block bg-red-600 hover:bg-red-700 px-5 py-1.5 rounded text-xs text-white font-bold transition">Logout</a>
+
+        <!-- Hamburger button (mobile only) -->
+        <button type="button" id="hamburgerBtn" class="hamburger-btn" aria-label="Buka menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile dropdown panel -->
+    <div id="mobileNavPanel" class="mobile-nav-panel">
+      <a href="/dashboardAdmin" class="mobile-nav-link"> Dashboard</a>
+      <a href="/admin/daftarPeserta" class="mobile-nav-link"> Peserta Ujian</a>
+      <a href="/admin/anggota" class="mobile-nav-link"> Anggota Gratis</a>
+      <a href="/admin/rankUjian" class="mobile-nav-link active"> Rangking</a>
+      <a href="/logout" class="mobile-nav-link" style="color:#fca5a5"> Logout</a>
     </div>
   </nav>
 

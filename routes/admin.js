@@ -105,7 +105,7 @@ router.get("/dashboardAdmin", isAdmin, async (req, res) => {
         COUNT(*) AS total_users,
         SUM(CASE WHEN DATE(create_at) = CURDATE() THEN 1 ELSE 0 END) AS today_users,
         SUM(CASE WHEN status_ujian = 'SEDANG_UJIAN' THEN 1 ELSE 0 END) AS active_exam,
-        SUM(CASE WHEN status_ujian = 'SELESAI'      THEN 1 ELSE 0 END) AS finished_exam
+        SUM(CASE WHEN status_ujian = 'SELESAI' THEN 1 ELSE 0 END) AS finished_exam
       FROM users WHERE role != 'admin'
     `);
 
@@ -342,8 +342,6 @@ router.get("/admin/kelola-soal/:paket", isAdmin, async (req, res) => {
 });
 
 // GET /admin/editSoal/:id
-// [FIX #1] Tambah query materiList dan kirim ke view supaya dropdown materi
-// tidak lagi hardcoded di file .ejs
 
 router.get("/admin/editSoal/:id", isAdmin, async (req, res) => {
   try {
@@ -446,10 +444,7 @@ router.post("/admin/reject/:paymentId", isAdmin, async (req, res) => {
 
 // POST /admin/tambah-soal
 
-router.post(
-  "/admin/tambah-soal",
-  isAdmin,
-  (req, res, next) => {
+router.post("/admin/tambah-soal", isAdmin, (req, res, next) => {
     cpUploadSoal(req, res, (err) => {
       if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE")
         return res.redirect(
@@ -485,8 +480,6 @@ router.post(
       bobot_e,
     } = req.body;
     try {
-      // [FIX] Cek duplikat manual (bukan lewat ER_DUP_ENTRY karena tidak ada
-      // UNIQUE constraint di kolom nomor_urut pada tabel questions)
       const [dup] = await db.query(
         "SELECT id FROM questions WHERE paket = ? AND nomor_to = ? AND nomor_urut = ?",
         [paket, nomor_to, nomor_urut],
@@ -544,14 +537,8 @@ router.post(
 );
 
 // POST /admin/updateSoal
-// [FIX #2] Cek duplikat nomor_urut sebelum UPDATE (exclude id sendiri)
-// [FIX #3] catch block tidak lagi res.status(500).send(...) supaya tidak blank page,
-// sekarang redirect balik ke halaman kelola-soal dengan pesan error
 
-router.post(
-  "/admin/updateSoal",
-  isAdmin,
-  (req, res, next) => {
+router.post("/admin/updateSoal", isAdmin, (req, res, next) => {
     cpUploadSoal(req, res, (err) => {
       const to = req.body.nomor_to || 1;
       const paket = req.body.paket || "";
@@ -590,7 +577,6 @@ router.post(
     const back = `/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}`;
 
     try {
-      // [FIX #2] Cek duplikat nomor_urut di paket+TO yang sama, kecuali soal ini sendiri
       const [dup] = await db.query(
         "SELECT id FROM questions WHERE paket = ? AND nomor_to = ? AND nomor_urut = ? AND id <> ?",
         [paket, nomor_to, nomor_urut, id],
@@ -654,7 +640,6 @@ router.post(
       res.redirect(back + "&message=Soal+berhasil+diupdate");
     } catch (err) {
       console.error(err);
-      // [FIX #3] Jangan blank page — redirect balik dengan pesan error
       res.redirect(back + "&error=Gagal+update+soal");
     }
   },
@@ -662,11 +647,7 @@ router.post(
 
 // POST /admin/upload-soal (import Excel)
 
-router.post(
-  "/admin/upload-soal",
-  isAdmin,
-  uploadExcel.single("fileExcel"),
-  async (req, res) => {
+router.post("/admin/upload-soal", isAdmin, uploadExcel.single("fileExcel"), async (req, res) => {
     if (!req.file) return res.status(400).send("File tidak ditemukan.");
     try {
       const rows = XLSX.utils.sheet_to_json(
@@ -688,7 +669,6 @@ router.post(
           continue;
         }
 
-        // [FIX] Cek duplikat manual karena tidak ada UNIQUE constraint di DB
         const [dup] = await db.query(
           "SELECT id FROM questions WHERE paket = ? AND nomor_to = ? AND nomor_urut = ?",
           [paket, nomorTo, row.nomor_urut],
@@ -749,12 +729,8 @@ router.post(
 );
 
 // POST /admin/tambah-soal-manual
-// [FIX #4] Cek duplikat nomor_urut sebelum INSERT
 
-router.post(
-  "/admin/tambah-soal-manual",
-  isAdmin,
-  (req, res, next) => {
+router.post("/admin/tambah-soal-manual", isAdmin, (req, res, next) => {
     cpUploadSoal(req, res, (err) => {
       const to = req.body.nomor_to || 1;
       const paket = req.body.paket || "";
@@ -792,7 +768,6 @@ router.post(
     const back = `/admin/kelola-soal/${encodeURIComponent(paket)}?to=${nomor_to}`;
 
     try {
-      // [FIX #4] Cek duplikat nomor_urut di paket+TO yang sama sebelum insert
       const [dup] = await db.query(
         "SELECT id FROM questions WHERE paket = ? AND nomor_to = ? AND nomor_urut = ?",
         [paket, nomor_to, nomor_urut],
@@ -1283,10 +1258,7 @@ router.post("/admin/passing-grade/subtest/save", isAdmin, async (req, res) => {
 });
 
 // POST /admin/passing-grade/subtest/delete
-router.post(
-  "/admin/passing-grade/subtest/delete",
-  isAdmin,
-  async (req, res) => {
+router.post("/admin/passing-grade/subtest/delete", isAdmin, async (req, res) => {
     const { id, redirect_to } = req.body;
     const back = redirect_to || "/dashboardAdmin";
     try {
